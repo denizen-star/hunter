@@ -229,6 +229,80 @@
         .hidden {
             display: none;
         }
+        
+        /* Application Dropdown Styles */
+        .application-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .application-dropdown-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        .application-dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .application-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .application-dropdown-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .application-dropdown-item .company {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .application-dropdown-item .job-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .application-dropdown-item .app-id {
+            color: #999;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -242,6 +316,7 @@
             <a href="/dashboard" target="_blank">📊 View Dashboard</a>
             <a href="#" onclick="checkOllama(); return false;">🔍 Check AI Status</a>
             <a href="#" onclick="showResumeManager(); return false;">📄 Manage Resume</a>
+            <a href="#" onclick="showStatusUpdate(); return false;">📝 Update Status</a>
         </div>
         
         <div id="status-banner" class="status-banner hidden"></div>
@@ -336,6 +411,58 @@
             <div style="display: flex; gap: 15px;">
                 <button class="btn" onclick="saveResume()">Save Resume</button>
                 <button class="btn btn-secondary" onclick="hideResumeManager()">Cancel</button>
+            </div>
+        </div>
+        
+        <!-- Status Update Module (hidden by default) -->
+        <div class="card hidden" id="status-update-module">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px;">
+                <div style="width: 24px; height: 24px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: white; font-size: 12px; font-weight: bold;">📊</span>
+                </div>
+                <h2 style="margin: 0; color: #333;">Update Status</h2>
+            </div>
+            
+            <hr style="border: none; height: 1px; background: #e9ecef; margin-bottom: 30px;">
+            
+            <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
+                <div class="form-group">
+                    <label for="application_search">Application ID</label>
+                    <input type="text" id="application_search" placeholder="Search or select application ID..." autocomplete="off">
+                    <div id="application_dropdown" class="application-dropdown hidden"></div>
+                    <small>Start typing to search applications by company, job title, or ID</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_status">New Status</label>
+                    <select id="new_status" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="Pending">⏳ Pending</option>
+                        <option value="Applied">✉️ Applied</option>
+                        <option value="Contacted Someone">👥 Contacted Someone</option>
+                        <option value="Contacted Hiring Manager">👔 Contacted Hiring Manager</option>
+                        <option value="Interviewed">🎤 Interviewed</option>
+                        <option value="Offered">🎉 Offered</option>
+                        <option value="Rejected">❌ Rejected</option>
+                        <option value="Accepted">✅ Accepted</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status_notes">Notes (Optional)</label>
+                    <textarea id="status_notes" placeholder="Add notes about this status update..." style="min-height: 120px; resize: vertical;"></textarea>
+                </div>
+                
+                <button type="submit" class="btn" style="background: #fd7e14; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                    <div style="width: 16px; height: 16px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 2px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-size: 8px;">📊</span>
+                    </div>
+                    Update Status
+                </button>
+            </form>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="hideStatusUpdate()">Cancel</button>
             </div>
         </div>
     </div>
@@ -505,6 +632,143 @@
                 if (result.success) {
                     showStatus('✅ Resume saved successfully!', 'success');
                     hideResumeManager();
+                } else {
+                    showStatus(`❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Status Update Module Functions
+        let selectedApplicationId = null;
+        let searchTimeout = null;
+        
+        async function showStatusUpdate() {
+            document.getElementById('application-form').classList.add('hidden');
+            document.getElementById('resume-manager').classList.add('hidden');
+            document.getElementById('status-update-module').classList.remove('hidden');
+            
+            // Reset form
+            document.getElementById('statusUpdateForm').reset();
+            selectedApplicationId = null;
+            document.getElementById('application_dropdown').classList.add('hidden');
+            
+            // Add event listeners
+            const searchInput = document.getElementById('application_search');
+            searchInput.addEventListener('input', handleApplicationSearch);
+            searchInput.addEventListener('blur', () => {
+                // Delay hiding dropdown to allow clicks
+                setTimeout(() => {
+                    document.getElementById('application_dropdown').classList.add('hidden');
+                }, 200);
+            });
+            searchInput.addEventListener('focus', () => {
+                if (document.getElementById('application_dropdown').children.length > 0) {
+                    document.getElementById('application_dropdown').classList.remove('hidden');
+                }
+            });
+        }
+        
+        function hideStatusUpdate() {
+            document.getElementById('status-update-module').classList.add('hidden');
+            document.getElementById('application-form').classList.remove('hidden');
+        }
+        
+        async function handleApplicationSearch(event) {
+            const query = event.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                if (query.length < 2) {
+                    document.getElementById('application_dropdown').classList.add('hidden');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/api/applications/search?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        displayApplicationDropdown(data.applications);
+                    }
+                } catch (error) {
+                    console.error('Error searching applications:', error);
+                }
+            }, 300);
+        }
+        
+        function displayApplicationDropdown(applications) {
+            const dropdown = document.getElementById('application_dropdown');
+            dropdown.innerHTML = '';
+            
+            if (applications.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'application-dropdown-item';
+                noResults.textContent = 'No applications found';
+                noResults.style.color = '#999';
+                noResults.style.fontStyle = 'italic';
+                dropdown.appendChild(noResults);
+            } else {
+                applications.forEach(app => {
+                    const item = document.createElement('div');
+                    item.className = 'application-dropdown-item';
+                    item.innerHTML = `
+                        <div class="company">${app.company}</div>
+                        <div class="job-title">${app.job_title}</div>
+                        <div class="app-id">${app.id}</div>
+                    `;
+                    item.addEventListener('click', () => selectApplication(app));
+                    dropdown.appendChild(item);
+                });
+            }
+            
+            dropdown.classList.remove('hidden');
+        }
+        
+        function selectApplication(app) {
+            selectedApplicationId = app.id;
+            document.getElementById('application_search').value = `${app.company} - ${app.job_title}`;
+            document.getElementById('application_dropdown').classList.add('hidden');
+        }
+        
+        async function submitStatusUpdate(event) {
+            event.preventDefault();
+            
+            if (!selectedApplicationId) {
+                showStatus('❌ Please select an application first', 'error');
+                return;
+            }
+            
+            const status = document.getElementById('new_status').value;
+            const notes = document.getElementById('status_notes').value;
+            
+            if (!status) {
+                showStatus('❌ Please select a status', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/applications/${selectedApplicationId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        notes: notes || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ Status updated to ${status} successfully!`, 'success');
+                    hideStatusUpdate();
+                    
+                    // Reset form
+                    document.getElementById('statusUpdateForm').reset();
+                    selectedApplicationId = null;
                 } else {
                     showStatus(`❌ Error: ${result.error}`, 'error');
                 }

@@ -1,5 +1,32 @@
 # Changelog
 
+## Version 1.5.0 - October 13, 2025
+
+### ✅ Enhanced Qualification Analysis (NEW)
+**Feature:** Comprehensive feature counting and technology analysis
+- Added feature count tracking across all analysis sections
+- New Technologies & Tools section with detailed matching
+- Weighted match score calculation (Technologies: 30% weight)
+- Missing technology identification and tracking
+- Visual indicators (✓/✗) for quick technology assessment
+
+**Files Changed:**
+- `app/utils/prompts.py` - Enhanced AI prompts
+- `app/models/qualification.py` - Added features_compared field
+- `app/services/ai_analyzer.py` - Updated parsers
+- All qualification files updated with new format
+
+**Impact:** More accurate match scores, better technology gap analysis, improved transparency
+
+### ✅ Summary Generation Fix (FIXED)
+**Issue:** Fundraise-Down application missing summary page
+**Solution:** Generated missing summary with proper match score integration
+**Files Changed:**
+- `data/applications/Fundraise-Down-Head-of-data/20251013164318-Summary-Fundraise-Down-Head-of-data.html`
+- `data/output/index.html` - Updated dashboard
+
+---
+
 ## Version 1.0.1 - October 13, 2025
 
 ### ✅ Issue #1: Increased Context Window (FIXED)

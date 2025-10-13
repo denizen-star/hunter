@@ -94,6 +94,12 @@ class AIAnalyzer:
         if score_match:
             match_score = float(score_match.group(1))
         
+        # Extract features compared count
+        features_compared = 0
+        features_match = re.search(r'Features Compared:?\s*(\d+)', response, re.IGNORECASE)
+        if features_match:
+            features_compared = int(features_match.group(1))
+        
         # Extract strong matches
         strong_matches = []
         strong_section = re.search(r'Strong Matches:?\s*([^\n]+)', response, re.IGNORECASE)
@@ -130,6 +136,7 @@ class AIAnalyzer:
         
         return QualificationAnalysis(
             match_score=match_score,
+            features_compared=features_compared,
             strong_matches=strong_matches[:5] if strong_matches else [],
             missing_skills=missing_skills[:5] if missing_skills else [],
             partial_matches=[],

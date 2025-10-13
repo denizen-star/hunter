@@ -12,23 +12,51 @@ Please provide a detailed analysis in the following format:
 
 ## Skills Match Summary
 - Match Score: [percentage as a number, e.g., 85]
+  * Consider: Technical skills (40%), Technologies/Tools (30%), Experience level (15%), Soft skills (10%), Other factors (5%)
+- Features Compared: [total number of features/skills you analyzed]
 - Strong Matches: [list top 5 matching skills, separated by commas]
 - Missing Skills: [list skills mentioned in job but not in resume, separated by commas]
+- Missing Technologies: [list key technologies mentioned in job but not in resume, separated by commas]
 
 ## Detailed Skill Analysis
+**Skills Analyzed: [count of skills below]**
+
 For each major skill/requirement in the job description:
 1. Skill Name
 2. Job Requirement (quote from description)
 3. Resume Evidence (quote from resume if match exists)
 4. Match Level: Strong Match / Partial Match / No Match
 
+## Technologies & Tools
+**Technologies Compared: [count of technologies analyzed]**
+**Technologies Matched: [count found in resume] | Missing: [count not in resume]**
+
+Extract ALL technologies, tools, platforms, programming languages, frameworks, databases, and software mentioned in the job description. For each one:
+- Technology Name
+- Required in Job: Yes/No
+- Found in Resume: Yes/No/Partial
+- Resume Evidence: [specific mention or related experience]
+
+Group by categories (show both matched and missing):
+- Programming Languages: [list matched ✓ and missing ✗]
+- Frameworks & Libraries: [list matched ✓ and missing ✗]
+- Databases: [list matched ✓ and missing ✗]
+- Cloud Platforms: [list matched ✓ and missing ✗]
+- Tools & Software: [list matched ✓ and missing ✗]
+- Other Technologies: [list matched ✓ and missing ✗]
+
+**Critical Missing Technologies:**
+[List the most important technologies mentioned in the job description that are NOT found in the resume]
+
 ## Soft Skills Alignment
+**Soft Skills Analyzed: [count of soft skills below]**
+
 List relevant soft skills from job description and indicate if demonstrated in resume.
 
 ## Recommendations
 Suggest 3-5 ways to emphasize relevant experience or address gaps.
 
-Please be thorough and specific in your analysis."""
+Please be thorough and specific in your analysis. Count every technology, tool, and skill you analyze."""
 
 
 COVER_LETTER_PROMPT = """You are a professional cover letter writer.

@@ -249,6 +249,36 @@ def get_application(app_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/applications/search', methods=['GET'])
+def search_applications():
+    """Search applications for dropdown selection"""
+    try:
+        query = request.args.get('q', '').lower()
+        applications = job_processor.list_all_applications()
+        
+        # Filter applications based on query
+        filtered_apps = []
+        for app in applications:
+            if (query in app.company.lower() or 
+                query in app.job_title.lower() or 
+                query in app.id.lower()):
+                filtered_apps.append({
+                    'id': app.id,
+                    'company': app.company,
+                    'job_title': app.job_title,
+                    'status': app.status,
+                    'display_text': f"{app.company} - {app.job_title} ({app.id})"
+                })
+        
+        return jsonify({
+            'success': True,
+            'applications': filtered_apps,
+            'count': len(filtered_apps)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/applications/<app_id>/status', methods=['PUT'])
 def update_status(app_id):
     """Update application status"""
@@ -278,7 +308,9 @@ def update_status(app_id):
         return jsonify({
             'success': True,
             'message': f'Status updated to {status}',
-            'application_id': application.id
+            'application_id': application.id,
+            'status': status,
+            'updated_at': format_for_display(application.status_updated_at)
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

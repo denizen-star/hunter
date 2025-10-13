@@ -284,6 +284,7 @@ class DocumentGenerator:
                 <div class="timeline-item">
                     <strong>{format_for_display(application.created_at)}</strong> - Application Created
                 </div>
+                {self._generate_updates_timeline(application)}
             </div>
         </div>
     </div>
@@ -310,6 +311,31 @@ class DocumentGenerator:
 </body>
 </html>"""
         return html
+    
+    def _generate_updates_timeline(self, application: Application) -> str:
+        """Generate HTML for status updates timeline"""
+        from app.services.job_processor import JobProcessor
+        
+        job_processor = JobProcessor()
+        updates = job_processor.get_application_updates(application)
+        
+        if not updates:
+            return ""
+        
+        timeline_html = ""
+        for update in reversed(updates):  # Show newest first
+            timeline_html += f"""
+                <div class="timeline-item">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #667eea;">{update['status']}</strong>
+                        <span style="color: #666; font-size: 14px;">{update['display_timestamp']}</span>
+                    </div>
+                    <a href="{update['relative_url']}" target="_blank" style="color: #667eea; text-decoration: none; font-size: 14px;">
+                        View Details →
+                    </a>
+                </div>"""
+        
+        return timeline_html
     
     def _get_match_score_color(self, score: float) -> str:
         """Get color based on match score"""

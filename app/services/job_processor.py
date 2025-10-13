@@ -105,22 +105,127 @@ class JobProcessor:
         application.status = status
         application.status_updated_at = get_est_now()
         
-        # Save notes if provided
-        if notes:
-            timestamp = format_datetime_for_filename()
-            updates_dir = application.folder_path / "updates"
-            ensure_dir_exists(updates_dir)
-            
-            note_filename = f"{timestamp}-{status}.md"
-            note_path = updates_dir / note_filename
-            
-            note_content = f"""# Status Update: {status}
-**Date**: {application.status_updated_at.strftime('%B %d, %Y %I:%M %p EST')}
-
-## Notes
-{notes}
-"""
-            write_text_file(note_content, note_path)
+        # Always create status update file (even without notes)
+        timestamp = format_datetime_for_filename()
+        updates_dir = application.folder_path / "updates"
+        ensure_dir_exists(updates_dir)
+        
+        # Create HTML status update file
+        status_filename = f"{timestamp}-{status}.html"
+        status_path = updates_dir / status_filename
+        
+        # Format the timestamp for display
+        display_timestamp = application.status_updated_at.strftime('%B %d, %Y %I:%M %p EST')
+        
+        # Create HTML content
+        html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Update: {status} - {application.company}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }}
+        .status-badge {{
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        .status-pending {{ background-color: #fff3cd; color: #856404; }}
+        .status-applied {{ background-color: #d1ecf1; color: #0c5460; }}
+        .status-contacted-someone {{ background-color: #d4edda; color: #155724; }}
+        .status-contacted-hiring-manager {{ background-color: #cce5ff; color: #004085; }}
+        .status-interviewed {{ background-color: #f8d7da; color: #721c24; }}
+        .status-offered {{ background-color: #d1ecf1; color: #0c5460; }}
+        .status-rejected {{ background-color: #f8d7da; color: #721c24; }}
+        .status-accepted {{ background-color: #d4edda; color: #155724; }}
+        .timestamp {{
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 10px;
+        }}
+        .notes-section {{
+            margin-top: 20px;
+        }}
+        .notes-content {{
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+            white-space: pre-wrap;
+        }}
+        .no-notes {{
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }}
+        .application-info {{
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }}
+        .back-link {{
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }}
+        .back-link:hover {{
+            text-decoration: underline;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../{application.folder_path.name}-Summary-{application.company}-{application.job_title}.html" class="back-link">← Back to Application Summary</a>
+        
+        <div class="header">
+            <h1>Status Update: {status}</h1>
+            <span class="status-badge status-{status.lower().replace(' ', '-')}">{status}</span>
+            <div class="timestamp">{display_timestamp}</div>
+        </div>
+        
+        <div class="application-info">
+            <strong>Application:</strong> {application.company} - {application.job_title}<br>
+            <strong>Application ID:</strong> {application.id}
+        </div>
+        
+        <div class="notes-section">
+            <h3>Update Details</h3>
+            {f'<div class="notes-content">{notes}</div>' if notes else '<div class="no-notes">No additional notes provided for this status update.</div>'}
+        </div>
+    </div>
+</body>
+</html>"""
+        
+        write_text_file(html_content, status_path)
         
         # Update metadata
         self._save_application_metadata(application)
@@ -134,18 +239,30 @@ class JobProcessor:
             return updates
         
         for update_file in sorted(updates_dir.iterdir()):
-            if update_file.is_file() and update_file.suffix == '.md':
-                content = read_text_file(update_file)
-                # Extract timestamp from filename
-                timestamp_str = update_file.stem.split('-')[0]
-                status = '-'.join(update_file.stem.split('-')[1:])
-                
-                updates.append({
-                    'timestamp': timestamp_str,
-                    'status': status,
-                    'content': content,
-                    'file': str(update_file)
-                })
+            if update_file.is_file() and update_file.suffix == '.html':
+                # Extract timestamp and status from filename
+                # Format: YYYYMMDDHHMMSS-Status.html
+                filename_parts = update_file.stem.split('-', 1)
+                if len(filename_parts) == 2:
+                    timestamp_str = filename_parts[0]
+                    status = filename_parts[1]
+                    
+                    # Format timestamp for display
+                    try:
+                        # Convert filename timestamp to datetime
+                        from datetime import datetime
+                        dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                        display_timestamp = dt.strftime('%B %d, %Y %I:%M %p EST')
+                    except:
+                        display_timestamp = timestamp_str
+                    
+                    updates.append({
+                        'timestamp': timestamp_str,
+                        'display_timestamp': display_timestamp,
+                        'status': status,
+                        'file': str(update_file),
+                        'relative_url': f"/applications/{application.folder_path.name}/updates/{update_file.name}"
+                    })
         
         return updates
 

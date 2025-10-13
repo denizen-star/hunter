@@ -8,6 +8,7 @@ class QualificationAnalysis:
     """Represents a qualification analysis result"""
     
     match_score: float
+    features_compared: int
     strong_matches: List[str]
     missing_skills: List[str]
     partial_matches: List[str]
@@ -20,6 +21,7 @@ class QualificationAnalysis:
         """Create QualificationAnalysis instance from dictionary"""
         return cls(
             match_score=data.get('match_score', 0.0),
+            features_compared=data.get('features_compared', 0),
             strong_matches=data.get('strong_matches', []),
             missing_skills=data.get('missing_skills', []),
             partial_matches=data.get('partial_matches', []),
@@ -32,6 +34,7 @@ class QualificationAnalysis:
         """Convert QualificationAnalysis instance to dictionary"""
         return {
             'match_score': self.match_score,
+            'features_compared': self.features_compared,
             'strong_matches': self.strong_matches,
             'missing_skills': self.missing_skills,
             'partial_matches': self.partial_matches,
