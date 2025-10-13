@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Hunter - AI-Powered Application Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .status-banner {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-banner.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-banner.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-banner.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .quick-links a {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .quick-links a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .success-message h2 {
+            color: #155724;
+            margin-bottom: 20px;
+        }
+        
+        .success-message .match-score {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .success-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .success-actions button,
+        .success-actions a {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Job Hunter</h1>
+            <p>AI-Powered Resume Matching & Application Management</p>
+        </div>
+        
+        <div class="quick-links">
+            <a href="/dashboard" target="_blank">📊 View Dashboard</a>
+            <a href="#" onclick="checkOllama(); return false;">🔍 Check AI Status</a>
+            <a href="#" onclick="showResumeManager(); return false;">📄 Manage Resume</a>
+        </div>
+        
+        <div id="status-banner" class="status-banner hidden"></div>
+        
+        <div class="card" id="application-form">
+            <h2 style="margin-bottom: 30px; color: #333;">Create New Application</h2>
+            
+            <form id="jobForm" onsubmit="submitApplication(event)">
+                <div class="form-group">
+                    <label for="company">Company Name *</label>
+                    <input type="text" id="company" name="company" required placeholder="e.g., Google, Microsoft, Apple">
+                </div>
+                
+                <div class="form-group">
+                    <label for="job_title">Job Title *</label>
+                    <input type="text" id="job_title" name="job_title" required placeholder="e.g., Senior Software Engineer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="job_url">Job URL (Optional)</label>
+                    <input type="url" id="job_url" name="job_url" placeholder="https://...">
+                    <small>Link to the job posting</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="job_description">Job Description *</label>
+                    <textarea id="job_description" name="job_description" required placeholder="Paste the complete job description here..."></textarea>
+                    <small>Include responsibilities, requirements, qualifications, and any other relevant details</small>
+                </div>
+                
+                <button type="submit" class="btn" id="submitBtn">
+                    🚀 Analyze & Create Application
+                </button>
+            </form>
+            
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p style="color: #666;"><strong>AI is working its magic...</strong></p>
+                <p style="color: #999; font-size: 14px;">Extracting features, analyzing match, and generating documents</p>
+                <p style="color: #999; font-size: 14px;">This may take 30-60 seconds</p>
+            </div>
+        </div>
+        
+        <div class="card hidden" id="success-card">
+            <div class="success-message">
+                <h2>✅ Application Created Successfully!</h2>
+                <div class="match-score" id="match-score">--</div>
+                <p style="color: #666; margin-bottom: 10px;">Match Score</p>
+                <p style="color: #999; font-size: 14px;" id="success-details">All documents generated and saved</p>
+                
+                <div class="success-actions">
+                    <a href="#" id="view-summary-btn" class="btn">View Summary</a>
+                    <button class="btn btn-secondary" onclick="createAnother()">Create Another</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resume Manager Modal (hidden by default) -->
+        <div class="card hidden" id="resume-manager">
+            <h2 style="margin-bottom: 30px; color: #333;">Resume Manager</h2>
+            
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="john@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" placeholder="+1-234-567-8900">
+            </div>
+            
+            <div class="form-group">
+                <label for="linkedin">LinkedIn</label>
+                <input type="text" id="linkedin" placeholder="linkedin.com/in/johndoe">
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="City, State">
+            </div>
+            
+            <div class="form-group">
+                <label for="resume_content">Resume Content (Markdown)</label>
+                <textarea id="resume_content" style="min-height: 300px;" placeholder="Paste your resume in markdown format..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <button class="btn" onclick="saveResume()">Save Resume</button>
+                <button class="btn btn-secondary" onclick="hideResumeManager()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check Ollama status on page load
+        window.addEventListener('load', () => {
+            checkOllama(false);
+        });
+        
+        async function checkOllama(showMessage = true) {
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                if (data.connected) {
+                    if (showMessage) {
+                        showStatus(`✅ AI Connected - Model: ${data.current_model}`, 'success');
+                    }
+                } else {
+                    showStatus('⚠️ AI Not Connected - Please start Ollama', 'warning');
+                }
+            } catch (error) {
+                showStatus('❌ Error checking AI status', 'error');
+            }
+        }
+        
+        async function submitApplication(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('jobForm');
+            const formData = new FormData(form);
+            
+            const data = {
+                company: formData.get('company'),
+                job_title: formData.get('job_title'),
+                job_url: formData.get('job_url') || null,
+                job_description: formData.get('job_description')
+            };
+            
+            // Show loading, hide form
+            document.getElementById('application-form').querySelector('form').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('submitBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/applications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Hide loading and form
+                    document.getElementById('application-form').classList.add('hidden');
+                    
+                    // Show success card
+                    document.getElementById('success-card').classList.remove('hidden');
+                    document.getElementById('match-score').textContent = `${Math.round(result.match_score || 0)}%`;
+                    document.getElementById('success-details').textContent = `Application for ${data.company} - ${data.job_title}`;
+                    
+                    // Set summary link - use the summary_url from backend
+                    if (result.summary_url) {
+                        document.getElementById('view-summary-btn').href = result.summary_url;
+                        document.getElementById('view-summary-btn').target = '_blank';
+                    }
+                    
+                    showStatus('✅ Application created successfully!', 'success');
+                } else {
+                    showStatus(`❌ Error: ${result.error}`, 'error');
+                    document.getElementById('application-form').querySelector('form').classList.remove('hidden');
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                document.getElementById('application-form').querySelector('form').classList.remove('hidden');
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+        
+        function createAnother() {
+            // Reset form
+            document.getElementById('jobForm').reset();
+            
+            // Hide success card
+            document.getElementById('success-card').classList.add('hidden');
+            
+            // Show form
+            document.getElementById('application-form').classList.remove('hidden');
+            document.getElementById('application-form').querySelector('form').classList.remove('hidden');
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('submitBtn').disabled = false;
+            
+            // Clear status
+            document.getElementById('status-banner').classList.add('hidden');
+        }
+        
+        function showStatus(message, type) {
+            const banner = document.getElementById('status-banner');
+            banner.textContent = message;
+            banner.className = `status-banner ${type}`;
+            banner.classList.remove('hidden');
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    banner.classList.add('hidden');
+                }, 5000);
+            }
+        }
+        
+        async function showResumeManager() {
+            document.getElementById('application-form').classList.add('hidden');
+            document.getElementById('resume-manager').classList.remove('hidden');
+            
+            // Load existing resume
+            try {
+                const response = await fetch('/api/resume');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const resume = data.resume;
+                    document.getElementById('full_name').value = resume.full_name || '';
+                    document.getElementById('email').value = resume.email || '';
+                    document.getElementById('phone').value = resume.phone || '';
+                    document.getElementById('linkedin').value = resume.linkedin || '';
+                    document.getElementById('location').value = resume.location || '';
+                    document.getElementById('resume_content').value = resume.content || '';
+                }
+            } catch (error) {
+                console.error('Error loading resume:', error);
+            }
+        }
+        
+        function hideResumeManager() {
+            document.getElementById('resume-manager').classList.add('hidden');
+            document.getElementById('application-form').classList.remove('hidden');
+        }
+        
+        async function saveResume() {
+            const data = {
+                full_name: document.getElementById('full_name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                linkedin: document.getElementById('linkedin').value,
+                location: document.getElementById('location').value,
+                content: document.getElementById('resume_content').value
+            };
+            
+            try {
+                const response = await fetch('/api/resume', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('✅ Resume saved successfully!', 'success');
+                    hideResumeManager();
+                } else {
+                    showStatus(`❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
+
