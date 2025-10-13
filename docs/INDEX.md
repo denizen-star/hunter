@@ -20,9 +20,8 @@ Welcome to the Job Hunter documentation! This guide will help you understand and
 - **[Development Guide](DEVELOPMENT.md)** - For developers who want to contribute
 
 ### Advanced Topics
-- **[Feature Extraction](FEATURE_EXTRACTION.md)** - How the AI extracts and matches features
+- **[Feature Extraction & Matching](FEATURE_EXTRACTION.md)** - Complete guide to feature extraction capacity and matching
 - **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
-- **[FAQ](FAQ.md)** - Frequently asked questions
 
 ## 🚀 Quick Links
 
