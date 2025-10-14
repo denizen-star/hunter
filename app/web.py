@@ -491,9 +491,12 @@ def internal_error(error):
 
 
 if __name__ == '__main__':
+    # Get port from environment variable or use default
+    port = int(os.environ.get('PORT', 51003))
+    
     print("🚀 Starting Job Hunter Application...")
-    print("📱 Open http://localhost:51002 in your browser")
-    print("📊 Dashboard: http://localhost:51002/dashboard")
+    print(f"📱 Open http://localhost:{port} in your browser")
+    print(f"📊 Dashboard: http://localhost:{port}/dashboard")
     print("Press Ctrl+C to stop")
     print()
     
@@ -509,5 +512,5 @@ if __name__ == '__main__':
         print("   3. Pull model: ollama pull llama3")
     
     print()
-    app.run(debug=True, port=51002, host='0.0.0.0')
+    app.run(debug=True, port=port, host='0.0.0.0')
 

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-echo "🎯 Starting Job Hunter Application..."
+# Get port from command line argument or use default
+PORT=${1:-51003}
+
+echo "🎯 Starting Job Hunter Application on port $PORT..."
 echo ""
 
 # Check if virtual environment exists
@@ -25,6 +28,7 @@ if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
     read -p "Press Enter to continue anyway, or Ctrl+C to exit..."
 fi
 
-# Start the application
+# Start the application with specified port
+export PORT=$PORT
 python -m app.web
 

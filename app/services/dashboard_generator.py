@@ -226,7 +226,7 @@ class DashboardGenerator:
         </div>
         
         <div class="actions">
-            <a href="http://localhost:51002" class="btn">+ New Application</a>
+            <a href="/" class="btn">+ New Application</a>
         </div>
         
         {"<div class='applications-grid'>" + cards_html + "</div>" if applications else self._create_empty_state()}
@@ -241,7 +241,7 @@ class DashboardGenerator:
         if app.summary_path:
             folder_name = app.folder_path.name
             summary_filename = app.summary_path.name
-            summary_link = f"http://localhost:51002/applications/{folder_name}/{summary_filename}"
+            summary_link = f"/applications/{folder_name}/{summary_filename}"
         else:
             summary_link = "#"
         
