@@ -28,11 +28,6 @@ class DashboardGenerator:
     
     def _create_dashboard_html(self, applications: List[Application]) -> str:
         """Create the HTML dashboard"""
-        # Generate application cards
-        cards_html = ""
-        for app in applications:
-            cards_html += self._create_application_card(app)
-        
         # Calculate stats for all possible statuses
         total = len(applications)
         status_counts = {
@@ -45,6 +40,9 @@ class DashboardGenerator:
             'rejected': len([a for a in applications if a.status.lower() == 'rejected']),
             'accepted': len([a for a in applications if a.status.lower() == 'accepted'])
         }
+        
+        # Generate tabbed content for each status
+        tabs_html = self._create_tabs_html(applications, status_counts)
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -74,33 +72,6 @@ class DashboardGenerator:
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }}
-        .stats {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-        }}
-        .stat {{
-            background: rgba(255,255,255,0.2);
-            padding: 12px 15px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }}
-        .stat-number {{
-            font-size: 32px;
-            font-weight: bold;
-        }}
-        .stat-label {{
-            font-size: 12px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
-        }}
         .actions {{
             text-align: center;
             margin-bottom: 30px;
@@ -123,11 +94,70 @@ class DashboardGenerator:
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }}
+        .tabs-container {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }}
+        .tabs-header {{
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            overflow-x: auto;
+        }}
+        .tab {{
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
+            white-space: nowrap;
+            position: relative;
+        }}
+        .tab:hover {{
+            background: #e9ecef;
+            color: #333;
+        }}
+        .tab.active {{
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }}
+        .tab-count {{
+            font-size: 12px;
+            opacity: 0.7;
+            margin-left: 5px;
+        }}
+        .tab-content {{
+            padding: 30px;
+            min-height: 400px;
+        }}
+        .sort-controls {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }}
+        .sort-select {{
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }}
         .applications-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
-            margin-bottom: 40px;
         }}
         .card {{
             background: white;
@@ -162,6 +192,8 @@ class DashboardGenerator:
         }}
         .status-pending {{ background: #fff3cd; color: #856404; }}
         .status-applied {{ background: #d1ecf1; color: #0c5460; }}
+        .status-contacted someone {{ background: #e2e3e5; color: #383d41; }}
+        .status-contacted hiring manager {{ background: #f8d7da; color: #721c24; }}
         .status-interviewed {{ background: #d4edda; color: #155724; }}
         .status-offered {{ background: #c3e6cb; color: #155724; }}
         .status-rejected {{ background: #f8d7da; color: #721c24; }}
@@ -193,7 +225,7 @@ class DashboardGenerator:
         .empty-state {{
             text-align: center;
             padding: 60px 20px;
-            background: white;
+            background: #f8f9fa;
             border-radius: 12px;
             color: #999;
         }}
@@ -210,61 +242,214 @@ class DashboardGenerator:
             font-weight: bold;
             color: #667eea;
         }}
+        .hidden {{ display: none; }}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎯 Job Application Dashboard</h1>
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-number">{total}</div>
-                    <div class="stat-label">Total</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['pending']}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['applied']}</div>
-                    <div class="stat-label">Applied</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['contacted someone']}</div>
-                    <div class="stat-label">Contacted Someone</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['contacted hiring manager']}</div>
-                    <div class="stat-label">Contacted Hiring Manager</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['interviewed']}</div>
-                    <div class="stat-label">Interviewed</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['offered']}</div>
-                    <div class="stat-label">Offered</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['rejected']}</div>
-                    <div class="stat-label">Rejected</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">{status_counts['accepted']}</div>
-                    <div class="stat-label">Accepted</div>
-                </div>
-            </div>
+            <h1>🎯 Job Application Dashboard - {total}</h1>
         </div>
         
         <div class="actions">
             <a href="/" class="btn">+ New Application</a>
         </div>
         
-        {"<div class='applications-grid'>" + cards_html + "</div>" if applications else self._create_empty_state()}
+        {tabs_html}
     </div>
+    
+    <script>
+        // Tab switching functionality
+        function switchTab(status) {{
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {{
+                content.style.display = 'none';
+            }});
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById('tab-' + status);
+            if (selectedContent) {{
+                selectedContent.style.display = 'block';
+            }}
+            
+            // Add active class to clicked tab
+            const selectedTab = document.querySelector(`[data-status="${{status}}"]`);
+            if (selectedTab) {{
+                selectedTab.classList.add('active');
+            }}
+            
+            // Update sort dropdown for this tab
+            updateSortOptions(status);
+        }}
+        
+        // Update sort options based on current tab
+        function updateSortOptions(status) {{
+            const sortSelect = document.getElementById('sort-select-' + status);
+            if (sortSelect) {{
+                // Reset to default sorting
+                sortSelect.value = 'updated_desc';
+                sortApplications(status, 'updated_desc');
+            }}
+        }}
+        
+        // Sort applications in the current tab
+        function sortApplications(status, sortBy) {{
+            const tabContent = document.getElementById('tab-' + status);
+            if (!tabContent) return;
+            
+            const grid = tabContent.querySelector('.applications-grid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.card'));
+            
+            cards.sort((a, b) => {{
+                switch(sortBy) {{
+                    case 'updated_desc':
+                        return new Date(b.dataset.updatedAt) - new Date(a.dataset.updatedAt);
+                    case 'updated_asc':
+                        return new Date(a.dataset.updatedAt) - new Date(b.dataset.updatedAt);
+                    case 'applied_desc':
+                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                    case 'applied_asc':
+                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
+                    case 'job_posted_desc':
+                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                    case 'job_posted_asc':
+                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
+                    case 'match_desc':
+                        return parseFloat(b.dataset.matchScore || 0) - parseFloat(a.dataset.matchScore || 0);
+                    case 'match_asc':
+                        return parseFloat(a.dataset.matchScore || 0) - parseFloat(b.dataset.matchScore || 0);
+                    default:
+                        return 0;
+                }}
+            }});
+            
+            // Re-append sorted cards
+            cards.forEach(card => grid.appendChild(card));
+        }}
+        
+        // Handle sort dropdown change
+        function handleSortChange() {{
+            const activeTab = document.querySelector('.tab.active');
+            
+            if (activeTab) {{
+                const status = activeTab.dataset.status;
+                const sortSelect = document.getElementById('sort-select-' + status);
+                if (sortSelect) {{
+                    sortApplications(status, sortSelect.value);
+                }}
+            }}
+        }}
+        
+        // Initialize with first tab active
+        document.addEventListener('DOMContentLoaded', function() {{
+            // Activate first tab by default
+            const firstTab = document.querySelector('.tab');
+            if (firstTab) {{
+                const status = firstTab.dataset.status;
+                switchTab(status);
+            }}
+        }});
+    </script>
 </body>
 </html>"""
         return html
+    
+    def _create_tabs_html(self, applications: List[Application], status_counts: dict) -> str:
+        """Create the tabbed interface HTML"""
+        # Define status order with 'all' first, then as shown in the image
+        status_order = [
+            'all',
+            'pending',
+            'applied', 
+            'contacted someone',
+            'contacted hiring manager',
+            'interviewed',
+            'offered',
+            'rejected',
+            'accepted'
+        ]
+        
+        # Create tab headers
+        tab_headers = ""
+        for status in status_order:
+            if status == 'all':
+                count = len(applications)  # Total count for all applications
+                status_display = "All"
+            else:
+                count = status_counts.get(status, 0)
+                # Shorten long tab titles to prevent overlap
+                if status == 'contacted someone':
+                    status_display = "Contacted"
+                elif status == 'contacted hiring manager':
+                    status_display = "Hiring Mgr"
+                else:
+                    status_display = status.replace('_', ' ').title()
+            tab_headers += f'''
+                <button class="tab" data-status="{status}" onclick="switchTab('{status}')">
+                    {status_display}
+                    <span class="tab-count">({count})</span>
+                </button>
+            '''
+        
+        # Create tab contents
+        tab_contents = ""
+        for status in status_order:
+            if status == 'all':
+                status_apps = applications  # All applications
+                status_title = "All Applications"
+                default_display = 'block'  # Show 'all' tab by default
+            else:
+                status_apps = [app for app in applications if app.status.lower() == status]
+                # Use full names in content area for clarity
+                if status == 'contacted someone':
+                    status_title = "Contacted Someone Applications"
+                elif status == 'contacted hiring manager':
+                    status_title = "Contacted Hiring Manager Applications"
+                else:
+                    status_title = f"{status.replace('_', ' ').title()} Applications"
+                default_display = 'none'
+            
+            # Sort applications by updated timestamp (newest first) by default
+            status_apps.sort(key=lambda x: x.status_updated_at or x.created_at, reverse=True)
+            
+            cards_html = ""
+            for app in status_apps:
+                cards_html += self._create_application_card(app)
+            
+            tab_contents += f'''
+                <div class="tab-content" id="tab-{status}" style="display: {default_display}">
+                    <div class="sort-controls">
+                        <h3 style="margin: 0; color: #333;">{status_title}</h3>
+                        <select id="sort-select-{status}" class="sort-select" onchange="handleSortChange()">
+                            <option value="updated_desc">Updated (Newest First)</option>
+                            <option value="updated_asc">Updated (Oldest First)</option>
+                            <option value="applied_desc">Applied (Newest First)</option>
+                            <option value="applied_asc">Applied (Oldest First)</option>
+                            <option value="job_posted_desc">Job Posted (Newest First)</option>
+                            <option value="job_posted_asc">Job Posted (Oldest First)</option>
+                            <option value="match_desc">Match % (Highest First)</option>
+                            <option value="match_asc">Match % (Lowest First)</option>
+                        </select>
+                    </div>
+                    {f'<div class="applications-grid">{cards_html}</div>' if cards_html else self._create_empty_state(status)}
+                </div>
+            '''
+        
+        return f'''
+        <div class="tabs-container">
+            <div class="tabs-header">
+                {tab_headers}
+            </div>
+            {tab_contents}
+        </div>
+        '''
     
     def _create_application_card(self, app: Application) -> str:
         """Create HTML for a single application card"""
@@ -278,8 +463,16 @@ class DashboardGenerator:
         
         match_score_html = f'<span class="match-score">{app.match_score:.0f}%</span>' if app.match_score else ''
         
+        # Create data attributes for sorting
+        updated_at = app.status_updated_at or app.created_at
+        applied_at = app.created_at
+        match_score = app.match_score or 0
+        
         return f"""
-        <div class="card">
+        <div class="card" 
+             data-updated-at="{updated_at.isoformat()}" 
+             data-applied-at="{applied_at.isoformat()}" 
+             data-match-score="{match_score}">
             <div class="card-company">
                 {app.company}
                 {match_score_html}
@@ -292,6 +485,9 @@ class DashboardGenerator:
                 📅 Applied: {format_for_display(app.created_at)}
             </div>
             <div class="card-meta">
+                📋 Posted: {app.posted_date if app.posted_date else 'N/A'}
+            </div>
+            <div class="card-meta">
                 🔄 Updated: {format_for_display(app.status_updated_at)}
             </div>
             <div class="card-actions">
@@ -300,12 +496,18 @@ class DashboardGenerator:
         </div>
         """
     
-    def _create_empty_state(self) -> str:
+    def _create_empty_state(self, status: str = None) -> str:
         """Create empty state HTML"""
-        return """
+        if status:
+            status_display = status.replace('_', ' ').title()
+            message = f"No {status_display} applications yet."
+        else:
+            message = "No applications yet. Create your first one!"
+        
+        return f"""
         <div class="empty-state">
             <div class="empty-state-icon">📭</div>
-            <div class="empty-state-text">No applications yet. Create your first one!</div>
+            <div class="empty-state-text">{message}</div>
         </div>
         """
 

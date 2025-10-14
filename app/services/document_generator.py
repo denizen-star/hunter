@@ -240,6 +240,34 @@ class DocumentGenerator:
         if 'Posted Date' in title or title_clean == 'Job Description Details':
             return f'<div class="job-meta">{formatted_content}</div>'
         
+        # Skip sections if content is "Not available"
+        if title_clean in ['Additional Insights', 'Hiring Team Information'] and ('Not available' in formatted_content or 'Not specified' in formatted_content):
+            return ''
+        
+        # Special formatting for Additional Insights section (use standard styling)
+        if 'Additional Insights' in title_clean:
+            return f'''
+        <div class="job-section">
+            <h3 class="job-section-title">📊 {title_clean}</h3>
+            <div class="job-section-content">
+                {formatted_content}
+            </div>
+        </div>
+        '''
+        
+        # Special formatting for Hiring Team Information section (use standard styling)
+        if 'Hiring Team Information' in title_clean:
+            # Parse and format hiring team information
+            formatted_team_info = self._format_hiring_team_info(formatted_content)
+            return f'''
+        <div class="job-section">
+            <h3 class="job-section-title">👥 {title_clean}</h3>
+            <div class="job-section-content">
+                {formatted_team_info}
+            </div>
+        </div>
+        '''
+        
         return f'''
         <div class="job-section">
             <h3 class="job-section-title">{title_clean}</h3>
@@ -249,18 +277,19 @@ class DocumentGenerator:
         </div>
         '''
     
-    def _extract_technologies(self, qual_analysis: str) -> dict:
-        """Extract technologies from qualification analysis"""
+    def _extract_technologies_from_qual_analysis(self, qual_analysis: str) -> dict:
+        """Extract technologies from qualification analysis using the actual format"""
         import re
         
         technologies = {
             'matched': [],
-            'missing': []
+            'missing': [],
+            'partial': []
         }
         
-        # Find the Technologies & Tools section
+        # Find the Technologies & Tools section - include Critical Missing Technologies too
         tech_section_match = re.search(
-            r'\*\*Technologies & Tools\*\*.*?(?=\*\*[A-Z]|\Z)',
+            r'\*\*Technologies & Tools\*\*.*?(?=\*\*Soft Skills\*\*|\*\*Recommendations\*\*|\Z)',
             qual_analysis,
             re.DOTALL
         )
@@ -270,13 +299,29 @@ class DocumentGenerator:
         
         tech_section = tech_section_match.group(0)
         
-        # Extract all technologies with checkmarks (matched)
-        matched = re.findall(r'-\s+([^✗✓\n]+)\s*✓', tech_section)
-        technologies['matched'] = [tech.strip() for tech in matched]
+        # Parse the new format: "- Technology: ✓" or "- Technology: ✗"
+        # Look for patterns like "- Python: ✓" or "- MySQL: ✗"
+        lines = tech_section.split('\n')
         
-        # Extract all technologies with X marks (missing)
-        missing = re.findall(r'-\s+([^✗✓\n]+)\s*✗', tech_section)
-        technologies['missing'] = [tech.strip() for tech in missing]
+        for line in lines:
+            line = line.strip()
+            if not line or line.startswith('**') or line.startswith('|'):
+                continue
+            
+            # Match pattern: "- Technology: ✓" or "* Technology: ✓ MATCHED"
+            # Try both formats
+            match = re.search(r'[-*]\s+([^:]+):\s*([✓✗⚠])', line)
+            if match:
+                tech_name = match.group(1).strip()
+                symbol = match.group(2).strip()
+                
+                # Also check for MATCHED/MISSING/PARTIAL keywords
+                if 'MATCHED' in line or symbol == '✓':
+                    technologies['matched'].append(tech_name)
+                elif 'MISSING' in line or symbol == '✗':
+                    technologies['missing'].append(tech_name)
+                elif 'PARTIAL' in line or symbol == '⚠':
+                    technologies['partial'].append(tech_name)
         
         return technologies
     
@@ -287,17 +332,27 @@ class DocumentGenerator:
         # Matched Technologies (Green Pills)
         if technologies.get('matched'):
             html_parts.append('<div class="tech-pills-section">')
-            html_parts.append('<div class="tech-pills-label">✅ Matched Technologies</div>')
+            html_parts.append('<div class="tech-pills-label">✅ Matched Technologies (Found in Resume)</div>')
             html_parts.append('<div class="tech-pills">')
             for tech in technologies['matched']:
                 html_parts.append(f'<span class="tech-pill tech-pill-green">{tech}</span>')
             html_parts.append('</div>')
             html_parts.append('</div>')
         
+        # Partial Match Technologies (Yellow Pills)
+        if technologies.get('partial'):
+            html_parts.append('<div class="tech-pills-section">')
+            html_parts.append('<div class="tech-pills-label">⚠️ Partial Match (Inferred/Related Experience)</div>')
+            html_parts.append('<div class="tech-pills">')
+            for tech in technologies['partial']:
+                html_parts.append(f'<span class="tech-pill tech-pill-yellow">{tech}</span>')
+            html_parts.append('</div>')
+            html_parts.append('</div>')
+        
         # Missing Technologies (Red Pills)
         if technologies.get('missing'):
             html_parts.append('<div class="tech-pills-section">')
-            html_parts.append('<div class="tech-pills-label">❌ Missing Technologies</div>')
+            html_parts.append('<div class="tech-pills-label">❌ Missing Technologies (Not Found in Resume)</div>')
             html_parts.append('<div class="tech-pills">')
             for tech in technologies['missing']:
                 html_parts.append(f'<span class="tech-pill tech-pill-red">{tech}</span>')
@@ -305,10 +360,180 @@ class DocumentGenerator:
             html_parts.append('</div>')
         
         # If no technologies found
-        if not technologies.get('matched') and not technologies.get('missing'):
-            html_parts.append('<div style="color: #999; font-style: italic;">No technologies extracted from job description.</div>')
+        if not technologies.get('matched') and not technologies.get('missing') and not technologies.get('partial'):
+            html_parts.append('<div style="color: #999; font-style: italic;">No specific technologies mentioned in job description.</div>')
         
         return '\n'.join(html_parts)
+    
+    def _generate_strong_matches_html(self, strong_matches: list) -> str:
+        """Generate HTML for strong matches pills"""
+        if not strong_matches:
+            return '<span style="color: #999; font-style: italic;">No strong matches identified</span>'
+        
+        html_parts = []
+        for match in strong_matches[:5]:  # Limit to top 5
+            match_clean = match.strip()
+            if match_clean:
+                html_parts.append(
+                    f'<span style="display: inline-block; background: #d4edda; color: #666; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin: 1px; border: 1px solid #c3e6cb; box-shadow: none;">{match_clean}</span>'
+                )
+        
+        return ''.join(html_parts)
+    
+    def _generate_missing_skills_html(self, missing_skills: list) -> str:
+        """Generate HTML for missing skills pills"""
+        if not missing_skills:
+            return '<span style="color: #28a745; font-weight: 600;">No missing skills identified!</span>'
+        
+        html_parts = []
+        for skill in missing_skills[:5]:  # Limit to top 5
+            skill_clean = skill.strip()
+            if skill_clean:
+                html_parts.append(
+                    f'<span style="display: inline-block; background: #f8d7da; color: #666; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin: 1px; border: 1px solid #f5c6cb; box-shadow: none;">{skill_clean}</span>'
+                )
+        
+        return ''.join(html_parts)
+    
+    def _format_hiring_team_info(self, content: str) -> str:
+        """Format hiring team information into structured display"""
+        import re
+        
+        # Look for the pattern: Name | Position at Company | Connection: X degree | Role: Y
+        team_members = []
+        lines = content.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if not line or line.lower() in ['not available', 'not specified']:
+                continue
+                
+            # Check if line contains hiring team info
+            if '|' in line:
+                parts = [p.strip() for p in line.split('|')]
+                if len(parts) >= 3:
+                    name = parts[0]
+                    position = parts[1] if len(parts) > 1 else ""
+                    connection = parts[2] if len(parts) > 2 else ""
+                    role = parts[3] if len(parts) > 3 else ""
+                    
+                    # Extract connection degree
+                    degree_match = re.search(r'(\d+)(st|nd|rd|th)', connection, re.IGNORECASE)
+                    degree = degree_match.group(0) if degree_match else ""
+                    
+                    # Extract role
+                    role_match = re.search(r'Role:\s*([^|]+)', role, re.IGNORECASE)
+                    role_text = role_match.group(1).strip() if role_match else role.strip()
+                    
+                    team_members.append({
+                        'name': name,
+                        'position': position,
+                        'degree': degree,
+                        'role': role_text
+                    })
+        
+        if not team_members:
+            return content  # Return original if no structured data found
+        
+        # Format as cards
+        html_parts = []
+        for member in team_members:
+            degree_color = "#10b981" if member['degree'] in ['1st', '2nd'] else "#f59e0b"
+            role_color = "#3b82f6" if member['role'].lower() == 'job poster' else "#6366f1"
+            
+            html_parts.append(f'''
+            <div style="display: flex; align-items: center; gap: 15px; padding: 12px; background: white; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #1f2937; font-size: 16px;">{member['name']}</div>
+                    <div style="color: #6b7280; font-size: 14px; margin-top: 2px;">{member['position']}</div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    {f'<span style="background: {degree_color}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">{member["degree"]}</span>' if member['degree'] else ''}
+                    {f'<span style="background: {role_color}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">{member["role"]}</span>' if member['role'] else ''}
+                </div>
+            </div>
+            ''')
+        
+        return ''.join(html_parts)
+    
+    def _generate_technologies_section_html(self, technologies: dict) -> str:
+        """Generate Technologies section HTML using the same format as other sections"""
+        if not technologies.get('matched') and not technologies.get('missing') and not technologies.get('partial'):
+            # If no technologies are found, show a message indicating no specific technologies mentioned
+            return '''
+        <div class="job-section">
+            <h3 class="job-section-title">💻 Technologies & Skills Match</h3>
+            <div class="job-section-content">
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <p style="margin: 0; color: #666; font-style: italic;">
+                        <strong>No specific technologies mentioned in job description.</strong><br>
+                        This job focuses on analytical skills and business intelligence rather than specific technical tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+        '''
+        
+        # Create content for the section
+        content_parts = []
+        
+        # Add matched technologies
+        if technologies.get('matched'):
+            content_parts.append('<div class="tech-pills-section">')
+            content_parts.append('<div class="tech-pills-label">✅ Matched Technologies (Found in Resume)</div>')
+            content_parts.append('<div class="tech-pills">')
+            for tech in technologies['matched']:
+                content_parts.append(f'<span class="tech-pill tech-pill-green">{tech}</span>')
+            content_parts.append('</div>')
+            content_parts.append('</div>')
+        
+        # Add partial match technologies
+        if technologies.get('partial'):
+            content_parts.append('<div class="tech-pills-section">')
+            content_parts.append('<div class="tech-pills-label">⚠️ Partial Match (Inferred/Related Experience)</div>')
+            content_parts.append('<div class="tech-pills">')
+            for tech in technologies['partial']:
+                content_parts.append(f'<span class="tech-pill tech-pill-yellow">{tech}</span>')
+            content_parts.append('</div>')
+            content_parts.append('</div>')
+        
+        # Add missing technologies
+        if technologies.get('missing'):
+            content_parts.append('<div class="tech-pills-section">')
+            content_parts.append('<div class="tech-pills-label">❌ Missing Technologies (Not Found in Resume)</div>')
+            content_parts.append('<div class="tech-pills">')
+            for tech in technologies['missing']:
+                content_parts.append(f'<span class="tech-pill tech-pill-red">{tech}</span>')
+            content_parts.append('</div>')
+            content_parts.append('</div>')
+        
+        # Add legend
+        content_parts.append('<div class="tech-legend">')
+        content_parts.append('<div class="tech-legend-item">')
+        content_parts.append('<div class="tech-legend-dot" style="background: #d4edda; border: 1px solid #c3e6cb;"></div>')
+        content_parts.append('<span>✅ Match (Found in Resume)</span>')
+        content_parts.append('</div>')
+        content_parts.append('<div class="tech-legend-item">')
+        content_parts.append('<div class="tech-legend-dot" style="background: #fff3cd; border: 1px solid #ffeaa7;"></div>')
+        content_parts.append('<span>⚠️ Partial (Inferred/Related)</span>')
+        content_parts.append('</div>')
+        content_parts.append('<div class="tech-legend-item">')
+        content_parts.append('<div class="tech-legend-dot" style="background: #f8d7da; border: 1px solid #f5c6cb;"></div>')
+        content_parts.append('<span>❌ Missing (Not in Resume)</span>')
+        content_parts.append('</div>')
+        content_parts.append('</div>')
+        
+        formatted_content = '\n'.join(content_parts)
+        
+        # Use the same format as other sections
+        return f'''
+        <div class="job-section">
+            <h3 class="job-section-title">💻 Technologies & Skills Match</h3>
+            <div class="job-section-content">
+                {formatted_content}
+            </div>
+        </div>
+        '''
     
     def _create_summary_html(
         self,
@@ -325,9 +550,6 @@ class DocumentGenerator:
         
         # Parse job description markdown into formatted HTML
         job_desc_html = self._parse_job_description_markdown(job_desc)
-        
-        # Extract technologies for pills section
-        technologies = self._extract_technologies(qual_analysis)
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -482,6 +704,10 @@ class DocumentGenerator:
                     <value>{job_details.get('hiring_manager', 'N/A')}</value>
                 </div>
                 <div class="summary-item">
+                    <label>Posted Date</label>
+                    <value>{job_details.get('posted_date', 'N/A')}</value>
+                </div>
+                <div class="summary-item">
                     <label>Applied</label>
                     <value>{format_for_display(application.created_at)}</value>
                 </div>
@@ -492,24 +718,6 @@ class DocumentGenerator:
             </div>
             
             {f'<div style="margin-top: 20px;"><label style="display: block; font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 600;">Job URL</label><a href="{application.job_url}" target="_blank">{application.job_url}</a></div>' if application.job_url else ''}
-        </div>
-        
-        <!-- Technologies Section -->
-        <div style="padding: 30px 40px; border-bottom: 1px solid #e0e0e0; background: white;">
-            <h2 style="margin-bottom: 15px; color: #333; font-size: 24px;">12. Technologies</h2>
-            <div class="tech-pills-container">
-                {self._generate_tech_pills_html(technologies)}
-            </div>
-            <div class="tech-legend">
-                <div class="tech-legend-item">
-                    <div class="tech-legend-dot" style="background: #d4edda; border: 1px solid #c3e6cb;"></div>
-                    <span>100% Match (Found in Resume)</span>
-                </div>
-                <div class="tech-legend-item">
-                    <div class="tech-legend-dot" style="background: #f8d7da; border: 1px solid #f5c6cb;"></div>
-                    <span>Missing (Not in Resume)</span>
-                </div>
-            </div>
         </div>
         
         <div class="tabs">
@@ -532,7 +740,84 @@ class DocumentGenerator:
         
         <div id="cover-letter" class="tab-content">
             <h2>Cover Letter</h2>
-            <pre>{cover_letter}</pre>
+            
+            <!-- Analysis Summary Box (similar to the one from application creation) -->
+            <div style="border: 1px solid #0099FF; padding: 15px; margin-bottom: 20px; box-shadow: none; border-radius: 8px; background: white;">
+                <h3 style="color: #666; margin-bottom: 10px; font-size: 16px;">
+                    Match Score: {qualifications.match_score:.0f}% - Application for {application.company} - {application.job_title}
+                </h3>
+                
+                <!-- Introductory text before analysis summary -->
+                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #667eea;">
+                    <p style="color: #333; font-size: 14px; line-height: 1.5; margin: 0;">
+                        Yes, I've checked our compatibility based on job posting against my experience with my proprietary ML Model and these are my findings:
+                    </p>
+                </div>
+                
+                <!-- Methodology -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Methodology</h4>
+                    <p style="color: #666; font-size: 11px; line-height: 1.4;">
+                        Our AI analyzes your resume against the job description using weighted scoring: 
+                        Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
+                    </p>
+                </div>
+                
+                <!-- Features Compared -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Features Compared</h4>
+                    <p style="color: #666; font-size: 11px;">
+                        {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed
+                    </p>
+                </div>
+                
+                <!-- Strong Matches -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Strong Matches</h4>
+                    <div style="color: #666; font-size: 11px;">
+                        {self._generate_strong_matches_html(qualifications.strong_matches)}
+                    </div>
+                </div>
+                
+                <!-- Missing Skills -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Missing Skills</h4>
+                    <div style="color: #666; font-size: 11px;">
+                        {self._generate_missing_skills_html(qualifications.missing_skills)}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cover Letter Content with Copy Button -->
+            <div style="position: relative;">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333;">Cover Letter Content</h3>
+                    <button onclick="copyCoverLetter()" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        📋 Copy Cover Letter
+                    </button>
+                </div>
+                
+                <h4 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: 600;">**Cover Letter**</h4>
+                
+                <div id="cover-letter-content" style="background: #f5f5f5; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-height: 500px; overflow-y: auto;">
+{application.job_title} - {application.company} - Intro
+
+{cover_letter}
+
+Yes, I've checked our compatibility based on job posting against my experience with my proprietary ML Model and these are my findings:
+
+Match Score: {qualifications.match_score:.0f}% - Application for {application.company} - {application.job_title}
+
+Methodology: Weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
+Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed
+Strong Matches: {', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else 'No strong matches identified'}
+Missing Skills: {', '.join(qualifications.missing_skills[:5]) if qualifications.missing_skills else 'No missing skills identified'}
+
+
+Sincerely,
+Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
+                </div>
+            </div>
         </div>
         
         <div id="resume" class="tab-content">
@@ -721,6 +1006,43 @@ class DocumentGenerator:
                     messageDiv.style.display = 'none';
                 }}, 5000);
             }}
+        }}
+        
+        function copyCoverLetter() {{
+            const coverLetterContent = document.getElementById('cover-letter-content');
+            const text = coverLetterContent.textContent || coverLetterContent.innerText;
+            
+            navigator.clipboard.writeText(text).then(function() {{
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {{
+                    button.innerHTML = originalText;
+                    button.style.background = '#667eea';
+                }}, 2000);
+            }}).catch(function(err) {{
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {{
+                    button.innerHTML = originalText;
+                    button.style.background = '#667eea';
+                }}, 2000);
+            }});
         }}
     </script>
 </body>

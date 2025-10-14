@@ -30,6 +30,7 @@ class Application:
     status_updated_at: Optional[datetime] = None
     match_score: Optional[float] = None
     job_url: Optional[str] = None
+    posted_date: Optional[str] = None
     
     def __post_init__(self):
         """Convert string paths to Path objects and strings to datetime objects"""
@@ -63,7 +64,8 @@ class Application:
             folder_path=data.get('folder_path'),
             status_updated_at=data.get('status_updated_at'),
             match_score=data.get('match_score'),
-            job_url=data.get('job_url')
+            job_url=data.get('job_url'),
+            posted_date=data.get('posted_date')
         )
     
     def to_dict(self) -> dict:
@@ -83,7 +85,8 @@ class Application:
             'folder_path': str(self.folder_path) if self.folder_path else None,
             'status_updated_at': self.status_updated_at.isoformat() if self.status_updated_at and isinstance(self.status_updated_at, datetime) else self.status_updated_at,
             'match_score': self.match_score,
-            'job_url': self.job_url
+            'job_url': self.job_url,
+            'posted_date': self.posted_date
         }
     
     def get_folder_name(self) -> str:

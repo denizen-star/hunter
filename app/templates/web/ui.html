@@ -13,7 +13,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: white;
             min-height: 100vh;
             padding: 20px;
         }
@@ -25,14 +25,13 @@
         
         .header {
             text-align: center;
-            color: white;
+            color: #333;
             margin-bottom: 40px;
         }
         
         .header h1 {
             font-size: 48px;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
         
         .header p {
@@ -44,7 +43,7 @@
             background: white;
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: none;
             margin-bottom: 20px;
         }
         
@@ -173,23 +172,25 @@
             display: flex;
             gap: 15px;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
         
         .quick-links a {
             flex: 1;
             padding: 15px;
-            background: rgba(255,255,255,0.2);
-            color: white;
+            background: #f8f9fa;
+            color: #333;
             text-decoration: none;
             text-align: center;
             border-radius: 8px;
-            backdrop-filter: blur(10px);
+            border: 1px solid #e9ecef;
             transition: all 0.3s;
         }
         
         .quick-links a:hover {
-            background: rgba(255,255,255,0.3);
+            background: #e9ecef;
             transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .success-message {
@@ -344,7 +345,7 @@
                 <div class="form-group">
                     <label for="job_description">Job Description *</label>
                     <textarea id="job_description" name="job_description" required placeholder="Paste the complete job description here..."></textarea>
-                    <small>Include responsibilities, requirements, qualifications, and any other relevant details</small>
+                    <small>💡 <strong>Pro Tip:</strong> Include ALL information from LinkedIn including "People you can reach out to", "Meet the hiring team", applicant statistics, and "See how you compare" sections for better analysis</small>
                 </div>
                 
                 <button type="submit" class="btn" id="submitBtn">
@@ -362,16 +363,55 @@
         
         <div class="card hidden" id="success-card">
             <div class="success-message">
-                <h2>✅ Application Created Successfully!</h2>
+                <h2>Application Created Successfully!</h2>
                 <div class="match-score" id="match-score">--</div>
                 <p style="color: #666; margin-bottom: 10px;">Match Score</p>
                 <p style="color: #999; font-size: 14px;" id="success-details">All documents generated and saved</p>
-                
-                <div class="success-actions">
-                    <a href="#" id="view-summary-btn" class="btn">View Summary</a>
-                    <button class="btn btn-secondary" onclick="createAnother()">Create Another</button>
+            </div>
+        </div>
+        
+        <!-- Analysis Details Section - Outside the success card -->
+        <div id="analysis-details" class="card hidden" style="border: 1px solid #0099FF; padding: 15px; margin-top: 20px; box-shadow: none;">
+            <h3 style="color: #666; margin-bottom: 10px; font-size: 16px;" id="analysis-title">Analysis Summary</h3>
+            
+            <!-- Methodology -->
+            <div style="margin-bottom: 10px;">
+                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Methodology</h4>
+                <p style="color: #666; font-size: 11px; line-height: 1.4;">
+                    Our AI analyzes your resume against the job description using weighted scoring: 
+                    Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
+                </p>
+            </div>
+            
+            <!-- Features Compared -->
+            <div style="margin-bottom: 10px;">
+                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Features Compared</h4>
+                <p style="color: #666; font-size: 11px;">
+                    <span id="features-compared-count">--</span> individual skills, technologies, and requirements analyzed
+                </p>
+            </div>
+            
+            <!-- Strong Matches -->
+            <div style="margin-bottom: 10px;">
+                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Strong Matches</h4>
+                <div id="strong-matches-list" style="color: #666; font-size: 11px;">
+                    <!-- Will be populated by JavaScript -->
                 </div>
             </div>
+            
+            <!-- Missing Skills -->
+            <div style="margin-bottom: 10px;">
+                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Missing Skills</h4>
+                <div id="missing-skills-list" style="color: #666; font-size: 11px;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Success Actions - Outside both cards -->
+        <div class="success-actions" id="success-actions" style="display: none; margin-top: 20px;">
+            <a href="#" id="view-summary-btn" class="btn">View Summary</a>
+            <button class="btn btn-secondary" onclick="createAnother()">Create Another</button>
         </div>
         
         <!-- Resume Manager Modal (hidden by default) -->
@@ -528,13 +568,22 @@
                     document.getElementById('match-score').textContent = `${Math.round(result.match_score || 0)}%`;
                     document.getElementById('success-details').textContent = `Application for ${data.company} - ${data.job_title}`;
                     
+                    // Show analysis details if available
+                    if (result.qualifications) {
+                        document.getElementById('analysis-details').classList.remove('hidden');
+                        populateAnalysisDetails(result.qualifications, data.company, data.job_title, result.match_score);
+                    }
+                    
+                    // Show success actions
+                    document.getElementById('success-actions').style.display = 'flex';
+                    
                     // Set summary link - use the summary_url from backend
                     if (result.summary_url) {
                         document.getElementById('view-summary-btn').href = result.summary_url;
                         document.getElementById('view-summary-btn').target = '_blank';
                     }
                     
-                    showStatus('✅ Application created successfully!', 'success');
+                    showStatus('Application created successfully!', 'success');
                 } else {
                     showStatus(`❌ Error: ${result.error}`, 'error');
                     document.getElementById('application-form').querySelector('form').classList.remove('hidden');
@@ -553,8 +602,10 @@
             // Reset form
             document.getElementById('jobForm').reset();
             
-            // Hide success card
+            // Hide success card and related elements
             document.getElementById('success-card').classList.add('hidden');
+            document.getElementById('analysis-details').classList.add('hidden');
+            document.getElementById('success-actions').style.display = 'none';
             
             // Show form
             document.getElementById('application-form').classList.remove('hidden');
@@ -577,6 +628,38 @@
                 setTimeout(() => {
                     banner.classList.add('hidden');
                 }, 5000);
+            }
+        }
+        
+        function populateAnalysisDetails(qualifications, company, jobTitle, matchScore) {
+            // Set the analysis title
+            const analysisTitle = document.getElementById('analysis-title');
+            analysisTitle.textContent = `Match Score: ${Math.round(matchScore || 0)}% - Application for ${company} - ${jobTitle}`;
+            
+            // Populate features compared count
+            const featuresCount = document.getElementById('features-compared-count');
+            featuresCount.textContent = qualifications.features_compared || '--';
+            
+            // Populate strong matches
+            const strongMatchesList = document.getElementById('strong-matches-list');
+            if (qualifications.strong_matches && qualifications.strong_matches.length > 0) {
+                const matchesHtml = qualifications.strong_matches.map(match => 
+                    `<span style="display: inline-block; background: #d4edda; color: #666; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin: 1px; border: 1px solid #c3e6cb; box-shadow: none;">${match.trim()}</span>`
+                ).join('');
+                strongMatchesList.innerHTML = matchesHtml;
+            } else {
+                strongMatchesList.innerHTML = '<span style="color: #999; font-style: italic;">No strong matches identified</span>';
+            }
+            
+            // Populate missing skills
+            const missingSkillsList = document.getElementById('missing-skills-list');
+            if (qualifications.missing_skills && qualifications.missing_skills.length > 0) {
+                const skillsHtml = qualifications.missing_skills.map(skill => 
+                    `<span style="display: inline-block; background: #f8d7da; color: #666; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin: 1px; border: 1px solid #f5c6cb; box-shadow: none;">${skill.trim()}</span>`
+                ).join('');
+                missingSkillsList.innerHTML = skillsHtml;
+            } else {
+                missingSkillsList.innerHTML = '<span style="color: #28a745; font-weight: 600;">No missing skills identified!</span>';
             }
         }
         

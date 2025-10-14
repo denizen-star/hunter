@@ -154,6 +154,16 @@ class JobProcessor:
         write_text_file(structured_job_description, job_desc_path)
         application.job_description_path = job_desc_path
         
+        # Extract posted date from job description
+        print("  → Extracting posted date...")
+        try:
+            job_details = self.ai_analyzer.extract_job_details(raw_job_description)
+            application.posted_date = job_details.get('posted_date', 'N/A')
+            print(f"  ✓ Posted date: {application.posted_date}")
+        except Exception as e:
+            print(f"  ⚠ Warning: Could not extract posted date: {e}")
+            application.posted_date = 'N/A'
+        
         # Save application metadata
         self._save_application_metadata(application)
         

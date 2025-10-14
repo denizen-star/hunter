@@ -173,6 +173,50 @@ def create_application():
             summary_filename = application.summary_path.name
             summary_url = f"/applications/{folder_name}/{summary_filename}"
         
+        # Load qualifications analysis for detailed response
+        qualifications_data = None
+        if application.qualifications_path and application.qualifications_path.exists():
+            try:
+                from app.models.qualification import QualificationAnalysis
+                from app.utils.file_utils import read_text_file
+                
+                # Parse qualifications from file to get structured data
+                qual_content = read_text_file(application.qualifications_path)
+                
+                # Create a basic QualificationAnalysis object from the match score
+                qualifications_data = {
+                    'match_score': application.match_score or 0.0,
+                    'features_compared': 0,  # Will be parsed from content if available
+                    'strong_matches': [],
+                    'missing_skills': [],
+                    'partial_matches': [],
+                    'soft_skills': [],
+                    'recommendations': [],
+                    'detailed_analysis': qual_content
+                }
+                
+                # Try to parse additional data from the content
+                import re
+                
+                # Extract features compared
+                features_match = re.search(r'Features Compared:?\s*(\d+)', qual_content, re.IGNORECASE)
+                if features_match:
+                    qualifications_data['features_compared'] = int(features_match.group(1))
+                
+                # Extract strong matches
+                strong_section = re.search(r'Strong Matches:?\s*([^\n]+)', qual_content, re.IGNORECASE)
+                if strong_section:
+                    qualifications_data['strong_matches'] = [s.strip() for s in strong_section.group(1).split(',')]
+                
+                # Extract missing skills
+                missing_section = re.search(r'Missing Skills:?\s*([^\n]+)', qual_content, re.IGNORECASE)
+                if missing_section:
+                    qualifications_data['missing_skills'] = [s.strip() for s in missing_section.group(1).split(',')]
+                
+            except Exception as e:
+                print(f"Warning: Could not load qualifications data: {e}")
+                qualifications_data = None
+
         return jsonify({
             'success': True,
             'message': f'Application created successfully',
@@ -180,7 +224,8 @@ def create_application():
             'folder_path': str(application.folder_path),
             'summary_path': str(application.summary_path),
             'summary_url': summary_url,
-            'match_score': application.match_score
+            'match_score': application.match_score,
+            'qualifications': qualifications_data
         })
     except Exception as e:
         import traceback
