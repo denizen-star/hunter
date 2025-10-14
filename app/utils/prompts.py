@@ -8,55 +8,59 @@ JOB DESCRIPTION:
 CANDIDATE RESUME:
 {resume_content}
 
+---
+TECHNOLOGY ANALYSIS (PRE-COMPUTED - DO NOT MODIFY):
+
+{tech_summary}
+
+Matched Technologies: {matched_technologies}
+Missing Technologies: {missing_technologies}
+
+{tech_table}
+---
+
+IMPORTANT: The technology matching above has been pre-computed using exact string matching. DO NOT attempt to re-analyze or modify the technology matches. Simply use this information in your analysis.
+
 Please provide a detailed analysis in the following format:
 
 ## Skills Match Summary
 - Match Score: [percentage as a number, e.g., 85]
   * Consider: Technical skills (40%), Technologies/Tools (30%), Experience level (15%), Soft skills (10%), Other factors (5%)
 - Features Compared: [total number of features/skills you analyzed]
-- Strong Matches: [list top 5 matching skills, separated by commas]
-- Missing Skills: [list skills mentioned in job but not in resume, separated by commas]
-- Missing Technologies: [list key technologies mentioned in job but not in resume, separated by commas]
+- Strong Matches: {matched_technologies}
+- Missing Skills: [list NON-TECHNOLOGY skills mentioned in job but not in resume, separated by commas]
+- Missing Technologies: {missing_technologies}
 
 ## Detailed Skill Analysis
-**Skills Analyzed: [count of skills below]**
 
-For each major skill/requirement in the job description:
-1. Skill Name
-2. Job Requirement (quote from description)
-3. Resume Evidence (quote from resume if match exists)
-4. Match Level: Strong Match / Partial Match / No Match
+For each major skill/requirement in the job description (EXCLUDE TECHNOLOGIES - focus on conceptual skills, experience, and responsibilities):
+
+| Skill Name | Job Requirement | Resume Evidence | Match Level |
+| --- | --- | --- | --- |
+| [Skill] | [Quote from job description] | [Quote from resume or "Not demonstrated"] | Strong Match / Partial Match / No Match |
 
 ## Technologies & Tools
-**Technologies Compared: [count of technologies analyzed]**
-**Technologies Matched: [count found in resume] | Missing: [count not in resume]**
 
-Extract ALL technologies, tools, platforms, programming languages, frameworks, databases, and software mentioned in the job description. For each one:
-- Technology Name
-- Required in Job: Yes/No
-- Found in Resume: Yes/No/Partial
-- Resume Evidence: [specific mention or related experience]
+{tech_table}
 
-Group by categories (show both matched and missing):
-- Programming Languages: [list matched ✓ and missing ✗]
-- Frameworks & Libraries: [list matched ✓ and missing ✗]
-- Databases: [list matched ✓ and missing ✗]
-- Cloud Platforms: [list matched ✓ and missing ✗]
-- Tools & Software: [list matched ✓ and missing ✗]
-- Other Technologies: [list matched ✓ and missing ✗]
-
-**Critical Missing Technologies:**
-[List the most important technologies mentioned in the job description that are NOT found in the resume]
+**Critical Missing Technologies**
+{missing_technologies}
 
 ## Soft Skills Alignment
-**Soft Skills Analyzed: [count of soft skills below]**
 
-List relevant soft skills from job description and indicate if demonstrated in resume.
+| Soft Skill | Job Description | Resume Evidence | Match Level |
+| --- | --- | --- | --- |
+| [Skill] | [Quote from job] | [Evidence or "Not demonstrated"] | Strong Match / Partial Match / No Match |
 
 ## Recommendations
-Suggest 3-5 ways to emphasize relevant experience or address gaps.
 
-Please be thorough and specific in your analysis. Count every technology, tool, and skill you analyze."""
+1. [Recommendation to emphasize relevant experience]
+2. [Recommendation to address gaps]
+3. [Recommendation for interview preparation]
+4. [Optional: Additional recommendations]
+5. [Optional: Additional recommendations]
+
+Verification: All technologies listed in the "Technologies & Tools" section appear explicitly in the job description text above."""
 
 
 COVER_LETTER_PROMPT = """You are a professional cover letter writer.
@@ -181,6 +185,24 @@ Please extract and organize the following information in this EXACT format:
 
 ## 11. Job URL
 [If there's a URL or link mentioned, extract it. Otherwise write "Not specified"]
+
+## 12. Additional Insights
+[Extract any competitive insights or applicant information from sections like "See how you compare to others who clicked apply", "About applicants", "X applicants", "Competition level", or similar. Include:
+- Number of applicants who have applied
+- Skills comparison data
+- Application statistics
+- Any other competitive intelligence
+If not found, write "Not available"]
+
+## 13. Hiring Team Information
+[Extract hiring team details from sections with ANY of these headings: "Meet the hiring team", "People you can reach out to", "About the hiring manager", "Contact the hiring team", or similar variations. For each person, capture:
+- Name
+- Position/Title  
+- Company
+- Connection degree (1st, 2nd, 3rd, etc.)
+- Role in this job (Job poster, Hiring manager, etc.)
+Format as: "Name | Position at Company | Connection: X degree | Role: Y"
+If no hiring team information is found, write "Not available"]
 
 ## Other Information
 [Any other relevant information that doesn't fit the above categories, such as application instructions, equal opportunity statements, accommodation processes, etc.]

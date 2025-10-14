@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 import requests
 from app.models.qualification import QualificationAnalysis
 from app.utils.prompts import get_prompt
+from app.utils.tech_matcher import TechnologyMatcher
 
 
 class AIAnalyzer:
@@ -14,6 +15,7 @@ class AIAnalyzer:
         self.model = model
         self.base_url = base_url
         self.timeout = 600  # 10 minutes timeout for longer responses
+        self.tech_matcher = TechnologyMatcher()  # Initialize technology matcher
     
     def check_connection(self) -> bool:
         """Check if Ollama is running and accessible"""
@@ -74,19 +76,35 @@ class AIAnalyzer:
     
     def analyze_qualifications(self, job_description: str, resume_content: str) -> QualificationAnalysis:
         """Analyze how well the resume matches the job description"""
+        # First, do direct technology comparison using string matching (no AI hallucination)
+        tech_comparison = self.tech_matcher.compare_technologies(job_description, resume_content)
+        
+        # Format technology information for the AI
+        tech_table = self.tech_matcher.format_technology_table(tech_comparison)
+        tech_summary = self.tech_matcher.get_summary_statistics(tech_comparison)
+        
+        # Build a list of matched and missing technologies for display
+        matched_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['matched']]
+        missing_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['missing']]
+        
+        # Get the AI prompt with pre-computed technology matches
         prompt = get_prompt(
             'qualification_analysis',
             job_description=job_description,
-            resume_content=resume_content
+            resume_content=resume_content,
+            tech_summary=tech_summary,
+            tech_table=tech_table,
+            matched_technologies=', '.join(matched_techs) if matched_techs else 'None',
+            missing_technologies=', '.join(missing_techs) if missing_techs else 'None'
         )
         
         response = self._call_ollama(prompt)
         
         # Parse the response to extract structured data
-        analysis = self._parse_qualification_response(response)
+        analysis = self._parse_qualification_response(response, tech_comparison)
         return analysis
     
-    def _parse_qualification_response(self, response: str) -> QualificationAnalysis:
+    def _parse_qualification_response(self, response: str, tech_comparison: Dict = None) -> QualificationAnalysis:
         """Parse AI response into QualificationAnalysis object"""
         # Extract match score
         match_score = 0.0
@@ -100,17 +118,32 @@ class AIAnalyzer:
         if features_match:
             features_compared = int(features_match.group(1))
         
-        # Extract strong matches
+        # Use pre-computed technology matches instead of extracting from AI response
+        if tech_comparison:
+            matched_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['matched']]
+            missing_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['missing']]
+        else:
+            # Fallback to extracting from response if tech_comparison not provided
+            matched_techs = []
+            missing_techs = []
+        
+        # Extract strong skill matches (non-technology)
         strong_matches = []
         strong_section = re.search(r'Strong Matches:?\s*([^\n]+)', response, re.IGNORECASE)
         if strong_section:
             strong_matches = [s.strip() for s in strong_section.group(1).split(',')]
         
-        # Extract missing skills
+        # Combine strong skill matches with matched technologies
+        all_strong_matches = strong_matches + matched_techs
+        
+        # Extract missing skills (non-technology)
         missing_skills = []
         missing_section = re.search(r'Missing Skills:?\s*([^\n]+)', response, re.IGNORECASE)
         if missing_section:
             missing_skills = [s.strip() for s in missing_section.group(1).split(',')]
+        
+        # Combine missing skills with missing technologies
+        all_missing_skills = missing_skills + missing_techs
         
         # Extract soft skills (simplified)
         soft_skills = []
@@ -137,14 +170,13 @@ class AIAnalyzer:
         return QualificationAnalysis(
             match_score=match_score,
             features_compared=features_compared,
-            strong_matches=strong_matches[:5] if strong_matches else [],
-            missing_skills=missing_skills[:5] if missing_skills else [],
+            strong_matches=all_strong_matches[:10] if all_strong_matches else [],
+            missing_skills=all_missing_skills[:10] if all_missing_skills else [],
             partial_matches=[],
             soft_skills=soft_skills,
             recommendations=recommendations[:5] if recommendations else [],
             detailed_analysis=response
         )
-    
     def generate_cover_letter(
         self, 
         qualifications: QualificationAnalysis, 
@@ -202,7 +234,7 @@ class AIAnalyzer:
         return next_steps
     
     def extract_job_details(self, job_description: str) -> dict:
-        """Extract salary range, location, and hiring manager from job description"""
+        """Extract salary range, location, hiring manager, and posted date from job description"""
         prompt = f"""Extract the following information from this job description. If any information is not found, respond with the default value.
 
 JOB DESCRIPTION:
@@ -212,6 +244,7 @@ Please extract and format as follows:
 - Salary Range: [extract salary range or return "$0"]
 - Location: [extract location or return "N/A"]
 - Hiring Manager: [extract hiring manager name if mentioned or return "N/A"]
+- Posted Date: [extract when the job was posted (e.g., "2 days ago", "1 week ago", "October 14, 2024") or return "N/A"]
 
 Be specific and only extract information that is explicitly stated."""
         
@@ -221,6 +254,7 @@ Be specific and only extract information that is explicitly stated."""
         salary_range = "$0"
         location = "N/A"
         hiring_manager = "N/A"
+        posted_date = "N/A"
         
         # Extract salary
         salary_match = re.search(r'Salary Range:?\s*([^\n]+)', response, re.IGNORECASE)
@@ -243,10 +277,18 @@ Be specific and only extract information that is explicitly stated."""
             if not hiring_manager or hiring_manager.lower() in ['not found', 'not mentioned']:
                 hiring_manager = "N/A"
         
+        # Extract posted date
+        posted_match = re.search(r'Posted Date:?\s*([^\n]+)', response, re.IGNORECASE)
+        if posted_match:
+            posted_date = posted_match.group(1).strip()
+            if not posted_date or posted_date.lower() in ['not found', 'not mentioned']:
+                posted_date = "N/A"
+        
         return {
             'salary_range': salary_range,
             'location': location,
-            'hiring_manager': hiring_manager
+            'hiring_manager': hiring_manager,
+            'posted_date': posted_date
         }
     
     def extract_comprehensive_job_details(self, job_description: str, raw_job_description: str = None) -> str:
