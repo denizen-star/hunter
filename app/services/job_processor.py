@@ -397,6 +397,9 @@ class JobProcessor:
         
         # Update metadata
         self._save_application_metadata(application)
+        
+        # Regenerate summary to include the new update
+        self._regenerate_summary(application)
     
     def get_application_updates(self, application: Application) -> List[dict]:
         """Get all status updates for an application"""
@@ -433,4 +436,41 @@ class JobProcessor:
                     })
         
         return updates
+    
+    def _regenerate_summary(self, application: Application) -> None:
+        """Regenerate summary HTML with updated status and timeline"""
+        try:
+            from app.services.document_generator import DocumentGenerator
+            from app.models.qualification import QualificationAnalysis
+            
+            # Load qualifications from file
+            if not application.qualifications_path or not application.qualifications_path.exists():
+                print("Warning: Cannot regenerate summary - qualifications file not found")
+                return
+            
+            qual_content = read_text_file(application.qualifications_path)
+            
+            # Parse match score from qualifications file
+            match_score = application.match_score if application.match_score else 0.0
+            
+            # Create a basic QualificationAnalysis object
+            qualifications = QualificationAnalysis(
+                match_score=match_score,
+                features_compared=0,
+                strong_matches=[],
+                missing_skills=[],
+                partial_matches=[],
+                soft_skills=[],
+                recommendations=[],
+                detailed_analysis=qual_content
+            )
+            
+            # Regenerate summary
+            doc_generator = DocumentGenerator()
+            doc_generator.generate_summary_page(application, qualifications)
+            
+            print(f"  ✓ Summary regenerated with latest updates")
+            
+        except Exception as e:
+            print(f"Warning: Could not regenerate summary: {e}")
 

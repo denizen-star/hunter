@@ -33,11 +33,18 @@ class DashboardGenerator:
         for app in applications:
             cards_html += self._create_application_card(app)
         
-        # Calculate stats
+        # Calculate stats for all possible statuses
         total = len(applications)
-        pending = len([a for a in applications if a.status == 'pending'])
-        applied = len([a for a in applications if a.status == 'applied'])
-        interviewed = len([a for a in applications if a.status == 'interviewed'])
+        status_counts = {
+            'pending': len([a for a in applications if a.status.lower() == 'pending']),
+            'applied': len([a for a in applications if a.status.lower() == 'applied']),
+            'contacted someone': len([a for a in applications if a.status.lower() == 'contacted someone']),
+            'contacted hiring manager': len([a for a in applications if a.status.lower() == 'contacted hiring manager']),
+            'interviewed': len([a for a in applications if a.status.lower() == 'interviewed']),
+            'offered': len([a for a in applications if a.status.lower() == 'offered']),
+            'rejected': len([a for a in applications if a.status.lower() == 'rejected']),
+            'accepted': len([a for a in applications if a.status.lower() == 'accepted'])
+        }
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -68,27 +75,31 @@ class DashboardGenerator:
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }}
         .stats {{
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
             margin-top: 20px;
-            flex-wrap: wrap;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }}
         .stat {{
             background: rgba(255,255,255,0.2);
-            padding: 15px 30px;
+            padding: 12px 15px;
             border-radius: 12px;
             backdrop-filter: blur(10px);
+            text-align: center;
         }}
         .stat-number {{
             font-size: 32px;
             font-weight: bold;
         }}
         .stat-label {{
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.9;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
         }}
         .actions {{
             text-align: center;
@@ -211,16 +222,36 @@ class DashboardGenerator:
                     <div class="stat-label">Total</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">{pending}</div>
+                    <div class="stat-number">{status_counts['pending']}</div>
                     <div class="stat-label">Pending</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">{applied}</div>
+                    <div class="stat-number">{status_counts['applied']}</div>
                     <div class="stat-label">Applied</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">{interviewed}</div>
+                    <div class="stat-number">{status_counts['contacted someone']}</div>
+                    <div class="stat-label">Contacted Someone</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">{status_counts['contacted hiring manager']}</div>
+                    <div class="stat-label">Contacted Hiring Manager</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">{status_counts['interviewed']}</div>
                     <div class="stat-label">Interviewed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">{status_counts['offered']}</div>
+                    <div class="stat-label">Offered</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">{status_counts['rejected']}</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">{status_counts['accepted']}</div>
+                    <div class="stat-label">Accepted</div>
                 </div>
             </div>
         </div>
@@ -255,7 +286,7 @@ class DashboardGenerator:
             </div>
             <div class="card-title">{app.job_title}</div>
             <div>
-                <span class="card-status status-{app.status}">{app.status}</span>
+                <span class="card-status status-{app.status.lower()}">{app.status}</span>
             </div>
             <div class="card-meta">
                 📅 Applied: {format_for_display(app.created_at)}

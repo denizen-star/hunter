@@ -317,6 +317,9 @@ class DocumentGenerator:
         <div class="header">
             <h1>{application.company}</h1>
             <h2>{application.job_title}</h2>
+            <div style="margin-top: 15px;">
+                <span class="status-badge status-{application.status.lower()}" style="font-size: 16px; padding: 8px 20px;">{application.status}</span>
+            </div>
         </div>
         
         <div class="summary">
@@ -329,7 +332,7 @@ class DocumentGenerator:
             <div class="summary-grid">
                 <div class="summary-item">
                     <label>Status</label>
-                    <value><span class="status-badge status-{application.status}">{application.status}</span></value>
+                    <value><span class="status-badge status-{application.status.lower()}">{application.status}</span></value>
                 </div>
                 <div class="summary-item">
                     <label>Salary Range</label>
@@ -386,6 +389,53 @@ class DocumentGenerator:
         
         <div id="updates" class="tab-content">
             <h2>Updates & Notes</h2>
+            <div style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-left: 4px solid #667eea; border-radius: 4px;">
+                <strong style="color: #667eea;">Current Status:</strong> 
+                <span class="status-badge status-{application.status.lower()}" style="margin-left: 10px;">{application.status}</span>
+                <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                    Last Updated: {format_for_display(application.status_updated_at)}
+                </div>
+            </div>
+            
+            <!-- Update Status Form -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                <h3 style="color: #667eea; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    <span style="width: 20px; height: 20px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-size: 10px; font-weight: bold;">📊</span>
+                    </span>
+                    Update Status
+                </h3>
+                
+                <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
+                    <div style="margin-bottom: 15px;">
+                        <label for="new_status" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">New Status</label>
+                        <select id="new_status" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">-- Select Status --</option>
+                            <option value="Pending">⏳ Pending</option>
+                            <option value="Applied">✉️ Applied</option>
+                            <option value="Contacted Someone">👥 Contacted Someone</option>
+                            <option value="Contacted Hiring Manager">👔 Contacted Hiring Manager</option>
+                            <option value="Interviewed">🎤 Interviewed</option>
+                            <option value="Offered">🎉 Offered</option>
+                            <option value="Rejected">❌ Rejected</option>
+                            <option value="Accepted">✅ Accepted</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="status_notes" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Notes (Optional)</label>
+                        <textarea id="status_notes" placeholder="Add notes about this status update..." style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="updateStatusBtn" style="background: #fd7e14; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; transition: all 0.3s;">
+                        <span id="btnIcon" style="color: white; font-size: 12px;">📊</span>
+                        <span id="btnText">Update Status</span>
+                    </button>
+                </form>
+                
+                <div id="status-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+            </div>
+            
             <div class="timeline">
                 <div class="timeline-item">
                     <strong>{format_for_display(application.created_at)}</strong> - Application Created
@@ -396,6 +446,9 @@ class DocumentGenerator:
     </div>
     
     <script>
+        // Application ID for this summary page
+        const APPLICATION_ID = '{application.id}';
+        
         function showTab(event, tabId) {{
             // Hide all tab contents
             var contents = document.getElementsByClassName('tab-content');
@@ -413,6 +466,109 @@ class DocumentGenerator:
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }}
+        
+        async function submitStatusUpdate(event) {{
+            event.preventDefault();
+            
+            const status = document.getElementById('new_status').value;
+            const notes = document.getElementById('status_notes').value;
+            const messageDiv = document.getElementById('status-message');
+            const submitBtn = document.getElementById('updateStatusBtn');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnText = document.getElementById('btnText');
+            
+            if (!status) {{
+                showMessage('❌ Please select a status', 'error');
+                return;
+            }}
+            
+            // Clear form immediately
+            document.getElementById('statusUpdateForm').reset();
+            
+            // Show processing state
+            submitBtn.disabled = true;
+            submitBtn.style.background = '#6c757d';
+            submitBtn.style.cursor = 'not-allowed';
+            btnIcon.textContent = '⏳';
+            btnText.textContent = 'Processing...';
+            
+            // Show processing message
+            showMessage('⏳ Updating status...', 'processing');
+            
+            try {{
+                const response = await fetch(`/api/applications/${{APPLICATION_ID}}/status`, {{
+                    method: 'PUT',
+                    headers: {{
+                        'Content-Type': 'application/json'
+                    }},
+                    body: JSON.stringify({{
+                        status: status,
+                        notes: notes || null
+                    }})
+                }});
+                
+                const result = await response.json();
+                
+                if (result.success) {{
+                    // Show success state
+                    btnIcon.textContent = '✅';
+                    btnText.textContent = 'Updated!';
+                    showMessage(`✅ Status updated to ${{status}} successfully!`, 'success');
+                    
+                    // Reload the page to show updated status and timeline
+                    setTimeout(() => {{
+                        window.location.reload();
+                    }}, 2000);
+                }} else {{
+                    // Reset button state on error
+                    resetButtonState();
+                    showMessage(`❌ Error: ${{result.error}}`, 'error');
+                }}
+            }} catch (error) {{
+                // Reset button state on error
+                resetButtonState();
+                showMessage(`❌ Error: ${{error.message}}`, 'error');
+            }}
+        }}
+        
+        function resetButtonState() {{
+            const submitBtn = document.getElementById('updateStatusBtn');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnText = document.getElementById('btnText');
+            
+            submitBtn.disabled = false;
+            submitBtn.style.background = '#fd7e14';
+            submitBtn.style.cursor = 'pointer';
+            btnIcon.textContent = '📊';
+            btnText.textContent = 'Update Status';
+        }}
+        
+        function showMessage(message, type) {{
+            const messageDiv = document.getElementById('status-message');
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {{
+                messageDiv.style.backgroundColor = '#d4edda';
+                messageDiv.style.color = '#155724';
+                messageDiv.style.border = '1px solid #c3e6cb';
+            }} else if (type === 'error') {{
+                messageDiv.style.backgroundColor = '#f8d7da';
+                messageDiv.style.color = '#721c24';
+                messageDiv.style.border = '1px solid #f5c6cb';
+            }} else if (type === 'processing') {{
+                messageDiv.style.backgroundColor = '#d1ecf1';
+                messageDiv.style.color = '#0c5460';
+                messageDiv.style.border = '1px solid #bee5eb';
+            }}
+            
+            // Hide message after 5 seconds (except for processing which will be replaced)
+            if (type !== 'processing') {{
+                setTimeout(() => {{
+                    messageDiv.style.display = 'none';
+                }}, 5000);
+            }}
+        }}
     </script>
 </body>
 </html>"""
@@ -421,6 +577,7 @@ class DocumentGenerator:
     def _generate_updates_timeline(self, application: Application) -> str:
         """Generate HTML for status updates timeline"""
         from app.services.job_processor import JobProcessor
+        import re
         
         job_processor = JobProcessor()
         updates = job_processor.get_application_updates(application)
@@ -430,46 +587,56 @@ class DocumentGenerator:
         
         timeline_html = ""
         for update in reversed(updates):  # Show newest first
-            # Extract all content from the HTML file
-            full_content = ""
+            # Extract content from the HTML file
+            app_id = ""
+            notes_text = ""
+            
             try:
                 if Path(update['file']).exists():
                     html_content = read_text_file(Path(update['file']))
-                    # Extract the main content area from the HTML
-                    import re
                     
-                    # Extract application details
-                    app_match = re.search(r'<div class="application-details">(.*?)</div>', html_content, re.DOTALL)
-                    app_details = app_match.group(1).strip() if app_match else ""
+                    # Extract Application ID
+                    app_id_match = re.search(r'<strong>Application ID:</strong>\s*([^<]+)', html_content)
+                    if app_id_match:
+                        app_id = app_id_match.group(1).strip()
                     
-                    # Extract update details
-                    details_match = re.search(r'<div class="update-details">(.*?)</div>', html_content, re.DOTALL)
-                    details_content = details_match.group(1).strip() if details_match else ""
-                    
-                    # Extract notes
-                    notes_match = re.search(r'<div class="notes-content">(.*?)</div>', html_content, re.DOTALL)
-                    notes_text = notes_match.group(1).strip() if notes_match else ""
-                    
-                    # Build full content
-                    if app_details:
-                        full_content += f'<div style="margin-top: 8px; padding: 8px; background: #f0f8ff; border-radius: 4px; font-size: 14px; color: #333;"><strong>Application:</strong> {app_details}</div>'
-                    
-                    if details_content and details_content != "No additional details provided.":
-                        full_content += f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 14px; color: #555;"><strong>Details:</strong> {details_content}</div>'
-                    
-                    if notes_text and notes_text != "No additional notes":
-                        full_content += f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 14px; color: #000;"><strong>Notes:</strong> {notes_text}</div>'
+                    # Extract notes text
+                    notes_match = re.search(r'<div class="notes-text">([^<]*(?:<[^>]+>[^<]*)*?)</div>', html_content, re.DOTALL)
+                    if notes_match:
+                        notes_text = notes_match.group(1).strip()
+                        # Clean up the notes text
+                        notes_text = re.sub(r'\s+', ' ', notes_text).strip()
                         
             except Exception as e:
                 print(f"Warning: Could not extract content from {update['file']}: {e}")
             
+            # Build status badge HTML
+            status_class = f"status-{update['status'].lower()}"
+            status_badge = f'<span class="status-badge" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #d1ecf1; color: #0c5460; margin-left: 10px;">{update["status"]}</span>'
+            
+            # Build content sections
+            content_parts = []
+            
+            if app_id:
+                content_parts.append(f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #666;"><strong>Application ID:</strong> {app_id}</div>')
+            
+            if notes_text and notes_text not in ["No additional notes", ""]:
+                # Make URLs clickable
+                notes_with_links = re.sub(r'(https?://[^\s]+)', r'<a href="\1" target="_blank" style="color: #667eea; text-decoration: underline;">\1</a>', notes_text)
+                content_parts.append(f'<div style="margin-top: 8px; padding: 12px; background: #fff3e0; border-left: 3px solid #ff9800; border-radius: 4px; font-size: 14px; color: #000; white-space: pre-wrap;"><strong>📝 Notes:</strong><br>{notes_with_links}</div>')
+            
+            content_html = "".join(content_parts)
+            
             timeline_html += f"""
                 <div class="timeline-item">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #667eea;">{update['status']}</strong>
+                        <div>
+                            <strong style="color: #667eea;">{update['status']}</strong>
+                            {status_badge}
+                        </div>
                         <span style="color: #666; font-size: 14px;">{update['display_timestamp']}</span>
                     </div>
-                    {full_content}
+                    {content_html}
                 </div>"""
         
         return timeline_html
