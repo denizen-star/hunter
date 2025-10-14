@@ -5,24 +5,21 @@
 
 ## 🚨 P0 - CRITICAL (Fix First)
 
-### 1. Summary Updates Not Auto-Updating
+### 1. ~~Summary Updates Creating Duplicate Files~~ ✅ FIXED
 **Priority:** P0 - SUPER IMPORTANT  
 **Effort:** 4-6 hours  
-**Issue:** Summaries are not updating automatically with updates text in the "Updates and Notes" section  
-**Impact:** Users cannot track application progress - core tracking feature broken  
-**Business Impact:** HIGH - Prevents users from tracking application status  
+**Status:** ✅ **RESOLVED** - October 14, 2025  
+**Issue:** New summary HTML files were being created with timestamps on every status update instead of updating the existing summary file  
+**Impact:** Duplicate files cluttered application folders and users viewed outdated summaries  
+**Business Impact:** HIGH - Prevents users from tracking application status accurately  
 **Files Affected:** 
 - `app/services/document_generator.py` - Summary generation
-- `app/services/job_processor.py` - Update handling
-- Summary HTML files
 
-**Expected Behavior:** When status updates are added, the summary page should automatically refresh the "Updates & Notes" section
-
-**Implementation Plan:**
-1. Modify `generate_summary_page()` to include update timeline
-2. Update `_generate_updates_timeline()` to read from updates folder
-3. Ensure summary regenerates when status changes
-4. Test with existing applications
+**Solution Implemented:**
+- Modified `generate_summary_page()` to check if a summary file already exists
+- If exists, updates the existing file instead of creating a new timestamped file
+- Only creates new timestamped file on initial summary generation
+- Cleaned up all duplicate summary files from existing applications (removed 6 duplicates)
 
 ### 2. Summary Page Generation Failure
 **Priority:** P0 - CRITICAL  

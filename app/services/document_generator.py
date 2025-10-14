@@ -144,18 +144,23 @@ class DocumentGenerator:
                 resume_content
             )
             
-            # Save summary
-            timestamp = format_datetime_for_filename()
-            company_clean = application.company.replace(' ', '-')
-            job_title_clean = application.job_title.replace(' ', '-')
-            
-            summary_filename = f"{timestamp}-Summary-{company_clean}-{job_title_clean}.html"
-            summary_path = application.folder_path / summary_filename
+            # Save summary - reuse existing file if it exists, otherwise create new one
+            if application.summary_path and Path(application.summary_path).exists():
+                # Update existing summary file
+                summary_path = Path(application.summary_path)
+                print(f"✓ Updating existing summary page: {summary_path.name}")
+            else:
+                # Create new summary file with timestamp
+                timestamp = format_datetime_for_filename()
+                company_clean = application.company.replace(' ', '-')
+                job_title_clean = application.job_title.replace(' ', '-')
+                
+                summary_filename = f"{timestamp}-Summary-{company_clean}-{job_title_clean}.html"
+                summary_path = application.folder_path / summary_filename
+                print(f"✓ Creating new summary page: {summary_filename}")
             
             write_text_file(summary_html, summary_path)
             application.summary_path = summary_path
-            
-            print(f"✓ Summary page generated: {summary_filename}")
             
         except Exception as e:
             print(f"✗ Error generating summary page: {e}")
@@ -244,6 +249,67 @@ class DocumentGenerator:
         </div>
         '''
     
+    def _extract_technologies(self, qual_analysis: str) -> dict:
+        """Extract technologies from qualification analysis"""
+        import re
+        
+        technologies = {
+            'matched': [],
+            'missing': []
+        }
+        
+        # Find the Technologies & Tools section
+        tech_section_match = re.search(
+            r'\*\*Technologies & Tools\*\*.*?(?=\*\*[A-Z]|\Z)',
+            qual_analysis,
+            re.DOTALL
+        )
+        
+        if not tech_section_match:
+            return technologies
+        
+        tech_section = tech_section_match.group(0)
+        
+        # Extract all technologies with checkmarks (matched)
+        matched = re.findall(r'-\s+([^✗✓\n]+)\s*✓', tech_section)
+        technologies['matched'] = [tech.strip() for tech in matched]
+        
+        # Extract all technologies with X marks (missing)
+        missing = re.findall(r'-\s+([^✗✓\n]+)\s*✗', tech_section)
+        technologies['missing'] = [tech.strip() for tech in missing]
+        
+        return technologies
+    
+    def _generate_tech_pills_html(self, technologies: dict) -> str:
+        """Generate HTML for technology pills"""
+        html_parts = []
+        
+        # Matched Technologies (Green Pills)
+        if technologies.get('matched'):
+            html_parts.append('<div class="tech-pills-section">')
+            html_parts.append('<div class="tech-pills-label">✅ Matched Technologies</div>')
+            html_parts.append('<div class="tech-pills">')
+            for tech in technologies['matched']:
+                html_parts.append(f'<span class="tech-pill tech-pill-green">{tech}</span>')
+            html_parts.append('</div>')
+            html_parts.append('</div>')
+        
+        # Missing Technologies (Red Pills)
+        if technologies.get('missing'):
+            html_parts.append('<div class="tech-pills-section">')
+            html_parts.append('<div class="tech-pills-label">❌ Missing Technologies</div>')
+            html_parts.append('<div class="tech-pills">')
+            for tech in technologies['missing']:
+                html_parts.append(f'<span class="tech-pill tech-pill-red">{tech}</span>')
+            html_parts.append('</div>')
+            html_parts.append('</div>')
+        
+        # If no technologies found
+        if not technologies.get('matched') and not technologies.get('missing'):
+            html_parts.append('<div style="color: #999; font-style: italic;">No technologies extracted from job description.</div>')
+        
+        return '\n'.join(html_parts)
+    
     def _create_summary_html(
         self,
         application: Application,
@@ -259,6 +325,9 @@ class DocumentGenerator:
         
         # Parse job description markdown into formatted HTML
         job_desc_html = self._parse_job_description_markdown(job_desc)
+        
+        # Extract technologies for pills section
+        technologies = self._extract_technologies(qual_analysis)
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -310,6 +379,72 @@ class DocumentGenerator:
         .job-section-content li {{ margin: 8px 0; padding-left: 5px; }}
         .job-section-content strong {{ color: #555; font-weight: 600; }}
         #job-desc h2 {{ color: #333; font-size: 28px; margin-bottom: 25px; }}
+        
+        /* Technology Pills Styles */
+        .tech-pills-container {{ margin-top: 20px; }}
+        .tech-pills-section {{ margin-bottom: 20px; }}
+        .tech-pills-label {{ 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: #667eea; 
+            margin-bottom: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }}
+        .tech-pills {{ 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px;
+        }}
+        .tech-pill {{ 
+            display: inline-block; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }}
+        .tech-pill:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }}
+        .tech-pill-green {{ 
+            background: #d4edda; 
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }}
+        .tech-pill-yellow {{ 
+            background: #fff3cd; 
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }}
+        .tech-pill-red {{ 
+            background: #f8d7da; 
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }}
+        .tech-legend {{ 
+            margin-top: 15px; 
+            padding: 12px; 
+            background: #f8f9fa; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            color: #666;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }}
+        .tech-legend-item {{ 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+        }}
+        .tech-legend-dot {{ 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%;
+        }}
     </style>
 </head>
 <body>
@@ -357,6 +492,24 @@ class DocumentGenerator:
             </div>
             
             {f'<div style="margin-top: 20px;"><label style="display: block; font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 600;">Job URL</label><a href="{application.job_url}" target="_blank">{application.job_url}</a></div>' if application.job_url else ''}
+        </div>
+        
+        <!-- Technologies Section -->
+        <div style="padding: 30px 40px; border-bottom: 1px solid #e0e0e0; background: white;">
+            <h2 style="margin-bottom: 15px; color: #333; font-size: 24px;">12. Technologies</h2>
+            <div class="tech-pills-container">
+                {self._generate_tech_pills_html(technologies)}
+            </div>
+            <div class="tech-legend">
+                <div class="tech-legend-item">
+                    <div class="tech-legend-dot" style="background: #d4edda; border: 1px solid #c3e6cb;"></div>
+                    <span>100% Match (Found in Resume)</span>
+                </div>
+                <div class="tech-legend-item">
+                    <div class="tech-legend-dot" style="background: #f8d7da; border: 1px solid #f5c6cb;"></div>
+                    <span>Missing (Not in Resume)</span>
+                </div>
+            </div>
         </div>
         
         <div class="tabs">
