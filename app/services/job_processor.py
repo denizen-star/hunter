@@ -8,6 +8,7 @@ from app.utils.file_utils import (
     load_yaml, save_yaml, write_text_file, read_text_file
 )
 from app.utils.datetime_utils import get_est_now, format_datetime_for_filename
+from app.services.ai_analyzer import AIAnalyzer
 
 
 class JobProcessor:
@@ -16,7 +17,86 @@ class JobProcessor:
     def __init__(self):
         self.applications_dir = get_data_path('applications')
         ensure_dir_exists(self.applications_dir)
+        self.ai_analyzer = AIAnalyzer()
     
+    def _clean_job_description(self, job_description: str) -> str:
+        """Remove LinkedIn metadata and clutter from job descriptions"""
+        lines = job_description.split('\n')
+        cleaned_lines = []
+        
+        # Skip LinkedIn metadata patterns
+        skip_patterns = [
+            'Skip to main content',
+            'LinkedIn',
+            'Jobs',
+            'Clear text',
+            'Sign in',
+            'Join now',
+            'Apply',
+            'Save',
+            'Use AI to assess',
+            'Get AI-powered advice',
+            'Am I a good fit',
+            'Tailor my resume',
+            'See who',
+            'has hired for this role',
+            'applicants',
+            'days ago',
+            'weeks ago',
+            'months ago',
+            'years ago',
+            'More searches',
+            'Explore collaborative articles',
+            'Explore More',
+            'Show less',
+            'Show more',
+            'Similar jobs',
+            'People also viewed',
+            'Similar Searches',
+            'Open jobs',
+            'Show less',
+            'Show more'
+        ]
+        
+        for line in lines:
+            line = line.strip()
+            
+            # Skip empty lines
+            if not line:
+                continue
+                
+            # Skip lines that match skip patterns
+            should_skip = False
+            for pattern in skip_patterns:
+                if pattern.lower() in line.lower():
+                    should_skip = True
+                    break
+            
+            # Skip lines that are just navigation elements
+            if line in ['', ' ', '|', '-', '•']:
+                should_skip = True
+                
+            # Skip lines that are very short (likely navigation elements)
+            if len(line) <= 3:
+                should_skip = True
+                
+            if not should_skip:
+                cleaned_lines.append(line)
+        
+        # Remove duplicate consecutive lines
+        final_lines = []
+        prev_line = ""
+        for line in cleaned_lines:
+            if line != prev_line:
+                final_lines.append(line)
+                prev_line = line
+        
+        # Join back and clean up multiple newlines
+        cleaned = '\n'.join(final_lines)
+        cleaned = '\n'.join([line for line in cleaned.split('\n') if line.strip()])
+        
+        return cleaned
+
     def create_job_application(
         self,
         company: str,
@@ -25,6 +105,24 @@ class JobProcessor:
         job_url: Optional[str] = None
     ) -> Application:
         """Create a new job application"""
+        # Store raw job description for date extraction
+        raw_job_description = job_description
+        
+        # Clean the job description to remove LinkedIn metadata
+        cleaned_job_description = self._clean_job_description(job_description)
+        
+        # Extract comprehensive job details using AI
+        print("  → Extracting comprehensive job details...")
+        try:
+            structured_job_description = self.ai_analyzer.extract_comprehensive_job_details(
+                cleaned_job_description, 
+                raw_job_description
+            )
+        except Exception as e:
+            print(f"  ⚠ Warning: Could not extract structured job details: {e}")
+            print("  → Using cleaned job description instead")
+            structured_job_description = cleaned_job_description
+        
         # Generate application ID
         timestamp = format_datetime_for_filename()
         app_id = f"{timestamp}-{company}-{job_title}"
@@ -50,10 +148,10 @@ class JobProcessor:
         updates_dir = folder_path / "updates"
         ensure_dir_exists(updates_dir)
         
-        # Save job description
+        # Save structured job description
         job_desc_filename = f"{timestamp}-{company}-{job_title}.md"
         job_desc_path = folder_path / job_desc_filename
-        write_text_file(job_description, job_desc_path)
+        write_text_file(structured_job_description, job_desc_path)
         application.job_description_path = job_desc_path
         
         # Save application metadata
@@ -185,10 +283,59 @@ class JobProcessor:
         }}
         .application-info {{
             background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #28a745;
+        }}
+        .application-info h3 {{
+            color: #28a745;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }}
+        .info-content {{
+            display: grid;
+            gap: 8px;
+        }}
+        .info-item {{
+            font-size: 14px;
+            color: #333;
+        }}
+        .info-item strong {{
+            color: #555;
+            font-weight: 600;
+        }}
+        .update-info {{
+            background-color: #e3f2fd;
             padding: 15px;
             border-radius: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196f3;
+        }}
+        .update-item {{
             font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }}
+        .update-item strong {{
+            color: #1976d2;
+            font-weight: 600;
+        }}
+        .notes-content h4 {{
+            color: #ff9800;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }}
+        .notes-text {{
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #ff9800;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
         }}
         .back-link {{
             display: inline-block;
@@ -213,13 +360,34 @@ class JobProcessor:
         </div>
         
         <div class="application-info">
-            <strong>Application:</strong> {application.company} - {application.job_title}<br>
-            <strong>Application ID:</strong> {application.id}
+            <h3>📋 Application Information</h3>
+            <div class="info-content">
+                <div class="info-item">
+                    <strong>Company:</strong> {application.company}
+                </div>
+                <div class="info-item">
+                    <strong>Position:</strong> {application.job_title}
+                </div>
+                <div class="info-item">
+                    <strong>Application ID:</strong> {application.id}
+                </div>
+                <div class="info-item">
+                    <strong>Current Status:</strong> <span class="status-badge status-{status.lower().replace(' ', '-')}">{status}</span>
+                </div>
+            </div>
         </div>
         
         <div class="notes-section">
-            <h3>Update Details</h3>
-            {f'<div class="notes-content">{notes}</div>' if notes else '<div class="no-notes">No additional notes provided for this status update.</div>'}
+            <h3>📝 Status Update Details</h3>
+            <div class="update-info">
+                <div class="update-item">
+                    <strong>Status Change:</strong> {status}
+                </div>
+                <div class="update-item">
+                    <strong>Updated On:</strong> {display_timestamp}
+                </div>
+            </div>
+            {f'<div class="notes-content"><h4>📋 Additional Notes</h4><div class="notes-text">{notes}</div></div>' if notes else '<div class="no-notes">No additional notes provided for this status update.</div>'}
         </div>
     </div>
 </body>

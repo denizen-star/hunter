@@ -248,4 +248,84 @@ Be specific and only extract information that is explicitly stated."""
             'location': location,
             'hiring_manager': hiring_manager
         }
+    
+    def extract_comprehensive_job_details(self, job_description: str, raw_job_description: str = None) -> str:
+        """
+        Extract comprehensive job details and return formatted markdown.
+        
+        Args:
+            job_description: Cleaned job description text
+            raw_job_description: Original raw job description (used to extract posting date)
+        
+        Returns:
+            Formatted markdown with structured job details
+        """
+        from datetime import datetime, timedelta
+        
+        # Extract posting date from raw description if available
+        posted_date = "Not specified"
+        if raw_job_description:
+            posted_date = self._extract_posting_date(raw_job_description)
+        
+        # Use AI to extract all structured information
+        prompt = get_prompt('job_description_extraction', job_description=job_description)
+        extracted_info = self._call_ollama(prompt)
+        
+        # Format the final markdown with posting date header
+        formatted_markdown = f"""# Job Description Details
+
+**Posted Date:** {posted_date}
+
+---
+
+{extracted_info}
+"""
+        
+        return formatted_markdown
+    
+    def _extract_posting_date(self, raw_text: str) -> str:
+        """
+        Extract posting date from raw job description text and calculate actual date.
+        Handles formats like "4 days ago", "2 weeks ago", "1 month ago", etc.
+        
+        Returns date in MM/DD/YYYY format.
+        """
+        from datetime import datetime, timedelta
+        
+        # Look for posting date patterns
+        patterns = [
+            (r'(\d+)\s+days?\s+ago', 'days'),
+            (r'(\d+)\s+weeks?\s+ago', 'weeks'),
+            (r'(\d+)\s+months?\s+ago', 'months'),
+            (r'(\d+)\s+years?\s+ago', 'years'),
+            (r'(\d+)\s+hours?\s+ago', 'hours'),
+            (r'(\d+)\s+minutes?\s+ago', 'minutes'),
+        ]
+        
+        today = datetime.now()
+        
+        for pattern, unit in patterns:
+            match = re.search(pattern, raw_text, re.IGNORECASE)
+            if match:
+                value = int(match.group(1))
+                
+                if unit == 'days':
+                    posted_date = today - timedelta(days=value)
+                elif unit == 'weeks':
+                    posted_date = today - timedelta(weeks=value)
+                elif unit == 'months':
+                    posted_date = today - timedelta(days=value * 30)  # Approximate
+                elif unit == 'years':
+                    posted_date = today - timedelta(days=value * 365)  # Approximate
+                elif unit == 'hours':
+                    posted_date = today - timedelta(hours=value)
+                elif unit == 'minutes':
+                    posted_date = today - timedelta(minutes=value)
+                else:
+                    posted_date = today
+                
+                return posted_date.strftime('%m/%d/%Y')
+        
+        # If no pattern matched, return today's date
+        return today.strftime('%m/%d/%Y')
 

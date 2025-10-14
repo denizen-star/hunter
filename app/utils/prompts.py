@@ -134,13 +134,68 @@ Based on this analysis, provide:
 Be specific and actionable. Focus on what the candidate should do to increase their chances of success."""
 
 
+JOB_DESCRIPTION_EXTRACTION_PROMPT = """You are an expert at parsing job descriptions from LinkedIn and extracting structured information.
+
+IMPORTANT: Extract information ONLY if it is explicitly stated in the job description. If information is not found, respond with "Not specified".
+
+JOB DESCRIPTION:
+{job_description}
+
+Please extract and organize the following information in this EXACT format:
+
+## 1. Job Title
+[Extract the job title]
+
+## 2. Location and Employment Type
+**Location:** [City, State/Province, Country or Remote/Hybrid]
+**Employment Type:** [Full-time/Part-time/Contract/etc.]
+
+## 3. Compensation
+**Salary Range:** [e.g., "$120,000 - $150,000 per year" or "Not specified"]
+**Bonus Structure:** [e.g., "Annual bonus eligibility" or "Not specified"]
+
+## 4. Job Summary/Overview
+[Extract the 3-5 sentence overview that explains the role's purpose and importance. If there's a section like "About the Role" or introductory paragraph, extract it here.]
+
+## 5. Key Responsibilities and Duties
+[Extract all bullet points or paragraphs describing main tasks and expectations. Maintain original format if possible.]
+
+## 6. Required Qualifications and Skills
+[Extract mandatory requirements including:
+- Education/Certifications
+- Years of Experience
+- Must-have Technical Skills
+- Must-have Soft Skills]
+
+## 7. Preferred Qualifications (Optional)
+[Extract "nice-to-have" skills, experience, or attributes if mentioned separately. If not separated from required qualifications, write "Not separated from required qualifications"]
+
+## 8. Benefits
+[Extract details about benefits like health insurance, 401k, PTO, retirement, flexible work, etc.]
+
+## 9. Company Culture/EVP
+[Extract information about company values, diversity and inclusion, growth opportunities, work environment, etc.]
+
+## 10. Company Overview
+[Extract the company introduction, mission, and culture description if provided]
+
+## 11. Job URL
+[If there's a URL or link mentioned, extract it. Otherwise write "Not specified"]
+
+## Other Information
+[Any other relevant information that doesn't fit the above categories, such as application instructions, equal opportunity statements, accommodation processes, etc.]
+
+Be thorough and extract all relevant information from the job description."""
+
+
 def get_prompt(prompt_name: str, **kwargs) -> str:
     """Get a formatted prompt by name"""
     prompts = {
         'qualification_analysis': QUALIFICATION_ANALYSIS_PROMPT,
         'cover_letter': COVER_LETTER_PROMPT,
         'resume_rewrite': RESUME_REWRITE_PROMPT,
-        'summary_generation': SUMMARY_GENERATION_PROMPT
+        'summary_generation': SUMMARY_GENERATION_PROMPT,
+        'job_description_extraction': JOB_DESCRIPTION_EXTRACTION_PROMPT
     }
     
     if prompt_name not in prompts:

@@ -302,6 +302,45 @@ def update_status(app_id):
         # Update status with notes
         job_processor.update_application_status(application, status, notes)
         
+        # Regenerate summary page to include new update in timeline
+        try:
+            # Load qualifications to regenerate summary
+            if application.qualifications_path and Path(application.qualifications_path).exists():
+                from app.utils.file_utils import read_text_file
+                qual_content = read_text_file(application.qualifications_path)
+                
+                # Extract match score from qualifications
+                import re
+                match_score = 0.0
+                score_match = re.search(r'Match Score:?\s*(\d+)', qual_content, re.IGNORECASE)
+                if score_match:
+                    match_score = float(score_match.group(1))
+                
+                # Create QualificationAnalysis object
+                from app.models.qualification import QualificationAnalysis
+                qualifications = QualificationAnalysis(
+                    match_score=match_score,
+                    features_compared=24,  # Default value
+                    strong_matches=[],
+                    missing_skills=[],
+                    partial_matches=[],
+                    soft_skills=[],
+                    recommendations=[],
+                    detailed_analysis=qual_content
+                )
+                
+                # Update application metadata with qualifications info
+                application.match_score = match_score
+                application.qualifications_path = str(application.folder_path / "Headofdata-Qualifications.md")
+                
+                # Regenerate summary page
+                doc_generator.generate_summary_page(application, qualifications)
+                
+                # Save updated metadata
+                job_processor._save_application_metadata(application)
+        except Exception as e:
+            print(f"Warning: Could not regenerate summary page: {e}")
+        
         # Update dashboard
         dashboard_generator.generate_index_page()
         

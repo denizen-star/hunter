@@ -122,37 +122,127 @@ class DocumentGenerator:
         qualifications: QualificationAnalysis
     ) -> None:
         """Generate HTML summary page for the application"""
-        # Extract salary and location from job description
-        job_description = read_text_file(application.job_description_path)
-        job_details = self.ai_analyzer.extract_job_details(job_description)
+        try:
+            # Extract salary and location from job description
+            job_description = read_text_file(application.job_description_path)
+            job_details = self.ai_analyzer.extract_job_details(job_description)
+            
+            # Load all documents
+            job_desc_content = read_text_file(application.job_description_path)
+            qual_content = read_text_file(application.qualifications_path) if application.qualifications_path else ""
+            cover_letter_content = read_text_file(application.cover_letter_path) if application.cover_letter_path else ""
+            resume_content = read_text_file(application.custom_resume_path) if application.custom_resume_path else ""
+            
+            # Generate summary
+            summary_html = self._create_summary_html(
+                application,
+                qualifications,
+                job_details,
+                job_desc_content,
+                qual_content,
+                cover_letter_content,
+                resume_content
+            )
+            
+            # Save summary
+            timestamp = format_datetime_for_filename()
+            company_clean = application.company.replace(' ', '-')
+            job_title_clean = application.job_title.replace(' ', '-')
+            
+            summary_filename = f"{timestamp}-Summary-{company_clean}-{job_title_clean}.html"
+            summary_path = application.folder_path / summary_filename
+            
+            write_text_file(summary_html, summary_path)
+            application.summary_path = summary_path
+            
+            print(f"✓ Summary page generated: {summary_filename}")
+            
+        except Exception as e:
+            print(f"✗ Error generating summary page: {e}")
+            raise
+    
+    def _parse_job_description_markdown(self, job_desc: str) -> str:
+        """Parse structured job description markdown and convert to formatted HTML"""
+        import re
         
-        # Load all documents
-        job_desc_content = read_text_file(application.job_description_path)
-        qual_content = read_text_file(application.qualifications_path) if application.qualifications_path else ""
-        cover_letter_content = read_text_file(application.cover_letter_path) if application.cover_letter_path else ""
-        resume_content = read_text_file(application.custom_resume_path) if application.custom_resume_path else ""
+        # Convert markdown to HTML with custom styling for job description
+        html_parts = []
         
-        # Generate summary
-        summary_html = self._create_summary_html(
-            application,
-            qualifications,
-            job_details,
-            job_desc_content,
-            qual_content,
-            cover_letter_content,
-            resume_content
-        )
+        # Split by headers
+        lines = job_desc.split('\n')
+        current_section = None
+        current_content = []
         
-        # Save summary
-        timestamp = format_datetime_for_filename()
-        company_clean = application.company.replace(' ', '-')
-        job_title_clean = application.job_title.replace(' ', '-')
+        for line in lines:
+            # Check for headers
+            if line.startswith('# '):
+                if current_section and current_content:
+                    html_parts.append(self._format_job_section(current_section, '\n'.join(current_content)))
+                current_section = line[2:].strip()
+                current_content = []
+            elif line.startswith('## '):
+                if current_section and current_content:
+                    html_parts.append(self._format_job_section(current_section, '\n'.join(current_content)))
+                current_section = line[3:].strip()
+                current_content = []
+            else:
+                current_content.append(line)
         
-        summary_filename = f"{timestamp}-Summary-{company_clean}-{job_title_clean}.html"
-        summary_path = application.folder_path / summary_filename
+        # Add last section
+        if current_section and current_content:
+            html_parts.append(self._format_job_section(current_section, '\n'.join(current_content)))
         
-        write_text_file(summary_html, summary_path)
-        application.summary_path = summary_path
+        return '\n'.join(html_parts)
+    
+    def _format_job_section(self, title: str, content: str) -> str:
+        """Format a job description section with appropriate styling"""
+        import re
+        
+        content = content.strip()
+        if not content or content == '---':
+            return ''
+        
+        # Extract section number if present (e.g., "1. Job Title" -> "Job Title")
+        title_clean = re.sub(r'^\d+\.\s*', '', title)
+        
+        # Format content - handle markdown bold formatting
+        formatted_content = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', content)
+        
+        # Handle bullet points
+        if '- ' in formatted_content or '* ' in formatted_content:
+            lines = formatted_content.split('\n')
+            ul_items = []
+            regular_text = []
+            
+            for line in lines:
+                line = line.strip()
+                if line.startswith('- ') or line.startswith('* '):
+                    ul_items.append(f'<li>{line[2:]}</li>')
+                elif line:
+                    regular_text.append(line)
+            
+            formatted_content = ''
+            if regular_text:
+                formatted_content += '<p>' + '<br>'.join(regular_text) + '</p>'
+            if ul_items:
+                formatted_content += '<ul>' + ''.join(ul_items) + '</ul>'
+        else:
+            # Replace double newlines with paragraph breaks
+            paragraphs = formatted_content.split('\n\n')
+            formatted_content = '<p>' + '</p><p>'.join(p.replace('\n', '<br>') for p in paragraphs if p.strip()) + '</p>'
+        
+        # Special styling for certain sections
+        if 'Posted Date' in title or title_clean == 'Job Description Details':
+            return f'<div class="job-meta">{formatted_content}</div>'
+        
+        return f'''
+        <div class="job-section">
+            <h3 class="job-section-title">{title_clean}</h3>
+            <div class="job-section-content">
+                {formatted_content}
+            </div>
+        </div>
+        '''
     
     def _create_summary_html(
         self,
@@ -166,6 +256,9 @@ class DocumentGenerator:
     ) -> str:
         """Create HTML summary page"""
         match_score_color = self._get_match_score_color(qualifications.match_score)
+        
+        # Parse job description markdown into formatted HTML
+        job_desc_html = self._parse_job_description_markdown(job_desc)
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -204,6 +297,19 @@ class DocumentGenerator:
         a:hover {{ text-decoration: underline; }}
         .timeline {{ margin-top: 20px; }}
         .timeline-item {{ padding: 15px; border-left: 3px solid #667eea; margin-left: 10px; margin-bottom: 15px; background: #f9f9f9; border-radius: 4px; }}
+        
+        /* Job Description Specific Styles */
+        .job-meta {{ background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #667eea; }}
+        .job-meta p {{ margin: 5px 0; color: #333; font-size: 14px; }}
+        .job-meta strong {{ color: #667eea; font-weight: 600; }}
+        .job-section {{ margin-bottom: 30px; padding: 20px; background: #fafafa; border-radius: 8px; border: 1px solid #e9ecef; }}
+        .job-section-title {{ color: #667eea; font-size: 20px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; }}
+        .job-section-content {{ color: #333; font-size: 15px; line-height: 1.7; }}
+        .job-section-content p {{ margin: 10px 0; }}
+        .job-section-content ul {{ margin: 10px 0 10px 20px; }}
+        .job-section-content li {{ margin: 8px 0; padding-left: 5px; }}
+        .job-section-content strong {{ color: #555; font-weight: 600; }}
+        #job-desc h2 {{ color: #333; font-size: 28px; margin-bottom: 25px; }}
     </style>
 </head>
 <body>
@@ -260,7 +366,7 @@ class DocumentGenerator:
         
         <div id="job-desc" class="tab-content active">
             <h2>Job Description</h2>
-            <pre>{job_desc}</pre>
+            {job_desc_html}
         </div>
         
         <div id="qualifications" class="tab-content">
@@ -324,15 +430,46 @@ class DocumentGenerator:
         
         timeline_html = ""
         for update in reversed(updates):  # Show newest first
+            # Extract all content from the HTML file
+            full_content = ""
+            try:
+                if Path(update['file']).exists():
+                    html_content = read_text_file(Path(update['file']))
+                    # Extract the main content area from the HTML
+                    import re
+                    
+                    # Extract application details
+                    app_match = re.search(r'<div class="application-details">(.*?)</div>', html_content, re.DOTALL)
+                    app_details = app_match.group(1).strip() if app_match else ""
+                    
+                    # Extract update details
+                    details_match = re.search(r'<div class="update-details">(.*?)</div>', html_content, re.DOTALL)
+                    details_content = details_match.group(1).strip() if details_match else ""
+                    
+                    # Extract notes
+                    notes_match = re.search(r'<div class="notes-content">(.*?)</div>', html_content, re.DOTALL)
+                    notes_text = notes_match.group(1).strip() if notes_match else ""
+                    
+                    # Build full content
+                    if app_details:
+                        full_content += f'<div style="margin-top: 8px; padding: 8px; background: #f0f8ff; border-radius: 4px; font-size: 14px; color: #333;"><strong>Application:</strong> {app_details}</div>'
+                    
+                    if details_content and details_content != "No additional details provided.":
+                        full_content += f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 14px; color: #555;"><strong>Details:</strong> {details_content}</div>'
+                    
+                    if notes_text and notes_text != "No additional notes":
+                        full_content += f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 14px; color: #000;"><strong>Notes:</strong> {notes_text}</div>'
+                        
+            except Exception as e:
+                print(f"Warning: Could not extract content from {update['file']}: {e}")
+            
             timeline_html += f"""
                 <div class="timeline-item">
-                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <strong style="color: #667eea;">{update['status']}</strong>
                         <span style="color: #666; font-size: 14px;">{update['display_timestamp']}</span>
                     </div>
-                    <a href="{update['relative_url']}" target="_blank" style="color: #667eea; text-decoration: none; font-size: 14px;">
-                        View Details →
-                    </a>
+                    {full_content}
                 </div>"""
         
         return timeline_html
