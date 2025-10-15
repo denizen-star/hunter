@@ -96,6 +96,9 @@ def get_all_applications():
             'match_score': app.match_score,
             'posted_date': app.posted_date,
             'job_url': app.job_url,
+            'salary_range': app.salary_range,
+            'location': app.location,
+            'hiring_manager': app.hiring_manager,
             'summary_path': str(app.summary_path) if app.summary_path else None
         } for app in applications])
     except Exception as e:
@@ -179,6 +182,45 @@ def init_resume():
             'success': True,
             'message': 'Base resume template created successfully',
             'path': str(resume_manager.resumes_dir)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/resume/technologies', methods=['GET'])
+def get_resume_technologies():
+    """Get technologies extracted from resume"""
+    try:
+        tech_data = resume_manager.load_technologies()
+        if not tech_data:
+            return jsonify({
+                'success': True,
+                'technologies': None,
+                'message': 'No technologies extracted yet. Save your resume to extract technologies.'
+            })
+        
+        return jsonify({
+            'success': True,
+            'technologies': tech_data
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/resume/technologies/regenerate', methods=['POST'])
+def regenerate_technologies():
+    """Regenerate technologies from current resume"""
+    try:
+        # Load current resume
+        resume = resume_manager.load_base_resume()
+        
+        # Extract and save technologies
+        tech_data = resume_manager.extract_and_save_technologies(resume.content)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Technologies regenerated successfully. Found {tech_data["total_technologies"]} technologies.',
+            'technologies': tech_data
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -353,6 +395,10 @@ def get_application(app_id):
                 'updated_at': format_for_display(application.status_updated_at),
                 'match_score': application.match_score,
                 'job_url': application.job_url,
+                'posted_date': application.posted_date,
+                'salary_range': application.salary_range,
+                'location': application.location,
+                'hiring_manager': application.hiring_manager,
                 'folder_path': str(application.folder_path),
                 'summary_path': str(application.summary_path) if application.summary_path else None,
                 'updates': updates
@@ -462,6 +508,54 @@ def update_status(app_id):
             'message': f'Status updated to {status}',
             'application_id': application.id,
             'status': status,
+            'updated_at': format_for_display(application.status_updated_at)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/applications/<app_id>/details', methods=['PUT'])
+def update_job_details(app_id):
+    """Update job details (salary_range, location, hiring_manager)"""
+    try:
+        data = request.json
+        salary_range = data.get('salary_range')
+        location = data.get('location')
+        hiring_manager = data.get('hiring_manager')
+        
+        # Check if at least one field is provided
+        if not any([salary_range, location, hiring_manager]):
+            return jsonify({
+                'success': False,
+                'error': 'At least one field must be provided: salary_range, location, hiring_manager'
+            }), 400
+        
+        # Load application
+        application = job_processor.get_application_by_id(app_id)
+        
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Update job details
+        job_processor.update_job_details(
+            application,
+            salary_range=salary_range,
+            location=location,
+            hiring_manager=hiring_manager
+        )
+        
+        # Update dashboard
+        dashboard_generator.generate_index_page()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Job details updated successfully',
+            'application_id': application.id,
+            'updated_fields': {
+                'salary_range': application.salary_range,
+                'location': application.location,
+                'hiring_manager': application.hiring_manager
+            },
             'updated_at': format_for_display(application.status_updated_at)
         })
     except Exception as e:

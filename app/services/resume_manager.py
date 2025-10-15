@@ -1,11 +1,12 @@
 """Resume management service"""
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict
 from app.models.resume import Resume
 from app.utils.file_utils import (
     get_data_path, ensure_dir_exists, 
     load_yaml, save_yaml, read_text_file, write_text_file
 )
+from app.utils.simple_tech_extractor import SimpleTechExtractor
 
 
 class ResumeManager:
@@ -16,6 +17,8 @@ class ResumeManager:
         ensure_dir_exists(self.resumes_dir)
         self.base_resume_path = self.resumes_dir / 'base_resume.md'
         self.base_resume_metadata_path = self.resumes_dir / 'base_resume.yaml'
+        self.tech_yaml_path = self.resumes_dir / 'tech.yaml'
+        self.tech_extractor = SimpleTechExtractor()
     
     def load_base_resume(self) -> Resume:
         """Load the base resume"""
@@ -42,7 +45,7 @@ class ResumeManager:
         )
     
     def save_base_resume(self, resume: Resume) -> None:
-        """Save the base resume"""
+        """Save the base resume and extract technologies"""
         # Save content
         write_text_file(resume.content, self.base_resume_path)
         
@@ -57,6 +60,9 @@ class ResumeManager:
             'is_active': resume.is_active
         }
         save_yaml(metadata, self.base_resume_metadata_path)
+        
+        # Extract and save technologies
+        self.extract_and_save_technologies(resume.content)
     
     def create_base_resume_template(self) -> None:
         """Create a base resume template"""
@@ -135,4 +141,137 @@ Brief summary of your professional background and key strengths (2-3 sentences).
             return base_resume
         else:
             return self.load_base_resume()
+    
+    def extract_and_save_technologies(self, resume_content: str) -> Dict[str, any]:
+        """Extract technologies from resume content and save to tech.yaml"""
+        # Extract technologies using the simple tech extractor
+        extracted_techs = self.tech_extractor.extract_technologies(resume_content)
+        
+        # Create technology data structure
+        tech_data = {
+            'extracted_at': self._get_current_timestamp(),
+            'total_technologies': len(extracted_techs),
+            'technologies': {}
+        }
+        
+        # Organize technologies by category
+        for tech_name in extracted_techs:
+            tech_data['technologies'][tech_name] = {
+                'display_name': tech_name,
+                'variations_found': [tech_name.lower()],  # Simple extractor doesn't track variations
+                'category': self._get_technology_category(tech_name)
+            }
+        
+        # Save to tech.yaml
+        save_yaml(tech_data, self.tech_yaml_path)
+        
+        return tech_data
+    
+    def load_technologies(self) -> Optional[Dict[str, any]]:
+        """Load technologies from tech.yaml"""
+        if not self.tech_yaml_path.exists():
+            return None
+        
+        try:
+            return load_yaml(self.tech_yaml_path)
+        except Exception as e:
+            print(f"Warning: Could not load technologies from {self.tech_yaml_path}: {e}")
+            return None
+    
+    def get_technology_list(self) -> List[str]:
+        """Get a simple list of technology names from the cached tech.yaml"""
+        tech_data = self.load_technologies()
+        if not tech_data or 'technologies' not in tech_data:
+            return []
+        
+        return list(tech_data['technologies'].keys())
+    
+    def _get_current_timestamp(self) -> str:
+        """Get current timestamp as string"""
+        from datetime import datetime
+        return datetime.now().isoformat()
+    
+    def _get_technology_category(self, tech_name: str) -> str:
+        """Get the category for a technology based on the tech matcher's categories"""
+        # Programming Languages
+        if tech_name in ['Python', 'Java', 'JavaScript', 'TypeScript', 'R', 'Scala', 'Go', 'Rust', 
+                        'C++', 'C#', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'Perl', 'Lua', 'Dart', 
+                        'Elixir', 'Haskell', 'Objective-C', 'PowerShell', 'Bash', 'MATLAB', 'Julia', 'Groovy', 'PL/SQL']:
+            return 'Programming Languages'
+        
+        # Databases
+        elif tech_name in ['SQL', 'MySQL', 'PostgreSQL', 'Oracle', 'MongoDB', 'Redis', 'Cassandra', 
+                          'DynamoDB', 'Redshift', 'BigQuery', 'Snowflake', 'SQLite', 'DB2', 'MariaDB', 
+                          'Neo4j', 'CouchDB', 'Elasticsearch', 'InfluxDB', 'Couchbase', 'HBase', 
+                          'Teradata', 'MemSQL', 'SQL Server', 'ClickHouse', 'TimescaleDB']:
+            return 'Databases'
+        
+        # Cloud Platforms
+        elif tech_name in ['AWS', 'Azure', 'GCP', 'IBM Cloud', 'Oracle Cloud', 'Alibaba Cloud', 
+                          'DigitalOcean', 'Heroku', 'Linode', 'Vultr', 'OpenStack', 'Cloud Foundry']:
+            return 'Cloud Platforms'
+        
+        # DevOps & Infrastructure
+        elif tech_name in ['Docker', 'Kubernetes', 'Terraform', 'Ansible', 'Jenkins', 'GitLab', 
+                          'GitHub', 'Git', 'CircleCI', 'Travis', 'Chef', 'Puppet', 'Bamboo', 
+                          'Azure DevOps', 'Bitbucket', 'GitHub Actions', 'GitLab CI', 'Helm', 
+                          'Rancher', 'Nomad', 'Consul', 'Vault', 'Pulumi', 'CI/CD']:
+            return 'DevOps & Infrastructure'
+        
+        # Data Engineering & Analytics
+        elif tech_name in ['Databricks', 'Apache Spark', 'Hadoop', 'Apache Kafka', 'Apache Airflow', 'Prefect', 'dbt', 
+                          'Talend', 'Informatica', 'Fivetran', 'Stitch', 'Segment', 'Kubeflow', 
+                          'Luigi', 'Dagster', 'Apache Flink', 'Apache Beam', 'Apache NiFi', 
+                          'Apache Storm', 'Apache Hive', 'Presto', 'Trino', 'Apache Drill', 
+                          'Apache Pig', 'Apache Kylin', 'Great Expectations', 'Dataflow', 'Glue', 
+                          'Data Factory', 'Matillion']:
+            return 'Data Engineering & Analytics'
+        
+        # Data Architecture
+        elif tech_name in ['Data Warehouse', 'Data Lake', 'Data Mesh', 'Blockchain Ledger', 'Data Marts', 'Spreadmarts']:
+            return 'Data Architecture'
+        
+        # Business Intelligence
+        elif tech_name in ['Tableau', 'Power BI', 'Qlik', 'Looker', 'Metabase', 'Sisense', 
+                          'Business Objects', 'Cognos', 'Crystal Reports', 'Domo', 'Mode', 
+                          'Superset', 'Redash', 'Chartio', 'Preset', 'Google Data Studio', 
+                          'MicroStrategy', 'ThoughtSpot', 'Alteryx', 'Spotfire', 'Pentaho', 'Yellowfin']:
+            return 'Business Intelligence'
+        
+        # Monitoring & Observability
+        elif tech_name in ['Grafana', 'DataDog', 'Datatrace', 'New Relic', 'Kibana', 'Splunk', 
+                          'Prometheus', 'ELK Stack', 'Logstash', 'Sentry', 'AppDynamics', 
+                          'Dynatrace', 'Sumo Logic', 'CloudWatch', 'Azure Monitor', 'Stackdriver']:
+            return 'Monitoring & Observability'
+        
+        # Web Frameworks
+        elif tech_name in ['React', 'Angular', 'Vue', 'Django', 'Flask', 'Spring', 'Express', 
+                          'Next.js', 'Nuxt.js', 'Svelte', 'Gatsby', 'Ember', 'Backbone', 
+                          'ASP.NET', 'Rails', 'Laravel', 'Phoenix', 'Koa', 'Fastify', 'NestJS', 
+                          'FastAPI', 'Gin', 'Echo', 'Fiber']:
+            return 'Web Frameworks'
+        
+        # Machine Learning & AI
+        elif tech_name in ['TensorFlow', 'PyTorch', 'Scikit-learn', 'Keras', 'MLflow', 
+                          'Hugging Face', 'LangChain', 'OpenAI', 'Anthropic', 'LLM', 'XGBoost', 
+                          'LightGBM', 'CatBoost', 'SageMaker', 'Vertex AI', 'Azure ML', 'H2O', 
+                          'RAPIDS', 'Optuna', 'Weights & Biases', 'Comet ML', 'Ray', 'Dask', 'MXNet', 'Caffe', 
+                          'ONNX', 'TensorRT']:
+            return 'Machine Learning & AI'
+        
+        # Data Sources & Integration
+        elif tech_name in ['Salesforce', 'Segment', 'Pendo', 'Tatari', 'Braze', 'Quicken', 'ERPs', 'NetSuite', 'Zapier', 'SAP']:
+            return 'Data Sources & Integration'
+        
+        # Data Modeling & Design
+        elif tech_name in ['ERwin', 'LucidArt']:
+            return 'Data Modeling & Design'
+        
+        # Other Tools
+        elif tech_name in ['Excel', 'MS Access', 'Jupyter', 'Pandas', 'NumPy', 'Google Sheets', 'Airtable', 
+                          'DVC', 'MLOps', 'DataOps', 'Cursor AI', 'PowerPoint', 'Word', 'Outlook']:
+            return 'Other Tools'
+        
+        else:
+            return 'Other'
 

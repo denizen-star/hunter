@@ -154,15 +154,24 @@ class JobProcessor:
         write_text_file(structured_job_description, job_desc_path)
         application.job_description_path = job_desc_path
         
-        # Extract posted date from job description
-        print("  → Extracting posted date...")
+        # Extract job details from job description
+        print("  → Extracting job details...")
         try:
             job_details = self.ai_analyzer.extract_job_details(raw_job_description)
             application.posted_date = job_details.get('posted_date', 'N/A')
+            application.salary_range = job_details.get('salary_range', 'N/A')
+            application.location = job_details.get('location', 'N/A')
+            application.hiring_manager = job_details.get('hiring_manager', 'N/A')
             print(f"  ✓ Posted date: {application.posted_date}")
+            print(f"  ✓ Salary range: {application.salary_range}")
+            print(f"  ✓ Location: {application.location}")
+            print(f"  ✓ Hiring manager: {application.hiring_manager}")
         except Exception as e:
-            print(f"  ⚠ Warning: Could not extract posted date: {e}")
+            print(f"  ⚠ Warning: Could not extract job details: {e}")
             application.posted_date = 'N/A'
+            application.salary_range = 'N/A'
+            application.location = 'N/A'
+            application.hiring_manager = 'N/A'
         
         # Save application metadata
         self._save_application_metadata(application)
@@ -447,6 +456,40 @@ class JobProcessor:
         
         return updates
     
+    def update_job_details(
+        self,
+        application: Application,
+        salary_range: Optional[str] = None,
+        location: Optional[str] = None,
+        hiring_manager: Optional[str] = None
+    ) -> None:
+        """Update job details for an application"""
+        updated = False
+        
+        if salary_range is not None:
+            application.salary_range = salary_range
+            updated = True
+            
+        if location is not None:
+            application.location = location
+            updated = True
+            
+        if hiring_manager is not None:
+            application.hiring_manager = hiring_manager
+            updated = True
+        
+        if updated:
+            # Update the status_updated_at timestamp
+            application.status_updated_at = get_est_now()
+            
+            # Save updated metadata
+            self._save_application_metadata(application)
+            
+            # Regenerate summary to reflect changes
+            self._regenerate_summary(application)
+            
+            print(f"  ✓ Job details updated for {application.company} - {application.job_title}")
+
     def _regenerate_summary(self, application: Application) -> None:
         """Regenerate summary HTML with updated status and timeline"""
         try:

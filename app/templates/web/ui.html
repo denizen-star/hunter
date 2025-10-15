@@ -449,6 +449,17 @@
                 <textarea id="resume_content" style="min-height: 300px;" placeholder="Paste your resume in markdown format..."></textarea>
             </div>
             
+            <!-- Technologies Section -->
+            <div class="form-group" id="technologies-section" style="display: none;">
+                <label>Extracted Technologies</label>
+                <div id="technologies-display" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; max-height: 200px; overflow-y: auto;">
+                    <p style="color: #666; font-style: italic; margin: 0;">No technologies extracted yet. Save your resume to extract technologies.</p>
+                </div>
+                <small style="color: #666; margin-top: 5px; display: block;">
+                    Technologies are automatically extracted when you save your resume and used for job matching.
+                </small>
+            </div>
+            
             <div style="display: flex; gap: 15px;">
                 <button class="btn" onclick="saveResume()">Save Resume</button>
                 <button class="btn btn-secondary" onclick="hideResumeManager()">Cancel</button>
@@ -682,6 +693,9 @@
                     document.getElementById('location').value = resume.location || '';
                     document.getElementById('resume_content').value = resume.content || '';
                 }
+                
+                // Load technologies
+                await loadTechnologies();
             } catch (error) {
                 console.error('Error loading resume:', error);
             }
@@ -714,8 +728,10 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showStatus('✅ Resume saved successfully!', 'success');
-                    hideResumeManager();
+                    showStatus('✅ Resume saved successfully! Technologies extracted and cached.', 'success');
+                    
+                    // Reload technologies after saving
+                    await loadTechnologies();
                 } else {
                     showStatus(`❌ Error: ${result.error}`, 'error');
                 }
@@ -859,6 +875,73 @@
             } catch (error) {
                 showStatus(`❌ Error: ${error.message}`, 'error');
             }
+        }
+        
+        // Technology Management Functions
+        async function loadTechnologies() {
+            try {
+                const response = await fetch('/api/resume/technologies');
+                const data = await response.json();
+                
+                const technologiesSection = document.getElementById('technologies-section');
+                const technologiesDisplay = document.getElementById('technologies-display');
+                
+                if (data.success && data.technologies) {
+                    technologiesSection.style.display = 'block';
+                    displayTechnologies(data.technologies);
+                } else {
+                    technologiesSection.style.display = 'block';
+                    technologiesDisplay.innerHTML = '<p style="color: #666; font-style: italic; margin: 0;">No technologies extracted yet. Save your resume to extract technologies.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading technologies:', error);
+            }
+        }
+        
+        function displayTechnologies(techData) {
+            const technologiesDisplay = document.getElementById('technologies-display');
+            const technologies = techData.technologies || {};
+            
+            if (Object.keys(technologies).length === 0) {
+                technologiesDisplay.innerHTML = '<p style="color: #666; font-style: italic; margin: 0;">No technologies found in resume.</p>';
+                return;
+            }
+            
+            // Group technologies by category
+            const categories = {};
+            Object.entries(technologies).forEach(([techName, techInfo]) => {
+                const category = techInfo.category || 'Other';
+                if (!categories[category]) {
+                    categories[category] = [];
+                }
+                categories[category].push({
+                    name: techName,
+                    display_name: techInfo.display_name || techName,
+                    variations: techInfo.variations_found || []
+                });
+            });
+            
+            // Create HTML for technologies
+            let html = `<div style="margin-bottom: 10px; color: #666; font-size: 12px;">
+                <strong>Total Technologies:</strong> ${techData.total_technologies} | 
+                <strong>Extracted:</strong> ${new Date(techData.extracted_at).toLocaleString()}
+            </div>`;
+            
+            Object.entries(categories).sort().forEach(([category, techs]) => {
+                html += `<div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; color: #333; margin-bottom: 8px; font-size: 14px;">${category}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">`;
+                
+                techs.forEach(tech => {
+                    html += `<span style="display: inline-block; background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 12px; font-size: 11px; border: 1px solid #bbdefb;">
+                        ${tech.display_name}
+                    </span>`;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            technologiesDisplay.innerHTML = html;
         }
     </script>
 </body>

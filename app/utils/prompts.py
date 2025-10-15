@@ -15,11 +15,20 @@ TECHNOLOGY ANALYSIS (PRE-COMPUTED - DO NOT MODIFY):
 
 Matched Technologies: {matched_technologies}
 Missing Technologies: {missing_technologies}
-
-{tech_table}
 ---
 
 IMPORTANT: The technology matching above has been pre-computed using exact string matching. DO NOT attempt to re-analyze or modify the technology matches. Simply use this information in your analysis.
+
+CRITICAL: Before listing any skill as "Missing", carefully examine the resume for evidence of that skill. Look for:
+- Job titles that indicate the skill (e.g., "Product Manager" indicates product management experience)
+- Bullet points describing relevant experience
+- Years of experience in related roles
+- Specific achievements that demonstrate the skill
+
+For example:
+- "Leadership" is demonstrated by managing teams, directing projects, or having leadership titles
+- "Product Management" is demonstrated by product manager roles, roadmaps, feature specifications, etc.
+- "Data Strategy" is demonstrated by strategic planning, roadmaps, data initiatives, etc.
 
 Please provide a detailed analysis in the following format:
 
@@ -28,8 +37,18 @@ Please provide a detailed analysis in the following format:
   * Consider: Technical skills (40%), Technologies/Tools (30%), Experience level (15%), Soft skills (10%), Other factors (5%)
 - Features Compared: [total number of features/skills you analyzed]
 - Strong Matches: {matched_technologies}
-- Missing Skills: [list NON-TECHNOLOGY skills mentioned in job but not in resume, separated by commas]
+- Missing Skills: [ONLY list skills that are genuinely absent from the resume after careful examination, separated by commas]
 - Missing Technologies: {missing_technologies}
+
+## Technology Comparison
+
+**Match Score: {tech_summary}**
+
+### ✅ Matched Technologies
+{matched_technologies}
+
+### ❌ Missing Technologies
+{missing_technologies}
 
 ## Detailed Skill Analysis
 
@@ -39,12 +58,13 @@ For each major skill/requirement in the job description (EXCLUDE TECHNOLOGIES - 
 | --- | --- | --- | --- |
 | [Skill] | [Quote from job description] | [Quote from resume or "Not demonstrated"] | Strong Match / Partial Match / No Match |
 
-## Technologies & Tools
-
-{tech_table}
-
-**Critical Missing Technologies**
-{missing_technologies}
+IMPORTANT: When evaluating "Resume Evidence", look for:
+- Direct job titles that indicate the skill
+- Bullet points that describe relevant experience
+- Years of experience in related roles
+- Specific achievements or responsibilities that demonstrate the skill
+- Leadership experience (managing teams, directing projects, etc.)
+- Strategic experience (roadmaps, planning, initiatives, etc.)
 
 ## Soft Skills Alignment
 
@@ -58,14 +78,10 @@ For each major skill/requirement in the job description (EXCLUDE TECHNOLOGIES - 
 2. [Recommendation to address gaps]
 3. [Recommendation for interview preparation]
 4. [Optional: Additional recommendations]
-5. [Optional: Additional recommendations]
-
-Verification: All technologies listed in the "Technologies & Tools" section appear explicitly in the job description text above."""
+5. [Optional: Additional recommendations]"""
 
 
-COVER_LETTER_PROMPT = """You are a professional cover letter writer.
-
-Write an eloquent, professional cover letter based on:
+COVER_LETTER_PROMPT = """You are a professional cover letter writer. Generate the actual cover letter content directly - do not provide explanations or meta-commentary about creating a cover letter.
 
 QUALIFICATIONS ANALYSIS:
 {qualifications}
@@ -76,7 +92,7 @@ SOFT SKILLS TO EMPHASIZE (use 50% of these):
 COMPANY: {company}
 JOB TITLE: {job_title}
 
-REQUIREMENTS:
+Generate a professional cover letter with these requirements:
 - Opening paragraph: Express interest and briefly state why you're a great fit
 - Include a dedicated paragraph: "Why do I want to work for {company}" - research and highlight specific company values, mission, culture, or recent achievements that align with your career goals
 - 1-2 body paragraphs: Integrate the provided soft skills naturally and emphasize strengths from the qualifications analysis
@@ -84,10 +100,9 @@ REQUIREMENTS:
 - Tone: Professional yet personable
 - Length: 350-450 words (slightly longer to accommodate company interest section)
 
-Format as markdown with proper structure.
-Start with a proper salutation like "Dear Hiring Manager," and end with "Sincerely, [Name]"
+Start directly with "Dear Hiring Manager," and end with "Sincerely, [Name]"
 
-IMPORTANT: For the "Why do I want to work for {company}" section, make specific, research-based statements about what attracts you to this particular company. Avoid generic statements that could apply to any company.
+IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation.
 """
 
 

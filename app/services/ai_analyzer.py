@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 import requests
 from app.models.qualification import QualificationAnalysis
 from app.utils.prompts import get_prompt
-from app.utils.tech_matcher import TechnologyMatcher
+from app.utils.simple_tech_extractor import SimpleTechExtractor
 
 
 class AIAnalyzer:
@@ -15,7 +15,7 @@ class AIAnalyzer:
         self.model = model
         self.base_url = base_url
         self.timeout = 600  # 10 minutes timeout for longer responses
-        self.tech_matcher = TechnologyMatcher()  # Initialize technology matcher
+        self.tech_extractor = SimpleTechExtractor()  # Initialize simple tech extractor
     
     def check_connection(self) -> bool:
         """Check if Ollama is running and accessible"""
@@ -76,16 +76,24 @@ class AIAnalyzer:
     
     def analyze_qualifications(self, job_description: str, resume_content: str) -> QualificationAnalysis:
         """Analyze how well the resume matches the job description"""
-        # First, do direct technology comparison using string matching (no AI hallucination)
-        tech_comparison = self.tech_matcher.compare_technologies(job_description, resume_content)
+        # Use cached technologies from resume manager if available
+        from app.services.resume_manager import ResumeManager
+        resume_manager = ResumeManager()
+        cached_tech_list = resume_manager.get_technology_list()
         
-        # Format technology information for the AI
-        tech_table = self.tech_matcher.format_technology_table(tech_comparison)
-        tech_summary = self.tech_matcher.get_summary_statistics(tech_comparison)
+        if cached_tech_list:
+            # Use cached technologies for comparison
+            tech_comparison = self._compare_with_cached_technologies(job_description, cached_tech_list)
+        else:
+            # Fallback to extracting from resume content
+            tech_comparison = self.tech_extractor.compare_technologies(job_description, resume_content)
         
-        # Build a list of matched and missing technologies for display
-        matched_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['matched']]
-        missing_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['missing']]
+        # Format technology information for the AI using simple format
+        tech_summary = f"Technologies Required: {tech_comparison['total_required']}, Technologies Matched: {tech_comparison['match_count']}, Technologies Missing: {tech_comparison['missing_count']}, Match Score: {tech_comparison['score']}%"
+        
+        # Build simple lists for display
+        matched_techs = tech_comparison['matched']
+        missing_techs = tech_comparison['missing']
         
         # Get the AI prompt with pre-computed technology matches
         prompt = get_prompt(
@@ -93,7 +101,7 @@ class AIAnalyzer:
             job_description=job_description,
             resume_content=resume_content,
             tech_summary=tech_summary,
-            tech_table=tech_table,
+            tech_table="",  # We'll use simple format instead
             matched_technologies=', '.join(matched_techs) if matched_techs else 'None',
             missing_technologies=', '.join(missing_techs) if missing_techs else 'None'
         )
@@ -120,8 +128,8 @@ class AIAnalyzer:
         
         # Use pre-computed technology matches instead of extracting from AI response
         if tech_comparison:
-            matched_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['matched']]
-            missing_techs = [self.tech_matcher.get_technology_display_name(t) for t in tech_comparison['missing']]
+            matched_techs = tech_comparison['matched']
+            missing_techs = tech_comparison['missing']
         else:
             # Fallback to extracting from response if tech_comparison not provided
             matched_techs = []
@@ -324,6 +332,36 @@ Be specific and only extract information that is explicitly stated."""
 """
         
         return formatted_markdown
+    
+    def _compare_with_cached_technologies(self, job_description: str, cached_tech_list: List[str]) -> Dict[str, any]:
+        """Compare job description technologies with cached resume technologies"""
+        # Extract technologies from job description
+        job_techs = set(self.tech_extractor.extract_technologies(job_description))
+        
+        # Use cached technologies as resume technologies
+        resume_techs = set(cached_tech_list)
+        
+        # Calculate matches
+        matched = job_techs & resume_techs
+        missing = job_techs - resume_techs
+        additional = resume_techs - job_techs
+        
+        # Calculate simple score
+        total_required = len(job_techs)
+        match_count = len(matched)
+        score = int((match_count / total_required * 100)) if total_required > 0 else 0
+        
+        return {
+            'job_technologies': sorted(list(job_techs)),
+            'resume_technologies': sorted(list(resume_techs)),
+            'matched': sorted(list(matched)),
+            'missing': sorted(list(missing)),
+            'additional': sorted(list(additional)),
+            'total_required': total_required,
+            'match_count': match_count,
+            'missing_count': len(missing),
+            'score': score
+        }
     
     def _extract_posting_date(self, raw_text: str) -> str:
         """

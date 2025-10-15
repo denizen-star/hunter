@@ -123,9 +123,13 @@ class DocumentGenerator:
     ) -> None:
         """Generate HTML summary page for the application"""
         try:
-            # Extract salary and location from job description
-            job_description = read_text_file(application.job_description_path)
-            job_details = self.ai_analyzer.extract_job_details(job_description)
+            # Use stored job details from application.yaml instead of re-extracting
+            job_details = {
+                'salary_range': application.salary_range or 'N/A',
+                'location': application.location or 'N/A', 
+                'hiring_manager': application.hiring_manager or 'N/A',
+                'posted_date': application.posted_date or 'N/A'
+            }
             
             # Load all documents
             job_desc_content = read_text_file(application.job_description_path)
