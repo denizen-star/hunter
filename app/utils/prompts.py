@@ -83,8 +83,11 @@ IMPORTANT: When evaluating "Resume Evidence", look for:
 
 COVER_LETTER_PROMPT = """You are a professional cover letter writer. Generate the actual cover letter content directly - do not provide explanations or meta-commentary about creating a cover letter.
 
-QUALIFICATIONS ANALYSIS:
-{qualifications}
+CANDIDATE STRENGTHS:
+{strong_matches}
+
+MISSING SKILLS TO ADDRESS:
+{missing_skills}
 
 SOFT SKILLS TO EMPHASIZE (use 50% of these):
 {soft_skills}
@@ -95,7 +98,7 @@ JOB TITLE: {job_title}
 Generate a professional cover letter with these requirements:
 - Opening paragraph: Express interest and briefly state why you're a great fit
 - Include a dedicated paragraph: "Why do I want to work for {company}" - research and highlight specific company values, mission, culture, or recent achievements that align with your career goals
-- 1-2 body paragraphs: Integrate the provided soft skills naturally and emphasize strengths from the qualifications analysis
+- 1-2 body paragraphs: Integrate the provided soft skills naturally and emphasize the candidate strengths listed above
 - Closing: Call to action
 - Tone: Professional yet personable
 - Length: 350-450 words (slightly longer to accommodate company interest section)

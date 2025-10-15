@@ -197,9 +197,14 @@ class AIAnalyzer:
         soft_skills_list = [s['skill'] for s in qualifications.soft_skills[:len(qualifications.soft_skills)//2 + 1]]
         soft_skills_str = '\n- '.join(soft_skills_list) if soft_skills_list else "Leadership, Communication, Problem Solving"
         
+        # Extract strong matches and missing skills for cleaner prompt
+        strong_matches_str = ', '.join(qualifications.strong_matches) if qualifications.strong_matches else "Technical expertise, Data analysis, Project management"
+        missing_skills_str = ', '.join(qualifications.missing_skills) if qualifications.missing_skills else "None identified"
+        
         prompt = get_prompt(
             'cover_letter',
-            qualifications=qualifications.detailed_analysis,
+            strong_matches=strong_matches_str,
+            missing_skills=missing_skills_str,
             soft_skills=soft_skills_str,
             company=company,
             job_title=job_title
