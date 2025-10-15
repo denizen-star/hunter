@@ -281,6 +281,7 @@ class DashboardGenerator:
                         <div class="nav-links">
                             <a href="javascript:void(0)" onclick="openNewApplication()" class="nav-link">+ New Application</a>
                             <a href="/dashboard" class="nav-link">Dashboard</a>
+                            <a href="/reports" class="nav-link">Reports</a>
                             <a href="javascript:void(0)" onclick="showAIStatus()" class="nav-link">AI Status</a>
                             <a href="javascript:void(0)" onclick="openResumeManager()" class="nav-link">Resume Manager</a>
                         </div>

@@ -650,6 +650,123 @@ def update_dashboard():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/reports')
+def view_reports():
+    """View the reports page"""
+    return render_template('reports.html')
+
+@app.route('/api/reports', methods=['GET'])
+def get_reports_data():
+    """Get reports data for specified period"""
+    try:
+        from datetime import datetime, timedelta
+        import pytz
+        
+        period = request.args.get('period', 'today')
+        
+        # Get all applications
+        applications = job_processor.list_all_applications()
+        
+        # Calculate date ranges
+        now = datetime.now(pytz.timezone('US/Eastern'))
+        
+        if period == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        elif period == 'yesterday':
+            yesterday = now - timedelta(days=1)
+            start_date = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = yesterday.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif period == '7days':
+            start_date = now - timedelta(days=7)
+            end_date = now
+        elif period == '30days':
+            start_date = now - timedelta(days=30)
+            end_date = now
+        else:  # all
+            start_date = datetime(2020, 1, 1, tzinfo=pytz.timezone('US/Eastern'))
+            end_date = now
+        
+        # Filter applications by period
+        period_applications = []
+        status_changes = []
+        
+        for app in applications:
+            # Check if application was created in period
+            if start_date <= app.created_at <= end_date:
+                period_applications.append(app)
+            
+            # Check if status was updated in period (must be significantly different from creation)
+            if app.status_updated_at and start_date <= app.status_updated_at <= end_date:
+                # Check if the status update was significantly different from creation (more than 1 minute)
+                time_diff = abs((app.status_updated_at - app.created_at).total_seconds())
+                if time_diff > 60:  # More than 1 minute difference
+                    status_changes.append(app)
+        
+        # Applications by status (for period) - count applications created in period by their current status
+        applications_by_status = {}
+        for app in period_applications:
+            status = app.status.lower()
+            applications_by_status[status] = applications_by_status.get(status, 0) + 1
+        
+        # Status changes by status (for period) - count status changes that happened in period by the new status
+        status_changes_by_status = {}
+        for app in status_changes:
+            status = app.status.lower()
+            status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
+        
+        
+        # Follow-up applications (more than one week without updates)
+        one_week_ago = now - timedelta(days=7)
+        followup_applications = []
+        
+        for app in applications:
+            # Skip applications that are already rejected or accepted
+            if app.status.lower() in ['rejected', 'accepted']:
+                continue
+            
+            last_update = app.status_updated_at or app.created_at
+            if last_update < one_week_ago:
+                # Generate summary URL
+                summary_url = None
+                if app.summary_path and app.summary_path.exists():
+                    folder_name = app.folder_path.name
+                    summary_filename = app.summary_path.name
+                    summary_url = f"/applications/{folder_name}/{summary_filename}"
+                
+                followup_applications.append({
+                    'company': app.company,
+                    'job_title': app.job_title,
+                    'match_score': round(app.match_score or 0),
+                    'last_updated': format_for_display(last_update),
+                    'summary_url': summary_url
+                })
+        
+        # Sort follow-up applications by newest update first
+        followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
+        
+        # Summary statistics
+        summary = {
+            'total_applications': len(period_applications),
+            'new_applications': len(period_applications),
+            'status_changes': len(status_changes),
+            'followup_needed': len(followup_applications)
+        }
+        
+        return jsonify({
+            'success': True,
+            'period': period,
+            'summary': summary,
+            'applications_by_status': applications_by_status,
+            'status_changes': status_changes_by_status,
+            'followup_applications': followup_applications
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/dashboard')
 def view_dashboard():
     """View the generated dashboard"""

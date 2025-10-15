@@ -310,15 +310,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎯 Job Hunter</h1>
+            <h1>Job Hunter</h1>
             <p>AI-Powered Resume Matching & Application Management</p>
         </div>
         
         <div class="quick-links">
-            <a href="/dashboard" target="_blank">📊 View Dashboard</a>
-            <a href="#" onclick="checkOllama(); return false;">🔍 Check AI Status</a>
-            <a href="#" onclick="showResumeManager(); return false;">📄 Manage Resume</a>
-            <a href="#" onclick="showStatusUpdate(); return false;">📝 Update Status</a>
+            <a href="/dashboard" target="_blank">View Dashboard</a>
+            <a href="/reports" target="_blank">View Reports</a>
+            <a href="#" onclick="checkOllama(); return false;">Check AI Status</a>
+            <a href="#" onclick="showResumeManager(); return false;">Manage Resume</a>
         </div>
         
         <div id="status-banner" class="status-banner hidden"></div>
@@ -346,11 +346,10 @@
                 <div class="form-group">
                     <label for="job_description">Job Description *</label>
                     <textarea id="job_description" name="job_description" required placeholder="Paste the complete job description here..."></textarea>
-                    <small>💡 <strong>Pro Tip:</strong> Include ALL information from LinkedIn including "People you can reach out to", "Meet the hiring team", applicant statistics, and "See how you compare" sections for better analysis</small>
                 </div>
                 
                 <button type="submit" class="btn" id="submitBtn">
-                    🚀 Analyze & Create Application
+                    Analyze & Create Application
                 </button>
             </form>
             
@@ -470,7 +469,7 @@
         <div class="card hidden" id="status-update-module">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px;">
                 <div style="width: 24px; height: 24px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: white; font-size: 12px; font-weight: bold;">📊</span>
+                    <span style="color: white; font-size: 12px; font-weight: bold;"></span>
                 </div>
                 <h2 style="margin: 0; color: #333;">Update Status</h2>
             </div>
@@ -489,14 +488,14 @@
                     <label for="new_status">New Status</label>
                     <select id="new_status" required>
                         <option value="">-- Select Status --</option>
-                        <option value="Pending">⏳ Pending</option>
-                        <option value="Applied">✉️ Applied</option>
-                        <option value="Contacted Someone">👥 Contacted Someone</option>
-                        <option value="Contacted Hiring Manager">👔 Contacted Hiring Manager</option>
-                        <option value="Interviewed">🎤 Interviewed</option>
-                        <option value="Offered">🎉 Offered</option>
-                        <option value="Rejected">❌ Rejected</option>
-                        <option value="Accepted">✅ Accepted</option>
+                        <option value="Pending"> Pending</option>
+                        <option value="Applied"> Applied</option>
+                        <option value="Contacted Someone"> Contacted Someone</option>
+                        <option value="Contacted Hiring Manager"> Contacted Hiring Manager</option>
+                        <option value="Interviewed"> Interviewed</option>
+                        <option value="Offered"> Offered</option>
+                        <option value="Rejected"> Rejected</option>
+                        <option value="Accepted"> Accepted</option>
                     </select>
                 </div>
                 
@@ -507,7 +506,7 @@
                 
                 <button type="submit" class="btn" style="background: #fd7e14; display: flex; align-items: center; gap: 8px; justify-content: center;">
                     <div style="width: 16px; height: 16px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 2px; display: flex; align-items: center; justify-content: center;">
-                        <span style="color: white; font-size: 8px;">📊</span>
+                        <span style="color: white; font-size: 8px;"></span>
                     </div>
                     Update Status
                 </button>
@@ -532,13 +531,13 @@
                 
                 if (data.connected) {
                     if (showMessage) {
-                        showStatus(`✅ AI Connected - Model: ${data.current_model}`, 'success');
+                        showStatus(` AI Connected - Model: ${data.current_model}`, 'success');
                     }
                 } else {
-                    showStatus('⚠️ AI Not Connected - Please start Ollama', 'warning');
+                    showStatus(' AI Not Connected - Please start Ollama', 'warning');
                 }
             } catch (error) {
-                showStatus('❌ Error checking AI status', 'error');
+                showStatus(' Error checking AI status', 'error');
             }
         }
         
@@ -597,13 +596,13 @@
                     
                     showStatus('Application created successfully!', 'success');
                 } else {
-                    showStatus(`❌ Error: ${result.error}`, 'error');
+                    showStatus(` Error: ${result.error}`, 'error');
                     document.getElementById('application-form').querySelector('form').classList.remove('hidden');
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('submitBtn').disabled = false;
                 }
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus(` Error: ${error.message}`, 'error');
                 document.getElementById('application-form').querySelector('form').classList.remove('hidden');
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('submitBtn').disabled = false;
@@ -728,15 +727,15 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showStatus('✅ Resume saved successfully! Technologies extracted and cached.', 'success');
+                    showStatus(' Resume saved successfully! Technologies extracted and cached.', 'success');
                     
                     // Reload technologies after saving
                     await loadTechnologies();
                 } else {
-                    showStatus(`❌ Error: ${result.error}`, 'error');
+                    showStatus(` Error: ${result.error}`, 'error');
                 }
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus(` Error: ${error.message}`, 'error');
             }
         }
         
@@ -836,7 +835,7 @@
             event.preventDefault();
             
             if (!selectedApplicationId) {
-                showStatus('❌ Please select an application first', 'error');
+                showStatus(' Please select an application first', 'error');
                 return;
             }
             
@@ -844,7 +843,7 @@
             const notes = document.getElementById('status_notes').value;
             
             if (!status) {
-                showStatus('❌ Please select a status', 'error');
+                showStatus(' Please select a status', 'error');
                 return;
             }
             
@@ -863,17 +862,17 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showStatus(`✅ Status updated to ${status} successfully!`, 'success');
+                    showStatus(` Status updated to ${status} successfully!`, 'success');
                     hideStatusUpdate();
                     
                     // Reset form
                     document.getElementById('statusUpdateForm').reset();
                     selectedApplicationId = null;
                 } else {
-                    showStatus(`❌ Error: ${result.error}`, 'error');
+                    showStatus(` Error: ${result.error}`, 'error');
                 }
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus(` Error: ${error.message}`, 'error');
             }
         }
         
