@@ -32,8 +32,8 @@ dashboard_generator = DashboardGenerator()
 
 @app.route('/')
 def index():
-    """Main application form page"""
-    return render_template('ui.html')
+    """Landing page"""
+    return render_template('landing.html')
 
 @app.route('/new-application')
 def new_application():

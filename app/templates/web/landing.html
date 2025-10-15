@@ -1,631 +1,353 @@
-{% extends "base.html" %}
-
-{% block title %}Job Hunter - AI-Powered Application Manager{% endblock %}
-
-{% block content %}
-<!-- Dashboard Page -->
-<div id="dashboard-page" class="page active" style="display: block;">
-    <div class="dashboard-header">
-        <h2>🎯 Job Application Dashboard</h2>
-        <p>Manage your job applications with AI-powered insights</p>
-    </div>
-    
-    <div class="dashboard-stats">
-        <div class="stat-card">
-            <h3>Total Applications</h3>
-            <div class="stat-number" id="total-applications">-</div>
-        </div>
-        <div class="stat-card">
-            <h3>Pending</h3>
-            <div class="stat-number" id="pending-applications">-</div>
-        </div>
-        <div class="stat-card">
-            <h3>Interviews</h3>
-            <div class="stat-number" id="interview-applications">-</div>
-        </div>
-        <div class="stat-card">
-            <h3>Offers</h3>
-            <div class="stat-number" id="offer-applications">-</div>
-        </div>
-    </div>
-    
-    <div class="dashboard-actions">
-        <a href="#" data-page="new-application" class="btn btn-primary">+ New Application</a>
-        <a href="#" data-page="reports" class="btn btn-outline">View Reports</a>
-    </div>
-    
-    <div class="recent-applications">
-        <h3>Recent Applications</h3>
-        <div id="recent-applications-list">
-            <!-- Recent applications will be loaded here -->
-        </div>
-    </div>
-    
-    <!-- Full Dashboard with Tabs and Cards -->
-    <div class="dashboard-tabs-container">
-        <div class="dashboard-tabs-header">
-            <button class="dashboard-tab active" data-status="all">All <span class="tab-count">(18)</span></button>
-            <button class="dashboard-tab" data-status="pending">Pending <span class="tab-count">(1)</span></button>
-            <button class="dashboard-tab" data-status="applied">Applied <span class="tab-count">(11)</span></button>
-            <button class="dashboard-tab" data-status="interviewed">Interviewed <span class="tab-count">(0)</span></button>
-            <button class="dashboard-tab" data-status="offered">Offered <span class="tab-count">(0)</span></button>
-            <button class="dashboard-tab" data-status="rejected">Rejected <span class="tab-count">(6)</span></button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Hunter - AI-Powered Application Manager</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 18px 36px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .feature-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .stat-label {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .quick-actions {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .quick-actions h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .action-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .action-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+        
+        .action-item a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: block;
+        }
+        
+        .action-item .icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>Job Hunter</h1>
+            <p>AI-Powered Resume Matching & Application Management</p>
+            <div class="cta-buttons">
+                <a href="/new-application" class="btn btn-primary">
+                    <span>+</span> New Application
+                </a>
+                <a href="/dashboard" class="btn btn-secondary">
+                    View Dashboard
+                </a>
+            </div>
         </div>
         
-        <div class="dashboard-tab-content active" id="dashboard-tab-all">
-            <div class="sort-controls">
-                <h3>All Applications</h3>
-                <select class="sort-select" onchange="sortApplications(this.value)">
-                    <option value="updated_desc">Updated (Newest First)</option>
-                    <option value="updated_asc">Updated (Oldest First)</option>
-                    <option value="applied_desc">Applied (Newest First)</option>
-                    <option value="applied_asc">Applied (Oldest First)</option>
-                    <option value="job_posted_desc">Job Posted (Newest First)</option>
-                    <option value="job_posted_asc">Job Posted (Oldest First)</option>
-                    <option value="match_desc">Match % (Highest First)</option>
-                    <option value="match_asc">Match % (Lowest First)</option>
-                </select>
-            </div>
-            <div class="applications-grid" id="applications-grid-all">
-                <!-- Application cards will be loaded here -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- New Application Page -->
-<div id="new-application-page" class="page" style="display: none;">
-    <div class="page-header">
-        <h2>New Job Application</h2>
-        <p>Create a new job application with AI-powered analysis</p>
-    </div>
-    
-    <div class="form-container">
-        <form id="new-application-form" class="auto-save" method="POST" action="/api/create-application">
-            <div class="form-group">
-                <label for="company">Company Name *</label>
-                <input type="text" id="company" name="company" class="form-control" required>
-                <small>Enter the company name (e.g., "Google", "Microsoft")</small>
+        <div class="features">
+            <div class="feature-card">
+                <span class="feature-icon">AI</span>
+                <h3>AI-Powered Analysis</h3>
+                <p>Advanced AI analyzes job descriptions and matches them against your resume with detailed scoring and insights.</p>
             </div>
             
-            <div class="form-group">
-                <label for="job_title">Job Title *</label>
-                <input type="text" id="job_title" name="job_title" class="form-control" required>
-                <small>Enter the job title (e.g., "Software Engineer", "Product Manager")</small>
+            <div class="feature-card">
+                <span class="feature-icon">DOC</span>
+                <h3>Automated Documents</h3>
+                <p>Generate customized cover letters, application summaries, and qualification analyses for each position.</p>
             </div>
             
-            <div class="form-group">
-                <label for="job_url">Job URL</label>
-                <input type="url" id="job_url" name="job_url" class="form-control">
-                <small>Optional: Link to the job posting</small>
+            <div class="feature-card">
+                <span class="feature-icon">TRACK</span>
+                <h3>Progress Tracking</h3>
+                <p>Track your application status, follow-ups, and success rates with comprehensive reporting and analytics.</p>
             </div>
-            
-            <div class="form-group">
-                <label for="job_description">Job Description *</label>
-                <textarea id="job_description" name="job_description" class="form-control" rows="10" required maxlength="10000"></textarea>
-                <small>Paste the complete job description here</small>
+        </div>
+        
+        <div class="stats" id="stats-section">
+            <div class="stat-card">
+                <span class="stat-number" id="total-applications">-</span>
+                <span class="stat-label">Total Applications</span>
             </div>
-            
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="window.navManager.navigateToPage('dashboard')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create Application</button>
+            <div class="stat-card">
+                <span class="stat-number" id="pending-applications">-</span>
+                <span class="stat-label">Pending</span>
             </div>
-        </form>
-    </div>
-</div>
-
-<!-- Resume Manager Page -->
-<div id="resume-manager-page" class="page" style="display: none;">
-    <div class="page-header">
-        <h2>Resume Manager</h2>
-        <p>Manage your base resume and create custom versions</p>
-    </div>
-    
-    <div class="resume-actions">
-        <a href="#" class="btn btn-primary">Edit Base Resume</a>
-        <a href="#" class="btn btn-outline">View All Resumes</a>
-    </div>
-    
-    <div class="resume-info">
-        <h3>Current Base Resume</h3>
-        <p>Your base resume is used as a template for all applications.</p>
-    </div>
-</div>
-
-<!-- Reports Page -->
-<div id="reports-page" class="page" style="display: none;">
-    <div class="page-header">
-        <h2>Reports & Analytics</h2>
-        <p>Track your application progress and insights</p>
-    </div>
-    
-    <div class="reports-grid">
-        <div class="report-card">
-            <h3>Daily Summary</h3>
-            <p>View today's application activity</p>
-            <a href="#" class="btn btn-outline">View Daily Report</a>
+            <div class="stat-card">
+                <span class="stat-number" id="interview-applications">-</span>
+                <span class="stat-label">Interviews</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="offer-applications">-</span>
+                <span class="stat-label">Offers</span>
+            </div>
         </div>
         
-        <div class="report-card">
-            <h3>Weekly Report</h3>
-            <p>Weekly progress and trends</p>
-            <a href="#" class="btn btn-outline">View Weekly Report</a>
-        </div>
-        
-        <div class="report-card">
-            <h3>Monthly Report</h3>
-            <p>Monthly statistics and insights</p>
-            <a href="#" class="btn btn-outline">View Monthly Report</a>
-        </div>
-    </div>
-</div>
-
-<!-- Settings Page -->
-<div id="settings-page" class="page" style="display: none;">
-    <div class="page-header">
-        <h2>Settings</h2>
-        <p>Configure your application preferences</p>
-    </div>
-    
-    <div class="settings-sections">
-        <div class="settings-section">
-            <h3>Application Settings</h3>
-            <p>Configure default application settings</p>
-        </div>
-        
-        <div class="settings-section">
-            <h3>AI Settings</h3>
-            <p>Configure AI analysis preferences</p>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Dashboard specific styles */
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.dashboard-header h2 {
-    color: var(--primary-dark);
-    margin-bottom: 0.5rem;
-}
-
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background-color: var(--neutral-light);
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-}
-
-.stat-card h3 {
-    color: var(--neutral-medium);
-    font-size: var(--font-size-small);
-    margin-bottom: 0.5rem;
-}
-
-.stat-number {
-    font-size: 2rem;
-    font-weight: var(--font-weight-bold);
-    color: var(--primary-dark);
-}
-
-.dashboard-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.recent-applications {
-    background-color: var(--neutral-light);
-    padding: 1.5rem;
-    border-radius: 8px;
-}
-
-.recent-applications h3 {
-    color: var(--primary-dark);
-    margin-bottom: 1rem;
-}
-
-.page-header {
-    margin-bottom: 2rem;
-}
-
-.page-header h2 {
-    color: var(--primary-dark);
-    margin-bottom: 0.5rem;
-}
-
-.reports-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.report-card {
-    background-color: var(--neutral-light);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.report-card h3 {
-    color: var(--primary-dark);
-    margin-bottom: 0.5rem;
-}
-
-.report-card p {
-    color: var(--neutral-medium);
-    margin-bottom: 1rem;
-}
-
-.settings-sections {
-    display: grid;
-    gap: 1.5rem;
-}
-
-.settings-section {
-    background-color: var(--neutral-light);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.settings-section h3 {
-    color: var(--primary-dark);
-    margin-bottom: 0.5rem;
-}
-
-.resume-actions {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.resume-info {
-    background-color: var(--neutral-light);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.resume-info h3 {
-    color: var(--primary-dark);
-    margin-bottom: 0.5rem;
-}
-
-/* Dashboard Tabs and Cards */
-.dashboard-tabs-container {
-    margin-top: 2rem;
-}
-
-.dashboard-tabs-header {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid var(--neutral-light);
-    padding-bottom: 1rem;
-}
-
-.dashboard-tab {
-    background: none;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    cursor: pointer;
-    border-radius: 6px 6px 0 0;
-    color: var(--neutral-medium);
-    font-weight: var(--font-weight-medium);
-    transition: all 0.3s ease;
-}
-
-.dashboard-tab:hover {
-    background-color: var(--neutral-light);
-    color: var(--primary-dark);
-}
-
-.dashboard-tab.active {
-    background-color: var(--primary-dark);
-    color: var(--neutral-white);
-}
-
-.tab-count {
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-.dashboard-tab-content {
-    display: none;
-}
-
-.dashboard-tab-content.active {
-    display: block;
-}
-
-.sort-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background-color: var(--neutral-light);
-    border-radius: 6px;
-}
-
-.sort-controls h3 {
-    color: var(--primary-dark);
-    margin: 0;
-}
-
-.sort-select {
-    padding: 0.5rem;
-    border: 1px solid var(--primary-dark);
-    border-radius: 4px;
-    background-color: var(--neutral-white);
-    color: var(--neutral-dark);
-}
-
-.applications-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 1.5rem;
-}
-
-.application-card {
-    background-color: var(--neutral-white);
-    border: 1px solid var(--neutral-light);
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.application-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
-}
-
-.card-company {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.card-company h4 {
-    color: var(--primary-dark);
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.match-score {
-    background-color: var(--primary-dark);
-    color: var(--neutral-white);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: var(--font-weight-bold);
-}
-
-.card-title {
-    color: var(--neutral-dark);
-    font-weight: var(--font-weight-medium);
-    margin-bottom: 1rem;
-}
-
-.card-status {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: var(--font-weight-medium);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-}
-
-.status-pending { background-color: #fff3cd; color: #856404; }
-.status-applied { background-color: #d1ecf1; color: #0c5460; }
-.status-interviewed { background-color: #d4edda; color: #155724; }
-.status-offered { background-color: #c3e6cb; color: #155724; }
-.status-rejected { background-color: #f8d7da; color: #721c24; }
-.status-accepted { background-color: #d4edda; color: #155724; }
-
-.card-meta {
-    color: var(--neutral-medium);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.card-actions {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--neutral-light);
-}
-
-.card-btn {
-    display: inline-block;
-    background-color: var(--primary-dark);
-    color: var(--neutral-white);
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: var(--font-weight-medium);
-    transition: all 0.3s ease;
-}
-
-.card-btn:hover {
-    background-color: var(--primary-medium);
-    color: var(--neutral-white);
-    text-decoration: none;
-}
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-// Initialize dashboard when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Load dashboard statistics
-    loadDashboardStats();
-    
-    // Load recent applications
-    loadRecentApplications();
-    
-    // Load all applications for cards
-    loadApplicationCards();
-    
-    // Setup dashboard tab functionality
-    setupDashboardTabs();
-});
-
-async function loadDashboardStats() {
-    try {
-        const response = await fetch('/api/dashboard-stats');
-        const stats = await response.json();
-        
-        document.getElementById('total-applications').textContent = stats.total || 0;
-        document.getElementById('pending-applications').textContent = stats.pending || 0;
-        document.getElementById('interview-applications').textContent = stats.interviewed || 0;
-        document.getElementById('offer-applications').textContent = stats.offered || 0;
-    } catch (error) {
-        console.error('Failed to load dashboard stats:', error);
-    }
-}
-
-async function loadRecentApplications() {
-    try {
-        const response = await fetch('/api/recent-applications');
-        const applications = await response.json();
-        
-        const container = document.getElementById('recent-applications-list');
-        if (applications.length === 0) {
-            container.innerHTML = '<p>No applications yet. <a href="#" data-page="new-application">Create your first application</a>!</p>';
-        } else {
-            container.innerHTML = applications.map(app => `
-                <div class="application-item">
-                    <strong>${app.company}</strong> - ${app.job_title}
-                    <span class="status status-${app.status.toLowerCase()}">${app.status}</span>
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-grid">
+                <div class="action-item">
+                    <span class="icon">NEW</span>
+                    <a href="/new-application">Create New Application</a>
                 </div>
-            `).join('');
-        }
-    } catch (error) {
-        console.error('Failed to load recent applications:', error);
-    }
-}
-
-async function loadApplicationCards() {
-    try {
-        const response = await fetch('/api/applications');
-        const applications = await response.json();
-        
-        const container = document.getElementById('applications-grid-all');
-        if (applications.length === 0) {
-            container.innerHTML = '<p>No applications yet. <a href="#" data-page="new-application">Create your first application</a>!</p>';
-        } else {
-            container.innerHTML = applications.map(app => createApplicationCard(app)).join('');
-        }
-    } catch (error) {
-        console.error('Failed to load application cards:', error);
-    }
-}
-
-function createApplicationCard(app) {
-    const matchScore = app.match_score ? `${app.match_score}%` : 'N/A';
-    const postedDate = app.posted_date || 'N/A';
-    const appliedDate = new Date(app.created_at).toLocaleDateString();
-    const updatedDate = app.status_updated_at ? new Date(app.status_updated_at).toLocaleDateString() : 'N/A';
-    
-    // Create summary link
-    const summaryLink = app.summary_path ? `/summary/${app.id}` : '#';
-    
-    return `
-        <div class="application-card" 
-             data-updated-at="${app.status_updated_at || app.created_at}" 
-             data-applied-at="${app.created_at}" 
-             data-match-score="${app.match_score || 0}">
-            <div class="card-company">
-                <h4>${app.company}</h4>
-                <span class="match-score">${matchScore}</span>
-            </div>
-            <div class="card-title">${app.job_title}</div>
-            <div>
-                <span class="card-status status-${app.status.toLowerCase()}">${app.status}</span>
-            </div>
-            <div class="card-meta">📅 Applied: ${appliedDate}</div>
-            <div class="card-meta">📋 Posted: ${postedDate}</div>
-            <div class="card-meta">🔄 Updated: ${updatedDate}</div>
-            <div class="card-actions">
-                <a href="${summaryLink}" class="card-btn" target="_blank">View Summary →</a>
+                <div class="action-item">
+                    <span class="icon">DASH</span>
+                    <a href="/dashboard">View Dashboard</a>
+                </div>
+                <div class="action-item">
+                    <span class="icon">REP</span>
+                    <a href="/reports">View Reports</a>
+                </div>
+                <div class="action-item">
+                    <span class="icon">AI</span>
+                    <a href="#" onclick="checkAIConnection(); return false;">Check AI Status</a>
+                </div>
             </div>
         </div>
-    `;
-}
-
-function setupDashboardTabs() {
-    // Add click handlers for dashboard tabs
-    document.querySelectorAll('.dashboard-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            const status = this.dataset.status;
-            switchDashboardTab(status);
-        });
-    });
-}
-
-function switchDashboardTab(status) {
-    // Update tab appearance
-    document.querySelectorAll('.dashboard-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelector(`[data-status="${status}"]`).classList.add('active');
+        
+        <div class="footer">
+            <p>Powered by AI • Built for Job Seekers • Designed for Success</p>
+        </div>
+    </div>
     
-    // Show/hide tab content
-    document.querySelectorAll('.dashboard-tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById(`dashboard-tab-${status}`).classList.add('active');
-}
-
-function sortApplications(sortBy) {
-    const container = document.getElementById('applications-grid-all');
-    const cards = Array.from(container.querySelectorAll('.application-card'));
-    
-    cards.sort((a, b) => {
-        switch(sortBy) {
-            case 'updated_desc':
-                return new Date(b.dataset.updatedAt) - new Date(a.dataset.updatedAt);
-            case 'updated_asc':
-                return new Date(a.dataset.updatedAt) - new Date(b.dataset.updatedAt);
-            case 'applied_desc':
-                return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
-            case 'applied_asc':
-                return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
-            case 'job_posted_desc':
-                return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
-            case 'job_posted_asc':
-                return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
-            case 'match_desc':
-                return parseFloat(b.dataset.matchScore) - parseFloat(a.dataset.matchScore);
-            case 'match_asc':
-                return parseFloat(a.dataset.matchScore) - parseFloat(b.dataset.matchScore);
-            default:
-                return 0;
+    <script>
+        // Load dashboard statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/dashboard-stats');
+                const stats = await response.json();
+                
+                document.getElementById('total-applications').textContent = stats.total || 0;
+                document.getElementById('pending-applications').textContent = stats.pending || 0;
+                document.getElementById('interview-applications').textContent = stats.interviewed || 0;
+                document.getElementById('offer-applications').textContent = stats.offered || 0;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                // Keep the dashes if loading fails
+            }
         }
-    });
-    
-    // Re-append sorted cards
-    cards.forEach(card => container.appendChild(card));
-}
-</script>
-{% endblock %}
+        
+        // Check AI connection
+        async function checkAIConnection() {
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                if (data.connected) {
+                    alert(`AI Connected!\nModel: ${data.current_model}\nBase URL: ${data.base_url}`);
+                } else {
+                    alert('AI Not Connected\nPlease start Ollama:\n1. Install: brew install ollama\n2. Start: ollama serve\n3. Pull model: ollama pull llama3');
+                }
+            } catch (error) {
+                alert('Error checking AI status');
+            }
+        }
+        
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', loadStats);
+    </script>
+</body>
+</html>
