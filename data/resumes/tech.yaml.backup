@@ -1,0 +1,293 @@
+extracted_at: '2025-10-15T15:22:58.874183'
+technologies:
+  AWS:
+    category: Cloud Platforms
+    display_name: AWS
+    variations_found:
+    - aws
+  AWS Lake Formation:
+    category: Other
+    display_name: AWS Lake Formation
+    variations_found:
+    - aws lake formation
+  Amazon Kinesis:
+    category: Other
+    display_name: Amazon Kinesis
+    variations_found:
+    - amazon kinesis
+  Apache Airflow:
+    category: Data Engineering & Analytics
+    display_name: Apache Airflow
+    variations_found:
+    - apache airflow
+  Blockchain Ledger:
+    category: Data Architecture
+    display_name: Blockchain Ledger
+    variations_found:
+    - blockchain ledger
+  Braze:
+    category: Data Sources & Integration
+    display_name: Braze
+    variations_found:
+    - braze
+  Business Objects:
+    category: Business Intelligence
+    display_name: Business Objects
+    variations_found:
+    - business objects
+  Cassandra:
+    category: Databases
+    display_name: Cassandra
+    variations_found:
+    - cassandra
+  Cognos:
+    category: Business Intelligence
+    display_name: Cognos
+    variations_found:
+    - cognos
+  Crystal Reports:
+    category: Business Intelligence
+    display_name: Crystal Reports
+    variations_found:
+    - crystal reports
+  Cursor AI:
+    category: Other Tools
+    display_name: Cursor AI
+    variations_found:
+    - cursor ai
+  DB2:
+    category: Databases
+    display_name: DB2
+    variations_found:
+    - db2
+  Data Lake:
+    category: Data Architecture
+    display_name: Data Lake
+    variations_found:
+    - data lake
+  Data Marts:
+    category: Data Architecture
+    display_name: Data Marts
+    variations_found:
+    - data marts
+  Data Mesh:
+    category: Data Architecture
+    display_name: Data Mesh
+    variations_found:
+    - data mesh
+  Data Warehouse:
+    category: Data Architecture
+    display_name: Data Warehouse
+    variations_found:
+    - data warehouse
+  DataDog:
+    category: Monitoring & Observability
+    display_name: DataDog
+    variations_found:
+    - datadog
+  Databricks:
+    category: Data Engineering & Analytics
+    display_name: Databricks
+    variations_found:
+    - databricks
+  Datatrace:
+    category: Monitoring & Observability
+    display_name: Datatrace
+    variations_found:
+    - datatrace
+  Docker:
+    category: DevOps & Infrastructure
+    display_name: Docker
+    variations_found:
+    - docker
+  ERPs:
+    category: Data Sources & Integration
+    display_name: ERPs
+    variations_found:
+    - erps
+  ERwin:
+    category: Data Modeling & Design
+    display_name: ERwin
+    variations_found:
+    - erwin
+  Excel:
+    category: Other Tools
+    display_name: Excel
+    variations_found:
+    - excel
+  Git:
+    category: DevOps & Infrastructure
+    display_name: Git
+    variations_found:
+    - git
+  GitHub:
+    category: DevOps & Infrastructure
+    display_name: GitHub
+    variations_found:
+    - github
+  GitLab:
+    category: DevOps & Infrastructure
+    display_name: GitLab
+    variations_found:
+    - gitlab
+  Informatica:
+    category: Data Engineering & Analytics
+    display_name: Informatica
+    variations_found:
+    - informatica
+  Java:
+    category: Programming Languages
+    display_name: Java
+    variations_found:
+    - java
+  Kubeflow:
+    category: Data Engineering & Analytics
+    display_name: Kubeflow
+    variations_found:
+    - kubeflow
+  Kubernetes:
+    category: DevOps & Infrastructure
+    display_name: Kubernetes
+    variations_found:
+    - kubernetes
+  LucidArt:
+    category: Data Modeling & Design
+    display_name: LucidArt
+    variations_found:
+    - lucidart
+  MS Access:
+    category: Other Tools
+    display_name: MS Access
+    variations_found:
+    - ms access
+  MySQL:
+    category: Databases
+    display_name: MySQL
+    variations_found:
+    - mysql
+  NetSuite:
+    category: Data Sources & Integration
+    display_name: NetSuite
+    variations_found:
+    - netsuite
+  Oracle:
+    category: Databases
+    display_name: Oracle
+    variations_found:
+    - oracle
+  PL/SQL:
+    category: Programming Languages
+    display_name: PL/SQL
+    variations_found:
+    - pl/sql
+  Pendo:
+    category: Data Sources & Integration
+    display_name: Pendo
+    variations_found:
+    - pendo
+  PostgreSQL:
+    category: Databases
+    display_name: PostgreSQL
+    variations_found:
+    - postgresql
+  Python:
+    category: Programming Languages
+    display_name: Python
+    variations_found:
+    - python
+  Qlik:
+    category: Business Intelligence
+    display_name: Qlik
+    variations_found:
+    - qlik
+  Quicken:
+    category: Data Sources & Integration
+    display_name: Quicken
+    variations_found:
+    - quicken
+  R:
+    category: Programming Languages
+    display_name: R
+    variations_found:
+    - r
+  React:
+    category: Web Frameworks
+    display_name: React
+    variations_found:
+    - react
+  Redshift:
+    category: Databases
+    display_name: Redshift
+    variations_found:
+    - redshift
+  SAP:
+    category: Data Sources & Integration
+    display_name: SAP
+    variations_found:
+    - sap
+  SQL:
+    category: Databases
+    display_name: SQL
+    variations_found:
+    - sql
+  Salesforce:
+    category: Data Sources & Integration
+    display_name: Salesforce
+    variations_found:
+    - salesforce
+  Scala:
+    category: Programming Languages
+    display_name: Scala
+    variations_found:
+    - scala
+  Segment:
+    category: Data Engineering & Analytics
+    display_name: Segment
+    variations_found:
+    - segment
+  Sisense:
+    category: Business Intelligence
+    display_name: Sisense
+    variations_found:
+    - sisense
+  Spreadmarts:
+    category: Data Architecture
+    display_name: Spreadmarts
+    variations_found:
+    - spreadmarts
+  Tableau:
+    category: Business Intelligence
+    display_name: Tableau
+    variations_found:
+    - tableau
+  Talend:
+    category: Data Engineering & Analytics
+    display_name: Talend
+    variations_found:
+    - talend
+  Tatari:
+    category: Data Sources & Integration
+    display_name: Tatari
+    variations_found:
+    - tatari
+  Terraform:
+    category: DevOps & Infrastructure
+    display_name: Terraform
+    variations_found:
+    - terraform
+  TypeScript:
+    category: Programming Languages
+    display_name: TypeScript
+    variations_found:
+    - typescript
+  Zapier:
+    category: Data Sources & Integration
+    display_name: Zapier
+    variations_found:
+    - zapier
+  dbt:
+    category: Data Engineering & Analytics
+    display_name: dbt
+    variations_found:
+    - dbt
+total_technologies: 58

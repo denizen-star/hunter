@@ -1,0 +1,472 @@
+# Job Description General Skills Analysis
+
+This document contains a comprehensive analysis of skills extracted from all job descriptions in the applications folder.
+
+## Summary
+
+- **Technical Skills**: 145 unique skills found
+- **Soft Skills**: 93 unique skills found
+- **Tools Technologies**: 108 unique skills found
+- **Experience Requirements**: 65 unique skills found
+- **Education Certifications**: 26 unique skills found
+
+---
+
+## Technical Skills
+
+- AI
+- AWS
+- AWS (Amazon Web Services)
+- AWS (Amazon Web Services) experience (preferred)
+- AWS Redshift
+- AWS Sagemaker
+- Ability to write optimized queries for large-scale data processing
+- Advanced data analytics (R, Python)
+- Airflow
+- Analytics
+- Analytics best practices
+- Automating lead flows, attribution pipelines, and marketing operations
+- Azure or GCP cloud-based data architecture experience (acceptable alternative to AWS)
+- BI platforms (e.g., Looker, Tableau, PowerBI)
+- BI tool expertise (Tableau, SQL, Power BI, Looker)
+- BI tool expertise (Tableau, SQL, Power BI, Looker, etc.)
+- BI tools
+- BI tools:
+- Big Data
+- Budgeting
+- Business Intelligence (BI)
+- CDC pipelines
+- CRM analytics
+- CRM/API integrations (Salesforce, LeadPerfection, custom workflows)
+- Campaign management
+- Census
+- Change-data-capture (CDC)
+- Cloud Data Warehouses: Snowflake, Amazon Redshift
+- Cloud Platforms: AWS, GCP, or Azure, with strong understanding of data services and scaling strategies
+- Cloud data platforms:
+- Cloud-based data architecture
+- Cloud-based data infrastructure (BigQuery or equivalent)
+- Clustering
+- Data Ingestion & Processing: Expertise in designing high-volume, real-time and batch ingestion pipelines (Kafka, Kinesis, Spark, or equivalent)
+- Data Mining
+- Data Modeling techniques
+- Data architecture patterns
+- Data modeling
+- Data modeling techniques
+- Data orchestration patterns (Airflow/Dagster)
+- Data pipelines (experience leading technical teams that build)
+- Data platforms
+- Data science
+- Data storage strategies
+- Data visualization tools
+- Data visualization tools (Looker, Tableau, etc.)
+- Data warehousing
+- Database & BI architecture
+- Databricks
+- Decision Trees
+- Deep expertise with Snowflake as a data platform, including performance optimization, cost management, and architecting for scale
+- Deep understanding of modern data architecture patterns, including Lakehouse design, data mesh principles, and data quality monitoring frameworks
+- Digital initiatives
+- Experience with real-time or near-real-time data processing systems (preferred)
+- Expertise in Lakehouse data platforms built on object storage and open table formats (e.g., Apache Hudi, Apache Iceberg) for ACID transactions, schema evolution, and incremental processing
+- Expertise in advanced data analytics (R, Python)
+- Financial modeling
+- Financial planning software
+- Fivetran
+- Fivetran/Airbyte for data ingestion
+- Forecasting
+- Frameworks/tools/platforms:
+- Frameworks:
+- GCP (Google Cloud Platform)
+- GTM tools
+- Glue
+- Google Cloud systems (BigQuery, Cloud Functions, Google Workspace tools)
+- GraphQL
+- Hadoop Hortonworks/Cloudera
+- Hands-on experience with our modern data stack: dbt for transformation, Hex for analytics, and Fivetran/Airbyte for data ingestion
+- Hands-on expertise in designing, deploying, and optimizing cloud-native data solutions on platforms such as AWS, Azure, or GCP
+- Hex for analytics
+- High-performance database design
+- Hyperion Essbase
+- Hyperion IR
+- Informatica IICS
+- Integration Platforms: iPaaS solutions (e.g., MuleSoft, Workato, Boomi, N8N) and open-source integration frameworks
+- Kafka
+- Knowledge of cloud platforms (AWS, Azure, or GCP) and their data services (preferred)
+- LLM frameworks (bonus)
+- LLMs (multiple)
+- Lambda
+- Looker
+- Looker Studio
+- MDM (Master Data Management)
+- Machine learning applications
+- Machine learning concepts
+- Martech stacks
+- Microsoft Azure
+- Microsoft Excel
+- Microsoft Fabric
+- ModelOps
+- Modeling performant data sets in modern cloud data warehouses (Snowflake, BigQuery, Redshift)
+- Modern data orchestration patterns
+- Modern data stack (specifically BigQuery, dbt, Airflow, Looker)
+- Multi-touch attribution models
+- Neural Networks
+- None explicitly mentioned in this job description. However, some systems and tools are mentioned, which may require technical knowledge to use effectively:
+- None mentioned (the job description does not specify any technical skills)
+- Omnichannel campaigns
+- Optimization models (advance)
+- Oracle Exadata
+- Orchestration & Workflow Tools: Apache Airflow, DBT (data build tool)
+- PLSQL
+- Peer code reviews
+- Pipelines
+- Post-campaign analysis and recommendations
+- Power BI
+- PowerBI
+- Pre-campaign analysis and planning
+- Predictive modeling
+- Proficiency in Infrastructure-as-Code, orchestration, transformation frameworks, containers, and observability tools
+- Proficiency in at least one advanced programming language (Python, Scala, or Java)
+- Programming & Data Engineering: Proficiency in SQL, Python, and modern data modeling approaches
+- Programming languages: None mentioned
+- Programming languages: Python, Scala, Java
+- Proven experience with distributed processing frameworks (e.g., Apache Spark, Apache Flink) and real-time streaming architectures
+- Python
+- Python (bonus)
+- Python for scripting, automation, or orchestration tasks
+- Quantitative modeling (advanced)
+- R
+- R Studio
+- RDM (Reference Data Management)
+- Random Forest and Tree
+- Redshift
+- Regression
+- Reporting solutions
+- Rigorous documentation
+- Robust QA
+- SQL
+- SQL (Azure & AWS)
+- SQL or equivalent data querying
+- Salesforce
+- Scalable data pipelines architecture, and governance
+- Snowflake
+- Snowflake as a data platform (performance optimization, cost management, architecting for scale)
+- Tableau
+- Test/learn/optimize/pivot
+- Tools and technologies:
+- Variance analysis
+- Version control
+- Workflow orchestrators (e.g. Airflow, Dagster)
+- dbt
+- dbt for transformation
+
+## Soft Skills
+
+- Ability to effectively interact with all levels of the organization
+- Ability to foster a culture of technical excellence, knowledge sharing, and continuous improvement
+- Ability to influence C-level stakeholders
+- Ability to translate complex business requirements into scalable technical solutions
+- Ability to translate complex financial data into meaningful insights and actionable recommendations for business leaders
+- Able to translate deep technical detail into crisp narratives for executives and cross-functional partners
+- Bringing structure to ambiguity and driving results through data
+- Building a culture of excellence and continuous learning
+- Building and maintaining teams
+- Business acumen (deep understanding of SaaS metrics and how data drives business strategy)
+- Business-first mindset
+- Collaboration
+- Collaboration (cross-functional with departments like Finance, Product, and Marketing)
+- Collaboration (foster a high-performing, collaborative culture focused on delivering actionable insights)
+- Collaboration cross-functionally with departments like Finance, Product, and Marketing
+- Collaboration with data management, security, and privacy teams to ensure compliance and governance
+- Collaboration with executive team
+- Comfortable working cross-functionally across Sales, Marketing, Finance, and Product teams
+- Communication
+- Communication (outstanding ability to influence stakeholders and translate technical concepts into business insights)
+- Communication (translate complex data into actionable strategies for senior leadership)
+- Communication skills: Not explicitly mentioned, but implied through partnership and leadership roles
+- Communication skills: translating complex business requirements into scalable technical solutions
+- Communication to translate complex data into actionable strategies for senior leadership
+- Consultation
+- Continuous improvement through training and growth opportunities within the team based on merit
+- Continuous learning and optimization
+- Cross-functional collaboration (with Data Engineering and Data Science teams)
+- Data quality monitoring: ensuring compliance and governance
+- Enabling growth paths
+- Enterprise mindset
+- Ethical integrity
+- Excellent collaboration and leadership skills
+- Excellent communication skills
+- Excellent communication skills with the ability to bridge business priorities and technical execution
+- Excellent data analysis skills with ability to extract meaningful insights
+- Experience with utility data, billing systems, or similar high-volume transactional data is highly valued
+- Familiarity with Hyperion, Oracle Projects and/or OBI (Business Intelligence Objects)
+- Feedback provision
+- Guide development of self-service analytics tools and dashboards, empowering business units to generate insights independently
+- Hands-on experience with utility data, billing systems, or similar high-volume transactional data is highly valued
+- Hands-on mentorship
+- High attention to detail
+- High bias for action
+- Influencing across all levels of the organization
+- Interpersonal flexibility
+- Leadership
+- Leadership and team management abilities
+- Leadership skills
+- Leadership skills:
+- Leadership skills: collaborating with data management, security, and privacy teams
+- Leadership to build a team in a startup environment
+- Liaisoning
+- Mentoring
+- Mentorship skills
+- None mentioned (the job description does not specify any soft skills)
+- None specified (only "Must-have" technical skills are mentioned)
+- None specified explicitly, but collaboration and communication skills are implied
+- Organisational skills
+- Overseeing training frameworks
+- Ownership mindset (high accountability and sense of urgency with bias toward action and problem-solving)
+- Partnership building
+- Passion for AI agents and their application in real operations
+- Planning and execution
+- Prioritization and delivery of data initiatives
+- Problem-solving
+- Problem-solving (unify fragmented BI systems into a scalable infrastructure)
+- Problem-solving ability
+- Problem-solving skills
+- Problem-solving skills: Implied through prioritizing and managing the data roadmap
+- Problem-solving skills: optimizing cloud-native data solutions
+- Problem-solving to refine pricing models and unit economics
+- Project management
+- Project management skills
+- Proven ability to adapt to challenges
+- Proven ability to translate complex financial data into clear, concise, and actionable insights
+- Proven success building secure, privacy-aware, compliant data platforms (SOC 2, HIPAA, ISO 27001; FedRAMP experience a major plus)
+- Proven track record of cross-functional partnership and stakeholder alignment
+- Relationship-building
+- Stakeholder management
+- Stakeholder management skills
+- Strategic enterprise data architecture engagement skills with executive level stakeholders
+- Strategic mindset: Emphasized through experience with AI/ML and identifying opportunities for business impact
+- Strategic planning
+- Strategic thinking
+- Strong commercial awareness
+- Strong communication
+- Strong communication and presentation skills
+- Strong communication skills
+- Strong communication, critical thinking, conceptual and analytical skills
+- Strong communicator who uses data narratives to explain the solutions they build
+- Strong interest in coaching and mentoring colleagues
+- Translating complex data into actionable business strategies
+
+## Tools Technologies
+
+- AI-driven workflows
+- AI-driven workflows (routing, pricing, recruiting, logistics)
+- API
+- AS400
+- AWS
+- AWS (Amazon Web Services)
+- AWS (cloud platform)
+- AWS Lake Formation
+- AWS Redshift
+- Airbyte
+- Airflow
+- Airflow/Dagster (for orchestration)
+- Amazon Kinesis
+- Amazon Redshift
+- Amplitude
+- Apache Airflow
+- Apache Flink
+- Apache Hudi
+- Apache Iceberg
+- Apache Kafka
+- Apache Spark
+- Azure
+- Azure (cloud platform)
+- BI tools
+- BigQuery
+- Boomi
+- Brio
+- CRM platforms (Salesforce, LeadPerfection, ImproveIt360, etc.)
+- Census
+- Cloud data warehouse: Snowflake
+- Custom APIs
+- DBT (data build tool)
+- Dagster
+- Dashboards
+- Data infrastructure technologies
+- Data lake(s)
+- Data transformation: dbt
+- Data visualization tools (not specified)
+- Data warehouse platform(s)
+- ERP systems (Oracle, Workday, SAP, PeopleSoft)
+- ETL
+- Excel
+- FP&A systems (Oracle EPM, TM1/Cognos)
+- Financial planning software
+- Fivetran
+- Fivetran/Airbyte (for data ingestion)
+- GCP (Google Cloud Platform)
+- GCP (cloud platform)
+- Glue
+- Google Cloud Platform (GCP)
+- Google Workspace tools
+- GraphQL
+- Great Expectations
+- Hadoop Hortonworks/Cloudera
+- Hex
+- Hex (for analytics)
+- Hyperion
+- Hyperion Essbase
+- Informatica IICS
+- Ingestion tools: Fivetran
+- Insights
+- Kafka
+- Kinesis
+- LLM frameworks (logistics optimization) (bonus)
+- Lambda
+- Looker
+- Looker Studio
+- ML (Machine Learning) implementations
+- Microsoft Azure
+- Microsoft Excel
+- Microsoft Fabric
+- ModelOps
+- Modern data stack: Not explicitly defined, but implies familiarity with a modern data technology landscape
+- Monte Carlo
+- MuleSoft
+- N8N
+- None mentioned (the job description does not mention any tools or technologies)
+- None specified beyond data visualization tools (Tableau, Power BI)
+- OBI (Business Intelligence Objects)
+- Oracle Projects
+- Orchestration tools: Airflow or Dagster
+- Performance monitoring
+- Pipelines
+- Power BI
+- PowerBI
+- Presto
+- Python
+- R
+- R Studio
+- Random Forest and Tree
+- Real-time data streaming
+- Redshift
+- SQL
+- Salesforce
+- Same as Technical Skills section
+- Snowflake
+- Spark
+- StarRocks
+- Tableau
+- Tagging
+- Transactional databases
+- Tungsten (not explicitly defined, but likely a software or system)
+- Word
+- Workato
+- Zapier/Make
+- dbt
+- dbt (for transformation)
+- iPaaS solutions
+
+## Experience Requirements
+
+- 10+ years of experience in analytics, data strategy, or related roles
+- 10+ years of progressive experience in data engineering or platform engineering
+- 12+ years of experience in the workforce with significant experience in data-intensive environments
+- 12+ years working with data
+- 15+ years of build/design experience related to data service design, building data architecture, and leading end-to-end implementations
+- 15+ years of experience in data engineering, enterprise integrations, and analytics platforms
+- 2+ years of experience in a team lead or management capacity
+- 2+ years of experience in leadership
+- 2+ years of hands-on software engineering experience
+- 3+ years building and scaling data teams at a fast-growing SaaS startup
+- 3+ years with cloud-based data architecture in a modern AWS environment (preferred)
+- 3-5 years of experience in financial analytics, financial data analytics or financial planning and analysis technologies
+- 3-5 years of experience with ERP systems (Oracle, Workday, SAP, PeopleSoft) and FP&A systems (Oracle EPM, TM1/Cognos)
+- 5+ years architecting and operating Snowflake at scale
+- 5+ years in a similar position within Sales, Commercial, or Travel industry
+- 5+ years in data roles
+- 7+ years in a data and analytics leadership role
+- 7+ years in senior leadership roles
+- 7+ years of experience in analytics/data engineering
+- 7+ years of experience in data, analytics, or engineering
+- 8+ years of experience in business intelligence, analytics, or pricing
+- 8+ years of leadership roles with a proven track record of delivering production-grade, large-scale data and analytics platforms
+- 8–12+ years of experience in analytics, revenue operations, or data leadership roles
+- At least 12 years in the workforce with significant experience in data-intensive environments
+- At least 5 years of experience in a leadership position
+- Deep understanding of the full loan life cycle and P&L mechanics
+- Experience building customer or fan 360 platforms, identity resolution systems, and feature stores
+- Experience creating and managing budgets of ~$4M
+- Experience driving the adoption of financial analytics tools and dashboards across different teams and levels of the organization
+- Experience in ML / AI methodologies and event streaming (asset)
+- Experience in Team Leadership & Management
+- Experience in a related field or industry (not specified)
+- Experience in consulting (Big 4, Mckenzie) and experience working for a GSIB / Cat 1 Bank (preferred)
+- Experience leading a turnaround or transformation initiative in an analytics function (preferred)
+- Experience with building corporate Business Intelligence strategy
+- Experience working for a GSIB / Cat 1 Bank (preferred)
+- Experience working in fintech, crypto, or other regulated industries (preferred)
+- Experience working in high-growth B2B SaaS or marketplace companies
+- Experience working with marketing teams
+- Expertise in journey analytics, funnel optimization, and experimentation
+- Hands-on expertise in designing, deploying, and optimizing cloud-native data solutions on platforms such as AWS, Azure, or GCP
+- Industry experience:
+- Minimum 10 years hands-on experience in data engineering
+- Minimum 10 years of progressive FP&A or related experience in a finance, data or tech environment
+- Minimum of 6 years in a role with direct reports
+- None specified
+- None specified (years of experience and specific industry experience are not mentioned)
+- None specified (years of experience, specific industry experience, etc.)
+- Performance tuning for modern MPP OLAP systems and distributed query engines (e.g., Presto, Trino)
+- Preferably with global/cross-border experience
+- Prior experience working with data governance and its application
+- Proven experience building and maintaining cloud-based data infrastructure
+- Proven experience leading digital or customer analytics teams
+- Proven experience with distributed processing frameworks (e.g., Apache Spark, Apache Flink) and real-time streaming architectures
+- Proven leadership and team management abilities
+- Proven track record of building and leading high-performing teams across analytics, ops, and data engineering
+- Significant experience in utility data, billing systems, or similar high-volume transactional data
+- Strong background in self-service analytics strategies, data governance for BI, and cost optimization for analytical workloads
+- Strong understanding of data modeling, governance, and MDM principles
+- Ten (10) years of experience in data strategy, BI, or analytics leadership required
+- Ten (10) years of relevant experience
+- Three (3) years of supervisory experience required
+- Track record of leading data engineering teams and building robust data warehouses
+- Years of experience: 8+ years in data/analytics engineering or enterprise data management
+- [5] + years of hands-on experience in the Mortgage, Lending, or FinTech industries
+
+## Education Certifications
+
+- Bachelor Degree or equivalent experience in Data Engineering or Computer Science
+- Bachelor's degree in Computer Science, Engineering, or equivalent practical experience
+- Bachelor's degree in Computer Science, Statistics, Finance, Operations Research, Mathematics, or related fields
+- Bachelor's degree in Finance, Accounting, Economics, or a related field
+- Bachelor's or Master's degree in Analytics, Statistics, Economics, or related field
+- Bachelor’s degree in Computer Science or a related field (Master’s preferred)
+- Bachelor’s degree in Computer Science, Information Technology, or a related field required
+- Bachelor’s or Master’s in Computer Science, Engineering, or related field
+- MBA a plus
+- MBA or CPA preferred
+- Master of Business Administration (20%)
+- Master of Science (17%)
+- Master's Degree or higher (22%)
+- Master's degree in Engineering Systems Management or a related field
+- No specific education or certification requirements mentioned
+- None explicitly mentioned, but a strong computer science foundation is required.
+- None mentioned
+- None mentioned explicitly, but a bachelor's degree in a relevant field (e.g., computer science, mathematics) is likely assumed.
+- None mentioned specifically, but a bachelor's or higher degree is assumed given the complexity of the job requirements
+- None mentioned specifically, but a degree in a related field (e.g., computer science, data science) may be assumed or preferred.
+- None mentioned specifically, but a degree in a relevant field (e.g., computer science, business) would be assumed
+- None specified
+- None specified explicitly
+- Not explicitly mentioned.
+- Not specified
+- Other degrees (41%)
+
+## Skills Frequency Analysis
+
+The following skills appear most frequently across job descriptions:
+
+*Note: Frequency analysis requires additional processing*
+

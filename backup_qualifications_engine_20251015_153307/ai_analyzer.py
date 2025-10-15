@@ -7,13 +7,6 @@ from app.models.qualification import QualificationAnalysis
 from app.utils.prompts import get_prompt
 from app.utils.simple_tech_extractor import SimpleTechExtractor
 
-# Import enhanced analyzer for improved performance
-try:
-    from app.services.enhanced_qualifications_analyzer import EnhancedQualificationsAnalyzer
-    ENHANCED_ANALYZER_AVAILABLE = True
-except ImportError:
-    ENHANCED_ANALYZER_AVAILABLE = False
-
 
 class AIAnalyzer:
     """AI-powered analysis and generation using Ollama"""
@@ -23,14 +16,6 @@ class AIAnalyzer:
         self.base_url = base_url
         self.timeout = 600  # 10 minutes timeout for longer responses
         self.tech_extractor = SimpleTechExtractor()  # Initialize simple tech extractor
-        
-        # Initialize enhanced analyzer if available
-        if ENHANCED_ANALYZER_AVAILABLE:
-            self.enhanced_analyzer = EnhancedQualificationsAnalyzer()
-            print("✅ Enhanced Qualifications Analyzer loaded - using preliminary matching + focused AI analysis")
-        else:
-            self.enhanced_analyzer = None
-            print("⚠️ Enhanced Qualifications Analyzer not available - using standard AI analysis")
     
     def check_connection(self) -> bool:
         """Check if Ollama is running and accessible"""
@@ -91,18 +76,6 @@ class AIAnalyzer:
     
     def analyze_qualifications(self, job_description: str, resume_content: str) -> QualificationAnalysis:
         """Analyze how well the resume matches the job description"""
-        
-        # Use enhanced analyzer if available (preliminary matching + focused AI)
-        if self.enhanced_analyzer:
-            print("🚀 Using Enhanced Qualifications Analyzer (Preliminary Matching + Focused AI)")
-            return self.enhanced_analyzer.analyze_qualifications_enhanced(job_description, resume_content)
-        
-        # Fallback to original method if enhanced analyzer not available
-        print("⚠️ Using Standard AI Analysis (Enhanced analyzer not available)")
-        return self._analyze_qualifications_original(job_description, resume_content)
-    
-    def _analyze_qualifications_original(self, job_description: str, resume_content: str) -> QualificationAnalysis:
-        """Original qualifications analysis method (fallback)"""
         # Use cached technologies from resume manager if available
         from app.services.resume_manager import ResumeManager
         resume_manager = ResumeManager()
