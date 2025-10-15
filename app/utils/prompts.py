@@ -78,14 +78,16 @@ JOB TITLE: {job_title}
 
 REQUIREMENTS:
 - Opening paragraph: Express interest and briefly state why you're a great fit
-- 2-3 body paragraphs: Integrate the provided soft skills naturally
-- Emphasize strengths from the qualifications analysis
+- Include a dedicated paragraph: "Why do I want to work for {company}" - research and highlight specific company values, mission, culture, or recent achievements that align with your career goals
+- 1-2 body paragraphs: Integrate the provided soft skills naturally and emphasize strengths from the qualifications analysis
 - Closing: Call to action
 - Tone: Professional yet personable
-- Length: 300-400 words
+- Length: 350-450 words (slightly longer to accommodate company interest section)
 
 Format as markdown with proper structure.
 Start with a proper salutation like "Dear Hiring Manager," and end with "Sincerely, [Name]"
+
+IMPORTANT: For the "Why do I want to work for {company}" section, make specific, research-based statements about what attracts you to this particular company. Avoid generic statements that could apply to any company.
 """
 
 

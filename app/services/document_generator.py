@@ -557,6 +557,7 @@ class DocumentGenerator:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{application.company} - {application.job_title}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }}
@@ -564,6 +565,8 @@ class DocumentGenerator:
         .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 12px 12px 0 0; }}
         .header h1 {{ font-size: 32px; margin-bottom: 10px; }}
         .header h2 {{ font-size: 24px; font-weight: normal; opacity: 0.9; }}
+        .back-btn {{ display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-bottom: 20px; transition: all 0.3s ease; }}
+        .back-btn:hover {{ background: rgba(255,255,255,0.3); color: white; text-decoration: none; }}
         .summary {{ padding: 30px 40px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }}
         .summary-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }}
         .summary-item {{ background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; }}
@@ -672,6 +675,7 @@ class DocumentGenerator:
 <body>
     <div class="container">
         <div class="header">
+            <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
             <h1>{application.company}</h1>
             <h2>{application.job_title}</h2>
             <div style="margin-top: 15px;">

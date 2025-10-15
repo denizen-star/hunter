@@ -50,6 +50,7 @@ class DashboardGenerator:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Application Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ 
@@ -75,6 +76,31 @@ class DashboardGenerator:
         .actions {{
             text-align: center;
             margin-bottom: 30px;
+        }}
+        .nav-bar {{
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }}
+        .nav-links {{
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }}
+        .nav-link {{
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }}
+        .nav-link:hover {{
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }}
         .btn {{
             background: white;
@@ -251,14 +277,83 @@ class DashboardGenerator:
             <h1>🎯 Job Application Dashboard - {total}</h1>
         </div>
         
-        <div class="actions">
-            <a href="/" class="btn">+ New Application</a>
-        </div>
+                    <div class="nav-bar">
+                        <div class="nav-links">
+                            <a href="javascript:void(0)" onclick="openNewApplication()" class="nav-link">+ New Application</a>
+                            <a href="/dashboard" class="nav-link">Dashboard</a>
+                            <a href="javascript:void(0)" onclick="showAIStatus()" class="nav-link">AI Status</a>
+                            <a href="javascript:void(0)" onclick="openResumeManager()" class="nav-link">Resume Manager</a>
+                        </div>
+                    </div>
         
         {tabs_html}
     </div>
     
     <script>
+        // AI Status Check Function - Show message on screen
+        async function showAIStatus() {{
+            try {{
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                // Create status message element
+                let statusDiv = document.getElementById('ai-status-message');
+                if (!statusDiv) {{
+                    statusDiv = document.createElement('div');
+                    statusDiv.id = 'ai-status-message';
+                    statusDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #28a745;
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        z-index: 1000;
+                        max-width: 300px;
+                        font-size: 14px;
+                    `;
+                    document.body.appendChild(statusDiv);
+                }}
+                
+                if (data.connected) {{
+                    statusDiv.style.background = '#28a745';
+                    statusDiv.innerHTML = `
+                        <strong>AI Status: Connected</strong><br>
+                        Model: ${{data.current_model}}<br>
+                        Available: ${{data.available_models.join(', ')}}
+                    `;
+                }} else {{
+                    statusDiv.style.background = '#dc3545';
+                    statusDiv.innerHTML = `
+                        <strong>AI Status: Not Connected</strong><br>
+                        Please check your Ollama installation.
+                    `;
+                }}
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {{
+                    if (statusDiv) statusDiv.remove();
+                }}, 5000);
+                
+            }} catch (error) {{
+                console.error('AI Status Error:', error);
+            }}
+        }}
+        
+        // New Application Function
+        function openNewApplication() {{
+            // Open new application form in same window
+            window.location.href = '/new-application';
+        }}
+        
+        // Resume Manager Function  
+        function openResumeManager() {{
+            // Open new application page where resume manager is located
+            window.location.href = '/new-application';
+        }}
+        
         // Tab switching functionality
         function switchTab(status) {{
             // Hide all tab contents

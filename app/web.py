@@ -5,7 +5,7 @@ Flask application providing REST API and web interface
 """
 import os
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 
 from app.services.resume_manager import ResumeManager
@@ -16,7 +16,10 @@ from app.services.dashboard_generator import DashboardGenerator
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root
 
-app = Flask(__name__, template_folder='templates/web')
+app = Flask(__name__, 
+           template_folder='templates/web',
+           static_folder='../static',
+           static_url_path='/static')
 CORS(app)
 
 # Initialize services
@@ -29,9 +32,74 @@ dashboard_generator = DashboardGenerator()
 
 @app.route('/')
 def index():
-    """Main UI page"""
+    """Main application form page"""
     return render_template('ui.html')
 
+@app.route('/new-application')
+def new_application():
+    """New application form page"""
+    return render_template('ui.html')
+
+
+@app.route('/api/dashboard-stats', methods=['GET'])
+def dashboard_stats():
+    """Get dashboard statistics"""
+    try:
+        applications = job_processor.list_all_applications()
+        
+        stats = {
+            'total': len(applications),
+            'pending': len([app for app in applications if app.status.lower() == 'pending']),
+            'applied': len([app for app in applications if app.status.lower() == 'applied']),
+            'interviewed': len([app for app in applications if app.status.lower() == 'interviewed']),
+            'offered': len([app for app in applications if app.status.lower() == 'offered']),
+            'rejected': len([app for app in applications if app.status.lower() == 'rejected']),
+            'accepted': len([app for app in applications if app.status.lower() == 'accepted'])
+        }
+        
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/recent-applications', methods=['GET'])
+def recent_applications():
+    """Get recent applications for dashboard"""
+    try:
+        applications = job_processor.list_all_applications()
+        # Sort by created_at descending and take first 5
+        recent = sorted(applications, key=lambda x: x.created_at, reverse=True)[:5]
+        
+        return jsonify([{
+            'id': app.id,
+            'company': app.company,
+            'job_title': app.job_title,
+            'status': app.status,
+            'created_at': app.created_at.isoformat(),
+            'match_score': app.match_score
+        } for app in recent])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/applications', methods=['GET'])
+def get_all_applications():
+    """Get all applications for dashboard cards"""
+    try:
+        applications = job_processor.list_all_applications()
+        
+        return jsonify([{
+            'id': app.id,
+            'company': app.company,
+            'job_title': app.job_title,
+            'status': app.status,
+            'created_at': app.created_at.isoformat(),
+            'status_updated_at': app.status_updated_at.isoformat() if app.status_updated_at else None,
+            'match_score': app.match_score,
+            'posted_date': app.posted_date,
+            'job_url': app.job_url,
+            'summary_path': str(app.summary_path) if app.summary_path else None
+        } for app in applications])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/check-ollama', methods=['GET'])
 def check_ollama():

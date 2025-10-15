@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Hunter - AI-Powered Application Manager{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="alternate icon" href="/static/favicon.svg">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/static/css/colors.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/navigation.css">
+    <link rel="stylesheet" href="/static/css/forms.css">
+    
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>
+                <img src="/static/favicon.svg" alt="H" class="favicon">
+                Job Hunter
+            </h1>
+            <div class="header-actions">
+                <button id="ai-status-btn" class="btn btn-secondary">Check AI Status</button>
+            </div>
+        </header>
+        
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="#" data-page="dashboard" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" data-page="new-application" class="nav-link">New Application</a></li>
+                <li><a href="#" data-page="resume-manager" class="nav-link">Resume Manager</a></li>
+                <li><a href="#" data-page="reports" class="nav-link">Reports</a></li>
+                <li><a href="#" data-page="settings" class="nav-link">Settings</a></li>
+            </ul>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Breadcrumb Navigation -->
+            <nav class="breadcrumb" id="breadcrumb">
+                <ol>
+                    <li><a href="#" data-page="dashboard">Dashboard</a></li>
+                </ol>
+            </nav>
+            
+            <!-- Page Content -->
+            <div id="page-content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- JavaScript Files -->
+    <script src="/static/js/navigation.js"></script>
+    <script src="/static/js/forms.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    
+    <!-- Additional JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Global JavaScript -->
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize navigation
+            if (typeof NavigationManager !== 'undefined') {
+                window.navManager = new NavigationManager();
+            }
+            
+            // Initialize AI status check
+            const aiStatusBtn = document.getElementById('ai-status-btn');
+            if (aiStatusBtn) {
+                aiStatusBtn.addEventListener('click', checkAIStatus);
+            }
+        });
+        
+        // AI Status Check Function
+        async function checkAIStatus() {
+            const btn = document.getElementById('ai-status-btn');
+            const originalText = btn.textContent;
+            
+            btn.textContent = 'Checking...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                if (data.connected) {
+                    btn.textContent = `AI Connected (${data.current_model})`;
+                    btn.className = 'btn btn-success';
+                } else {
+                    btn.textContent = 'AI Not Connected';
+                    btn.className = 'btn btn-error';
+                }
+            } catch (error) {
+                btn.textContent = 'AI Check Failed';
+                btn.className = 'btn btn-error';
+            }
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.className = 'btn btn-secondary';
+                btn.disabled = false;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+
