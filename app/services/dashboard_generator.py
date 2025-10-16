@@ -64,8 +64,9 @@ class DashboardGenerator:
         .container {{ 
             width: calc(100vw - 250px);
             margin: 0;
-            padding: 20px;
+            padding: 20px 20px 20px 20px;
             margin-left: 250px;
+            box-sizing: border-box;
         }}
         
         .sidebar {{
@@ -136,13 +137,12 @@ class DashboardGenerator:
         .header {{
             text-align: center;
             color: white;
-            margin: 0;
+            margin: 0 -20px;
             position: relative;
             z-index: 1;
             background: #8b9dc3;
             padding: 0 20px;
-            width: 100vw;
-            margin-left: calc(-50vw + 50%);
+            width: calc(100% + 40px);
             border-radius: 0;
             height: 200px;
             display: flex;
@@ -214,7 +214,8 @@ class DashboardGenerator:
             border: 1px solid rgba(74, 85, 104, 0.2);
             box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
             overflow: hidden;
-            margin-bottom: 20px;
+            margin: 0 -20px 20px -20px;
+            width: calc(100% + 40px);
             position: relative;
             z-index: 1;
         }}
