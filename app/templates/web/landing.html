@@ -195,14 +195,6 @@
             margin-right: auto;
         }
         
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 80px;
-            position: relative;
-            z-index: 1;
-        }
         
         .feature-card {
             background: rgba(0, 0, 0, 0.15);
@@ -374,24 +366,6 @@
             </div>
         </div>
         
-        <div class="stats" id="stats-section">
-            <div class="stat-card">
-                <span class="stat-number" id="total-applications">-</span>
-                <span class="stat-label">Total Applications</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="pending-applications">-</span>
-                <span class="stat-label">Pending</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="interview-applications">-</span>
-                <span class="stat-label">Interviews</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" id="offer-applications">-</span>
-                <span class="stat-label">Offers</span>
-            </div>
-        </div>
         
         
         <div class="footer">
@@ -400,21 +374,6 @@
     </div>
     
     <script>
-        // Load dashboard statistics
-        async function loadStats() {
-            try {
-                const response = await fetch('/api/dashboard-stats');
-                const stats = await response.json();
-                
-                document.getElementById('total-applications').textContent = stats.total || 0;
-                document.getElementById('pending-applications').textContent = stats.pending || 0;
-                document.getElementById('interview-applications').textContent = stats.interviewed || 0;
-                document.getElementById('offer-applications').textContent = stats.offered || 0;
-            } catch (error) {
-                console.error('Failed to load stats:', error);
-                // Keep the dashes if loading fails
-            }
-        }
         
         // Check AI connection
         async function checkAIConnection() {
@@ -432,8 +391,6 @@
             }
         }
         
-        // Load stats when page loads
-        document.addEventListener('DOMContentLoaded', loadStats);
     </script>
 </body>
 </html>
