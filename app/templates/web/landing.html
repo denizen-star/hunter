@@ -183,16 +183,17 @@
             transform: translateY(-3px);
         }
         
-        .features {
+        .all-cards-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
             margin-bottom: 80px;
             position: relative;
             z-index: 1;
-            max-width: 1200px;
+            max-width: 1400px;
             margin-left: auto;
             margin-right: auto;
+            justify-items: center;
         }
         
         .feature-card {
@@ -228,24 +229,18 @@
             line-height: 1.6;
         }
         
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 80px;
-            position: relative;
-            z-index: 1;
-        }
         
         .stat-card {
             text-align: center;
             background: rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(20px);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 30px 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             color: white;
+            width: 100%;
+            max-width: 280px;
         }
         
         .stat-number {
@@ -356,7 +351,7 @@
             <p class="page-subtitle">AI-Powered Resume Matching & Application Management</p>
         </div>
         
-        <div class="features">
+        <div class="all-cards-container">
             <div class="feature-card">
                 <h3>AI-Powered Analysis</h3>
                 <p>Advanced AI analyzes job descriptions and matches them against your resume with detailed scoring and insights.</p>
@@ -371,9 +366,7 @@
                 <h3>Progress Tracking</h3>
                 <p>Track your application status, follow-ups, and success rates with comprehensive reporting and analytics.</p>
             </div>
-        </div>
-        
-        <div class="stats" id="stats-section">
+            
             <div class="stat-card">
                 <span class="stat-number" id="total-applications">-</span>
                 <span class="stat-label">Total Applications</span>
