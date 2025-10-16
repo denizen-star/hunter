@@ -62,10 +62,10 @@ class DashboardGenerator:
             position: relative;
         }}
         .container {{ 
-            max-width: 1400px; 
-            margin: 0 auto; 
+            width: calc(100vw - 250px);
+            margin: 0;
             padding: 20px;
-            margin-left: 280px;
+            margin-left: 250px;
         }}
         
         .sidebar {{
@@ -328,7 +328,7 @@ class DashboardGenerator:
         }}
         .card-btn {{
             display: inline-block;
-            background: #808080;
+            background: #8b9dc3;
             color: white;
             padding: 10px 20px;
             border-radius: 6px;
@@ -338,7 +338,7 @@ class DashboardGenerator:
             transition: background 0.2s;
         }}
         .card-btn:hover {{
-            background: #6b6b6b;
+            background: #7a8bb0;
         }}
         .empty-state {{
             text-align: center;
