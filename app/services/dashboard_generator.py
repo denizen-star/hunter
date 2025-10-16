@@ -210,7 +210,7 @@ class DashboardGenerator:
         .tabs-container {{
             background: white;
             backdrop-filter: blur(20px);
-            border-radius: 12px;
+            border-radius: 0;
             border: 1px solid rgba(74, 85, 104, 0.2);
             box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
             overflow: hidden;
