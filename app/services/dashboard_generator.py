@@ -74,7 +74,7 @@ class DashboardGenerator:
             top: 0;
             width: 250px;
             height: 100vh;
-            background: #4a5568;
+            background: #8b9dc3;
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
@@ -139,7 +139,7 @@ class DashboardGenerator:
             margin: 0;
             position: relative;
             z-index: 1;
-            background: #4a5568;
+            background: #8b9dc3;
             padding: 0 20px;
             width: 100vw;
             margin-left: calc(-50vw + 50%);
@@ -220,7 +220,7 @@ class DashboardGenerator:
         }}
         .tabs-header {{
             display: flex;
-            background: #4a5568;
+            background: #8b9dc3;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             overflow-x: auto;
         }}
