@@ -55,7 +55,7 @@ class DashboardGenerator:
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #d9d9d9;
+            background: #f5f5f5;
             min-height: 100vh;
             padding: 0;
             margin: 0;
@@ -74,7 +74,7 @@ class DashboardGenerator:
             top: 0;
             width: 250px;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
+            background: #4a5568;
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
@@ -116,16 +116,16 @@ class DashboardGenerator:
         }}
         
         .sidebar-menu a:hover {{
-            background: rgba(66, 66, 66, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            border-left-color: #424242;
+            border-left-color: #ffffff;
             transform: translateX(5px);
         }}
         
         .sidebar-menu a.active {{
-            background: rgba(66, 66, 66, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            border-left-color: #424242;
+            border-left-color: #ffffff;
         }}
         
         .sidebar-menu a i {{
@@ -139,8 +139,8 @@ class DashboardGenerator:
             margin: 0;
             position: relative;
             z-index: 1;
-            background: #424242;
-            padding: 80px 20px;
+            background: #4a5568;
+            padding: 0 20px;
             width: 100vw;
             margin-left: calc(-50vw + 50%);
             border-radius: 0;
@@ -153,7 +153,8 @@ class DashboardGenerator:
         .header h1 {{
             font-size: 48px;
             margin-bottom: 10px;
-            color: #F7F7F7;
+            color: white;
+            font-weight: 300;
         }}
         .actions {{
             text-align: center;
@@ -207,11 +208,11 @@ class DashboardGenerator:
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }}
         .tabs-container {{
-            background: rgba(0, 0, 0, 0.15);
+            background: white;
             backdrop-filter: blur(20px);
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(74, 85, 104, 0.2);
+            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
             overflow: hidden;
             margin-bottom: 20px;
             position: relative;
@@ -219,7 +220,7 @@ class DashboardGenerator:
         }}
         .tabs-header {{
             display: flex;
-            background: rgba(0, 0, 0, 0.1);
+            background: #4a5568;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             overflow-x: auto;
         }}
@@ -232,7 +233,7 @@ class DashboardGenerator:
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.8);
             transition: all 0.2s;
             white-space: nowrap;
             position: relative;
@@ -244,7 +245,7 @@ class DashboardGenerator:
         .tab.active {{
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #ffffff;
         }}
         .tab-count {{
             font-size: 12px;
@@ -279,12 +280,13 @@ class DashboardGenerator:
             background: white;
             border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(74, 85, 104, 0.1);
+            border: 1px solid rgba(74, 85, 104, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
         }}
         .card:hover {{
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(74, 85, 104, 0.15);
         }}
         .card-company {{
             font-size: 24px;
