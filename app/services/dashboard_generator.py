@@ -55,34 +55,120 @@ class DashboardGenerator:
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #d9d9d9;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
+            position: relative;
         }}
         .container {{ 
             max-width: 1400px; 
             margin: 0 auto; 
+            padding: 20px;
+            margin-left: 280px;
+        }}
+        
+        .sidebar {{
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }}
+        
+        .sidebar-header {{
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }}
+        
+        .sidebar-header h3 {{
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }}
+        
+        .sidebar-menu {{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }}
+        
+        .sidebar-menu li {{
+            margin: 0;
+        }}
+        
+        .sidebar-menu a {{
+            display: block;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }}
+        
+        .sidebar-menu a:hover {{
+            background: rgba(66, 66, 66, 0.2);
+            color: white;
+            border-left-color: #424242;
+            transform: translateX(5px);
+        }}
+        
+        .sidebar-menu a.active {{
+            background: rgba(66, 66, 66, 0.3);
+            color: white;
+            border-left-color: #424242;
+        }}
+        
+        .sidebar-menu a i {{
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
         }}
         .header {{
             text-align: center;
             color: white;
-            margin-bottom: 40px;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            background: #424242;
+            padding: 80px 20px;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            border-radius: 0;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }}
         .header h1 {{
             font-size: 48px;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: #F7F7F7;
         }}
         .actions {{
             text-align: center;
             margin-bottom: 30px;
         }}
         .nav-bar {{
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
             padding: 15px 0;
             margin-bottom: 30px;
             border-radius: 10px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }}
         .nav-links {{
             display: flex;
@@ -99,7 +185,7 @@ class DashboardGenerator:
             font-weight: 500;
         }}
         .nav-link:hover {{
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateY(-1px);
         }}
         .btn {{
@@ -121,16 +207,20 @@ class DashboardGenerator:
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }}
         .tabs-container {{
-            background: white;
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }}
         .tabs-header {{
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            background: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             overflow-x: auto;
         }}
         .tab {{
@@ -142,18 +232,18 @@ class DashboardGenerator:
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            color: #666;
+            color: rgba(255, 255, 255, 0.7);
             transition: all 0.2s;
             white-space: nowrap;
             position: relative;
         }}
         .tab:hover {{
-            background: #e9ecef;
-            color: #333;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }}
         .tab.active {{
-            background: white;
-            color: #667eea;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
             border-bottom: 3px solid #667eea;
         }}
         .tab-count {{
@@ -236,7 +326,7 @@ class DashboardGenerator:
         }}
         .card-btn {{
             display: inline-block;
-            background: #667eea;
+            background: #808080;
             color: white;
             padding: 10px 20px;
             border-radius: 6px;
@@ -246,7 +336,7 @@ class DashboardGenerator:
             transition: background 0.2s;
         }}
         .card-btn:hover {{
-            background: #5568d3;
+            background: #6b6b6b;
         }}
         .empty-state {{
             text-align: center;
@@ -272,20 +362,23 @@ class DashboardGenerator:
     </style>
 </head>
 <body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Job Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+        </ul>
+    </div>
+    
     <div class="container">
         <div class="header">
-            <h1>🎯 Job Application Dashboard - {total}</h1>
+            <h1>Job Application Dashboard - {total}</h1>
         </div>
         
-                    <div class="nav-bar">
-                        <div class="nav-links">
-                            <a href="javascript:void(0)" onclick="openNewApplication()" class="nav-link">+ New Application</a>
-                            <a href="/dashboard" class="nav-link">Dashboard</a>
-                            <a href="/reports" class="nav-link">Reports</a>
-                            <a href="javascript:void(0)" onclick="showAIStatus()" class="nav-link">AI Status</a>
-                            <a href="javascript:void(0)" onclick="openResumeManager()" class="nav-link">Resume Manager</a>
-                        </div>
-                    </div>
         
         {tabs_html}
     </div>
@@ -587,7 +680,7 @@ class DashboardGenerator:
                 🔄 Updated: {format_for_display(app.status_updated_at)}
             </div>
             <div class="card-actions">
-                <a href="{summary_link}" class="card-btn" target="_blank">View Summary →</a>
+                <a href="{summary_link}" class="card-btn">View Summary →</a>
             </div>
         </div>
         """

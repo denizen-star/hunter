@@ -566,14 +566,14 @@ class DocumentGenerator:
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }}
         .container {{ max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 12px 12px 0 0; }}
+        .header {{ background: #424242; color: white; padding: 40px; border-radius: 12px 12px 0 0; }}
         .header h1 {{ font-size: 32px; margin-bottom: 10px; }}
         .header h2 {{ font-size: 24px; font-weight: normal; opacity: 0.9; }}
         .back-btn {{ display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-bottom: 20px; transition: all 0.3s ease; }}
         .back-btn:hover {{ background: rgba(255,255,255,0.3); color: white; text-decoration: none; }}
         .summary {{ padding: 30px 40px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }}
         .summary-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }}
-        .summary-item {{ background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; }}
+        .summary-item {{ background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #424242; }}
         .summary-item label {{ display: block; font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 600; }}
         .summary-item value {{ display: block; font-size: 16px; color: #333; }}
         .match-score {{ font-size: 48px; font-weight: bold; color: {match_score_color}; text-align: center; padding: 20px; background: white; border-radius: 8px; }}
@@ -585,23 +585,23 @@ class DocumentGenerator:
         .status-rejected {{ background: #f8d7da; color: #721c24; }}
         .tabs {{ display: flex; border-bottom: 2px solid #e0e0e0; padding: 0 40px; background: #fafafa; }}
         .tab {{ padding: 15px 25px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: 500; color: #666; transition: all 0.3s; }}
-        .tab:hover {{ color: #667eea; }}
-        .tab.active {{ color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; }}
+        .tab:hover {{ color: #424242; }}
+        .tab.active {{ color: #424242; border-bottom: 3px solid #424242; margin-bottom: -2px; }}
         .tab-content {{ padding: 40px; display: none; }}
         .tab-content.active {{ display: block; }}
         .tab-content pre {{ background: #f5f5f5; padding: 20px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }}
-        .tab-content h3 {{ color: #667eea; margin-top: 20px; margin-bottom: 10px; }}
-        a {{ color: #667eea; text-decoration: none; }}
+        .tab-content h3 {{ color: #424242; margin-top: 20px; margin-bottom: 10px; }}
+        a {{ color: #424242; text-decoration: none; }}
         a:hover {{ text-decoration: underline; }}
         .timeline {{ margin-top: 20px; }}
-        .timeline-item {{ padding: 15px; border-left: 3px solid #667eea; margin-left: 10px; margin-bottom: 15px; background: #f9f9f9; border-radius: 4px; }}
+        .timeline-item {{ padding: 15px; border-left: 3px solid #424242; margin-left: 10px; margin-bottom: 15px; background: #f9f9f9; border-radius: 4px; }}
         
         /* Job Description Specific Styles */
-        .job-meta {{ background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #667eea; }}
+        .job-meta {{ background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #424242; }}
         .job-meta p {{ margin: 5px 0; color: #333; font-size: 14px; }}
-        .job-meta strong {{ color: #667eea; font-weight: 600; }}
+        .job-meta strong {{ color: #424242; font-weight: 600; }}
         .job-section {{ margin-bottom: 30px; padding: 20px; background: #fafafa; border-radius: 8px; border: 1px solid #e9ecef; }}
-        .job-section-title {{ color: #667eea; font-size: 20px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; }}
+        .job-section-title {{ color: #424242; font-size: 20px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; }}
         .job-section-content {{ color: #333; font-size: 15px; line-height: 1.7; }}
         .job-section-content p {{ margin: 10px 0; }}
         .job-section-content ul {{ margin: 10px 0 10px 20px; }}
@@ -615,7 +615,7 @@ class DocumentGenerator:
         .tech-pills-label {{ 
             font-size: 14px; 
             font-weight: 600; 
-            color: #667eea; 
+            color: #424242; 
             margin-bottom: 10px; 
             display: flex; 
             align-items: center; 

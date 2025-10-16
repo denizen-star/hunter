@@ -142,6 +142,8 @@ def update_resume():
     """Update base resume"""
     try:
         data = request.json
+        print(f"Received resume update - content length: {len(data.get('content', ''))}")
+        print(f"Content preview: {data.get('content', '')[:200]}...")
         
         # Load existing or create new
         try:
@@ -163,6 +165,7 @@ def update_resume():
         resume.location = data.get('location', resume.location)
         resume.content = data.get('content', resume.content)
         
+        print(f"Saving resume with content length: {len(resume.content)}")
         resume_manager.save_base_resume(resume)
         
         return jsonify({
@@ -170,6 +173,7 @@ def update_resume():
             'message': 'Resume updated successfully'
         })
     except Exception as e:
+        print(f"Error updating resume: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

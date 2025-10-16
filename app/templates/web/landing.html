@@ -14,27 +14,109 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #d9d9d9;
             min-height: 100vh;
-            color: white;
+            color: #333;
+            position: relative;
+            padding: 0;
+            margin: 0;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 0px;
+            margin-left: 280px;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h3 {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(66, 66, 66, 0.2);
+            color: white;
+            border-left-color: #424242;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(66, 66, 66, 0.3);
+            color: white;
+            border-left-color: #424242;
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
         }
         
         .hero {
             text-align: center;
-            margin-bottom: 80px;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            background: #424242;
+            border-radius: 0;
+            padding: 80px 20px;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         .hero h1 {
             font-size: 4rem;
             font-weight: 700;
             margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            color: #F7F7F7;
         }
         
         .hero p {
@@ -44,6 +126,7 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+            color: #F7F7F7;
         }
         
         .cta-buttons {
@@ -94,34 +177,37 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 40px;
             margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
         }
         
         .feature-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
             border-radius: 16px;
             padding: 40px 30px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        
+        .feature-card h3 {
+            background: #424242;
+            color: white;
+            padding: 15px 20px;
+            margin: -40px -30px 20px -30px;
+            border-radius: 16px 16px 0 0;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
         
         .feature-card:hover {
             transform: translateY(-5px);
-            background: rgba(255,255,255,0.15);
+            background: rgba(0, 0, 0, 0.25);
         }
         
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
         
         .feature-card p {
             opacity: 0.9;
@@ -133,15 +219,19 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 30px;
             margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
         }
         
         .stat-card {
             text-align: center;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
             padding: 30px 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: white;
         }
         
         .stat-number {
@@ -157,11 +247,15 @@
         }
         
         .quick-actions {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
             border-radius: 16px;
             padding: 40px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            color: white;
         }
         
         .quick-actions h2 {
@@ -177,16 +271,16 @@
         }
         
         .action-item {
-            background: rgba(255,255,255,0.1);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             padding: 25px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
         
         .action-item:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(0, 0, 0, 0.2);
             transform: translateY(-3px);
         }
         
@@ -197,17 +291,14 @@
             display: block;
         }
         
-        .action-item .icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            display: block;
-        }
         
         .footer {
             text-align: center;
             margin-top: 60px;
             opacity: 0.8;
             font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
         }
         
         @media (max-width: 768px) {
@@ -233,35 +324,36 @@
     </style>
 </head>
 <body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Job Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/" class="nav-link active">Home</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+        </ul>
+    </div>
+    
     <div class="container">
         <div class="hero">
             <h1>Job Hunter</h1>
             <p>AI-Powered Resume Matching & Application Management</p>
-            <div class="cta-buttons">
-                <a href="/new-application" class="btn btn-primary">
-                    <span>+</span> New Application
-                </a>
-                <a href="/dashboard" class="btn btn-secondary">
-                    View Dashboard
-                </a>
-            </div>
         </div>
         
         <div class="features">
             <div class="feature-card">
-                <span class="feature-icon">AI</span>
                 <h3>AI-Powered Analysis</h3>
                 <p>Advanced AI analyzes job descriptions and matches them against your resume with detailed scoring and insights.</p>
             </div>
             
             <div class="feature-card">
-                <span class="feature-icon">DOC</span>
                 <h3>Automated Documents</h3>
                 <p>Generate customized cover letters, application summaries, and qualification analyses for each position.</p>
             </div>
             
             <div class="feature-card">
-                <span class="feature-icon">TRACK</span>
                 <h3>Progress Tracking</h3>
                 <p>Track your application status, follow-ups, and success rates with comprehensive reporting and analytics.</p>
             </div>
@@ -286,27 +378,6 @@
             </div>
         </div>
         
-        <div class="quick-actions">
-            <h2>Quick Actions</h2>
-            <div class="action-grid">
-                <div class="action-item">
-                    <span class="icon">NEW</span>
-                    <a href="/new-application">Create New Application</a>
-                </div>
-                <div class="action-item">
-                    <span class="icon">DASH</span>
-                    <a href="/dashboard">View Dashboard</a>
-                </div>
-                <div class="action-item">
-                    <span class="icon">REP</span>
-                    <a href="/reports">View Reports</a>
-                </div>
-                <div class="action-item">
-                    <span class="icon">AI</span>
-                    <a href="#" onclick="checkAIConnection(); return false;">Check AI Status</a>
-                </div>
-            </div>
-        </div>
         
         <div class="footer">
             <p>Powered by AI • Built for Job Seekers • Designed for Success</p>
