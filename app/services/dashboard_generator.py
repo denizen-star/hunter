@@ -60,11 +60,12 @@ class DashboardGenerator:
             padding: 0;
             margin: 0;
             position: relative;
+            overflow-x: hidden;
         }}
         .container {{ 
             width: calc(100vw - 250px);
             margin: 0;
-            padding: 20px 20px 20px 20px;
+            padding: 0 20px 20px 20px;
             margin-left: 250px;
             box-sizing: border-box;
         }}
@@ -137,7 +138,7 @@ class DashboardGenerator:
         .header {{
             text-align: center;
             color: white;
-            margin: 0 -20px;
+            margin: 0 -20px 0 -20px;
             position: relative;
             z-index: 1;
             background: #8b9dc3;
@@ -224,20 +225,22 @@ class DashboardGenerator:
             background: #8b9dc3;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
         }}
         .tab {{
             flex: 1;
             min-width: 120px;
-            padding: 15px 20px;
+            padding: 18px 20px;
             background: none;
             border: none;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.2s;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
             white-space: nowrap;
             position: relative;
+            border-bottom: 3px solid transparent;
         }}
         .tab:hover {{
             background: rgba(255, 255, 255, 0.1);
