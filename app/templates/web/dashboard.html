@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Job Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/css/colors.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/navigation.css">
+    <link rel="stylesheet" href="/static/css/forms.css">
+    <style>
+        /* Dashboard Specific Styles */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-light);
+            color: var(--primary-medium);
+            margin-bottom: var(--space-sm);
+            text-shadow: 0 2px 4px rgba(139, 157, 195, 0.2);
+        }
+        
+        .stat-label {
+            font-size: var(--font-size-base);
+            color: var(--neutral-medium);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .tabs-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .tabs-header {
+            display: flex;
+            background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-dark) 100%);
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: var(--space-lg) var(--space-xl);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-medium);
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+        
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-bottom: 3px solid var(--neutral-white);
+        }
+        
+        .tab-count {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-left: var(--space-xs);
+        }
+        
+        .tab-content {
+            padding: var(--space-2xl);
+            min-height: 400px;
+        }
+        
+        .sort-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .sort-select {
+            padding: var(--space-sm) var(--space-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-small);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--neutral-medium);
+            transition: all 0.3s ease;
+        }
+        
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--primary-medium);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .application-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .card-company {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--neutral-dark);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: var(--font-size-large);
+            color: var(--neutral-medium);
+            margin-bottom: var(--space-md);
+        }
+        
+        .card-status {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-2xl);
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-medium);
+            text-transform: capitalize;
+            margin-bottom: var(--space-md);
+        }
+        
+        .status-pending { background: #fef5e7; color: #b7791f; }
+        .status-applied { background: #e6fffa; color: #0d9488; }
+        .status-contacted { background: #f0f9ff; color: #0369a1; }
+        .status-interviewed { background: #f0fff4; color: #059669; }
+        .status-offered { background: #f0fff4; color: #059669; }
+        .status-rejected { background: #fef2f2; color: #dc2626; }
+        .status-accepted { background: #f0fff4; color: #059669; }
+        
+        .card-meta {
+            font-size: var(--font-size-small);
+            color: var(--neutral-light);
+            margin-bottom: var(--space-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .card-actions {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .card-btn {
+            background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-medium);
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .card-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #5a6b7d 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .match-score {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-light);
+            color: var(--primary-medium);
+            text-shadow: 0 1px 2px rgba(139, 157, 195, 0.3);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--space-3xl) var(--space-xl);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-xl);
+            color: var(--neutral-light);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: var(--font-size-large);
+            color: var(--neutral-medium);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-2xl);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            color: var(--neutral-dark);
+            border: 2px solid var(--border-color);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .quick-action-btn:hover {
+            background: var(--primary-medium);
+            color: white;
+            border-color: var(--primary-medium);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Job Hunter</h3>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+        </ul>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="page-title">Job Application Dashboard</h1>
+            <p class="page-subtitle">Track and manage all your job applications</p>
+        </div>
+        
+        <div class="quick-actions">
+            <a href="/new-application" class="quick-action-btn">Create New Application</a>
+            <a href="/reports" class="quick-action-btn">View Reports</a>
+            <a href="#" onclick="checkAIStatus(); return false;" class="quick-action-btn">Check AI Status</a>
+            <a href="/new-application" class="quick-action-btn">Manage Resume</a>
+        </div>
+        
+        <div class="dashboard-stats" id="dashboard-stats">
+            <!-- Stats will be loaded dynamically -->
+        </div>
+        
+        <div class="tabs-container" id="tabs-container">
+            <!-- Tabs will be loaded dynamically -->
+        </div>
+    </div>
+    
+    <script>
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStats(data.stats);
+                    updateTabs(data.applications, data.status_counts);
+                } else {
+                    console.error('Failed to load dashboard:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        function updateStats(stats) {
+            const statsContainer = document.getElementById('dashboard-stats');
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.total}</div>
+                    <div class="stat-label">Total Applications</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.pending}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.interviewed}</div>
+                    <div class="stat-label">Interviews</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.offered}</div>
+                    <div class="stat-label">Offers</div>
+                </div>
+            `;
+        }
+        
+        function updateTabs(applications, status_counts) {
+            const tabsContainer = document.getElementById('tabs-container');
+            
+            // Create tab headers
+            const status_order = ['all', 'pending', 'applied', 'contacted', 'interviewed', 'offered', 'rejected', 'accepted'];
+            let tabHeaders = '';
+            
+            status_order.forEach(status => {
+                const count = status === 'all' ? applications.length : status_counts[status] || 0;
+                const displayName = status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1);
+                tabHeaders += `
+                    <button class="tab" data-status="${status}" onclick="switchTab('${status}')">
+                        ${displayName}
+                        <span class="tab-count">(${count})</span>
+                    </button>
+                `;
+            });
+            
+            // Create tab contents
+            let tabContents = '';
+            status_order.forEach(status => {
+                const statusApps = status === 'all' ? applications : applications.filter(app => app.status.toLowerCase() === status);
+                const defaultDisplay = status === 'all' ? 'block' : 'none';
+                
+                let cardsHtml = '';
+                if (statusApps.length > 0) {
+                    statusApps.forEach(app => {
+                        cardsHtml += createApplicationCard(app);
+                    });
+                } else {
+                    cardsHtml = createEmptyState(status);
+                }
+                
+                tabContents += `
+                    <div class="tab-content" id="tab-${status}" style="display: ${defaultDisplay}">
+                        <div class="sort-controls">
+                            <h3 class="section-title">${status.charAt(0).toUpperCase() + status.slice(1)} Applications</h3>
+                            <select id="sort-select-${status}" class="sort-select" onchange="handleSortChange()">
+                                <option value="updated_desc">Updated (Newest First)</option>
+                                <option value="updated_asc">Updated (Oldest First)</option>
+                                <option value="applied_desc">Applied (Newest First)</option>
+                                <option value="applied_asc">Applied (Oldest First)</option>
+                                <option value="match_desc">Match % (Highest First)</option>
+                                <option value="match_asc">Match % (Lowest First)</option>
+                            </select>
+                        </div>
+                        <div class="applications-grid">${cardsHtml}</div>
+                    </div>
+                `;
+            });
+            
+            tabsContainer.innerHTML = `
+                <div class="tabs-header">
+                    ${tabHeaders}
+                </div>
+                ${tabContents}
+            `;
+        }
+        
+        function createApplicationCard(app) {
+            const matchScore = app.match_score ? `<span class="match-score">${Math.round(app.match_score)}%</span>` : '';
+            const statusClass = app.status.toLowerCase().replace(' ', '-');
+            
+            return `
+                <div class="application-card" 
+                     data-updated-at="${app.status_updated_at || app.created_at}" 
+                     data-applied-at="${app.created_at}" 
+                     data-match-score="${app.match_score || 0}">
+                    <div class="card-company">
+                        ${app.company}
+                        ${matchScore}
+                    </div>
+                    <div class="card-title">${app.job_title}</div>
+                    <div>
+                        <span class="card-status status-${statusClass}">${app.status}</span>
+                    </div>
+                    <div class="card-meta">
+                        📅 Applied: ${formatDate(app.created_at)}
+                    </div>
+                    <div class="card-meta">
+                        🔄 Updated: ${formatDate(app.status_updated_at)}
+                    </div>
+                    <div class="card-actions">
+                        <a href="/applications/${app.folder_name}/summary.html" class="card-btn">View Summary →</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createEmptyState(status) {
+            const message = status === 'all' ? 'No applications yet. Create your first one!' : `No ${status} applications yet.`;
+            return `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-text">${message}</div>
+                </div>
+            `;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+        
+        // Tab switching functionality
+        function switchTab(status) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById('tab-' + status);
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+            
+            // Add active class to clicked tab
+            const selectedTab = document.querySelector(`[data-status="${status}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+        }
+        
+        function handleSortChange() {
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) {
+                const status = activeTab.dataset.status;
+                const sortSelect = document.getElementById('sort-select-' + status);
+                if (sortSelect) {
+                    sortApplications(status, sortSelect.value);
+                }
+            }
+        }
+        
+        function sortApplications(status, sortBy) {
+            const tabContent = document.getElementById('tab-' + status);
+            if (!tabContent) return;
+            
+            const grid = tabContent.querySelector('.applications-grid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.application-card'));
+            
+            cards.sort((a, b) => {
+                switch(sortBy) {
+                    case 'updated_desc':
+                        return new Date(b.dataset.updatedAt) - new Date(a.dataset.updatedAt);
+                    case 'updated_asc':
+                        return new Date(a.dataset.updatedAt) - new Date(b.dataset.updatedAt);
+                    case 'applied_desc':
+                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                    case 'applied_asc':
+                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
+                    case 'match_desc':
+                        return parseFloat(b.dataset.matchScore || 0) - parseFloat(a.dataset.matchScore || 0);
+                    case 'match_asc':
+                        return parseFloat(a.dataset.matchScore || 0) - parseFloat(b.dataset.matchScore || 0);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Re-append sorted cards
+            cards.forEach(card => grid.appendChild(card));
+        }
+        
+        // AI Status Check Function
+        async function checkAIStatus() {
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                // Create status message element
+                let statusDiv = document.getElementById('ai-status-message');
+                if (!statusDiv) {
+                    statusDiv = document.createElement('div');
+                    statusDiv.id = 'ai-status-message';
+                    statusDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #28a745;
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 24px rgba(108, 123, 149, 0.2);
+                        z-index: 1000;
+                        max-width: 300px;
+                        font-size: 14px;
+                        font-weight: 500;
+                    `;
+                    document.body.appendChild(statusDiv);
+                }
+                
+                if (data.connected) {
+                    statusDiv.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                    statusDiv.innerHTML = `
+                        <strong>AI Status: Connected</strong><br>
+                        Model: ${data.current_model}<br>
+                        Available: ${data.available_models.join(', ')}
+                    `;
+                } else {
+                    statusDiv.style.background = 'linear-gradient(135deg, #f56565 0%, #e53e3e 100%)';
+                    statusDiv.innerHTML = `
+                        <strong>AI Status: Not Connected</strong><br>
+                        Please check your Ollama installation.
+                    `;
+                }
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    if (statusDiv) statusDiv.remove();
+                }, 5000);
+                
+            } catch (error) {
+                console.error('AI Status Error:', error);
+            }
+        }
+        
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

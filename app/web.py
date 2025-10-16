@@ -61,6 +61,52 @@ def dashboard_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/dashboard', methods=['GET'])
+def dashboard_data():
+    """Get complete dashboard data including stats and applications"""
+    try:
+        applications = job_processor.list_all_applications()
+        
+        # Calculate stats
+        stats = {
+            'total': len(applications),
+            'pending': len([app for app in applications if app.status.lower() == 'pending']),
+            'applied': len([app for app in applications if app.status.lower() == 'applied']),
+            'interviewed': len([app for app in applications if app.status.lower() == 'interviewed']),
+            'offered': len([app for app in applications if app.status.lower() == 'offered']),
+            'rejected': len([app for app in applications if app.status.lower() == 'rejected']),
+            'accepted': len([app for app in applications if app.status.lower() == 'accepted'])
+        }
+        
+        # Calculate status counts
+        status_counts = {}
+        for status in ['pending', 'applied', 'contacted', 'interviewed', 'offered', 'rejected', 'accepted']:
+            status_counts[status] = len([app for app in applications if app.status.lower() == status])
+        
+        # Prepare applications data
+        apps_data = []
+        for app in applications:
+            app_data = {
+                'id': app.id,
+                'company': app.company,
+                'job_title': app.job_title,
+                'status': app.status,
+                'created_at': app.created_at.isoformat() if app.created_at else None,
+                'status_updated_at': app.status_updated_at.isoformat() if app.status_updated_at else None,
+                'match_score': app.match_score,
+                'folder_name': app.folder_path.name if app.folder_path else None
+            }
+            apps_data.append(app_data)
+        
+        return jsonify({
+            'success': True,
+            'stats': stats,
+            'status_counts': status_counts,
+            'applications': apps_data
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/recent-applications', methods=['GET'])
 def recent_applications():
     """Get recent applications for dashboard"""
@@ -773,24 +819,8 @@ def get_reports_data():
 
 @app.route('/dashboard')
 def view_dashboard():
-    """View the generated dashboard"""
-    from app.utils.file_utils import get_data_path
-    dashboard_path = get_data_path('output') / 'index.html'
-    
-    if dashboard_path.exists():
-        return send_from_directory(
-            dashboard_path.parent,
-            dashboard_path.name
-        )
-    else:
-        # Generate dashboard if it doesn't exist
-        dashboard_generator.generate_index_page()
-        if dashboard_path.exists():
-            return send_from_directory(
-                dashboard_path.parent,
-                dashboard_path.name
-            )
-        return "Dashboard not generated yet.", 404
+    """View the dashboard"""
+    return render_template('web/dashboard.html')
 
 
 @app.route('/applications/<path:filepath>')
