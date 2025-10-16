@@ -1,51 +1,56 @@
-/* Form Styles v2.1.0 */
+/* Form Styles v2.2.0 - Soft Nordic Design */
 
 /* Form Container */
 .form-container {
   max-width: 800px;
   margin: 0 auto;
-  background-color: var(--neutral-white);
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
 }
 
 /* Form Groups */
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-lg);
 }
 
 .form-group label {
   display: block;
-  font-weight: var(--font-weight-medium);
-  margin-bottom: 0.5rem;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-sm);
   color: var(--neutral-dark);
 }
 
 .form-group small {
   display: block;
-  margin-top: 0.25rem;
-  color: var(--neutral-medium);
+  margin-top: var(--space-xs);
+  color: var(--neutral-light);
   font-size: var(--font-size-small);
 }
 
 /* Form Controls */
 .form-control {
   width: 100%;
-  padding: 0.75rem;
+  padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-base);
   font-family: var(--font-family);
-  border: 2px solid var(--neutral-light);
-  border-radius: 6px;
-  background-color: var(--neutral-white);
-  color: var(--neutral-dark);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--neutral-medium);
   transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--primary-dark);
-  box-shadow: 0 0 0 3px rgba(74, 93, 35, 0.1);
+  border-color: var(--primary-medium);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .form-control:invalid {

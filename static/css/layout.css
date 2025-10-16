@@ -1,5 +1,5 @@
-/* Job Hunter Layout System v2.1.0 */
-/* 30/70 split layout with sidebar navigation */
+/* Job Hunter Layout System v2.2.0 - Soft Nordic Design */
+/* Warm gray backgrounds with soft shadows - Cozy and inviting while maintaining clean aesthetics */
 
 * {
   margin: 0;
@@ -10,9 +10,10 @@
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
-  color: var(--neutral-dark);
-  background-color: var(--neutral-white);
+  color: var(--neutral-medium);
+  background: linear-gradient(135deg, var(--neutral-bg) 0%, var(--neutral-bg-alt) 100%);
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 /* Main Application Layout */
@@ -25,22 +26,24 @@ body {
 /* Header */
 .app-header {
   grid-column: 1 / -1;
-  background-color: var(--primary-dark);
+  background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-dark) 100%);
   color: var(--neutral-white);
-  padding: 0.5rem 2rem;
+  padding: var(--space-lg) var(--space-2xl);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-height: 50px;
+  box-shadow: var(--shadow-lg);
+  min-height: 80px;
+  text-align: center;
 }
 
 .app-header h1 {
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-light);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-md);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .app-header .favicon {
@@ -50,10 +53,11 @@ body {
 
 /* Sidebar Navigation */
 .sidebar {
-  background-color: var(--primary-dark);
+  background: linear-gradient(180deg, var(--primary-medium) 0%, var(--primary-dark) 100%);
   color: var(--neutral-white);
-  padding: 1rem 0;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  padding: var(--space-lg) 0;
+  box-shadow: 4px 0 20px rgba(108, 123, 149, 0.15);
+  border-right: 1px solid var(--border-color);
 }
 
 .sidebar-nav {
@@ -61,34 +65,40 @@ body {
 }
 
 .sidebar-nav li {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
 }
 
 .sidebar-nav a {
   display: block;
-  padding: 0.5rem 2rem;
-  color: var(--neutral-white);
+  padding: var(--space-md) var(--space-xl);
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   transition: all 0.3s ease;
   border-left: 3px solid transparent;
-  font-size: 0.9rem;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-right: var(--space-md);
 }
 
 .sidebar-nav a:hover {
-  background-color: var(--hover-bg);
-  border-left-color: var(--primary-light);
+  background: var(--hover-bg);
+  border-left-color: var(--neutral-white);
+  transform: translateX(5px);
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-nav a.active {
-  background-color: var(--active-bg);
+  background: var(--active-bg);
   border-left-color: var(--neutral-white);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Main Content Area */
 .main-content {
-  background-color: var(--neutral-white);
-  padding: 2rem;
+  background: transparent;
+  padding: var(--space-2xl);
   overflow-y: auto;
 }
 
@@ -175,6 +185,68 @@ body {
   .main-content {
     padding: 1rem;
   }
+}
+
+/* Centralized Title and Subtitle System */
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-light);
+  color: var(--neutral-dark);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  text-shadow: 0 2px 4px rgba(139, 157, 195, 0.1);
+}
+
+.page-subtitle {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-normal);
+  color: var(--neutral-medium);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  opacity: 0.9;
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-dark);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.section-subtitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--neutral-medium);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.card-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-white);
+  text-align: center;
+  padding: var(--space-lg) var(--space-xl);
+  margin: calc(-1 * var(--space-2xl)) calc(-1 * var(--space-2xl)) var(--space-lg) calc(-1 * var(--space-2xl));
+  background: linear-gradient(135deg, var(--primary-medium) 0%, var(--primary-dark) 100%);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-md);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Card System */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  z-index: 1;
+  color: var(--neutral-medium);
 }
 
 /* Utility Classes */
