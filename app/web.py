@@ -32,8 +32,24 @@ dashboard_generator = DashboardGenerator()
 
 @app.route('/')
 def index():
-    """Landing page"""
-    return render_template('landing.html')
+    """Dashboard as landing page"""
+    from app.utils.file_utils import get_data_path
+    dashboard_path = get_data_path('output') / 'index.html'
+    
+    if dashboard_path.exists():
+        return send_from_directory(
+            dashboard_path.parent,
+            dashboard_path.name
+        )
+    else:
+        # Generate dashboard if it doesn't exist
+        dashboard_generator.generate_index_page()
+        if dashboard_path.exists():
+            return send_from_directory(
+                dashboard_path.parent,
+                dashboard_path.name
+            )
+        return "Dashboard not generated yet.", 404
 
 @app.route('/new-application')
 def new_application():
