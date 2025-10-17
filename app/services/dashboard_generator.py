@@ -139,21 +139,22 @@ class DashboardGenerator:
             text-align: center;
             color: white;
             margin: 0 -20px 0 -20px;
-            position: relative;
-            z-index: 1;
+            position: sticky;
+            top: 0;
+            z-index: 99;
             background: #8b9dc3;
             padding: 0 20px;
             width: calc(100% + 40px);
             border-radius: 0;
-            height: 200px;
+            height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }}
         .header h1 {{
-            font-size: 48px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 5px;
             color: white;
             font-weight: 300;
         }}
@@ -167,8 +168,9 @@ class DashboardGenerator:
             padding: 15px 0;
             margin-bottom: 30px;
             border-radius: 10px;
-            position: relative;
-            z-index: 1;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }}
@@ -377,6 +379,7 @@ class DashboardGenerator:
             <li><a href="/new-application" class="nav-link">New Application</a></li>
             <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
         </ul>
     </div>
     

@@ -20,14 +20,16 @@
             padding: 0;
             margin: 0;
             position: relative;
+            overflow-x: hidden;
             color: #4a5568;
         }
         
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0px;
-            margin-left: 280px;
+            width: calc(100vw - 250px);
+            margin: 0;
+            padding: 0 20px 20px 20px;
+            margin-left: 250px;
+            box-sizing: border-box;
         }
         
         .sidebar {
@@ -100,15 +102,15 @@
         .header {
             text-align: center;
             color: white;
-            margin: 0;
-            position: relative;
-            z-index: 1;
+            margin: 0 -20px 0 -20px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
             background: #8b9dc3;
             padding: 0 20px;
-            width: 100vw;
-            margin-left: calc(-50vw + 50%);
+            width: calc(100% + 40px);
             border-radius: 0;
-            height: 200px;
+            height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -117,8 +119,8 @@
         }
         
         .header h1 {
-            font-size: 48px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 5px;
             color: #F7F7F7;
         }
         
@@ -128,8 +130,9 @@
             padding: 15px 0;
             margin-bottom: 30px;
             border-radius: 10px;
-            position: relative;
-            z-index: 1;
+            position: sticky;
+            top: 100px;
+            z-index: 100;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
@@ -160,50 +163,52 @@
             font-weight: 600;
         }
         
-        .period-selector {
-            background: rgba(0, 0, 0, 0.15);
+        .tabs-container {
+            background: white;
             backdrop-filter: blur(20px);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 0;
+            border: 1px solid rgba(74, 85, 104, 0.2);
+            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
+            overflow: hidden;
+            margin: 0 -20px 20px -20px;
+            width: calc(100% + 40px);
             position: relative;
             z-index: 1;
-            color: white;
         }
         
-        .period-selector h3 {
-            margin-bottom: 15px;
-            color: white;
-        }
-        
-        .period-buttons {
+        .tabs-header {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            background: #8b9dc3;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
         }
         
-        .period-btn {
-            padding: 10px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
         }
         
-        .period-btn:hover {
-            border-color: rgba(255, 255, 255, 0.4);
+        .tab.active {
             background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .period-btn.active {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.4);
             color: white;
+            border-bottom: 3px solid #ffffff;
         }
         
         .reports-grid {
@@ -214,25 +219,28 @@
         }
         
         .report-card {
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(139, 157, 195, 0.2);
+            box-shadow: 0 8px 32px rgba(108, 123, 149, 0.15);
+            margin-bottom: 20px;
             position: relative;
             z-index: 1;
-            color: white;
+            color: #4a5568;
         }
         
         .report-card h3 {
             background: #8b9dc3;
             color: white;
-            padding: 15px 20px;
-            margin: -25px -25px 20px -25px;
-            border-radius: 12px 12px 0 0;
-            font-size: 20px;
-            font-weight: 600;
+            padding: 20px 25px;
+            margin: -40px -40px 30px -40px;
+            border-radius: 20px 20px 0 0;
+            font-size: 24px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
         }
         
         .chart-container {
@@ -256,13 +264,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            transition: background-color 0.2s;
+            padding: 20px;
+            border-bottom: 1px solid rgba(139, 157, 195, 0.1);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.5);
         }
         
         .followup-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background: rgba(139, 157, 195, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
         }
         
         .followup-item:last-child {
@@ -275,12 +288,13 @@
         
         .followup-company {
             font-weight: 600;
-            color: white;
+            color: #2d3748;
             margin-bottom: 5px;
+            font-size: 16px;
         }
         
         .followup-position {
-            color: rgba(255, 255, 255, 0.7);
+            color: #4a5568;
             font-size: 14px;
             margin-bottom: 5px;
         }
@@ -292,7 +306,7 @@
         }
         
         .followup-timestamp {
-            color: rgba(255, 255, 255, 0.5);
+            color: #718096;
             font-size: 12px;
             margin-left: 15px;
         }
@@ -301,27 +315,39 @@
             color: #667eea;
             text-decoration: none;
             font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
         }
         
         .followup-link:hover {
-            text-decoration: underline;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
         }
         
         .empty-state {
             text-align: center;
-            padding: 40px;
-            color: #999;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            color: #718096;
+            margin: 20px 0;
         }
         
         .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #8b9dc3;
         }
         
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            color: #718096;
+            margin: 20px 0;
         }
         
         .spinner {
@@ -340,16 +366,16 @@
         }
         
         .stats-summary {
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 40px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(139, 157, 195, 0.2);
+            box-shadow: 0 8px 32px rgba(108, 123, 149, 0.15);
             position: relative;
             z-index: 1;
-            color: white;
+            color: #4a5568;
         }
         
         .stats-grid {
@@ -370,8 +396,9 @@
         }
         
         .stat-label {
-            color: #666;
+            color: #718096;
             font-size: 14px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -385,23 +412,22 @@
             <li><a href="/new-application" class="nav-link">New Application</a></li>
             <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
             <li><a href="/reports" class="nav-link active">Reports</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
         </ul>
     </div>
     
     <div class="container">
         <div class="header">
             <h1>Application Reports</h1>
-            <p>Track your job application performance and follow-ups</p>
         </div>
         
-        <div class="period-selector">
-            <h3>📅 Select Time Period</h3>
-            <div class="period-buttons">
-                <button class="period-btn active" data-period="today" onclick="selectPeriod('today')">Today</button>
-                <button class="period-btn" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
-                <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Rolling Days</button>
-                <button class="period-btn" data-period="30days" onclick="selectPeriod('30days')">30 Rolling Days</button>
-                <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab active" data-period="today" onclick="selectPeriod('today')">Today</button>
+                <button class="tab" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
+                <button class="tab" data-period="7days" onclick="selectPeriod('7days')">7 Rolling Days</button>
+                <button class="tab" data-period="30days" onclick="selectPeriod('30days')">30 Rolling Days</button>
+                <button class="tab" data-period="all" onclick="selectPeriod('all')">All Time</button>
             </div>
         </div>
         
@@ -432,7 +458,7 @@
         
         <div class="report-card">
             <h3>Applications Requiring Follow-up</h3>
-            <p style="color: #666; margin-bottom: 20px;">Applications with more than one week without updates</p>
+            <p style="color: #718096; margin-bottom: 30px; font-size: 16px;">Applications with more than one week without updates</p>
             <div id="followup-list" class="followup-list">
                 <div class="loading">
                     <div class="spinner"></div>
@@ -500,7 +526,7 @@
             currentPeriod = period;
             
             // Update button states
-            document.querySelectorAll('.period-btn').forEach(btn => {
+            document.querySelectorAll('.tab').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.querySelector(`[data-period="${period}"]`).classList.add('active');
@@ -787,9 +813,6 @@
                         <div class="empty-state">
                             <div class="empty-state-icon">✓</div>
                             <p>No applications require follow-up at this time!</p>
-                            <p style="font-size: 14px; color: #999; margin-top: 10px;">
-                                All applications have been updated within the last week.
-                            </p>
                         </div>
                     `;
                     console.log('Follow-up list updated with empty state');
