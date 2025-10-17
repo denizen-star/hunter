@@ -45,7 +45,16 @@ class SimpleTechExtractor:
         'MongoDB': ['mongodb', 'mongo'],
         'Redis': ['redis'],
         'Cassandra': ['cassandra'],
+        'DynamoDB': ['dynamodb', 'dynamo db'],
+        'Aurora': ['aurora', 'aws aurora', 'amazon aurora'],
+        'RDS': ['rds', 'aws rds', 'amazon rds'],
+        'DocumentDB': ['documentdb', 'aws documentdb', 'amazon documentdb'],
+        'Neptune': ['neptune', 'aws neptune', 'amazon neptune'],
+        'Timestream': ['timestream', 'aws timestream', 'amazon timestream'],
         'DB2': ['db2', 'ibm db2'],
+        'Sybase': ['sybase'],
+        'ASE': ['ase', 'adaptive server enterprise', 'sybase ase', 'sybase adaptive server enterprise'],
+        'ASA': ['asa', 'adaptive server anywhere', 'sybase asa', 'sybase adaptive server anywhere'],
         'Elasticsearch': ['elasticsearch', 'elastic search'],
         
         # BI Tools

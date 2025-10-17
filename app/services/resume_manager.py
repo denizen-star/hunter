@@ -201,9 +201,10 @@ Brief summary of your professional background and key strengths (2-3 sentences).
         
         # Databases
         elif tech_name in ['SQL', 'MySQL', 'PostgreSQL', 'Oracle', 'MongoDB', 'Redis', 'Cassandra', 
-                          'DynamoDB', 'Redshift', 'BigQuery', 'Snowflake', 'SQLite', 'DB2', 'MariaDB', 
-                          'Neo4j', 'CouchDB', 'Elasticsearch', 'InfluxDB', 'Couchbase', 'HBase', 
-                          'Teradata', 'MemSQL', 'SQL Server', 'ClickHouse', 'TimescaleDB']:
+                          'DynamoDB', 'Aurora', 'RDS', 'DocumentDB', 'Neptune', 'Timestream', 'Redshift', 
+                          'BigQuery', 'Snowflake', 'SQLite', 'DB2', 'MariaDB', 'Neo4j', 'CouchDB', 
+                          'Elasticsearch', 'InfluxDB', 'Couchbase', 'HBase', 'Teradata', 'MemSQL', 
+                          'SQL Server', 'ClickHouse', 'TimescaleDB', 'Sybase', 'ASE', 'ASA']:
             return 'Databases'
         
         # Cloud Platforms
