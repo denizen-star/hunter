@@ -874,19 +874,13 @@ class DocumentGenerator:
             research_data['mission'] = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
             research_data['vision'] = f"To be the leading company in our industry, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
             
-            # Products, Services & Competitors (would come from business databases)
-            if any(keyword in company_name.lower() for keyword in ['bank', 'financial', 'td', 'toronto-dominion']):
-                # Banking/Financial services
-                research_data['products_services'] = f"{company_name} provides comprehensive banking and financial services including retail banking, commercial banking, wealth management, investment services, credit cards, mortgages, and digital banking solutions. The company serves millions of customers across multiple markets."
-                research_data['competitors'] = f"Main competitors include other major banks such as Royal Bank of Canada (RBC), Bank of Nova Scotia (Scotiabank), Bank of Montreal (BMO), Canadian Imperial Bank of Commerce (CIBC), and Wells Fargo in the US market."
-            elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
-                # Technology companies
-                research_data['products_services'] = f"{company_name} develops and provides technology solutions including software platforms, cloud services, data analytics tools, AI/ML solutions, and digital transformation consulting services for enterprise clients."
-                research_data['competitors'] = f"Main competitors include other technology leaders such as Microsoft, Amazon Web Services, Google Cloud, Salesforce, and Oracle in the enterprise software and cloud services space."
-            else:
-                # Generic business
-                research_data['products_services'] = f"{company_name} offers a comprehensive suite of products and services including software solutions, consulting services, and digital transformation initiatives designed to help businesses achieve their strategic objectives."
-                research_data['competitors'] = f"Main competitors in the industry include established players in the technology and consulting sectors, though specific competitive analysis would require access to industry databases and market research reports."
+            # Products, Services & Competitors (using real web search)
+            print(f"🔍 Searching for products/services and competitors for {company_name}...")
+            products_services = self._search_company_products_services(company_name)
+            competitors = self._search_company_competitors(company_name)
+            
+            research_data['products_services'] = products_services
+            research_data['competitors'] = competitors
             
             # Enhanced Latest News (would come from news APIs including Glassdoor and Google News)
             research_data['news'] = self._get_company_news(company_name)
@@ -900,174 +894,364 @@ class DocumentGenerator:
         return research_data
     
     def _get_company_news(self, company_name: str) -> list:
-        """Get latest news about the company using web search"""
+        """Get latest news about the company using real web search"""
         try:
-            # Use web search to find actual news about the company
-            search_queries = [
-                f"{company_name} latest news 2024",
-                f"{company_name} financial news",
-                f"{company_name} business news"
-            ]
+            print(f"🔍 Searching for real news about {company_name}...")
             
-            news_items = []
+            # Perform actual web search for company news
+            search_query = f"{company_name} latest news 2024 financial business"
             
-            # Try different search queries to get comprehensive news coverage
-            for query in search_queries[:1]:  # Use first query for now
-                try:
-                    # This is where we would integrate with actual web search
-                    # For demonstration, let's show realistic news based on company type
-                    if any(keyword in company_name.lower() for keyword in ['bank', 'financial', 'td', 'toronto-dominion']):
-                        # Real news for TD Bank based on actual search results
-                        if 'td' in company_name.lower() or 'toronto-dominion' in company_name.lower():
-                            news_items = [
-                                {
-                                    "title": f"{company_name} Money Laundering Settlement - $3B Fine",
-                                    "summary": f"{company_name} agreed to pay over $3 billion in fines to U.S. authorities in October 2024 for money-laundering-related charges, including an asset cap preventing U.S. expansion until compliance issues are resolved.",
-                                    "url": "https://www.americanbanker.com/news/td-steadies-the-ship-in-start-of-new-era",
-                                    "source": "American Banker"
-                                },
-                                {
-                                    "title": f"{company_name} Leadership Transition - New CEO in 2025",
-                                    "summary": f"{company_name} announced Raymond Chun, previously Chief Operating Officer, will become CEO in April 2025, leading the bank through its strategic review and compliance improvements.",
-                                    "url": "https://www.americanbanker.com/news/td-steadies-the-ship-in-start-of-new-era",
-                                    "source": "American Banker"
-                                },
-                                {
-                                    "title": f"{company_name} Securities Fraud Lawsuit Filed",
-                                    "summary": f"A securities fraud lawsuit was filed against {company_name} in November 2024, alleging the bank misled investors, leading to financial losses.",
-                                    "url": "https://www.globenewswire.com/news-release/2024/11/10/2977983/0/en/TD-INVESTOR-UPDATE.html",
-                                    "source": "Globe Newswire"
-                                }
-                            ]
-                        else:
-                            # Generic banking news
-                            news_items = [
-                                {
-                                    "title": f"{company_name} Reports Strong Q3 2024 Results",
-                                    "summary": f"{company_name} announced strong quarterly performance with improved digital banking metrics and customer satisfaction scores.",
-                                    "url": f"https://finance.yahoo.com/news/{company_name.lower().replace(' ', '-')}",
-                                    "source": "Yahoo Finance"
-                                },
-                                {
-                                    "title": f"{company_name} Expands Digital Banking Services",
-                                    "summary": f"{company_name} continues to invest in digital transformation, launching new mobile banking features and AI-powered customer service tools.",
-                                    "url": f"https://www.reuters.com/business/{company_name.lower().replace(' ', '-')}",
-                                    "source": "Reuters"
-                                }
-                            ]
-                        break
-                    else:
-                        # Generic business news for other companies
-                        news_items = [
-                            {
-                                "title": f"{company_name} Announces Strategic Partnership",
-                                "summary": f"{company_name} continues to expand its market presence through strategic alliances and innovative business solutions.",
-                                "url": f"https://www.{company_name.lower().replace(' ', '')}.com/news",
-                                "source": "Company News"
-                            },
-                            {
-                                "title": f"{company_name} Reports Strong Market Performance",
-                                "summary": f"{company_name} demonstrates resilience in the current market environment with positive growth indicators.",
-                                "url": f"https://finance.yahoo.com/news/{company_name.lower().replace(' ', '-')}",
-                                "source": "Yahoo Finance"
-                            }
-                        ]
-                        break
-                        
-                except Exception as e:
-                    print(f"Error searching for news with query '{query}': {e}")
-                    continue
-            
-            return news_items
-            
-        except Exception as e:
-            print(f"Error in _get_company_news: {e}")
-            return []
-    
-    def _get_company_personnel(self, company_name: str) -> list:
-        """Get key personnel with data-related titles"""
-        try:
-            # Real personnel data based on company type
-            if any(keyword in company_name.lower() for keyword in ['td', 'toronto-dominion']):
-                # Real TD Bank leadership team
-                personnel = [
-                    {
-                        "name": "Ajai Bambawale",
-                        "title": "Group Head & Chief Risk Officer"
-                    },
-                    {
-                        "name": "Christine Morris",
-                        "title": "Senior Executive Vice President, Transformation, Enablement & Customer Experience"
-                    },
-                    {
-                        "name": "Kelvin Vi Luan Tran",
-                        "title": "Group Head & Chief Financial Officer"
-                    },
-                    {
-                        "name": "Jo K Jagadish",
-                        "title": "Executive Vice President, Head of Digital Banking and Contact Centers"
-                    },
-                    {
-                        "name": "Melanie Burns",
-                        "title": "Deputy Chief Human Resources Officer"
-                    }
-                ]
-                return personnel
-            elif any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
-                # Generic banking leadership roles
-                personnel = [
-                    {
-                        "name": f"{company_name} CIO",
-                        "title": "Chief Information Officer"
-                    },
-                    {
-                        "name": f"{company_name} CDO",
-                        "title": "Chief Data Officer"
-                    },
-                    {
-                        "name": f"{company_name} Head of Analytics",
-                        "title": "Head of Data Analytics & Business Intelligence"
-                    }
-                ]
-                return personnel
-            elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
-                # Tech company leadership roles
-                personnel = [
-                    {
-                        "name": f"{company_name} CTO",
-                        "title": "Chief Technology Officer"
-                    },
-                    {
-                        "name": f"{company_name} VP Engineering",
-                        "title": "Vice President of Engineering"
-                    },
-                    {
-                        "name": f"{company_name} Head of Data Science",
-                        "title": "Head of Data Science & Analytics"
-                    }
-                ]
-                return personnel
-            else:
-                # Generic company leadership
-                personnel = [
-                    {
-                        "name": f"{company_name} CEO",
-                        "title": "Chief Executive Officer"
-                    },
-                    {
-                        "name": f"{company_name} CTO",
-                        "title": "Chief Technology Officer"
-                    },
-                    {
-                        "name": f"{company_name} Head of Analytics",
-                        "title": "Head of Data Analytics"
-                    }
-                ]
-                return personnel
+            try:
+                # Import web search functionality
+                from tools import web_search
+                
+                # Perform the actual web search
+                search_results = web_search(search_query)
+                
+                if search_results and hasattr(search_results, 'content'):
+                    # Parse the search results to extract news items
+                    news_items = self._parse_web_search_results(search_results.content, company_name)
+                    print(f"✅ Found {len(news_items)} news items for {company_name}")
+                    return news_items
+                else:
+                    print(f"⚠️ No search results found for {company_name}")
+                    return []
+                    
+            except ImportError:
+                print("⚠️ Web search tool not available, using fallback data")
+                # Fallback to generic news if web search not available
+                return self._get_fallback_news(company_name)
                 
         except Exception as e:
-            print(f"Error in _get_company_personnel: {e}")
+            print(f"❌ Error in _get_company_news: {e}")
             return []
+    
+    def _parse_web_search_results(self, search_content: str, company_name: str) -> list:
+        """Parse web search results to extract news items"""
+        try:
+            news_items = []
+            
+            # Simple parsing of search results
+            # Look for patterns that indicate news articles
+            lines = search_content.split('\n')
+            current_item = {}
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Look for title patterns (usually in quotes or bold)
+                if ('"' in line or '**' in line) and len(line) > 20 and len(line) < 200:
+                    # This might be a news title
+                    title = line.replace('"', '').replace('**', '').strip()
+                    if company_name.lower() in title.lower():
+                        current_item['title'] = title
+                
+                # Look for summary/description patterns
+                elif len(line) > 50 and len(line) < 300 and not line.startswith('http'):
+                    if 'title' in current_item and 'summary' not in current_item:
+                        current_item['summary'] = line
+                
+                # Look for URL patterns
+                elif line.startswith('http'):
+                    if 'title' in current_item:
+                        current_item['url'] = line
+                        current_item['source'] = self._extract_source_from_url(line)
+                        
+                        # Add the news item if we have enough info
+                        if len(current_item) >= 3:
+                            news_items.append(current_item.copy())
+                            current_item = {}
+            
+            # If we have a partial item, add it
+            if 'title' in current_item and len(current_item) >= 2:
+                news_items.append(current_item)
+            
+            return news_items[:5]  # Limit to 5 news items
+            
+        except Exception as e:
+            print(f"Error parsing search results: {e}")
+            return []
+    
+    def _extract_source_from_url(self, url: str) -> str:
+        """Extract source name from URL"""
+        try:
+            # Extract domain name
+            if 'yahoo.com' in url:
+                return 'Yahoo Finance'
+            elif 'reuters.com' in url:
+                return 'Reuters'
+            elif 'bloomberg.com' in url:
+                return 'Bloomberg'
+            elif 'cnbc.com' in url:
+                return 'CNBC'
+            elif 'wsj.com' in url:
+                return 'Wall Street Journal'
+            elif 'ft.com' in url:
+                return 'Financial Times'
+            elif 'forbes.com' in url:
+                return 'Forbes'
+            elif 'techcrunch.com' in url:
+                return 'TechCrunch'
+            else:
+                # Extract domain name
+                domain = url.split('//')[1].split('/')[0].split('.')[-2]
+                return domain.title()
+        except:
+            return 'News Source'
+    
+    def _get_fallback_news(self, company_name: str) -> list:
+        """Fallback news when web search is not available"""
+        return [
+            {
+                "title": f"{company_name} Business Update",
+                "summary": f"Latest business developments and company news for {company_name}. For the most current information, please visit the company's official website or financial news sources.",
+                "url": f"https://www.{company_name.lower().replace(' ', '')}.com",
+                "source": "Company Website"
+            }
+        ]
+    
+    def _get_company_personnel(self, company_name: str) -> list:
+        """Get key personnel with data-related titles using real web search"""
+        try:
+            print(f"🔍 Searching for key personnel at {company_name}...")
+            
+            # Perform actual web search for company personnel
+            search_query = f"{company_name} executives leadership team CEO CTO Chief Data Officer"
+            
+            try:
+                # Import web search functionality
+                from tools import web_search
+                
+                # Perform the actual web search
+                search_results = web_search(search_query)
+                
+                if search_results and hasattr(search_results, 'content'):
+                    # Parse the search results to extract personnel
+                    personnel = self._parse_personnel_search_results(search_results.content, company_name)
+                    print(f"✅ Found {len(personnel)} key personnel for {company_name}")
+                    return personnel
+                else:
+                    print(f"⚠️ No personnel results found for {company_name}")
+                    return self._get_fallback_personnel(company_name)
+                    
+            except ImportError:
+                print("⚠️ Web search tool not available, using fallback data")
+                # Fallback to generic personnel if web search not available
+                return self._get_fallback_personnel(company_name)
+                
+        except Exception as e:
+            print(f"❌ Error in _get_company_personnel: {e}")
+            return []
+    
+    def _parse_personnel_search_results(self, search_content: str, company_name: str) -> list:
+        """Parse web search results to extract personnel information"""
+        try:
+            personnel = []
+            
+            # Look for executive names and titles in the search results
+            lines = search_content.split('\n')
+            current_person = {}
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Look for name patterns (usually in bold or quotes)
+                if ('**' in line or '"' in line) and len(line) < 100:
+                    # Extract name from bold or quoted text
+                    name = line.replace('**', '').replace('"', '').strip()
+                    
+                    # Check if this looks like a person's name
+                    if self._is_likely_person_name(name):
+                        if current_person:
+                            personnel.append(current_person.copy())
+                        current_person = {'name': name}
+                
+                # Look for title patterns (CEO, CTO, etc.)
+                elif any(title in line.upper() for title in ['CEO', 'CTO', 'CFO', 'COO', 'CDO', 'CIO', 'PRESIDENT', 'CHIEF', 'HEAD OF', 'DIRECTOR', 'VICE PRESIDENT']):
+                    if current_person and 'title' not in current_person:
+                        # Extract title from the line
+                        title = self._extract_title_from_line(line)
+                        if title:
+                            current_person['title'] = title
+            
+            # Add the last person if we have one
+            if current_person and 'name' in current_person:
+                personnel.append(current_person)
+            
+            return personnel[:5]  # Limit to 5 personnel
+            
+        except Exception as e:
+            print(f"Error parsing personnel results: {e}")
+            return []
+    
+    def _is_likely_person_name(self, text: str) -> bool:
+        """Check if text looks like a person's name"""
+        # Simple heuristics for person names
+        if len(text.split()) < 2 or len(text.split()) > 4:
+            return False
+        
+        # Should not contain common non-name words
+        non_name_words = ['company', 'corp', 'inc', 'llc', 'ltd', 'the', 'and', 'or', 'of', 'in', 'at', 'for']
+        if any(word.lower() in text.lower() for word in non_name_words):
+            return False
+        
+        # Should contain at least one capital letter (for first name)
+        return any(c.isupper() for c in text)
+    
+    def _extract_title_from_line(self, line: str) -> str:
+        """Extract job title from a line of text"""
+        # Look for common executive titles
+        titles = ['CEO', 'CTO', 'CFO', 'COO', 'CDO', 'CIO', 'President', 'Chief Executive Officer', 
+                 'Chief Technology Officer', 'Chief Financial Officer', 'Chief Operating Officer',
+                 'Chief Data Officer', 'Chief Information Officer', 'Head of', 'Director', 'Vice President']
+        
+        for title in titles:
+            if title.lower() in line.lower():
+                return title
+        
+        return None
+    
+    def _get_fallback_personnel(self, company_name: str) -> list:
+        """Fallback personnel when web search is not available"""
+        # Determine company type for appropriate roles
+        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
+            return [
+                {
+                    "name": f"{company_name} CIO",
+                    "title": "Chief Information Officer"
+                },
+                {
+                    "name": f"{company_name} CDO", 
+                    "title": "Chief Data Officer"
+                },
+                {
+                    "name": f"{company_name} Head of Analytics",
+                    "title": "Head of Data Analytics & Business Intelligence"
+                }
+            ]
+        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+            return [
+                {
+                    "name": f"{company_name} CTO",
+                    "title": "Chief Technology Officer"
+                },
+                {
+                    "name": f"{company_name} VP Engineering",
+                    "title": "Vice President of Engineering"
+                },
+                {
+                    "name": f"{company_name} Head of Data Science",
+                    "title": "Head of Data Science & Analytics"
+                }
+            ]
+        else:
+            return [
+                {
+                    "name": f"{company_name} CEO",
+                    "title": "Chief Executive Officer"
+                },
+                {
+                    "name": f"{company_name} CTO",
+                    "title": "Chief Technology Officer"
+                },
+                {
+                    "name": f"{company_name} Head of Analytics",
+                    "title": "Head of Data Analytics"
+                }
+            ]
+    
+    def _search_company_products_services(self, company_name: str) -> str:
+        """Search for company products and services using web search"""
+        try:
+            search_query = f"{company_name} products services what does company do business"
+            
+            try:
+                from tools import web_search
+                search_results = web_search(search_query)
+                
+                if search_results and hasattr(search_results, 'content'):
+                    # Parse search results for products/services information
+                    content = search_results.content
+                    
+                    # Look for business description patterns
+                    lines = content.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if len(line) > 100 and company_name.lower() in line.lower():
+                            # This might contain business information
+                            if any(keyword in line.lower() for keyword in ['provides', 'offers', 'develops', 'services', 'products', 'solutions']):
+                                return line[:500] + "..." if len(line) > 500 else line
+                    
+                    # Fallback to generic description
+                    return f"{company_name} provides various products and services to its customers. For detailed information about their offerings, please visit their official website."
+                else:
+                    return self._get_fallback_products_services(company_name)
+                    
+            except ImportError:
+                return self._get_fallback_products_services(company_name)
+                
+        except Exception as e:
+            print(f"Error searching products/services: {e}")
+            return self._get_fallback_products_services(company_name)
+    
+    def _search_company_competitors(self, company_name: str) -> str:
+        """Search for company competitors using web search"""
+        try:
+            search_query = f"{company_name} competitors rivals main competitors industry"
+            
+            try:
+                from tools import web_search
+                search_results = web_search(search_query)
+                
+                if search_results and hasattr(search_results, 'content'):
+                    # Parse search results for competitor information
+                    content = search_results.content
+                    
+                    # Look for competitor mentions
+                    lines = content.split('\n')
+                    competitor_mentions = []
+                    
+                    for line in lines:
+                        line = line.strip()
+                        if any(keyword in line.lower() for keyword in ['competitor', 'rival', 'competes with', 'main competitor']):
+                            if len(line) > 50 and len(line) < 300:
+                                competitor_mentions.append(line)
+                    
+                    if competitor_mentions:
+                        return competitor_mentions[0][:500] + "..." if len(competitor_mentions[0]) > 500 else competitor_mentions[0]
+                    
+                    return self._get_fallback_competitors(company_name)
+                else:
+                    return self._get_fallback_competitors(company_name)
+                    
+            except ImportError:
+                return self._get_fallback_competitors(company_name)
+                
+        except Exception as e:
+            print(f"Error searching competitors: {e}")
+            return self._get_fallback_competitors(company_name)
+    
+    def _get_fallback_products_services(self, company_name: str) -> str:
+        """Fallback products/services description"""
+        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
+            return f"{company_name} provides comprehensive banking and financial services including retail banking, commercial banking, wealth management, investment services, credit cards, mortgages, and digital banking solutions."
+        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+            return f"{company_name} develops and provides technology solutions including software platforms, cloud services, data analytics tools, AI/ML solutions, and digital transformation consulting services."
+        else:
+            return f"{company_name} offers a comprehensive suite of products and services designed to help businesses achieve their strategic objectives. For detailed information, please visit their official website."
+    
+    def _get_fallback_competitors(self, company_name: str) -> str:
+        """Fallback competitors description"""
+        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
+            return f"Main competitors include other major banks and financial institutions in the industry, though specific competitive analysis would require access to industry databases and market research reports."
+        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+            return f"Main competitors include other technology leaders in the enterprise software and cloud services space, though specific competitive analysis would require access to industry databases."
+        else:
+            return f"Main competitors include other established players in the industry, though specific competitive analysis would require access to industry databases and market research reports."
     
     def _get_fallback_research_data(self, company_name: str) -> dict:
         """Get fallback research data when search fails"""
