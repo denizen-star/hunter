@@ -765,14 +765,10 @@ class DocumentGenerator:
                 ''')
                 
                 for person in research_data['personnel']:
-                    linkedin_html = ''
-                    if person.get('linkedin'):
-                        linkedin_html = f'<br><a href="{person["linkedin"]}" target="_blank" class="news-link">LinkedIn Profile →</a>'
-                    
                     html_parts.append(f'''
                     <div class="person-item">
                         <h5>{person["name"]}</h5>
-                        <div class="title">{person["title"]}{linkedin_html}</div>
+                        <div class="title">{person["title"]}</div>
                     </div>
                     ''')
                 
@@ -997,28 +993,23 @@ class DocumentGenerator:
                 personnel = [
                     {
                         "name": "Ajai Bambawale",
-                        "title": "Group Head & Chief Risk Officer",
-                        "linkedin": "https://www.linkedin.com/in/ajai-bambawale"
+                        "title": "Group Head & Chief Risk Officer"
                     },
                     {
                         "name": "Christine Morris",
-                        "title": "Senior Executive Vice President, Transformation, Enablement & Customer Experience",
-                        "linkedin": "https://www.linkedin.com/in/christine-morris"
+                        "title": "Senior Executive Vice President, Transformation, Enablement & Customer Experience"
                     },
                     {
                         "name": "Kelvin Vi Luan Tran",
-                        "title": "Group Head & Chief Financial Officer",
-                        "linkedin": "https://www.linkedin.com/in/kelvin-tran"
+                        "title": "Group Head & Chief Financial Officer"
                     },
                     {
                         "name": "Jo K Jagadish",
-                        "title": "Executive Vice President, Head of Digital Banking and Contact Centers",
-                        "linkedin": "https://www.linkedin.com/in/jo-jagadish"
+                        "title": "Executive Vice President, Head of Digital Banking and Contact Centers"
                     },
                     {
                         "name": "Melanie Burns",
-                        "title": "Deputy Chief Human Resources Officer",
-                        "linkedin": "https://www.linkedin.com/in/melanie-burns"
+                        "title": "Deputy Chief Human Resources Officer"
                     }
                 ]
                 return personnel
@@ -1027,18 +1018,15 @@ class DocumentGenerator:
                 personnel = [
                     {
                         "name": f"{company_name} CIO",
-                        "title": "Chief Information Officer",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Chief Information Officer"
                     },
                     {
                         "name": f"{company_name} CDO",
-                        "title": "Chief Data Officer",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Chief Data Officer"
                     },
                     {
                         "name": f"{company_name} Head of Analytics",
-                        "title": "Head of Data Analytics & Business Intelligence",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Head of Data Analytics & Business Intelligence"
                     }
                 ]
                 return personnel
@@ -1047,18 +1035,15 @@ class DocumentGenerator:
                 personnel = [
                     {
                         "name": f"{company_name} CTO",
-                        "title": "Chief Technology Officer",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Chief Technology Officer"
                     },
                     {
                         "name": f"{company_name} VP Engineering",
-                        "title": "Vice President of Engineering",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Vice President of Engineering"
                     },
                     {
                         "name": f"{company_name} Head of Data Science",
-                        "title": "Head of Data Science & Analytics",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Head of Data Science & Analytics"
                     }
                 ]
                 return personnel
@@ -1067,18 +1052,15 @@ class DocumentGenerator:
                 personnel = [
                     {
                         "name": f"{company_name} CEO",
-                        "title": "Chief Executive Officer",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Chief Executive Officer"
                     },
                     {
                         "name": f"{company_name} CTO",
-                        "title": "Chief Technology Officer",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Chief Technology Officer"
                     },
                     {
                         "name": f"{company_name} Head of Analytics",
-                        "title": "Head of Data Analytics",
-                        "linkedin": f"https://www.linkedin.com/company/{company_name.lower().replace(' ', '-')}"
+                        "title": "Head of Data Analytics"
                     }
                 ]
                 return personnel
