@@ -1234,8 +1234,109 @@ class DocumentGenerator:
     
     def _get_fallback_personnel(self, company_name: str) -> list:
         """Fallback personnel when web search is not available"""
-        # Determine company type for appropriate roles
-        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
+        company_lower = company_name.lower()
+        
+        # Company-specific personnel
+        if 'best buy' in company_lower:
+            return [
+                {
+                    "name": "Corie Barry",
+                    "title": "Chief Executive Officer"
+                },
+                {
+                    "name": "Matt Bilunas", 
+                    "title": "Chief Financial Officer"
+                },
+                {
+                    "name": "Brian Tilzer",
+                    "title": "Chief Digital Officer"
+                },
+                {
+                    "name": "Allison Peterson",
+                    "title": "Chief Marketing Officer"
+                },
+                {
+                    "name": "Rob Bass",
+                    "title": "Chief Supply Chain Officer"
+                }
+            ]
+        elif 'netflix' in company_lower:
+            return [
+                {
+                    "name": "Ted Sarandos",
+                    "title": "Co-CEO & Chief Content Officer"
+                },
+                {
+                    "name": "Greg Peters",
+                    "title": "Co-CEO & Chief Product Officer"
+                },
+                {
+                    "name": "Spencer Neumann",
+                    "title": "Chief Financial Officer"
+                },
+                {
+                    "name": "Elizabeth Stone",
+                    "title": "Chief Technology Officer"
+                }
+            ]
+        elif 'amazon' in company_lower:
+            return [
+                {
+                    "name": "Andy Jassy",
+                    "title": "Chief Executive Officer"
+                },
+                {
+                    "name": "Adam Selipsky",
+                    "title": "CEO, Amazon Web Services"
+                },
+                {
+                    "name": "Brian Olsavsky",
+                    "title": "Senior Vice President & Chief Financial Officer"
+                },
+                {
+                    "name": "Werner Vogels",
+                    "title": "Chief Technology Officer"
+                }
+            ]
+        elif 'google' in company_lower:
+            return [
+                {
+                    "name": "Sundar Pichai",
+                    "title": "Chief Executive Officer"
+                },
+                {
+                    "name": "Ruth Porat",
+                    "title": "Senior Vice President & Chief Financial Officer"
+                },
+                {
+                    "name": "Thomas Kurian",
+                    "title": "CEO, Google Cloud"
+                },
+                {
+                    "name": "Jeff Dean",
+                    "title": "Senior Fellow & Head of AI"
+                }
+            ]
+        elif 'microsoft' in company_lower:
+            return [
+                {
+                    "name": "Satya Nadella",
+                    "title": "Chairman & Chief Executive Officer"
+                },
+                {
+                    "name": "Amy Hood",
+                    "title": "Executive Vice President & Chief Financial Officer"
+                },
+                {
+                    "name": "Scott Guthrie",
+                    "title": "Executive Vice President, Cloud & AI"
+                },
+                {
+                    "name": "Rajesh Jha",
+                    "title": "Executive Vice President, Experiences & Devices"
+                }
+            ]
+        elif any(keyword in company_lower for keyword in ['bank', 'financial']):
             return [
                 {
                     "name": f"{company_name} CIO",
@@ -1250,7 +1351,7 @@ class DocumentGenerator:
                     "title": "Head of Data Analytics & Business Intelligence"
                 }
             ]
-        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+        elif any(keyword in company_lower for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
             return [
                 {
                     "name": f"{company_name} CTO",
