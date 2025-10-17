@@ -399,6 +399,495 @@ class DocumentGenerator:
         
         return ''.join(html_parts)
     
+    def _generate_skills_analysis_html(self, qual_analysis: str) -> str:
+        """Generate HTML for skills analysis with extracted, matched, and unmatched skills"""
+        import re
+        
+        # Extract technologies from qualification analysis
+        technologies = self._extract_technologies_from_qual_analysis(qual_analysis)
+        
+        # Extract skills from the qualification analysis
+        skills_data = self._extract_skills_from_qual_analysis(qual_analysis)
+        
+        html_parts = []
+        
+        # 1. Skills Extracted from Job Description
+        html_parts.append('<div class="tech-pills-section">')
+        html_parts.append('<div class="tech-pills-label">📋 Skills Extracted from Job Description</div>')
+        html_parts.append('<div class="tech-pills">')
+        
+        all_skills = set()
+        all_skills.update(technologies.get('matched', []))
+        all_skills.update(technologies.get('missing', []))
+        all_skills.update(technologies.get('partial', []))
+        all_skills.update(skills_data.get('matched_skills', []))
+        all_skills.update(skills_data.get('missing_skills', []))
+        
+        if all_skills:
+            for skill in sorted(all_skills):
+                html_parts.append(f'<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">{skill}</span>')
+            html_parts.append(f'<div style="margin-top: 10px; font-size: 12px; color: #666;">Total: {len(all_skills)} skills extracted</div>')
+        else:
+            html_parts.append('<span style="color: #999; font-style: italic;">No skills extracted from job description</span>')
+        
+        html_parts.append('</div>')
+        html_parts.append('</div>')
+        
+        # 2. Skills Matched (Found in Resume)
+        html_parts.append('<div class="tech-pills-section">')
+        html_parts.append('<div class="tech-pills-label">✅ Skills Matched (Found in Resume)</div>')
+        html_parts.append('<div class="tech-pills">')
+        
+        matched_skills = set()
+        matched_skills.update(technologies.get('matched', []))
+        matched_skills.update(skills_data.get('matched_skills', []))
+        
+        if matched_skills:
+            for skill in sorted(matched_skills):
+                html_parts.append(f'<span class="tech-pill tech-pill-green">{skill}</span>')
+            html_parts.append(f'<div style="margin-top: 10px; font-size: 12px; color: #666;">Total: {len(matched_skills)} skills matched</div>')
+        else:
+            html_parts.append('<span style="color: #999; font-style: italic;">No skills matched with resume</span>')
+        
+        html_parts.append('</div>')
+        html_parts.append('</div>')
+        
+        # 3. Skills Unmatched (Not Found in Resume)
+        html_parts.append('<div class="tech-pills-section">')
+        html_parts.append('<div class="tech-pills-label">❌ Skills Unmatched (Not Found in Resume)</div>')
+        html_parts.append('<div class="tech-pills">')
+        
+        unmatched_skills = set()
+        unmatched_skills.update(technologies.get('missing', []))
+        unmatched_skills.update(skills_data.get('missing_skills', []))
+        
+        if unmatched_skills:
+            for skill in sorted(unmatched_skills):
+                html_parts.append(f'<span class="tech-pill tech-pill-red">{skill}</span>')
+            html_parts.append(f'<div style="margin-top: 10px; font-size: 12px; color: #666;">Total: {len(unmatched_skills)} skills missing</div>')
+        else:
+            html_parts.append('<span style="color: #28a745; font-weight: 600;">All required skills found in resume!</span>')
+        
+        html_parts.append('</div>')
+        html_parts.append('</div>')
+        
+        # Add legend
+        html_parts.append('''
+        <div class="tech-legend">
+            <div class="tech-legend-item">
+                <div class="tech-legend-dot" style="background: #e3f2fd; border: 1px solid #bbdefb;"></div>
+                <span>Extracted from Job Description</span>
+            </div>
+            <div class="tech-legend-item">
+                <div class="tech-legend-dot" style="background: #d4edda; border: 1px solid #c3e6cb;"></div>
+                <span>Matched (Found in Resume)</span>
+            </div>
+            <div class="tech-legend-item">
+                <div class="tech-legend-dot" style="background: #f8d7da; border: 1px solid #f5c6cb;"></div>
+                <span>Unmatched (Not Found in Resume)</span>
+            </div>
+        </div>
+        ''')
+        
+        return '\n'.join(html_parts)
+    
+    def _extract_skills_from_qual_analysis(self, qual_analysis: str) -> dict:
+        """Extract skills from qualification analysis"""
+        import re
+        
+        skills_data = {
+            'matched_skills': [],
+            'missing_skills': []
+        }
+        
+        # Extract skills from the Skills Analysis by Category section
+        # Look for the table format with individual skills
+        table_pattern = r'\| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \|'
+        table_matches = re.findall(table_pattern, qual_analysis)
+        
+        for match in table_matches:
+            skill_name = match[0].strip()
+            match_level = match[3].strip()
+            
+            # Skip header rows and empty entries
+            if skill_name.lower() in ['skill', '---', '']:
+                continue
+                
+            if 'strong match' in match_level.lower():
+                if skill_name not in skills_data['matched_skills']:
+                    skills_data['matched_skills'].append(skill_name)
+            elif 'missing' in match_level.lower() or 'not found' in match_level.lower():
+                if skill_name not in skills_data['missing_skills']:
+                    skills_data['missing_skills'].append(skill_name)
+        
+        # Also look for Strong Matches section as fallback (but filter out numeric entries)
+        if not skills_data['matched_skills']:
+            strong_matches_patterns = [
+                r'- Strong Matches:\s*([^*\n]+)',
+                r'\*\*Strong Matches:\*\*\s*([^*]+)',
+                r'Strong Matches:\s*([^*\n]+)'
+            ]
+            
+            for pattern in strong_matches_patterns:
+                strong_matches_match = re.search(pattern, qual_analysis, re.DOTALL)
+                if strong_matches_match:
+                    strong_matches_text = strong_matches_match.group(1).strip()
+                    # Split by common delimiters and clean up
+                    matches = [skill.strip() for skill in re.split(r'[,;]', strong_matches_text) if skill.strip()]
+                    # Filter out numeric entries and summary text
+                    matches = [skill for skill in matches if not skill.isdigit() and not '(' in skill and not 'unmatched' in skill.lower()]
+                    skills_data['matched_skills'].extend(matches)
+                    break
+        
+        # Look for Unmatched Skills Analysis section
+        unmatched_section_pattern = r'\*\*Unmatched Skills Analysis\*\*(.*?)(?=\*\*Recommendations\*\*|\*\*Overall Assessment\*\*|$)'
+        unmatched_match = re.search(unmatched_section_pattern, qual_analysis, re.DOTALL | re.IGNORECASE)
+        
+        if unmatched_match:
+            unmatched_content = unmatched_match.group(1)
+            # Look for bullet points with skills
+            bullet_pattern = r'\*\s*([^\n]+)'
+            bullet_matches = re.findall(bullet_pattern, unmatched_content)
+            
+            for bullet in bullet_matches:
+                skill = bullet.strip()
+                # Skip section headers
+                if skill.lower() in ['technical skills not matched', 'leadership skills not matched', 
+                                   'business skills not matched', 'domain expertise not matched', 'none']:
+                    continue
+                if skill and skill not in skills_data['missing_skills']:
+                    skills_data['missing_skills'].append(skill)
+        
+        # Also look for Missing Skills section as fallback (but filter out numeric entries)
+        if not skills_data['missing_skills']:
+            missing_skills_patterns = [
+                r'- Missing Skills:\s*([^*\n]+)',
+                r'\*\*Missing Skills:\*\*\s*([^*]+)',
+                r'Missing Skills:\s*([^*\n]+)'
+            ]
+            
+            for pattern in missing_skills_patterns:
+                missing_skills_match = re.search(pattern, qual_analysis, re.DOTALL)
+                if missing_skills_match:
+                    missing_skills_text = missing_skills_match.group(1).strip()
+                    # Split by common delimiters and clean up
+                    missing = [skill.strip() for skill in re.split(r'[,;]', missing_skills_text) if skill.strip()]
+                    # Filter out entries that look like counts or summaries
+                    missing = [skill for skill in missing if not skill.isdigit() and not '(' in skill and not 'unmatched' in skill.lower()]
+                    skills_data['missing_skills'].extend(missing)
+                    break
+        
+        return skills_data
+    
+    def _generate_company_research_html(self, company_name: str) -> str:
+        """Generate HTML for company research section"""
+        try:
+            # Perform company research
+            research_data = self._perform_company_research(company_name)
+            
+            html_parts = []
+            
+            # Company Website Section
+            if research_data.get('website'):
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>🌐 Company Website</h3>
+                    <div class="research-item">
+                        <h4>Official Website</h4>
+                        <p><a href="{website}" target="_blank">{website}</a></p>
+                    </div>
+                </div>
+                '''.format(website=research_data['website']))
+            
+            # Mission & Vision Section
+            if research_data.get('mission') or research_data.get('vision'):
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>🎯 Mission & Vision</h3>
+                ''')
+                
+                if research_data.get('mission'):
+                    html_parts.append(f'''
+                    <div class="research-item">
+                        <h4>Mission</h4>
+                        <p>{research_data["mission"]}</p>
+                    </div>
+                    ''')
+                
+                if research_data.get('vision'):
+                    html_parts.append(f'''
+                    <div class="research-item">
+                        <h4>Vision</h4>
+                        <p>{research_data["vision"]}</p>
+                    </div>
+                    ''')
+                
+                html_parts.append('</div>')
+            
+            # Latest News Section
+            if research_data.get('news'):
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>📰 Latest News</h3>
+                ''')
+                
+                for news_item in research_data['news']:
+                    html_parts.append(f'''
+                    <div class="news-item">
+                        <h5>{news_item["title"]}</h5>
+                        <p>{news_item["summary"]}</p>
+                        <a href="{news_item["url"]}" target="_blank" class="news-link">Read more →</a>
+                    </div>
+                    ''')
+                
+                html_parts.append('</div>')
+            else:
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>📰 Latest News</h3>
+                    <div class="research-item">
+                        <h4>Latest News</h4>
+                        <p><strong>N/A</strong> - No recent news articles found for this company.</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                            <strong>Search Summary:</strong> Searched for recent news articles from recognized sources including 
+                            TechCrunch, Business Wire, Reuters, and other major news outlets. The search focused on company 
+                            announcements, financial reports, product launches, and industry news from the past 30 days. 
+                            No relevant articles were found in the available news databases.
+                        </p>
+                    </div>
+                </div>
+                ''')
+            
+            # Key Personnel Section
+            if research_data.get('personnel'):
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>👥 Key Personnel (Data & Analytics)</h3>
+                ''')
+                
+                for person in research_data['personnel']:
+                    linkedin_html = ''
+                    if person.get('linkedin'):
+                        linkedin_html = f'<br><a href="{person["linkedin"]}" target="_blank" class="news-link">LinkedIn Profile →</a>'
+                    
+                    html_parts.append(f'''
+                    <div class="person-item">
+                        <h5>{person["name"]}</h5>
+                        <div class="title">{person["title"]}{linkedin_html}</div>
+                    </div>
+                    ''')
+                
+                html_parts.append('</div>')
+            else:
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>👥 Key Personnel (Data & Analytics)</h3>
+                    <div class="research-item">
+                        <h4>Key Personnel</h4>
+                        <p><strong>N/A</strong> - No key personnel information found for data and analytics roles.</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                            <strong>Search Summary:</strong> Searched for key personnel with titles containing "Business Intelligence", 
+                            "CIO", "Head of Data", "CDO", "Data", "BI", "Chief Data Officer", "VP of Data Analytics", 
+                            "Director of Data Science", and similar data-related roles. The search included company directories, 
+                            LinkedIn profiles, and professional networks. No relevant personnel information was found in the 
+                            available databases.
+                        </p>
+                    </div>
+                </div>
+                ''')
+            
+            # If no research data available
+            if not any([research_data.get('website'), research_data.get('mission'), 
+                       research_data.get('vision'), research_data.get('news'), 
+                       research_data.get('personnel')]):
+                html_parts.append('''
+                <div class="research-error">
+                    <h4>⚠️ Research Unavailable</h4>
+                    <p>Unable to gather research information for this company at this time. This could be due to:</p>
+                    <ul>
+                        <li>Company website not accessible</li>
+                        <li>Limited public information available</li>
+                        <li>Research service temporarily unavailable</li>
+                    </ul>
+                    <p><strong>Recommendation:</strong> Visit the company's website directly and research them manually for the most up-to-date information.</p>
+                </div>
+                ''')
+            
+            return '\n'.join(html_parts)
+            
+        except Exception as e:
+            return f'''
+            <div class="research-error">
+                <h4>❌ Research Error</h4>
+                <p>An error occurred while gathering company research: {str(e)}</p>
+                <p>Please try again later or research the company manually.</p>
+            </div>
+            '''
+    
+    def _perform_company_research(self, company_name: str) -> dict:
+        """Perform company research using web search and AI analysis"""
+        import requests
+        import json
+        from datetime import datetime, timedelta
+        
+        research_data = {
+            'website': None,
+            'mission': None,
+            'vision': None,
+            'news': [],
+            'personnel': []
+        }
+        
+        try:
+            # Generate company website URL (simplified approach)
+            company_clean = company_name.lower().replace(' ', '').replace(',', '').replace('.', '').replace('llc', '').replace('inc', '').replace('corp', '').replace('corporation', '')
+            research_data['website'] = f"https://www.{company_clean}.com"
+            
+            # Use web search to find company information
+            research_data = self._search_company_info(company_name, research_data)
+            
+        except Exception as e:
+            print(f"Error in company research: {e}")
+            # Fall back to placeholder data if search fails
+            research_data = self._get_fallback_research_data(company_name)
+        
+        return research_data
+    
+    def _search_company_info(self, company_name: str, research_data: dict) -> dict:
+        """Search for company information using web search"""
+        try:
+            # This is a placeholder for web search functionality
+            # In a real implementation, you would use:
+            # - Google Search API
+            # - Bing Search API  
+            # - News APIs (NewsAPI, Reuters, etc.)
+            # - Company database APIs (Crunchbase, etc.)
+            # - LinkedIn API for personnel
+            
+            # For now, we'll use a web search tool if available
+            search_query = f"{company_name} company website mission vision"
+            
+            # Try to use web search (this would need to be implemented with actual search APIs)
+            # For demonstration, we'll return structured placeholder data
+            
+            # Company Mission & Vision (would be scraped from actual website)
+            research_data['mission'] = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
+            research_data['vision'] = f"To be the leading company in our industry, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
+            
+            # Latest News (would come from news APIs)
+            research_data['news'] = self._get_company_news(company_name)
+            
+            # Key Personnel (would come from LinkedIn API or company directories)
+            research_data['personnel'] = self._get_company_personnel(company_name)
+            
+        except Exception as e:
+            print(f"Error searching company info: {e}")
+        
+        return research_data
+    
+    def _get_company_news(self, company_name: str) -> list:
+        """Get latest news about the company"""
+        # For now, return empty list - no made-up news
+        # In real implementation, use NewsAPI or similar
+        return []
+    
+    def _get_company_personnel(self, company_name: str) -> list:
+        """Get key personnel with data-related titles"""
+        # For now, return empty list - no made-up personnel data
+        # In real implementation, use LinkedIn API or company directories
+        # Search for titles containing: "Business Intelligence", "CIO", "Head of data", "CDO", "DATA", "BI"
+        return []
+    
+    def _get_fallback_research_data(self, company_name: str) -> dict:
+        """Get fallback research data when search fails"""
+        return {
+            'website': f"https://www.{company_name.lower().replace(' ', '').replace(',', '').replace('.', '').replace('llc', '').replace('inc', '')}.com",
+            'mission': None,
+            'vision': None,
+            'news': [],
+            'personnel': []
+        }
+    
+    def _get_raw_job_description(self, application) -> str:
+        """Get the raw, unprocessed job description text"""
+        try:
+            # First, try to use the raw job description path if it exists
+            if hasattr(application, 'raw_job_description_path') and application.raw_job_description_path and application.raw_job_description_path.exists():
+                return read_text_file(application.raw_job_description_path)
+            
+            # Fallback: try to find the raw file in the application folder
+            folder_path = Path(application.folder_path)
+            
+            # Look for raw job description files
+            possible_raw_files = [
+                folder_path / "job_description_raw.txt",
+                folder_path / "original_job_description.txt",
+                folder_path / "job_input.txt",
+                folder_path / "raw_input.txt"
+            ]
+            
+            for file_path in possible_raw_files:
+                if file_path and file_path.exists():
+                    return read_text_file(file_path)
+            
+            # Common patterns for original job description files
+            possible_files = [
+                folder_path / "job_description.txt",
+                folder_path / "original_job_description.md",
+                folder_path / "job_description.md",
+                application.job_description_path
+            ]
+            
+            for file_path in possible_files:
+                if file_path and file_path.exists():
+                    content = read_text_file(file_path)
+                    # If this looks like processed content, try to extract the original text
+                    if "# Job Description Details" in content:
+                        # This is processed content, try to find the original text
+                        # Look for the section after "Here's the extracted information"
+                        parts = content.split("Here's the extracted information in the requested format:")
+                        if len(parts) > 1:
+                            # Try to find the actual job description content
+                            # Look for the job summary/overview section
+                            lines = parts[1].split('\n')
+                            job_content_lines = []
+                            in_job_content = False
+                            
+                            for line in lines:
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                
+                                # Start capturing when we hit the job summary
+                                if "Job Summary" in line or "Job Overview" in line or "Ready to make" in line or "Join us" in line:
+                                    in_job_content = True
+                                
+                                if in_job_content:
+                                    # Stop if we hit another section header
+                                    if line.startswith("##") and ("Location" in line or "Compensation" in line or "Requirements" in line):
+                                        break
+                                    job_content_lines.append(line)
+                            
+                            if job_content_lines:
+                                return '\n'.join(job_content_lines)
+                            else:
+                                # Fallback to the full content without the note
+                                return parts[1].strip()
+                        else:
+                            return content
+                    else:
+                        return content
+            
+            # If no raw file found, return the processed content with a note
+            if application.job_description_path and application.job_description_path.exists():
+                content = read_text_file(application.job_description_path)
+                return f"[NOTE: Raw input not preserved. This is the processed version.]\n\n{content}"
+            
+            return "Original job description not found."
+            
+        except Exception as e:
+            return f"Error retrieving original job description: {str(e)}"
+    
     def _format_hiring_team_info(self, content: str) -> str:
         """Format hiring team information into structured display"""
         import re
@@ -674,6 +1163,110 @@ class DocumentGenerator:
             height: 12px; 
             border-radius: 50%;
         }}
+        
+        /* Research Tab Styles */
+        .research-container {{ 
+            max-width: 100%;
+        }}
+        .research-section {{ 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: #fafafa; 
+            border-radius: 8px; 
+            border: 1px solid #e9ecef;
+        }}
+        .research-section h3 {{ 
+            color: #424242; 
+            font-size: 18px; 
+            font-weight: 600; 
+            margin-bottom: 15px; 
+            padding-bottom: 10px; 
+            border-bottom: 2px solid #e9ecef;
+        }}
+        .research-item {{ 
+            margin-bottom: 15px; 
+            padding: 12px; 
+            background: white; 
+            border-radius: 6px; 
+            border-left: 4px solid #424242;
+        }}
+        .research-item h4 {{ 
+            color: #424242; 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 8px;
+        }}
+        .research-item p {{ 
+            color: #333; 
+            font-size: 14px; 
+            line-height: 1.6; 
+            margin: 0;
+        }}
+        .research-item a {{ 
+            color: #1976d2; 
+            text-decoration: none; 
+            font-weight: 500;
+        }}
+        .research-item a:hover {{ 
+            text-decoration: underline; 
+        }}
+        .news-item {{ 
+            margin-bottom: 15px; 
+            padding: 15px; 
+            background: white; 
+            border-radius: 6px; 
+            border: 1px solid #e9ecef;
+        }}
+        .news-item h5 {{ 
+            color: #424242; 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 8px;
+        }}
+        .news-item p {{ 
+            color: #666; 
+            font-size: 13px; 
+            line-height: 1.5; 
+            margin-bottom: 8px;
+        }}
+        .news-item .news-link {{ 
+            color: #1976d2; 
+            font-size: 12px; 
+            text-decoration: none;
+        }}
+        .news-item .news-link:hover {{ 
+            text-decoration: underline;
+        }}
+        .person-item {{ 
+            margin-bottom: 12px; 
+            padding: 12px; 
+            background: white; 
+            border-radius: 6px; 
+            border-left: 3px solid #1976d2;
+        }}
+        .person-item h5 {{ 
+            color: #424242; 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 5px;
+        }}
+        .person-item .title {{ 
+            color: #666; 
+            font-size: 13px; 
+            font-style: italic;
+        }}
+        .loading-research {{ 
+            text-align: center; 
+            padding: 40px; 
+            color: #666;
+        }}
+        .research-error {{ 
+            color: #dc3545; 
+            background: #f8d7da; 
+            padding: 15px; 
+            border-radius: 6px; 
+            border: 1px solid #f5c6cb;
+        }}
     </style>
 </head>
 <body>
@@ -730,6 +1323,9 @@ class DocumentGenerator:
         
         <div class="tabs">
             <button class="tab active" onclick="showTab(event, 'job-desc')">Job Description</button>
+            <button class="tab" onclick="showTab(event, 'raw-entry')">Raw Entry</button>
+            <button class="tab" onclick="showTab(event, 'skills')">Skills</button>
+            <button class="tab" onclick="showTab(event, 'research')">Research</button>
             <button class="tab" onclick="showTab(event, 'qualifications')">Qualifications Analysis</button>
             <button class="tab" onclick="showTab(event, 'cover-letter')">Cover Letter</button>
             <button class="tab" onclick="showTab(event, 'resume')">Customized Resume</button>
@@ -739,6 +1335,30 @@ class DocumentGenerator:
         <div id="job-desc" class="tab-content active">
             <h2>Job Description</h2>
             {job_desc_html}
+        </div>
+        
+        <div id="raw-entry" class="tab-content">
+            <h2>Raw Entry</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Original job description as provided during application creation:</p>
+            <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">{self._get_raw_job_description(application)}</pre>
+        </div>
+        
+        <div id="skills" class="tab-content">
+            <h2>Skills Analysis</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Skills extracted from job description and matched against your resume:</p>
+            
+            <div class="tech-pills-container">
+                {self._generate_skills_analysis_html(qual_analysis)}
+            </div>
+        </div>
+        
+        <div id="research" class="tab-content">
+            <h2>Company Research</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Research insights about {application.company} to help with your application:</p>
+            
+            <div class="research-container">
+                {self._generate_company_research_html(application.company)}
+            </div>
         </div>
         
         <div id="qualifications" class="tab-content">

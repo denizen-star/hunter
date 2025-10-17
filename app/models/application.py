@@ -17,6 +17,7 @@ class Application:
     
     # File paths
     job_description_path: Optional[Path] = None
+    raw_job_description_path: Optional[Path] = None
     qualifications_path: Optional[Path] = None
     cover_letter_path: Optional[Path] = None
     custom_resume_path: Optional[Path] = None
@@ -45,7 +46,7 @@ class Application:
         if isinstance(self.status_updated_at, str) and self.status_updated_at:
             self.status_updated_at = datetime.fromisoformat(self.status_updated_at)
         
-        for field_name in ['job_description_path', 'qualifications_path', 'cover_letter_path', 
+        for field_name in ['job_description_path', 'raw_job_description_path', 'qualifications_path', 'cover_letter_path', 
                           'custom_resume_path', 'summary_path', 'folder_path']:
             value = getattr(self, field_name)
             if isinstance(value, str):
@@ -61,6 +62,7 @@ class Application:
             created_at=data['created_at'],
             status=data.get('status', 'pending'),
             job_description_path=data.get('job_description_path'),
+            raw_job_description_path=data.get('raw_job_description_path'),
             qualifications_path=data.get('qualifications_path'),
             cover_letter_path=data.get('cover_letter_path'),
             custom_resume_path=data.get('custom_resume_path'),
@@ -85,6 +87,7 @@ class Application:
             'created_at': self.created_at.isoformat() if isinstance(self.created_at, datetime) else self.created_at,
             'status': self.status,
             'job_description_path': str(self.job_description_path) if self.job_description_path else None,
+            'raw_job_description_path': str(self.raw_job_description_path) if self.raw_job_description_path else None,
             'qualifications_path': str(self.qualifications_path) if self.qualifications_path else None,
             'cover_letter_path': str(self.cover_letter_path) if self.cover_letter_path else None,
             'custom_resume_path': str(self.custom_resume_path) if self.custom_resume_path else None,

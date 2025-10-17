@@ -148,6 +148,12 @@ class JobProcessor:
         updates_dir = folder_path / "updates"
         ensure_dir_exists(updates_dir)
         
+        # Save raw job description (original input)
+        raw_job_desc_filename = f"{timestamp}-{company}-{job_title}-raw.txt"
+        raw_job_desc_path = folder_path / raw_job_desc_filename
+        write_text_file(raw_job_description, raw_job_desc_path)
+        application.raw_job_description_path = raw_job_desc_path
+        
         # Save structured job description
         job_desc_filename = f"{timestamp}-{company}-{job_title}.md"
         job_desc_path = folder_path / job_desc_filename
