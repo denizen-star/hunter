@@ -440,4 +440,50 @@ Be specific and only extract information that is explicitly stated."""
         
         # If no pattern matched, return today's date
         return today.strftime('%m/%d/%Y')
+    
+    def generate_hiring_manager_intros(
+        self, 
+        qualifications: QualificationAnalysis,
+        company: str,
+        job_title: str,
+        candidate_name: str
+    ) -> str:
+        """Generate hiring manager intro messages (3 versions)"""
+        # Extract strong matches for cleaner prompt
+        strong_matches_str = ', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else "Technical expertise, Data analysis, Project management"
+        
+        prompt = get_prompt(
+            'hiring_manager_intro',
+            company=company,
+            job_title=job_title,
+            match_score=qualifications.match_score,
+            strong_matches=strong_matches_str,
+            candidate_name=candidate_name
+        )
+        
+        intro_messages = self._call_ollama(prompt)
+        return intro_messages
+    
+    def generate_recruiter_intros(
+        self, 
+        qualifications: QualificationAnalysis,
+        company: str,
+        job_title: str,
+        candidate_name: str
+    ) -> str:
+        """Generate recruiter intro messages (3 versions, non-technical)"""
+        # Extract strong matches for cleaner prompt, avoiding technical jargon
+        strong_matches_str = ', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else "Business expertise, Data analysis, Project management"
+        
+        prompt = get_prompt(
+            'recruiter_intro',
+            company=company,
+            job_title=job_title,
+            match_score=qualifications.match_score,
+            strong_matches=strong_matches_str,
+            candidate_name=candidate_name
+        )
+        
+        intro_messages = self._call_ollama(prompt)
+        return intro_messages
 

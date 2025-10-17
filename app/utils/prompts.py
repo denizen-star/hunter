@@ -230,6 +230,52 @@ If no hiring team information is found, write "Not available"]
 Be thorough and extract all relevant information from the job description."""
 
 
+HIRING_MANAGER_INTRO_PROMPT = """You are creating professional intro messages for hiring managers. Generate 3 versions of an intro message based on the provided information.
+
+COMPANY: {company}
+JOB TITLE: {job_title}
+MATCH SCORE: {match_score}%
+STRONG MATCHES: {strong_matches}
+CANDIDATE NAME: {candidate_name}
+
+Create exactly 3 versions, each under 50 words:
+
+**PROFESSIONAL VERSION:**
+[Professional, direct message highlighting key qualifications and match score]
+
+**OUTRAGEOUS VERSION:**
+[Creative, attention-grabbing message that stands out while remaining professional]
+
+**GEN-Z VERSION:**
+[Modern, casual tone using data industry buzzwords and current language]
+
+Each message should be direct, unambiguous, and use only the information provided. Do not hallucinate details."""
+
+
+RECRUITER_INTRO_PROMPT = """You are creating professional intro messages for recruiters. Generate 3 versions of an intro message based on the provided information.
+
+COMPANY: {company}
+JOB TITLE: {job_title}
+MATCH SCORE: {match_score}%
+STRONG MATCHES: {strong_matches}
+CANDIDATE NAME: {candidate_name}
+
+IMPORTANT: Recruiters are typically not technical, so avoid jargon and technical terms. Use business language.
+
+Create exactly 3 versions, each under 50 words:
+
+**PROFESSIONAL VERSION:**
+[Professional, clear message focusing on business value and achievements]
+
+**OUTRAGEOUS VERSION:**
+[Creative, memorable message that stands out while remaining professional]
+
+**GEN-Z VERSION:**
+[Modern, casual tone using business buzzwords and current language]
+
+Each message should be direct, unambiguous, non-technical, and use only the information provided. Do not hallucinate details."""
+
+
 def get_prompt(prompt_name: str, **kwargs) -> str:
     """Get a formatted prompt by name"""
     prompts = {
@@ -237,7 +283,9 @@ def get_prompt(prompt_name: str, **kwargs) -> str:
         'cover_letter': COVER_LETTER_PROMPT,
         'resume_rewrite': RESUME_REWRITE_PROMPT,
         'summary_generation': SUMMARY_GENERATION_PROMPT,
-        'job_description_extraction': JOB_DESCRIPTION_EXTRACTION_PROMPT
+        'job_description_extraction': JOB_DESCRIPTION_EXTRACTION_PROMPT,
+        'hiring_manager_intro': HIRING_MANAGER_INTRO_PROMPT,
+        'recruiter_intro': RECRUITER_INTRO_PROMPT
     }
     
     if prompt_name not in prompts:

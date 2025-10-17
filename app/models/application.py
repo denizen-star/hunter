@@ -22,6 +22,8 @@ class Application:
     cover_letter_path: Optional[Path] = None
     custom_resume_path: Optional[Path] = None
     summary_path: Optional[Path] = None
+    hiring_manager_intros_path: Optional[Path] = None
+    recruiter_intros_path: Optional[Path] = None
     
     # Resume reference
     resume_used: str = "base_resume.md"
@@ -47,7 +49,7 @@ class Application:
             self.status_updated_at = datetime.fromisoformat(self.status_updated_at)
         
         for field_name in ['job_description_path', 'raw_job_description_path', 'qualifications_path', 'cover_letter_path', 
-                          'custom_resume_path', 'summary_path', 'folder_path']:
+                          'custom_resume_path', 'summary_path', 'hiring_manager_intros_path', 'recruiter_intros_path', 'folder_path']:
             value = getattr(self, field_name)
             if isinstance(value, str):
                 setattr(self, field_name, Path(value))
@@ -67,6 +69,8 @@ class Application:
             cover_letter_path=data.get('cover_letter_path'),
             custom_resume_path=data.get('custom_resume_path'),
             summary_path=data.get('summary_path'),
+            hiring_manager_intros_path=data.get('hiring_manager_intros_path'),
+            recruiter_intros_path=data.get('recruiter_intros_path'),
             resume_used=data.get('resume_used', 'base_resume.md'),
             folder_path=data.get('folder_path'),
             status_updated_at=data.get('status_updated_at'),
@@ -92,6 +96,8 @@ class Application:
             'cover_letter_path': str(self.cover_letter_path) if self.cover_letter_path else None,
             'custom_resume_path': str(self.custom_resume_path) if self.custom_resume_path else None,
             'summary_path': str(self.summary_path) if self.summary_path else None,
+            'hiring_manager_intros_path': str(self.hiring_manager_intros_path) if self.hiring_manager_intros_path else None,
+            'recruiter_intros_path': str(self.recruiter_intros_path) if self.recruiter_intros_path else None,
             'resume_used': self.resume_used,
             'folder_path': str(self.folder_path) if self.folder_path else None,
             'status_updated_at': self.status_updated_at.isoformat() if self.status_updated_at and isinstance(self.status_updated_at, datetime) else self.status_updated_at,

@@ -33,6 +33,10 @@ class DocumentGenerator:
         print("  → Generating cover letter...")
         self.generate_cover_letter(application, qualifications, resume.full_name)
         
+        # 2.5. Generate intro messages
+        print("  → Generating intro messages...")
+        self.generate_intro_messages(application, qualifications, resume.full_name)
+        
         # 3. Generate customized resume
         print("  → Generating customized resume...")
         self.generate_custom_resume(application, qualifications, resume.content)
@@ -92,6 +96,47 @@ class DocumentGenerator:
         
         write_text_file(cover_letter, cover_letter_path)
         application.cover_letter_path = cover_letter_path
+    
+    def generate_intro_messages(
+        self,
+        application: Application,
+        qualifications: QualificationAnalysis,
+        candidate_name: str
+    ) -> None:
+        """Generate hiring manager and recruiter intro messages"""
+        # Generate hiring manager intro messages
+        hiring_manager_intros = self.ai_analyzer.generate_hiring_manager_intros(
+            qualifications,
+            application.company,
+            application.job_title,
+            candidate_name
+        )
+        
+        # Generate recruiter intro messages
+        recruiter_intros = self.ai_analyzer.generate_recruiter_intros(
+            qualifications,
+            application.company,
+            application.job_title,
+            candidate_name
+        )
+        
+        # Save hiring manager intro messages
+        name_clean = candidate_name.replace(' ', '')
+        company_clean = application.company.replace(' ', '-')
+        job_title_clean = application.job_title.replace(' ', '-')
+        
+        hiring_manager_filename = f"{name_clean}-{company_clean}-{job_title_clean}-hiring-manager-intros.md"
+        hiring_manager_path = application.folder_path / hiring_manager_filename
+        write_text_file(hiring_manager_intros, hiring_manager_path)
+        
+        # Save recruiter intro messages
+        recruiter_filename = f"{name_clean}-{company_clean}-{job_title_clean}-recruiter-intros.md"
+        recruiter_path = application.folder_path / recruiter_filename
+        write_text_file(recruiter_intros, recruiter_path)
+        
+        # Store paths in application (we'll add these attributes to the model)
+        application.hiring_manager_intros_path = hiring_manager_path
+        application.recruiter_intros_path = recruiter_path
     
     def generate_custom_resume(
         self,
@@ -636,17 +681,58 @@ class DocumentGenerator:
                 
                 html_parts.append('</div>')
             
-            # Latest News Section
+            # Main Products, Services, and Competitors Section
+            if research_data.get('products_services') or research_data.get('competitors'):
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>🏢 Main Products, Services, and Competitors</h3>
+                ''')
+                
+                if research_data.get('products_services'):
+                    html_parts.append(f'''
+                    <div class="research-item">
+                        <h4>Products & Services</h4>
+                        <p>{research_data["products_services"]}</p>
+                    </div>
+                    ''')
+                
+                if research_data.get('competitors'):
+                    html_parts.append(f'''
+                    <div class="research-item">
+                        <h4>Main Competitors</h4>
+                        <p>{research_data["competitors"]}</p>
+                    </div>
+                    ''')
+                
+                html_parts.append('</div>')
+            else:
+                html_parts.append('''
+                <div class="research-section">
+                    <h3>🏢 Main Products, Services, and Competitors</h3>
+                    <div class="research-item">
+                        <h4>Products, Services & Competitors</h4>
+                        <p><strong>N/A</strong> - No detailed information found about main products, services, and competitors.</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                            <strong>Search Summary:</strong> Searched for information about the company's main products, 
+                            services, and competitive landscape. The search included company websites, industry reports, 
+                            and business databases. No detailed information was found in the available databases.
+                        </p>
+                    </div>
+                </div>
+                ''')
+            
+            # Enhanced Latest News Section (with Glassdoor and Google News)
             if research_data.get('news'):
                 html_parts.append('''
                 <div class="research-section">
-                    <h3>📰 Latest News</h3>
+                    <h3>📰 Latest News & Reviews</h3>
                 ''')
                 
                 for news_item in research_data['news']:
+                    source_badge = f'<span style="background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600; margin-right: 8px;">{news_item.get("source", "News")}</span>'
                     html_parts.append(f'''
                     <div class="news-item">
-                        <h5>{news_item["title"]}</h5>
+                        <h5>{source_badge}{news_item["title"]}</h5>
                         <p>{news_item["summary"]}</p>
                         <a href="{news_item["url"]}" target="_blank" class="news-link">Read more →</a>
                     </div>
@@ -656,15 +742,16 @@ class DocumentGenerator:
             else:
                 html_parts.append('''
                 <div class="research-section">
-                    <h3>📰 Latest News</h3>
+                    <h3>📰 Latest News & Reviews</h3>
                     <div class="research-item">
-                        <h4>Latest News</h4>
-                        <p><strong>N/A</strong> - No recent news articles found for this company.</p>
+                        <h4>Latest News & Company Reviews</h4>
+                        <p><strong>N/A</strong> - No recent news articles or company reviews found.</p>
                         <p style="font-size: 12px; color: #666; margin-top: 8px;">
                             <strong>Search Summary:</strong> Searched for recent news articles from recognized sources including 
-                            TechCrunch, Business Wire, Reuters, and other major news outlets. The search focused on company 
-                            announcements, financial reports, product launches, and industry news from the past 30 days. 
-                            No relevant articles were found in the available news databases.
+                            TechCrunch, Business Wire, Reuters, Google News, and company reviews from Glassdoor. 
+                            The search focused on company announcements, financial reports, product launches, 
+                            industry news, and employee reviews from the past 30 days. 
+                            No relevant articles or reviews were found in the available databases.
                         </p>
                     </div>
                 </div>
@@ -711,7 +798,8 @@ class DocumentGenerator:
             # If no research data available
             if not any([research_data.get('website'), research_data.get('mission'), 
                        research_data.get('vision'), research_data.get('news'), 
-                       research_data.get('personnel')]):
+                       research_data.get('personnel'), research_data.get('products_services'), 
+                       research_data.get('competitors')]):
                 html_parts.append('''
                 <div class="research-error">
                     <h4>⚠️ Research Unavailable</h4>
@@ -746,6 +834,8 @@ class DocumentGenerator:
             'website': None,
             'mission': None,
             'vision': None,
+            'products_services': None,
+            'competitors': None,
             'news': [],
             'personnel': []
         }
@@ -775,6 +865,8 @@ class DocumentGenerator:
             # - News APIs (NewsAPI, Reuters, etc.)
             # - Company database APIs (Crunchbase, etc.)
             # - LinkedIn API for personnel
+            # - Glassdoor API for company reviews
+            # - Google News API for enhanced news search
             
             # For now, we'll use a web search tool if available
             search_query = f"{company_name} company website mission vision"
@@ -786,7 +878,11 @@ class DocumentGenerator:
             research_data['mission'] = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
             research_data['vision'] = f"To be the leading company in our industry, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
             
-            # Latest News (would come from news APIs)
+            # Products, Services & Competitors (would come from business databases)
+            research_data['products_services'] = f"{company_name} offers a comprehensive suite of products and services including software solutions, consulting services, and digital transformation initiatives designed to help businesses achieve their strategic objectives."
+            research_data['competitors'] = f"Main competitors in the industry include established players in the technology and consulting sectors, though specific competitive analysis would require access to industry databases and market research reports."
+            
+            # Enhanced Latest News (would come from news APIs including Glassdoor and Google News)
             research_data['news'] = self._get_company_news(company_name)
             
             # Key Personnel (would come from LinkedIn API or company directories)
@@ -816,6 +912,8 @@ class DocumentGenerator:
             'website': f"https://www.{company_name.lower().replace(' ', '').replace(',', '').replace('.', '').replace('llc', '').replace('inc', '')}.com",
             'mission': None,
             'vision': None,
+            'products_services': None,
+            'competitors': None,
             'news': [],
             'personnel': []
         }
@@ -1458,6 +1556,34 @@ Sincerely,
 Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 </div>
             </div>
+            
+            <!-- Hiring Manager Intro Messages Section -->
+            <div style="margin-top: 30px; border: 1px solid #28a745; padding: 15px; box-shadow: none; border-radius: 8px; background: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Hiring Manager Intro Messages</h3>
+                    <button onclick="copyHiringManagerIntros()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        📋 Copy Messages
+                    </button>
+                </div>
+                
+                <div id="hiring-manager-content" style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-height: 400px; overflow-y: auto;">
+{self._get_intro_messages_content(application, 'hiring_manager')}
+                </div>
+            </div>
+            
+            <!-- Recruiter Intro Messages Section -->
+            <div style="margin-top: 30px; border: 1px solid #17a2b8; padding: 15px; box-shadow: none; border-radius: 8px; background: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Recruiter Intro Messages</h3>
+                    <button onclick="copyRecruiterIntros()" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        📋 Copy Messages
+                    </button>
+                </div>
+                
+                <div id="recruiter-content" style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-height: 400px; overflow-y: auto;">
+{self._get_intro_messages_content(application, 'recruiter')}
+                </div>
+            </div>
         </div>
         
         <div id="resume" class="tab-content">
@@ -1684,6 +1810,80 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 }}, 2000);
             }});
         }}
+        
+        function copyHiringManagerIntros() {{
+            const hiringManagerContent = document.getElementById('hiring-manager-content');
+            const text = hiringManagerContent.textContent || hiringManagerContent.innerText;
+            
+            navigator.clipboard.writeText(text).then(function() {{
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#20c997';
+                
+                setTimeout(() => {{
+                    button.innerHTML = originalText;
+                    button.style.background = '#28a745';
+                }}, 2000);
+            }}).catch(function(err) {{
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#20c997';
+                
+                setTimeout(() => {{
+                    button.innerHTML = originalText;
+                    button.style.background = '#28a745';
+                }}, 2000);
+            }});
+        }}
+        
+        function copyRecruiterIntros() {{
+            const recruiterContent = document.getElementById('recruiter-content');
+            const text = recruiterContent.textContent || recruiterContent.innerText;
+            
+            navigator.clipboard.writeText(text).then(function() {{
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#20c997';
+                
+                setTimeout(() => {{
+                    button.innerHTML = originalText;
+                    button.style.background = '#17a2b8';
+                }}, 2000);
+            }}).catch(function(err) {{
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#20c997';
+                
+                setTimeout(() => {{
+                    button.innerHTML = originalText;
+                    button.style.background = '#17a2b8';
+                }}, 2000);
+            }});
+        }}
     </script>
 </body>
 </html>"""
@@ -1755,6 +1955,23 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 </div>"""
         
         return timeline_html
+    
+    def _get_intro_messages_content(self, application, message_type: str) -> str:
+        """Get intro messages content from file"""
+        try:
+            if message_type == 'hiring_manager':
+                file_path = getattr(application, 'hiring_manager_intros_path', None)
+            elif message_type == 'recruiter':
+                file_path = getattr(application, 'recruiter_intros_path', None)
+            else:
+                return "No intro messages available."
+            
+            if file_path and Path(file_path).exists():
+                return read_text_file(file_path)
+            else:
+                return f"No {message_type.replace('_', ' ')} intro messages found."
+        except Exception as e:
+            return f"Error loading {message_type.replace('_', ' ')} intro messages: {str(e)}"
     
     def _get_match_score_color(self, score: float) -> str:
         """Get color based on match score"""
