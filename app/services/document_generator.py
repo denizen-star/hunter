@@ -902,28 +902,69 @@ class DocumentGenerator:
             search_query = f"{company_name} latest news 2024 financial business"
             
             try:
-                # Import web search functionality
-                from tools import web_search
+                # Use requests to perform web search via a search API
+                import requests
+                import json
                 
-                # Perform the actual web search
-                search_results = web_search(search_query)
+                # Try using DuckDuckGo Instant Answer API (free, no API key required)
+                search_url = f"https://api.duckduckgo.com/?q={search_query}&format=json&no_html=1&skip_disambig=1"
                 
-                if search_results and hasattr(search_results, 'content'):
-                    # Parse the search results to extract news items
-                    news_items = self._parse_web_search_results(search_results.content, company_name)
-                    print(f"✅ Found {len(news_items)} news items for {company_name}")
-                    return news_items
-                else:
-                    print(f"⚠️ No search results found for {company_name}")
-                    return []
+                response = requests.get(search_url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
                     
-            except ImportError:
-                print("⚠️ Web search tool not available, using fallback data")
+                    # Parse DuckDuckGo results
+                    news_items = self._parse_duckduckgo_results(data, company_name)
+                    if news_items:
+                        print(f"✅ Found {len(news_items)} news items for {company_name}")
+                        return news_items
+                
+                # If DuckDuckGo doesn't work, try a different approach
+                print(f"⚠️ No search results found for {company_name}")
+                return self._get_fallback_news(company_name)
+                    
+            except Exception as e:
+                print(f"⚠️ Web search failed: {e}, using fallback data")
                 # Fallback to generic news if web search not available
                 return self._get_fallback_news(company_name)
                 
         except Exception as e:
             print(f"❌ Error in _get_company_news: {e}")
+            return []
+    
+    def _parse_duckduckgo_results(self, data: dict, company_name: str) -> list:
+        """Parse DuckDuckGo API results to extract news items"""
+        try:
+            news_items = []
+            
+            # Check for abstract/summary
+            if data.get('Abstract'):
+                abstract = data['Abstract']
+                if len(abstract) > 50:
+                    news_items.append({
+                        "title": f"{company_name} - Latest Information",
+                        "summary": abstract,
+                        "url": data.get('AbstractURL', f"https://duckduckgo.com/?q={company_name}"),
+                        "source": data.get('AbstractSource', 'DuckDuckGo')
+                    })
+            
+            # Check for related topics
+            if data.get('RelatedTopics'):
+                for topic in data['RelatedTopics'][:3]:  # Limit to 3 topics
+                    if isinstance(topic, dict) and topic.get('Text'):
+                        text = topic['Text']
+                        if len(text) > 30:
+                            news_items.append({
+                                "title": f"{company_name} Related Information",
+                                "summary": text,
+                                "url": topic.get('FirstURL', f"https://duckduckgo.com/?q={company_name}"),
+                                "source": "DuckDuckGo Search"
+                            })
+            
+            return news_items
+            
+        except Exception as e:
+            print(f"Error parsing DuckDuckGo results: {e}")
             return []
     
     def _parse_web_search_results(self, search_content: str, company_name: str) -> list:
@@ -1021,28 +1062,67 @@ class DocumentGenerator:
             search_query = f"{company_name} executives leadership team CEO CTO Chief Data Officer"
             
             try:
-                # Import web search functionality
-                from tools import web_search
+                # Use requests to perform web search via a search API
+                import requests
                 
-                # Perform the actual web search
-                search_results = web_search(search_query)
+                # Try using DuckDuckGo Instant Answer API (free, no API key required)
+                search_url = f"https://api.duckduckgo.com/?q={search_query}&format=json&no_html=1&skip_disambig=1"
                 
-                if search_results and hasattr(search_results, 'content'):
-                    # Parse the search results to extract personnel
-                    personnel = self._parse_personnel_search_results(search_results.content, company_name)
-                    print(f"✅ Found {len(personnel)} key personnel for {company_name}")
-                    return personnel
-                else:
-                    print(f"⚠️ No personnel results found for {company_name}")
-                    return self._get_fallback_personnel(company_name)
+                response = requests.get(search_url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
                     
-            except ImportError:
-                print("⚠️ Web search tool not available, using fallback data")
+                    # Parse DuckDuckGo results for personnel
+                    personnel = self._parse_duckduckgo_personnel_results(data, company_name)
+                    if personnel:
+                        print(f"✅ Found {len(personnel)} key personnel for {company_name}")
+                        return personnel
+                
+                # If DuckDuckGo doesn't work, use fallback
+                print(f"⚠️ No personnel results found for {company_name}")
+                return self._get_fallback_personnel(company_name)
+                    
+            except Exception as e:
+                print(f"⚠️ Personnel search failed: {e}, using fallback data")
                 # Fallback to generic personnel if web search not available
                 return self._get_fallback_personnel(company_name)
                 
         except Exception as e:
             print(f"❌ Error in _get_company_personnel: {e}")
+            return []
+    
+    def _parse_duckduckgo_personnel_results(self, data: dict, company_name: str) -> list:
+        """Parse DuckDuckGo API results to extract personnel information"""
+        try:
+            personnel = []
+            
+            # Check for abstract/summary that might contain executive info
+            if data.get('Abstract'):
+                abstract = data['Abstract']
+                # Look for executive names and titles in the abstract
+                lines = abstract.split('. ')
+                for line in lines:
+                    if any(title in line.upper() for title in ['CEO', 'CTO', 'CFO', 'COO', 'PRESIDENT', 'CHIEF']):
+                        # Try to extract name and title from the line
+                        words = line.split()
+                        for i, word in enumerate(words):
+                            if any(title in word.upper() for title in ['CEO', 'CTO', 'CFO', 'COO', 'PRESIDENT', 'CHIEF']):
+                                # Found a title, try to get the name before it
+                                if i > 0 and i < len(words):
+                                    name = words[i-1] if i > 0 else "Unknown"
+                                    title = ' '.join(words[i:i+3])  # Get title and next few words
+                                    
+                                    personnel.append({
+                                        "name": name,
+                                        "title": title
+                                    })
+                                    break
+            
+            # If we didn't find specific personnel, return empty list to use fallback
+            return personnel
+            
+        except Exception as e:
+            print(f"Error parsing DuckDuckGo personnel results: {e}")
             return []
     
     def _parse_personnel_search_results(self, search_content: str, company_name: str) -> list:
@@ -1170,28 +1250,26 @@ class DocumentGenerator:
             search_query = f"{company_name} products services what does company do business"
             
             try:
-                from tools import web_search
-                search_results = web_search(search_query)
+                import requests
                 
-                if search_results and hasattr(search_results, 'content'):
-                    # Parse search results for products/services information
-                    content = search_results.content
+                # Try using DuckDuckGo Instant Answer API
+                search_url = f"https://api.duckduckgo.com/?q={search_query}&format=json&no_html=1&skip_disambig=1"
+                
+                response = requests.get(search_url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
                     
-                    # Look for business description patterns
-                    lines = content.split('\n')
-                    for line in lines:
-                        line = line.strip()
-                        if len(line) > 100 and company_name.lower() in line.lower():
-                            # This might contain business information
-                            if any(keyword in line.lower() for keyword in ['provides', 'offers', 'develops', 'services', 'products', 'solutions']):
-                                return line[:500] + "..." if len(line) > 500 else line
+                    # Parse DuckDuckGo results for business info
+                    if data.get('Abstract'):
+                        abstract = data['Abstract']
+                        if len(abstract) > 50:
+                            return abstract[:500] + "..." if len(abstract) > 500 else abstract
+                
+                # If no results, use fallback
+                return self._get_fallback_products_services(company_name)
                     
-                    # Fallback to generic description
-                    return f"{company_name} provides various products and services to its customers. For detailed information about their offerings, please visit their official website."
-                else:
-                    return self._get_fallback_products_services(company_name)
-                    
-            except ImportError:
+            except Exception as e:
+                print(f"Products/services search failed: {e}")
                 return self._get_fallback_products_services(company_name)
                 
         except Exception as e:
@@ -1204,31 +1282,26 @@ class DocumentGenerator:
             search_query = f"{company_name} competitors rivals main competitors industry"
             
             try:
-                from tools import web_search
-                search_results = web_search(search_query)
+                import requests
                 
-                if search_results and hasattr(search_results, 'content'):
-                    # Parse search results for competitor information
-                    content = search_results.content
+                # Try using DuckDuckGo Instant Answer API
+                search_url = f"https://api.duckduckgo.com/?q={search_query}&format=json&no_html=1&skip_disambig=1"
+                
+                response = requests.get(search_url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
                     
-                    # Look for competitor mentions
-                    lines = content.split('\n')
-                    competitor_mentions = []
+                    # Parse DuckDuckGo results for competitor info
+                    if data.get('Abstract'):
+                        abstract = data['Abstract']
+                        if len(abstract) > 50:
+                            return abstract[:500] + "..." if len(abstract) > 500 else abstract
+                
+                # If no results, use fallback
+                return self._get_fallback_competitors(company_name)
                     
-                    for line in lines:
-                        line = line.strip()
-                        if any(keyword in line.lower() for keyword in ['competitor', 'rival', 'competes with', 'main competitor']):
-                            if len(line) > 50 and len(line) < 300:
-                                competitor_mentions.append(line)
-                    
-                    if competitor_mentions:
-                        return competitor_mentions[0][:500] + "..." if len(competitor_mentions[0]) > 500 else competitor_mentions[0]
-                    
-                    return self._get_fallback_competitors(company_name)
-                else:
-                    return self._get_fallback_competitors(company_name)
-                    
-            except ImportError:
+            except Exception as e:
+                print(f"Competitors search failed: {e}")
                 return self._get_fallback_competitors(company_name)
                 
         except Exception as e:
