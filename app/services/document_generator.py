@@ -244,8 +244,8 @@ class DocumentGenerator:
         if 'Posted Date' in title or title_clean == 'Job Description Details':
             return f'<div class="job-meta">{formatted_content}</div>'
         
-        # Skip sections if content is "Not available"
-        if title_clean in ['Additional Insights', 'Hiring Team Information'] and ('Not available' in formatted_content or 'Not specified' in formatted_content):
+        # Skip Additional Insights if content is "Not available", but always show Hiring Team Information
+        if title_clean == 'Additional Insights' and ('Not available' in formatted_content or 'Not specified' in formatted_content):
             return ''
         
         # Special formatting for Additional Insights section (use standard styling)
@@ -263,6 +263,18 @@ class DocumentGenerator:
         if 'Hiring Team Information' in title_clean:
             # Parse and format hiring team information
             formatted_team_info = self._format_hiring_team_info(formatted_content)
+            
+            # If no team members found, show a styled "Not available" message
+            if 'Not available' in formatted_content or 'Not specified' in formatted_content:
+                formatted_team_info = '''
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #6c757d;">
+                    <p style="margin: 0; color: #6c757d; font-style: italic;">
+                        <strong>No hiring team information available.</strong><br>
+                        This information was not provided in the job posting or could not be extracted.
+                    </p>
+                </div>
+                '''
+            
             return f'''
         <div class="job-section">
             <h3 class="job-section-title">👥 {title_clean}</h3>
