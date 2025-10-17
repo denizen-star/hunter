@@ -731,9 +731,13 @@ def get_reports_data():
             applications_by_status[status] = applications_by_status.get(status, 0) + 1
         
         # Status changes by status (for period) - count status changes that happened in period by the new status
+        # Exclude status changes to rejected
         status_changes_by_status = {}
+        status_changes_count = 0
         for app in status_changes:
             status = app.status.lower()
+            if status != 'rejected':  # Exclude rejected from status changes count
+                status_changes_count += 1
             status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
         
         
@@ -766,11 +770,17 @@ def get_reports_data():
         # Sort follow-up applications by newest update first
         followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
         
+        # Calculate active applications (total - rejected)
+        rejected_count = applications_by_status.get('rejected', 0)
+        active_applications = len(period_applications) - rejected_count
+        
         # Summary statistics
         summary = {
             'total_applications': len(period_applications),
             'new_applications': len(period_applications),
-            'status_changes': len(status_changes),
+            'active_applications': active_applications,
+            'status_changes': status_changes_count,
+            'rejected': rejected_count,
             'followup_needed': len(followup_applications)
         }
         
