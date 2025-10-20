@@ -205,6 +205,8 @@ class JobProcessor:
                         metadata = load_yaml(metadata_path)
                         metadata['folder_path'] = str(folder_path)
                         application = Application.from_dict(metadata)
+                        # Calculate and set contact count
+                        application.contact_count = application.calculate_contact_count()
                         applications.append(application)
                     except Exception as e:
                         print(f"Error loading application from {folder_path}: {e}")
@@ -216,7 +218,11 @@ class JobProcessor:
     def get_application_by_id(self, app_id: str) -> Optional[Application]:
         """Get an application by ID"""
         applications = self.list_all_applications()
-        return next((app for app in applications if app.id == app_id), None)
+        application = next((app for app in applications if app.id == app_id), None)
+        if application:
+            # Ensure contact count is calculated
+            application.contact_count = application.calculate_contact_count()
+        return application
     
     def update_application_status(
         self,
@@ -240,7 +246,7 @@ class JobProcessor:
         # Format the timestamp for display
         display_timestamp = application.status_updated_at.strftime('%B %d, %Y %I:%M %p EST')
         
-        # Create HTML content
+        # Create HTML content (notes are now HTML formatted from rich text editor)
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -358,9 +364,45 @@ class JobProcessor:
             padding: 15px;
             border-radius: 6px;
             border-left: 4px solid #ff9800;
-            white-space: pre-wrap;
             font-size: 14px;
             line-height: 1.6;
+        }}
+        .notes-text p {{
+            margin: 0 0 10px 0;
+        }}
+        .notes-text p:last-child {{
+            margin-bottom: 0;
+        }}
+        .notes-text ul, .notes-text ol {{
+            margin: 10px 0;
+            padding-left: 20px;
+        }}
+        .notes-text blockquote {{
+            margin: 10px 0;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }}
+        .notes-text code {{
+            background-color: #f1f3f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }}
+        .notes-text pre {{
+            background-color: #f1f3f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }}
+        .notes-text a {{
+            color: #007bff;
+            text-decoration: none;
+        }}
+        .notes-text a:hover {{
+            text-decoration: underline;
         }}
         .back-link {{
             display: inline-block;
@@ -419,6 +461,9 @@ class JobProcessor:
 </html>"""
         
         write_text_file(html_content, status_path)
+        
+        # Recalculate contact count after status update
+        application.contact_count = application.calculate_contact_count()
         
         # Update metadata
         self._save_application_metadata(application)
@@ -488,9 +533,13 @@ class JobProcessor:
             # Update the status_updated_at timestamp
             application.status_updated_at = get_est_now()
             
-            # Save updated metadata
-            self._save_application_metadata(application)
-            
+        # Recalculate contact count after status update
+        application.contact_count = application.calculate_contact_count()
+        
+        # Save updated metadata
+        self._save_application_metadata(application)
+        
+        if updated:
             # Regenerate summary to reflect changes
             self._regenerate_summary(application)
             

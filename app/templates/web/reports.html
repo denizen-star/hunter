@@ -610,6 +610,10 @@
                         <div class="stat-label">Status Changes</div>
                     </div>
                     <div class="stat-item">
+                        <div class="stat-number">${summary.total_contact_count}</div>
+                        <div class="stat-label">Total Contacts</div>
+                    </div>
+                    <div class="stat-item">
                         <div class="stat-number">${summary.rejected}</div>
                         <div class="stat-label">Rejected</div>
                     </div>
@@ -832,7 +836,7 @@
                         <div class="followup-info">
                             <div class="followup-company">${app.company}</div>
                             <div class="followup-position">${app.job_title}</div>
-                            <div class="followup-match">${app.match_score}% Match</div>
+                            <div class="followup-match">${app.match_score}% Match • ${app.contact_count} Contacts</div>
                         </div>
                         <div class="followup-timestamp">
                             Last updated: ${app.last_updated}

@@ -24,6 +24,7 @@ class Application:
     summary_path: Optional[Path] = None
     hiring_manager_intros_path: Optional[Path] = None
     recruiter_intros_path: Optional[Path] = None
+    research_path: Optional[Path] = None
     
     # Resume reference
     resume_used: str = "base_resume.md"
@@ -40,6 +41,9 @@ class Application:
     location: Optional[str] = None
     hiring_manager: Optional[str] = None
     
+    # Contact tracking
+    contact_count: Optional[int] = None
+    
     def __post_init__(self):
         """Convert string paths to Path objects and strings to datetime objects"""
         if isinstance(self.created_at, str):
@@ -49,7 +53,7 @@ class Application:
             self.status_updated_at = datetime.fromisoformat(self.status_updated_at)
         
         for field_name in ['job_description_path', 'raw_job_description_path', 'qualifications_path', 'cover_letter_path', 
-                          'custom_resume_path', 'summary_path', 'hiring_manager_intros_path', 'recruiter_intros_path', 'folder_path']:
+                          'custom_resume_path', 'summary_path', 'hiring_manager_intros_path', 'recruiter_intros_path', 'research_path', 'folder_path']:
             value = getattr(self, field_name)
             if isinstance(value, str):
                 setattr(self, field_name, Path(value))
@@ -71,6 +75,7 @@ class Application:
             summary_path=data.get('summary_path'),
             hiring_manager_intros_path=data.get('hiring_manager_intros_path'),
             recruiter_intros_path=data.get('recruiter_intros_path'),
+            research_path=data.get('research_path'),
             resume_used=data.get('resume_used', 'base_resume.md'),
             folder_path=data.get('folder_path'),
             status_updated_at=data.get('status_updated_at'),
@@ -79,7 +84,8 @@ class Application:
             posted_date=data.get('posted_date'),
             salary_range=data.get('salary_range'),
             location=data.get('location'),
-            hiring_manager=data.get('hiring_manager')
+            hiring_manager=data.get('hiring_manager'),
+            contact_count=data.get('contact_count')
         )
     
     def to_dict(self) -> dict:
@@ -98,6 +104,7 @@ class Application:
             'summary_path': str(self.summary_path) if self.summary_path else None,
             'hiring_manager_intros_path': str(self.hiring_manager_intros_path) if self.hiring_manager_intros_path else None,
             'recruiter_intros_path': str(self.recruiter_intros_path) if self.recruiter_intros_path else None,
+            'research_path': str(self.research_path) if self.research_path else None,
             'resume_used': self.resume_used,
             'folder_path': str(self.folder_path) if self.folder_path else None,
             'status_updated_at': self.status_updated_at.isoformat() if self.status_updated_at and isinstance(self.status_updated_at, datetime) else self.status_updated_at,
@@ -106,7 +113,8 @@ class Application:
             'posted_date': self.posted_date,
             'salary_range': self.salary_range,
             'location': self.location,
-            'hiring_manager': self.hiring_manager
+            'hiring_manager': self.hiring_manager,
+            'contact_count': self.contact_count
         }
     
     def get_folder_name(self) -> str:
@@ -118,4 +126,26 @@ class Application:
         job_title = '-'.join(job_title.split())
         
         return f"{company}-{job_title}"
+    
+    def calculate_contact_count(self) -> int:
+        """Calculate the number of times 'Contacted Someone' or 'Contacted Hiring Manager' status updates occurred"""
+        if not self.folder_path:
+            return 0
+            
+        updates_dir = self.folder_path / "updates"
+        if not updates_dir.exists():
+            return 0
+        
+        contact_count = 0
+        for update_file in updates_dir.iterdir():
+            if update_file.is_file() and update_file.suffix == '.html':
+                # Extract status from filename
+                # Format: YYYYMMDDHHMMSS-Status.html
+                filename_parts = update_file.stem.split('-', 1)
+                if len(filename_parts) == 2:
+                    status = filename_parts[1]
+                    if status in ['Contacted Someone', 'Contacted Hiring Manager']:
+                        contact_count += 1
+        
+        return contact_count
 

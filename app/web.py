@@ -764,7 +764,8 @@ def get_reports_data():
                     'job_title': app.job_title,
                     'match_score': round(app.match_score or 0),
                     'last_updated': format_for_display(last_update),
-                    'summary_url': summary_url
+                    'summary_url': summary_url,
+                    'contact_count': app.calculate_contact_count()
                 })
         
         # Sort follow-up applications by newest update first
@@ -774,6 +775,13 @@ def get_reports_data():
         rejected_count = applications_by_status.get('rejected', 0)
         active_applications = len(period_applications) - rejected_count
         
+        # Calculate total contact count from status_changes_by_status (matches the chart)
+        total_contact_count = 0
+        if 'contacted someone' in status_changes_by_status:
+            total_contact_count += status_changes_by_status['contacted someone']
+        if 'contacted hiring manager' in status_changes_by_status:
+            total_contact_count += status_changes_by_status['contacted hiring manager']
+        
         # Summary statistics
         summary = {
             'total_applications': len(period_applications),
@@ -781,7 +789,8 @@ def get_reports_data():
             'active_applications': active_applications,
             'status_changes': status_changes_count,
             'rejected': rejected_count,
-            'followup_needed': len(followup_applications)
+            'followup_needed': len(followup_applications),
+            'total_contact_count': total_contact_count
         }
         
         return jsonify({

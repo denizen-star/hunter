@@ -238,18 +238,39 @@ MATCH SCORE: {match_score}%
 STRONG MATCHES: {strong_matches}
 CANDIDATE NAME: {candidate_name}
 
-Create exactly 3 versions, each under 50 words:
+CANDIDATE BACKGROUND: 15+ years data leadership, managed $3T daily transactions at BoNY Mellon, VP BI experience, led 250+ employees, Databricks/MLOps expertise, lakehouse solutions, data governance.
 
-**PROFESSIONAL VERSION:**
-[Professional, direct message highlighting key qualifications and match score]
+Create exactly 3 versions with specific character counts. Be specific about actual achievements and experience.
 
-**OUTRAGEOUS VERSION:**
-[Creative, attention-grabbing message that stands out while remaining professional]
+Format each message as:
+"RE: " {job_title}
 
-**GEN-Z VERSION:**
-[Modern, casual tone using data industry buzzwords and current language]
+"Hi Person, 
 
-Each message should be direct, unambiguous, and use only the information provided. Do not hallucinate details."""
+I recently applied for this role (kervin.leacock@yahoo.com)." [intro message with specified character count]
+
+**MESSAGE 1:**
+RE: {job_title}
+
+Hi Person, 
+
+I recently applied for this role (kervin.leacock@yahoo.com). [~275 characters total - be specific about $3T transactions, 250+ team leadership, and key technical achievements]
+
+**MESSAGE 2:**
+RE: {job_title}
+
+Hi Person, 
+
+I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - be specific about Databricks/lakehouse, data governance, and business impact]
+
+**MESSAGE 3:**
+RE: {job_title}
+
+Hi Person, 
+
+I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about achievements]
+
+Each message should be direct, specific about actual achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional."""
 
 
 RECRUITER_INTRO_PROMPT = """You are creating professional intro messages for recruiters. Generate 3 versions of an intro message based on the provided information.
@@ -260,20 +281,41 @@ MATCH SCORE: {match_score}%
 STRONG MATCHES: {strong_matches}
 CANDIDATE NAME: {candidate_name}
 
-IMPORTANT: Recruiters are typically not technical, so avoid jargon and technical terms. Use business language.
+CANDIDATE BACKGROUND: 15+ years data leadership, managed $3T daily transactions at BoNY Mellon, VP BI experience, led 250+ employees, Databricks/MLOps expertise, lakehouse solutions, data governance.
 
-Create exactly 3 versions, each under 50 words:
+IMPORTANT: Recruiters are typically not technical, so avoid jargon and technical terms. Use business language. Focus on business impact and leadership achievements.
 
-**PROFESSIONAL VERSION:**
-[Professional, clear message focusing on business value and achievements]
+Create exactly 3 versions with specific character counts. Be specific about actual business achievements.
 
-**OUTRAGEOUS VERSION:**
-[Creative, memorable message that stands out while remaining professional]
+Format each message as:
+"RE: " {job_title}
 
-**GEN-Z VERSION:**
-[Modern, casual tone using business buzzwords and current language]
+"Hi Person, 
 
-Each message should be direct, unambiguous, non-technical, and use only the information provided. Do not hallucinate details."""
+I recently applied for this role (kervin.leacock@yahoo.com)." [intro message with specified character count]
+
+**MESSAGE 1:**
+RE: {job_title}
+
+Hi Person, 
+
+I recently applied for this role (kervin.leacock@yahoo.com). [~275 characters total - be specific about $3T transactions, 250+ team leadership, and business impact - avoid technical jargon]
+
+**MESSAGE 2:**
+RE: {job_title}
+
+Hi Person, 
+
+I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - be specific about VP BI achievements, data strategy, and business value - focus on results]
+
+**MESSAGE 3:**
+RE: {job_title}
+
+Hi Person, 
+
+I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about business achievements]
+
+Each message should be direct, specific about actual business achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional. Avoid technical jargon."""
 
 
 def get_prompt(prompt_name: str, **kwargs) -> str:

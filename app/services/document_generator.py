@@ -636,10 +636,16 @@ class DocumentGenerator:
         
         return skills_data
     
-    def _generate_company_research_html(self, company_name: str) -> str:
+    def _generate_company_research_html(self, company_name: str, application: Application = None) -> str:
         """Generate HTML for company research section"""
         try:
-            # Perform company research
+            # If application has a research_path, read from that file instead of generating new research
+            if application and hasattr(application, 'research_path') and application.research_path and Path(application.research_path).exists():
+                print(f"📖 Reading AI-generated research from: {application.research_path}")
+                research_content = read_text_file(application.research_path)
+                return self._convert_markdown_research_to_html(research_content)
+            
+            # Fall back to performing company research
             research_data = self._perform_company_research(company_name)
             
             html_parts = []
@@ -820,6 +826,137 @@ class DocumentGenerator:
             </div>
             '''
     
+    def _convert_markdown_research_to_html(self, research_content: str) -> str:
+        """Convert markdown research content to HTML for display with clean sections"""
+        import re
+        
+        # Split content into lines for better processing
+        lines = research_content.split('\n')
+        html_lines = []
+        in_list = False
+        
+        for line in lines:
+            line = line.strip()
+            
+            # Skip empty lines
+            if not line:
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append('')
+                continue
+            
+            # Convert headers
+            if line.startswith('# '):
+                html_lines.append(f'<h1 class="research-main-title">{line[2:]}</h1>')
+            elif line.startswith('## '):
+                html_lines.append(f'<h2 class="research-section-title">{line[3:]}</h2>')
+            elif line.startswith('### '):
+                html_lines.append(f'<h3 class="research-subsection-title">{line[4:]}</h3>')
+            elif line.startswith('#### '):
+                html_lines.append(f'<h4 class="research-item-title">{line[5:]}</h4>')
+            
+            # Convert bullet points
+            elif line.startswith('- '):
+                if not in_list:
+                    html_lines.append('<ul class="research-list">')
+                    in_list = True
+                content = line[2:].strip()
+                # Convert bold text in list items
+                content = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', content)
+                # Convert URLs to links
+                content = re.sub(r'(https?://[^\s]+)', r'<a href="\1" target="_blank" class="research-link">\1</a>', content)
+                html_lines.append(f'<li class="research-bullet">{content}</li>')
+            
+            # Regular paragraphs
+            else:
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                
+                # Convert bold text
+                line = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
+                # Convert URLs to links
+                line = re.sub(r'(https?://[^\s]+)', r'<a href="\1" target="_blank" class="research-link">\1</a>', line)
+                html_lines.append(f'<p class="research-paragraph">{line}</p>')
+        
+        # Close any remaining list
+        if in_list:
+            html_lines.append('</ul>')
+        
+        html_content = '\n'.join(html_lines)
+        
+        # Wrap in research container with clean styling (no indentation lines)
+        return f'''
+        <div class="research-content">
+            <style>
+                .research-content {{
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                }}
+                .research-main-title {{
+                    color: #424242;
+                    font-size: 28px;
+                    font-weight: 700;
+                    margin: 30px 0 20px 0;
+                    padding-bottom: 10px;
+                    border-bottom: 3px solid #424242;
+                }}
+                .research-section-title {{
+                    color: #424242;
+                    font-size: 22px;
+                    font-weight: 600;
+                    margin: 25px 0 15px 0;
+                    padding: 10px 15px;
+                    background: #f8f9fa;
+                    border-radius: 4px;
+                }}
+                .research-subsection-title {{
+                    color: #555;
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin: 20px 0 10px 0;
+                    padding: 8px 0;
+                }}
+                .research-item-title {{
+                    color: #666;
+                    font-size: 16px;
+                    font-weight: 600;
+                    margin: 15px 0 8px 0;
+                    padding: 5px 0;
+                }}
+                .research-paragraph {{
+                    margin: 12px 0;
+                    text-align: justify;
+                }}
+                .research-list {{
+                    margin: 10px 0 10px 20px;
+                    padding-left: 0;
+                }}
+                .research-bullet {{
+                    margin: 8px 0;
+                    padding-left: 0;
+                }}
+                .research-link {{
+                    color: #1976d2;
+                    text-decoration: none;
+                    font-weight: 500;
+                    border-bottom: 1px dotted #1976d2;
+                }}
+                .research-link:hover {{
+                    color: #0d47a1;
+                    border-bottom: 1px solid #0d47a1;
+                    text-decoration: none;
+                }}
+            </style>
+            
+            <div class="research-item">
+                {html_content}
+            </div>
+        </div>
+        '''
+    
     def _perform_company_research(self, company_name: str) -> dict:
         """Perform company research using web search and AI analysis"""
         import requests
@@ -870,10 +1007,9 @@ class DocumentGenerator:
             # Try to use web search (this would need to be implemented with actual search APIs)
             # For demonstration, we'll return structured placeholder data
             
-            # Company Mission & Vision with real company statements
-            mission, vision = self._get_company_mission_vision(company_name)
-            research_data['mission'] = mission
-            research_data['vision'] = vision
+            # Company Mission & Vision (would be scraped from actual website)
+            research_data['mission'] = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
+            research_data['vision'] = f"To be the leading company in our industry, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
             
             # Products, Services & Competitors (using real web search)
             print(f"🔍 Searching for products/services and competitors for {company_name}...")
@@ -1045,51 +1181,14 @@ class DocumentGenerator:
     
     def _get_fallback_news(self, company_name: str) -> list:
         """Fallback news when web search is not available"""
-        company_lower = company_name.lower()
-        
-        # Company-specific news fallbacks
-        if 'best buy' in company_lower:
-            return [
-                {
-                    "title": f"{company_name} Q4 2024 Earnings Report",
-                    "summary": f"{company_name} continues to focus on omnichannel retail strategy, digital transformation, and customer experience improvements. The company has been investing in AI and data analytics capabilities to enhance operations and customer service.",
-                    "url": f"https://www.{company_name.lower().replace(' ', '')}.com/investor-relations",
-                    "source": "Company News"
-                },
-                {
-                    "title": f"{company_name} Geek Squad Services Expansion",
-                    "summary": f"{company_name} has been expanding its Geek Squad technical support services and in-home installation offerings to meet growing demand for tech support and smart home solutions.",
-                    "url": f"https://www.{company_name.lower().replace(' ', '')}.com/services",
-                    "source": "Business News"
-                }
-            ]
-        elif 'netflix' in company_lower:
-            return [
-                {
-                    "title": f"{company_name} Content Strategy Update",
-                    "summary": f"{company_name} continues to invest heavily in original content production and international expansion. The company focuses on data-driven content decisions and personalized user experiences.",
-                    "url": f"https://www.{company_name.lower().replace(' ', '')}.com/investor-relations",
-                    "source": "Company News"
-                }
-            ]
-        elif 'amazon' in company_lower:
-            return [
-                {
-                    "title": f"{company_name} AWS and E-commerce Growth",
-                    "summary": f"{company_name} continues to see strong growth in AWS cloud services and e-commerce operations. The company invests heavily in AI, logistics, and customer experience technologies.",
-                    "url": f"https://www.{company_name.lower().replace(' ', '')}.com/investor-relations",
-                    "source": "Company News"
-                }
-            ]
-        else:
-            return [
-                {
-                    "title": f"{company_name} Business Update",
-                    "summary": f"Latest business developments and company news for {company_name}. For the most current information, please visit the company's official website or financial news sources.",
-                    "url": f"https://www.{company_name.lower().replace(' ', '')}.com",
-                    "source": "Company Website"
-                }
-            ]
+        return [
+            {
+                "title": f"{company_name} Business Update",
+                "summary": f"Latest business developments and company news for {company_name}. For the most current information, please visit the company's official website or financial news sources.",
+                "url": f"https://www.{company_name.lower().replace(' ', '')}.com",
+                "source": "Company Website"
+            }
+        ]
     
     def _get_company_personnel(self, company_name: str) -> list:
         """Get key personnel with data-related titles using real web search"""
@@ -1235,109 +1334,8 @@ class DocumentGenerator:
     
     def _get_fallback_personnel(self, company_name: str) -> list:
         """Fallback personnel when web search is not available"""
-        company_lower = company_name.lower()
-        
-        # Company-specific personnel
-        if 'best buy' in company_lower:
-            return [
-                {
-                    "name": "Corie Barry",
-                    "title": "Chief Executive Officer"
-                },
-                {
-                    "name": "Matt Bilunas", 
-                    "title": "Chief Financial Officer"
-                },
-                {
-                    "name": "Brian Tilzer",
-                    "title": "Chief Digital Officer"
-                },
-                {
-                    "name": "Allison Peterson",
-                    "title": "Chief Marketing Officer"
-                },
-                {
-                    "name": "Rob Bass",
-                    "title": "Chief Supply Chain Officer"
-                }
-            ]
-        elif 'netflix' in company_lower:
-            return [
-                {
-                    "name": "Ted Sarandos",
-                    "title": "Co-CEO & Chief Content Officer"
-                },
-                {
-                    "name": "Greg Peters",
-                    "title": "Co-CEO & Chief Product Officer"
-                },
-                {
-                    "name": "Spencer Neumann",
-                    "title": "Chief Financial Officer"
-                },
-                {
-                    "name": "Elizabeth Stone",
-                    "title": "Chief Technology Officer"
-                }
-            ]
-        elif 'amazon' in company_lower:
-            return [
-                {
-                    "name": "Andy Jassy",
-                    "title": "Chief Executive Officer"
-                },
-                {
-                    "name": "Adam Selipsky",
-                    "title": "CEO, Amazon Web Services"
-                },
-                {
-                    "name": "Brian Olsavsky",
-                    "title": "Senior Vice President & Chief Financial Officer"
-                },
-                {
-                    "name": "Werner Vogels",
-                    "title": "Chief Technology Officer"
-                }
-            ]
-        elif 'google' in company_lower:
-            return [
-                {
-                    "name": "Sundar Pichai",
-                    "title": "Chief Executive Officer"
-                },
-                {
-                    "name": "Ruth Porat",
-                    "title": "Senior Vice President & Chief Financial Officer"
-                },
-                {
-                    "name": "Thomas Kurian",
-                    "title": "CEO, Google Cloud"
-                },
-                {
-                    "name": "Jeff Dean",
-                    "title": "Senior Fellow & Head of AI"
-                }
-            ]
-        elif 'microsoft' in company_lower:
-            return [
-                {
-                    "name": "Satya Nadella",
-                    "title": "Chairman & Chief Executive Officer"
-                },
-                {
-                    "name": "Amy Hood",
-                    "title": "Executive Vice President & Chief Financial Officer"
-                },
-                {
-                    "name": "Scott Guthrie",
-                    "title": "Executive Vice President, Cloud & AI"
-                },
-                {
-                    "name": "Rajesh Jha",
-                    "title": "Executive Vice President, Experiences & Devices"
-                }
-            ]
-        elif any(keyword in company_lower for keyword in ['bank', 'financial']):
+        # Determine company type for appropriate roles
+        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
             return [
                 {
                     "name": f"{company_name} CIO",
@@ -1352,7 +1350,7 @@ class DocumentGenerator:
                     "title": "Head of Data Analytics & Business Intelligence"
                 }
             ]
-        elif any(keyword in company_lower for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
             return [
                 {
                     "name": f"{company_name} CTO",
@@ -1382,47 +1380,6 @@ class DocumentGenerator:
                     "title": "Head of Data Analytics"
                 }
             ]
-    
-    def _get_company_mission_vision(self, company_name: str) -> tuple:
-        """Get real company mission and vision statements"""
-        company_lower = company_name.lower()
-        
-        # Company-specific mission and vision statements
-        if 'best buy' in company_lower:
-            mission = "To enrich lives through technology by solving the human problems that matter most."
-            vision = "To be the world's leading provider of technology products and services."
-        elif 'netflix' in company_lower:
-            mission = "To entertain the world."
-            vision = "To be the world's leading streaming entertainment service with over 200 million paid memberships in over 190 countries enjoying TV series, documentaries and feature films across a wide variety of genres and languages."
-        elif 'amazon' in company_lower:
-            mission = "To be Earth's most customer-centric company, where customers can find and discover anything they might want to buy online."
-            vision = "To be Earth's most customer-centric company; to build a place where people can come to find and discover anything they might want to buy online."
-        elif 'google' in company_lower:
-            mission = "To organize the world's information and make it universally accessible and useful."
-            vision = "To provide access to the world's information in one click."
-        elif 'microsoft' in company_lower:
-            mission = "To empower every person and every organization on the planet to achieve more."
-            vision = "To help people and businesses throughout the world realize their full potential."
-        elif 'apple' in company_lower:
-            mission = "To bring the best user experience to its customers through its innovative hardware, software, and services."
-            vision = "To make the best products on earth, and to leave the world better than we found it."
-        elif 'meta' in company_lower or 'facebook' in company_lower:
-            mission = "To give people the power to build community and bring the world closer together."
-            vision = "To help people connect and share with friends and family through innovative technologies."
-        elif 'tesla' in company_lower:
-            mission = "To accelerate the world's transition to sustainable energy."
-            vision = "To create the most compelling car company of the 21st century by driving the world's transition to electric vehicles."
-        elif any(keyword in company_lower for keyword in ['bank', 'financial']):
-            mission = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in the financial services industry."
-            vision = f"To be the leading financial services company, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
-        elif any(keyword in company_lower for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
-            mission = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
-            vision = f"To be the leading technology company, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
-        else:
-            mission = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
-            vision = f"To be the leading company in our industry, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
-        
-        return mission, vision
     
     def _search_company_products_services(self, company_name: str) -> str:
         """Search for company products and services using web search"""
@@ -1489,45 +1446,19 @@ class DocumentGenerator:
             return self._get_fallback_competitors(company_name)
     
     def _get_fallback_products_services(self, company_name: str) -> str:
-        """Fallback products/services description with company-specific information"""
-        company_lower = company_name.lower()
-        
-        # Specific company information
-        if 'best buy' in company_lower:
-            return f"{company_name} is a leading retailer of consumer electronics, appliances, and technology products. The company operates retail stores and e-commerce platforms, offering products from major brands including computers, smartphones, TVs, home appliances, gaming systems, and tech accessories. {company_name} also provides services like Geek Squad technical support, installation services, and extended warranties."
-        elif 'netflix' in company_lower:
-            return f"{company_name} is a global streaming entertainment service offering a wide variety of award-winning TV shows, movies, anime, documentaries, and more on thousands of internet-connected devices. The company produces original content and licenses content from other studios, serving millions of subscribers worldwide."
-        elif 'amazon' in company_lower:
-            return f"{company_name} is a multinational technology company focusing on e-commerce, cloud computing, digital streaming, and artificial intelligence. The company operates Amazon.com, AWS cloud services, Prime subscription services, and various consumer electronics including Echo devices and Kindle e-readers."
-        elif 'google' in company_lower:
-            return f"{company_name} is a multinational technology company specializing in internet-related services including search engines, cloud computing, software, and hardware. The company operates Google Search, YouTube, Google Cloud, Android operating system, and various consumer products like Pixel phones and Chromebooks."
-        elif 'microsoft' in company_lower:
-            return f"{company_name} is a multinational technology company that develops, manufactures, licenses, supports, and sells computer software, consumer electronics, personal computers, and related services. Key products include Windows operating system, Microsoft Office suite, Azure cloud services, and Xbox gaming consoles."
-        elif any(keyword in company_lower for keyword in ['bank', 'financial']):
+        """Fallback products/services description"""
+        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
             return f"{company_name} provides comprehensive banking and financial services including retail banking, commercial banking, wealth management, investment services, credit cards, mortgages, and digital banking solutions."
-        elif any(keyword in company_lower for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
             return f"{company_name} develops and provides technology solutions including software platforms, cloud services, data analytics tools, AI/ML solutions, and digital transformation consulting services."
         else:
             return f"{company_name} offers a comprehensive suite of products and services designed to help businesses achieve their strategic objectives. For detailed information, please visit their official website."
     
     def _get_fallback_competitors(self, company_name: str) -> str:
-        """Fallback competitors description with company-specific information"""
-        company_lower = company_name.lower()
-        
-        # Specific company competitors
-        if 'best buy' in company_lower:
-            return f"Main competitors include Amazon, Walmart, Target, Costco, and other major retailers in the consumer electronics and appliances space. {company_name} competes on customer service, technical expertise, and in-store experience."
-        elif 'netflix' in company_lower:
-            return f"Main competitors include Disney+, Amazon Prime Video, Hulu, HBO Max, Apple TV+, and other streaming services. {company_name} competes on original content, user experience, and global reach."
-        elif 'amazon' in company_lower:
-            return f"Main competitors include Walmart, eBay, Google, Microsoft, and other e-commerce and cloud computing companies. {company_name} competes on logistics, cloud services, and marketplace dominance."
-        elif 'google' in company_lower:
-            return f"Main competitors include Microsoft, Apple, Amazon, Meta (Facebook), and other technology giants. {company_name} competes in search, cloud services, mobile operating systems, and advertising."
-        elif 'microsoft' in company_lower:
-            return f"Main competitors include Apple, Google, Amazon, Oracle, and other enterprise software and cloud computing companies. {company_name} competes in productivity software, cloud services, and enterprise solutions."
-        elif any(keyword in company_lower for keyword in ['bank', 'financial']):
+        """Fallback competitors description"""
+        if any(keyword in company_name.lower() for keyword in ['bank', 'financial']):
             return f"Main competitors include other major banks and financial institutions in the industry, though specific competitive analysis would require access to industry databases and market research reports."
-        elif any(keyword in company_lower for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
+        elif any(keyword in company_name.lower() for keyword in ['tech', 'software', 'data', 'ai', 'cloud']):
             return f"Main competitors include other technology leaders in the enterprise software and cloud services space, though specific competitive analysis would require access to industry databases."
         else:
             return f"Main competitors include other established players in the industry, though specific competitive analysis would require access to industry databases and market research reports."
@@ -1787,6 +1718,11 @@ class DocumentGenerator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{application.company} - {application.job_title}</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }}
@@ -2003,6 +1939,61 @@ class DocumentGenerator:
             border-radius: 6px; 
             border: 1px solid #f5c6cb;
         }}
+        
+        /* Quill Editor Styles */
+        .ql-editor {{
+            min-height: 120px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #4a5568;
+        }}
+        
+        .ql-toolbar {{
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            background-color: rgba(255, 255, 255, 0.9);
+        }}
+        
+        .ql-container {{
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            font-family: inherit;
+        }}
+        
+        .ql-container.ql-snow:focus-within {{
+            border-color: #8b9dc3;
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+        }}
+        
+        .ql-toolbar.ql-snow {{
+            border-color: rgba(139, 157, 195, 0.3);
+        }}
+        
+        .ql-toolbar.ql-snow .ql-picker-label {{
+            border-color: transparent;
+        }}
+        
+        .ql-toolbar.ql-snow .ql-picker-options {{
+            border-color: rgba(139, 157, 195, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+        }}
+        
+        .ql-toolbar.ql-snow button {{
+            border-radius: 6px;
+            margin: 2px;
+        }}
+        
+        .ql-toolbar.ql-snow button:hover {{
+            background-color: rgba(139, 157, 195, 0.1);
+        }}
+        
+        .ql-toolbar.ql-snow button.ql-active {{
+            background-color: rgba(139, 157, 195, 0.2);
+        }}
     </style>
 </head>
 <body>
@@ -2052,6 +2043,10 @@ class DocumentGenerator:
                     <label>Last Updated</label>
                     <value>{format_for_display(application.status_updated_at)}</value>
                 </div>
+                <div class="summary-item">
+                    <label>Contact #</label>
+                    <value>{application.calculate_contact_count()}</value>
+                </div>
             </div>
             
             {f'<div style="margin-top: 20px;"><label style="display: block; font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 600;">Job URL</label><a href="{application.job_url}" target="_blank">{application.job_url}</a></div>' if application.job_url else ''}
@@ -2093,7 +2088,7 @@ class DocumentGenerator:
             <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Research insights about {application.company} to help with your application:</p>
             
             <div class="research-container">
-                {self._generate_company_research_html(application.company)}
+                {self._generate_company_research_html(application.company, application)}
             </div>
         </div>
         
@@ -2185,28 +2180,24 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             
             <!-- Hiring Manager Intro Messages Section -->
             <div style="margin-top: 30px; border: 1px solid #28a745; padding: 15px; box-shadow: none; border-radius: 8px; background: white;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Hiring Manager Intro Messages</h3>
-                    <button onclick="copyHiringManagerIntros()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                        📋 Copy Messages
-                    </button>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Three ready-to-copy messages for hiring managers</p>
                 </div>
                 
-                <div id="hiring-manager-content" style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-height: 400px; overflow-y: auto;">
+                <div id="hiring-manager-content">
 {self._get_intro_messages_content(application, 'hiring_manager')}
                 </div>
             </div>
             
             <!-- Recruiter Intro Messages Section -->
             <div style="margin-top: 30px; border: 1px solid #17a2b8; padding: 15px; box-shadow: none; border-radius: 8px; background: white;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="margin-bottom: 15px;">
                     <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Recruiter Intro Messages</h3>
-                    <button onclick="copyRecruiterIntros()" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                        📋 Copy Messages
-                    </button>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Three ready-to-copy messages for recruiters</p>
                 </div>
                 
-                <div id="recruiter-content" style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-height: 400px; overflow-y: auto;">
+                <div id="recruiter-content">
 {self._get_intro_messages_content(application, 'recruiter')}
                 </div>
             </div>
@@ -2254,7 +2245,8 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                     
                     <div style="margin-bottom: 15px;">
                         <label for="status_notes" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Notes (Optional)</label>
-                        <textarea id="status_notes" placeholder="Add notes about this status update..." style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical; font-family: inherit;"></textarea>
+                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                        <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
                     </div>
                     
                     <button type="submit" id="updateStatusBtn" style="background: #fd7e14; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; transition: all 0.3s;">
@@ -2279,6 +2271,36 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
         // Application ID for this summary page
         const APPLICATION_ID = '{application.id}';
         
+        // Initialize Quill editor
+        let quillEditor = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {{
+            if (typeof Quill !== 'undefined') {{
+                console.log('✅ Quill.js loaded successfully');
+                
+                // Initialize Quill editor
+                quillEditor = new Quill('#status_notes', {{
+                    theme: 'snow',
+                    placeholder: 'Add notes about this status update...',
+                    modules: {{
+                        toolbar: [
+                            [{{ 'header': [1, 2, 3, false] }}],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{{ 'color': [] }}, {{ 'background': [] }}],
+                            [{{ 'list': 'ordered'}}, {{ 'list': 'bullet' }}],
+                            [{{ 'indent': '-1'}}, {{ 'indent': '+1' }}],
+                            [{{ 'align': [] }}],
+                            ['link', 'blockquote', 'code-block'],
+                            ['clean']
+                        ]
+                    }}
+                }});
+                console.log('✅ Quill editor initialized successfully');
+            }} else {{
+                console.error('❌ Quill.js not loaded');
+            }}
+        }});
+        
         function showTab(event, tabId) {{
             // Hide all tab contents
             var contents = document.getElementsByClassName('tab-content');
@@ -2301,7 +2323,8 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             event.preventDefault();
             
             const status = document.getElementById('new_status').value;
-            const notes = document.getElementById('status_notes').value;
+            // Get HTML content from Quill editor
+            const notes = quillEditor ? quillEditor.root.innerHTML : '';
             const messageDiv = document.getElementById('status-message');
             const submitBtn = document.getElementById('updateStatusBtn');
             const btnIcon = document.getElementById('btnIcon');
@@ -2314,6 +2337,9 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             
             // Clear form immediately
             document.getElementById('statusUpdateForm').reset();
+            if (quillEditor) {{
+                quillEditor.setContents([]);
+            }}
             
             // Show processing state
             submitBtn.disabled = true;
@@ -2437,9 +2463,9 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             }});
         }}
         
-        function copyHiringManagerIntros() {{
-            const hiringManagerContent = document.getElementById('hiring-manager-content');
-            const text = hiringManagerContent.textContent || hiringManagerContent.innerText;
+        function copyMessage(contentId) {{
+            const contentElement = document.getElementById(contentId);
+            const text = contentElement.textContent || contentElement.innerText;
             
             navigator.clipboard.writeText(text).then(function() {{
                 // Show success message
@@ -2450,7 +2476,7 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 
                 setTimeout(() => {{
                     button.innerHTML = originalText;
-                    button.style.background = '#28a745';
+                    button.style.background = '#007bff';
                 }}, 2000);
             }}).catch(function(err) {{
                 // Fallback for older browsers
@@ -2469,44 +2495,7 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 
                 setTimeout(() => {{
                     button.innerHTML = originalText;
-                    button.style.background = '#28a745';
-                }}, 2000);
-            }});
-        }}
-        
-        function copyRecruiterIntros() {{
-            const recruiterContent = document.getElementById('recruiter-content');
-            const text = recruiterContent.textContent || recruiterContent.innerText;
-            
-            navigator.clipboard.writeText(text).then(function() {{
-                // Show success message
-                const button = event.target;
-                const originalText = button.innerHTML;
-                button.innerHTML = '✅ Copied!';
-                button.style.background = '#20c997';
-                
-                setTimeout(() => {{
-                    button.innerHTML = originalText;
-                    button.style.background = '#17a2b8';
-                }}, 2000);
-            }}).catch(function(err) {{
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                // Show success message
-                const button = event.target;
-                const originalText = button.innerHTML;
-                button.innerHTML = '✅ Copied!';
-                button.style.background = '#20c997';
-                
-                setTimeout(() => {{
-                    button.innerHTML = originalText;
-                    button.style.background = '#17a2b8';
+                    button.style.background = '#007bff';
                 }}, 2000);
             }});
         }}
@@ -2583,7 +2572,7 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
         return timeline_html
     
     def _get_intro_messages_content(self, application, message_type: str) -> str:
-        """Get intro messages content from file"""
+        """Get intro messages content from file and format as separate copy-ready boxes"""
         try:
             if message_type == 'hiring_manager':
                 file_path = getattr(application, 'hiring_manager_intros_path', None)
@@ -2593,11 +2582,67 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 return "No intro messages available."
             
             if file_path and Path(file_path).exists():
-                return read_text_file(file_path)
+                content = read_text_file(file_path)
+                return self._format_intro_messages_as_boxes(content, message_type)
             else:
                 return f"No {message_type.replace('_', ' ')} intro messages found."
         except Exception as e:
             return f"Error loading {message_type.replace('_', ' ')} intro messages: {str(e)}"
+    
+    def _format_intro_messages_as_boxes(self, content: str, message_type: str) -> str:
+        """Format intro messages as separate copy-ready boxes"""
+        try:
+            # Split content by MESSAGE markers
+            messages = []
+            current_message = ""
+            
+            lines = content.split('\n')
+            for line in lines:
+                if line.strip().startswith('**MESSAGE'):
+                    if current_message.strip():
+                        messages.append(current_message.strip())
+                    current_message = line + '\n'
+                else:
+                    current_message += line + '\n'
+            
+            # Add the last message
+            if current_message.strip():
+                messages.append(current_message.strip())
+            
+            # If we don't have the expected format, return original content
+            if len(messages) < 3:
+                return content
+            
+            # Create HTML for each message box
+            html_boxes = []
+            for i, message in enumerate(messages, 1):
+                # Clean up the message content
+                clean_message = message.replace('**MESSAGE {}:**'.format(i), '').strip()
+                
+                # Create individual copy button ID
+                copy_button_id = f"copy-{message_type}-{i}"
+                content_id = f"{message_type}-content-{i}"
+                
+                box_html = f"""
+                <div style="margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 8px; background: white; overflow: hidden;">
+                    <div style="background: #f8f9fa; padding: 10px 15px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+                        <h4 style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">Message {i}</h4>
+                        <button onclick="copyMessage('{content_id}')" id="{copy_button_id}" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <div id="{content_id}" style="padding: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; white-space: pre-wrap; background: white;">
+{clean_message}
+                    </div>
+                </div>
+                """
+                html_boxes.append(box_html)
+            
+            return '\n'.join(html_boxes)
+            
+        except Exception as e:
+            # If parsing fails, return original content
+            return content
     
     def _get_match_score_color(self, score: float) -> str:
         """Get color based on match score"""

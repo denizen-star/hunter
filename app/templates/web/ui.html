@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Hunter - AI-Powered Application Manager</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -480,6 +485,61 @@
             box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
             transform: translateY(-1px);
         }
+        
+        /* Quill Editor Styles */
+        .ql-editor {
+            min-height: 120px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+        
+        .ql-toolbar {
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .ql-container {
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            font-family: inherit;
+        }
+        
+        .ql-container.ql-snow:focus-within {
+            border-color: #8b9dc3;
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+        }
+        
+        .ql-toolbar.ql-snow {
+            border-color: rgba(139, 157, 195, 0.3);
+        }
+        
+        .ql-toolbar.ql-snow .ql-picker-label {
+            border-color: transparent;
+        }
+        
+        .ql-toolbar.ql-snow .ql-picker-options {
+            border-color: rgba(139, 157, 195, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+        }
+        
+        .ql-toolbar.ql-snow button {
+            border-radius: 6px;
+            margin: 2px;
+        }
+        
+        .ql-toolbar.ql-snow button:hover {
+            background-color: rgba(139, 157, 195, 0.1);
+        }
+        
+        .ql-toolbar.ql-snow button.ql-active {
+            background-color: rgba(139, 157, 195, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -691,7 +751,8 @@
                 
                 <div class="form-group">
                     <label for="status_notes">Notes (Optional)</label>
-                    <textarea id="status_notes" placeholder="Add notes about this status update..." style="min-height: 120px; resize: vertical;"></textarea>
+                    <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                    <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
                 </div>
                 
                 <button type="submit" class="btn" style="background: #fd7e14; display: flex; align-items: center; gap: 8px; justify-content: center;">
@@ -990,6 +1051,7 @@
         // Status Update Module Functions
         let selectedApplicationId = null;
         let searchTimeout = null;
+        let quillEditor = null;
         
         async function showStatusUpdate() {
             document.getElementById('application-form').classList.add('hidden');
@@ -1000,6 +1062,42 @@
             document.getElementById('statusUpdateForm').reset();
             selectedApplicationId = null;
             document.getElementById('application_dropdown').classList.add('hidden');
+            
+            // Initialize Quill editor if not already initialized
+            if (!quillEditor) {
+                try {
+                    // Check if Quill is available
+                    if (typeof Quill === 'undefined') {
+                        console.error('Quill.js library not loaded');
+                        showStatus(' Rich text editor not available. Please refresh the page.', 'error');
+                        return;
+                    }
+                    
+                    quillEditor = new Quill('#status_notes', {
+                        theme: 'snow',
+                        placeholder: 'Add notes about this status update...',
+                        modules: {
+                            toolbar: [
+                                [{ 'header': [1, 2, 3, false] }],
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                                [{ 'align': [] }],
+                                ['link', 'blockquote', 'code-block'],
+                                ['clean']
+                            ]
+                        }
+                    });
+                    console.log('Quill editor initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Quill editor:', error);
+                    showStatus(' Error initializing rich text editor. Please refresh the page.', 'error');
+                }
+            } else {
+                // Clear the editor content
+                quillEditor.setContents([]);
+            }
             
             // Add event listeners
             const searchInput = document.getElementById('application_search');
@@ -1088,7 +1186,8 @@
             }
             
             const status = document.getElementById('new_status').value;
-            const notes = document.getElementById('status_notes').value;
+            // Get HTML content from Quill editor
+            const notes = quillEditor ? quillEditor.root.innerHTML : '';
             
             if (!status) {
                 showStatus(' Please select a status', 'error');
@@ -1115,6 +1214,9 @@
                     
                     // Reset form
                     document.getElementById('statusUpdateForm').reset();
+                    if (quillEditor) {
+                        quillEditor.setContents([]);
+                    }
                     selectedApplicationId = null;
                 } else {
                     showStatus(` Error: ${result.error}`, 'error');
@@ -1196,6 +1298,15 @@
         }
         
         // Simple loading state - no complex animation needed
+        
+        // Test Quill availability on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Quill !== 'undefined') {
+                console.log('✅ Quill.js loaded successfully');
+            } else {
+                console.error('❌ Quill.js not loaded');
+            }
+        });
     </script>
 </body>
 </html>
