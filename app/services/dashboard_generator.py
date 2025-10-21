@@ -545,12 +545,12 @@ class DashboardGenerator:
             }}
         }}
         
-        // Initialize with first tab active
+        // Initialize with active tab as default
         document.addEventListener('DOMContentLoaded', function() {{
-            // Activate first tab by default
-            const firstTab = document.querySelector('.tab');
-            if (firstTab) {{
-                const status = firstTab.dataset.status;
+            // Activate 'active' tab by default (landing page)
+            const activeTab = document.querySelector('[data-status="active"]');
+            if (activeTab) {{
+                const status = activeTab.dataset.status;
                 switchTab(status);
             }}
         }});
@@ -561,8 +561,9 @@ class DashboardGenerator:
     
     def _create_tabs_html(self, applications: List[Application], status_counts: dict) -> str:
         """Create the tabbed interface HTML"""
-        # Define status order with 'all' first, then as shown in the image
+        # Define status order with 'active' first (as landing page), then 'all', then as shown in the image
         status_order = [
+            'active',
             'all',
             'pending',
             'applied', 
@@ -577,7 +578,11 @@ class DashboardGenerator:
         # Create tab headers
         tab_headers = ""
         for status in status_order:
-            if status == 'all':
+            if status == 'active':
+                # Count all applications except rejected ones
+                count = len([app for app in applications if app.status.lower() != 'rejected'])
+                status_display = "Active"
+            elif status == 'all':
                 count = len(applications)  # Total count for all applications
                 status_display = "All"
             else:
@@ -599,10 +604,15 @@ class DashboardGenerator:
         # Create tab contents
         tab_contents = ""
         for status in status_order:
-            if status == 'all':
+            if status == 'active':
+                # All applications except rejected ones
+                status_apps = [app for app in applications if app.status.lower() != 'rejected']
+                status_title = "Active Applications"
+                default_display = 'block'  # Show 'active' tab by default (landing page)
+            elif status == 'all':
                 status_apps = applications  # All applications
                 status_title = "All Applications"
-                default_display = 'block'  # Show 'all' tab by default
+                default_display = 'none'  # No longer the default
             else:
                 status_apps = [app for app in applications if app.status.lower() == status]
                 # Use full names in content area for clarity

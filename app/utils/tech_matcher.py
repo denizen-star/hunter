@@ -14,7 +14,6 @@ class TechnologyMatcher:
         'java': ['java'],
         'javascript': ['javascript', 'js', 'node.js', 'nodejs', 'node js'],
         'typescript': ['typescript', 'ts'],
-        'r': [r'\br\b', r'\br programming\b'],  # regex pattern to avoid matching "r" in words
         'scala': ['scala'],
         'go': ['golang', r'\bgo\b'],
         'rust': ['rust'],

@@ -77,7 +77,6 @@ class SimpleTechExtractor:
         'PL/SQL': ['pl/sql', 'plsql', 'pl sql'],
         'JavaScript': ['javascript', 'js', 'node.js', 'nodejs'],
         'TypeScript': ['typescript', 'ts'],
-        'R': [r'\br\b', r'\br programming\b'],
         'Go': ['golang', r'\bgo\b'],
         'Rust': ['rust'],
         'C++': ['c++', 'cpp', 'c plus plus'],
