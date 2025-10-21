@@ -268,12 +268,37 @@ class PreliminaryMatcher:
         """Check if a job skill matches any candidate skill"""
         job_skill_normalized = self.normalize_skill_name(job_skill)
         
+        # Define skill equivalence mappings
+        skill_equivalences = {
+            'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],
+            'amazon kinesis': ['aws', 'kinesis', 'streaming', 'data streaming'],
+            'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],
+            'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],
+            'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'planning'],
+            'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing'],
+            'cloud platforms': ['aws', 'azure', 'gcp', 'cloud'],
+        }
+        
         for candidate_skill in matched_skills:
             candidate_skill_normalized = self.normalize_skill_name(candidate_skill)
+            
+            # Direct match
             if (job_skill_normalized == candidate_skill_normalized or 
                 job_skill_normalized in candidate_skill_normalized or
                 candidate_skill_normalized in job_skill_normalized):
                 return True
+            
+            # Check for skill equivalences
+            if job_skill_normalized in skill_equivalences:
+                for equivalent in skill_equivalences[job_skill_normalized]:
+                    if equivalent in candidate_skill_normalized:
+                        return True
+            
+            # Check reverse equivalences
+            for skill_key, equivalents in skill_equivalences.items():
+                if job_skill_normalized in equivalents and skill_key in candidate_skill_normalized:
+                    return True
+                    
         return False
     
     def _is_partial_match(self, skill: str, job_desc: str) -> bool:

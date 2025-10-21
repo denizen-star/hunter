@@ -27,6 +27,15 @@ CRITICAL: Before listing any skill as "Missing", carefully examine the resume fo
 - Related technologies or tools that demonstrate the skill
 - Industry experience that implies the skill
 - Educational background that supports the skill
+- EQUIVALENT or RELATED skills that demonstrate the same capabilities
+
+IMPORTANT: Be GENEROUS in recognizing skills. For overqualified candidates, look for:
+- "AWS Lake Formation" is covered by general AWS experience
+- "Amazon Kinesis" is covered by AWS streaming/data experience
+- "Budget Management" is covered by leadership, management, or financial experience
+- "Financial Management" is covered by budget, management, or leadership experience
+- "Product Strategy" is covered by strategy, planning, or product experience
+- "Data Engineering" is covered by data warehousing, ETL, or data processing experience
 
 For example:
 - "Leadership" is demonstrated by managing teams, directing projects, or having leadership titles
@@ -35,6 +44,7 @@ For example:
 - "Business Intelligence" is demonstrated by experience with BI tools, analytics, reporting, dashboards
 - "Data Engineering" is demonstrated by ETL processes, data pipelines, data warehousing, etc.
 - "Cloud Platforms" is demonstrated by AWS, Azure, GCP experience or cloud-related projects
+- "AWS Services" (specific) are demonstrated by general AWS experience or cloud platform experience
 
 Please provide a detailed analysis in the following format:
 

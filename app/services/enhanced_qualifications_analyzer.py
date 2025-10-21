@@ -85,11 +85,18 @@ PRELIMINARY MATCHING RESULTS:
 
 Based on the preliminary matching results above, please provide a focused analysis in the following format:
 
+IMPORTANT: Be GENEROUS in recognizing skills and experience. Look for equivalent or related skills that demonstrate the same capabilities. For example:
+- "AWS experience" covers AWS Lake Formation, Kinesis, etc.
+- "Data engineering" covers data warehousing, ETL, pipelines, etc.
+- "Leadership" covers team management, budget management, financial oversight, etc.
+- "Strategy" covers product strategy, business strategy, planning, etc.
+- "Cloud platforms" covers AWS, Azure, GCP and their specific services
+
 ## Skills Match Summary
-- Match Score: [percentage as a number, e.g., 85]
+- Match Score: [percentage as a number, e.g., 85 - be generous for overqualified candidates]
 - Features Compared: [total number of features/skills analyzed]
-- Strong Matches: [list of strong matches from preliminary analysis]
-- Missing Skills: [list of skills that are genuinely absent, focusing on the AI focus areas]
+- Strong Matches: [list of strong matches from preliminary analysis + equivalent skills found]
+- Missing Skills: [ONLY list skills that are genuinely absent - be very conservative here]
 - Partial Matches: [list of partial matches that need context analysis]
 
 ## Skills Analysis by Category
