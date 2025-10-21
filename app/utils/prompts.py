@@ -24,11 +24,17 @@ CRITICAL: Before listing any skill as "Missing", carefully examine the resume fo
 - Bullet points describing relevant experience
 - Years of experience in related roles
 - Specific achievements that demonstrate the skill
+- Related technologies or tools that demonstrate the skill
+- Industry experience that implies the skill
+- Educational background that supports the skill
 
 For example:
 - "Leadership" is demonstrated by managing teams, directing projects, or having leadership titles
 - "Product Management" is demonstrated by product manager roles, roadmaps, feature specifications, etc.
 - "Data Strategy" is demonstrated by strategic planning, roadmaps, data initiatives, etc.
+- "Business Intelligence" is demonstrated by experience with BI tools, analytics, reporting, dashboards
+- "Data Engineering" is demonstrated by ETL processes, data pipelines, data warehousing, etc.
+- "Cloud Platforms" is demonstrated by AWS, Azure, GCP experience or cloud-related projects
 
 Please provide a detailed analysis in the following format:
 

@@ -65,6 +65,19 @@ class PreliminaryMatcher:
         # Convert to lowercase and remove extra spaces
         skill = skill.lower().strip()
         
+        # Skip invalid skills early
+        invalid_patterns = [
+            r'^etc\.\)?$',  # "etc.)" or "etc."
+            r'^\)$',        # Just ")"
+            r'^\d+\)?$',    # Just numbers
+            r'^[^a-zA-Z]+$', # No letters
+            r'^.{1,2}$'     # Too short (1-2 characters)
+        ]
+        
+        for pattern in invalid_patterns:
+            if re.match(pattern, skill, re.IGNORECASE):
+                return ""  # Return empty string for invalid skills
+        
         # Remove common prefixes/suffixes
         prefixes_to_remove = [
             'experience with', 'knowledge of', 'proficiency in', 'expertise in',
@@ -113,6 +126,11 @@ class PreliminaryMatcher:
         matched_skills = set()
         for skill_name, skill_data in self.candidate_skills.items():
             skill_normalized = self.normalize_skill_name(skill_name)
+            
+            # Skip invalid or empty skills
+            if not skill_normalized:
+                continue
+                
             skill_variations = [skill_normalized] + skill_data.get('variations_found', [])
             
             # Check for exact matches
@@ -120,11 +138,11 @@ class PreliminaryMatcher:
             partial_match = False
             
             for variation in skill_variations:
-                if variation in job_desc_lower:
+                if variation and variation in job_desc_lower:
                     exact_match = True
                     matched_skills.add(skill_name)
                     break
-                elif self._is_partial_match(variation, job_desc_lower):
+                elif variation and self._is_partial_match(variation, job_desc_lower):
                     partial_match = True
                     matched_skills.add(skill_name)
             
@@ -205,7 +223,7 @@ class PreliminaryMatcher:
         
         # Also extract specific skills mentioned in the job description
         specific_skills = [
-            "python", "r", "sql", "tableau", "power bi", "looker", "excel", "sheets",
+            "python", "sql", "tableau", "power bi", "looker", "excel", "sheets",
             "aws", "azure", "gcp", "cloud", "docker", "kubernetes",
             "leadership", "management", "team", "mentoring", "coaching",
             "strategy", "strategic", "business intelligence", "analytics", "forecasting",
@@ -216,7 +234,35 @@ class PreliminaryMatcher:
             if skill in job_desc_lower and skill not in [s.lower() for s in job_skills]:
                 job_skills.append(skill.title())
         
-        return job_skills
+        # Filter out invalid skills and clean up the list
+        filtered_skills = []
+        invalid_patterns = [
+            r'^etc\.\)?$',  # "etc.)" or "etc."
+            r'^\)$',        # Just ")"
+            r'^\d+\)?$',    # Just numbers
+            r'^[^a-zA-Z]+$', # No letters
+            r'^.{1,2}$',    # Too short (1-2 characters)
+            r'^tools and technologies:$',  # Section headers
+            r'^experience in$',  # Incomplete phrases
+            r'^bonus\)?$',  # Bonus items
+            r'^not specified\)?$',  # Placeholder text
+            r'^\d+\+ years',  # Years of experience without skill
+        ]
+        
+        for skill in job_skills:
+            skill_clean = skill.strip()
+            is_valid = True
+            
+            for pattern in invalid_patterns:
+                if re.match(pattern, skill_clean, re.IGNORECASE):
+                    is_valid = False
+                    break
+            
+            # Additional validation - must have meaningful content
+            if is_valid and len(skill_clean) > 3 and skill_clean not in filtered_skills:
+                filtered_skills.append(skill_clean)
+        
+        return filtered_skills
     
     def _is_skill_matched(self, job_skill: str, matched_skills: set) -> bool:
         """Check if a job skill matches any candidate skill"""
