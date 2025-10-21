@@ -122,6 +122,9 @@ class PreliminaryMatcher:
             'match_details': {}
         }
         
+        # Extract job skills first
+        job_skills_found = self._extract_job_skills_from_description(job_description)
+        
         # Check each candidate skill against job description
         matched_skills = set()
         for skill_name, skill_data in self.candidate_skills.items():
@@ -147,14 +150,20 @@ class PreliminaryMatcher:
                     matched_skills.add(skill_name)
             
             if exact_match:
+                # Find which job skill this matches
+                matched_job_skill = self._find_matched_job_skill(skill_name, skill_normalized, job_skills_found)
                 matches['exact_matches'].append({
                     'skill': skill_name,
+                    'job_skill': matched_job_skill,
                     'category': skill_data.get('category', 'Unknown'),
                     'source': skill_data.get('source', 'Unknown')
                 })
             elif partial_match:
+                # Find which job skill this matches
+                matched_job_skill = self._find_matched_job_skill(skill_name, skill_normalized, job_skills_found)
                 matches['partial_matches'].append({
                     'skill': skill_name,
+                    'job_skill': matched_job_skill,
                     'category': skill_data.get('category', 'Unknown'),
                     'source': skill_data.get('source', 'Unknown')
                 })
@@ -169,7 +178,6 @@ class PreliminaryMatcher:
                 })
         
         # Find job skills that don't match candidate skills
-        job_skills_found = self._extract_job_skills_from_description(job_description)
         for job_skill in job_skills_found:
             if not self._is_skill_matched(job_skill, matched_skills):
                 matches['unmatched_job_skills'].append(job_skill)
@@ -232,11 +240,11 @@ class PreliminaryMatcher:
             "key responsibilities and duties"
         ]
         
-        # Check against known job skills patterns
+        # Check against known job skills patterns (only exact matches to avoid noise)
         for category, skills in self.job_skills.items():
             for skill in skills:
                 skill_normalized = self.normalize_skill_name(skill)
-                if skill_normalized in job_desc_lower or self._is_partial_match(skill_normalized, job_desc_lower):
+                if skill_normalized and skill_normalized in job_desc_lower:
                     job_skills.append(skill)
         
         # Also extract specific skills mentioned in the job description
@@ -268,6 +276,14 @@ class PreliminaryMatcher:
             r'^bonus\)?$',  # Bonus items
             r'^not specified\)?$',  # Placeholder text
             r'^\d+\+ years',  # Years of experience without skill
+            r'^.{50,}$',     # Too long (more than 50 characters)
+            r'^.*experience.*$',  # Phrases about experience
+            r'^.*years.*$',  # Phrases about years
+            r'^.*degree.*$',  # Phrases about degrees
+            r'^.*bachelor.*$',  # Phrases about bachelor's
+            r'^.*master.*$',  # Phrases about master's
+            r'^.*minimum.*$',  # Phrases about minimum requirements
+            r'^.*preferred.*$',  # Phrases about preferred qualifications
         ]
         
         for skill in job_skills:
@@ -279,11 +295,18 @@ class PreliminaryMatcher:
                     is_valid = False
                     break
             
-            # Additional validation - must have meaningful content
-            if is_valid and len(skill_clean) > 3 and skill_clean not in filtered_skills:
+            # Additional validation - must have meaningful content and be reasonable length
+            if (is_valid and 
+                len(skill_clean) > 3 and 
+                len(skill_clean) < 50 and 
+                skill_clean not in filtered_skills and
+                not any(word in skill_clean.lower() for word in ['experience', 'years', 'degree', 'minimum', 'preferred', 'bachelor', 'master'])):
                 filtered_skills.append(skill_clean)
         
-        return filtered_skills
+        # CRITICAL: Deduplicate and consolidate similar skills
+        consolidated_skills = self._consolidate_similar_skills(filtered_skills)
+        
+        return consolidated_skills
     
     def _is_skill_matched(self, job_skill: str, matched_skills: set) -> bool:
         """Check if a job skill matches any candidate skill"""
@@ -464,6 +487,113 @@ Please focus your analysis on the areas above and provide detailed insights on:
             formatted.append(f"- {skill}")
         
         return "\n".join(formatted)
+    
+    def _consolidate_similar_skills(self, skills: list) -> list:
+        """Consolidate similar skills to avoid duplicates and inflated counts"""
+        consolidated = []
+        skill_groups = {
+            # BI Tools consolidation
+            'tableau': ['tableau', 'bi tools', 'bi tool expertise', 'bi platforms'],
+            'power bi': ['power bi', 'powerbi'],
+            'looker': ['looker'],
+            'sql': ['sql'],
+            
+            # Cloud platforms
+            'aws': ['aws', 'amazon web services'],
+            'azure': ['azure', 'microsoft azure'],
+            'gcp': ['gcp', 'google cloud', 'google cloud platform'],
+            'cloud': ['cloud', 'cloud platforms', 'cloud-based', 'cloud data platforms'],
+            
+            # Data engineering
+            'spark': ['spark', 'apache spark'],
+            'hadoop': ['hadoop', 'apache hadoop'],
+            'airflow': ['airflow', 'data orchestration', 'orchestration'],
+            'etl': ['etl', 'extract transform load'],
+            'data warehousing': ['data warehousing', 'data warehouse'],
+            
+            # Analytics and BI
+            'business intelligence': ['business intelligence', 'bi', 'bi platforms'],
+            'data analytics': ['data analytics', 'analytics'],
+            'data science': ['data science'],
+            'machine learning': ['machine learning', 'ml'],
+            
+            # Leadership and management
+            'leadership': ['leadership', 'team leadership'],
+            'management': ['management', 'team management', 'project management'],
+            'strategy': ['strategy', 'strategic', 'strategic planning'],
+            
+            # Programming
+            'python': ['python'],
+        }
+        
+        # Track which skills have been consolidated
+        used_skills = set()
+        
+        for skill in skills:
+            skill_lower = skill.lower()
+            
+            # Skip if already used
+            if skill_lower in used_skills:
+                continue
+                
+            # Check if this skill belongs to a group
+            found_group = False
+            for group_name, group_members in skill_groups.items():
+                for member in group_members:
+                    if member in skill_lower or skill_lower in member:
+                        # Use the canonical name
+                        if group_name not in [s.lower() for s in consolidated]:
+                            consolidated.append(group_name)
+                        used_skills.add(skill_lower)
+                        used_skills.add(member)
+                        found_group = True
+                        break
+                if found_group:
+                    break
+            
+            # If not in any group and not already used, add as-is
+            if not found_group and skill_lower not in used_skills:
+                consolidated.append(skill_lower)
+                used_skills.add(skill_lower)
+        
+        return consolidated
+    
+    def _find_matched_job_skill(self, candidate_skill: str, candidate_skill_normalized: str, job_skills: list) -> str:
+        """Find which job skill matches a candidate skill"""
+        # First try to find exact matches by checking if the candidate skill matches any job skill
+        for job_skill in job_skills:
+            job_skill_normalized = self.normalize_skill_name(job_skill)
+            
+            # Check for exact matches
+            if candidate_skill_normalized == job_skill_normalized:
+                return job_skill
+            
+            # Check for substring matches (exact match logic)
+            if (candidate_skill_normalized in job_skill_normalized or 
+                job_skill_normalized in candidate_skill_normalized):
+                return job_skill
+        
+        # If no exact match, try to find the best partial match using word overlap
+        best_match = None
+        best_score = 0
+        
+        for job_skill in job_skills:
+            job_skill_normalized = self.normalize_skill_name(job_skill)
+            
+            # Calculate word overlap score
+            candidate_words = set(candidate_skill_normalized.split())
+            job_words = set(job_skill_normalized.split())
+            
+            if candidate_words and job_words:
+                overlap = len(candidate_words & job_words)
+                total_words = len(candidate_words | job_words)
+                score = overlap / total_words if total_words > 0 else 0
+                
+                if score > best_score and score > 0.3:  # At least 30% overlap
+                    best_score = score
+                    best_match = job_skill
+        
+        return best_match if best_match else candidate_skill
 
 if __name__ == "__main__":
     matcher = PreliminaryMatcher()

@@ -262,6 +262,9 @@ Provide an overall assessment considering both the preliminary matching results 
         # Combine recommendations
         recommendations = ai_analysis.get('recommendations', [])
         
+        # Generate skill mapping
+        skill_mapping = self._generate_skill_mapping(preliminary_analysis)
+        
         # Create detailed analysis
         detailed_analysis = f"""
 PRELIMINARY MATCHING RESULTS:
@@ -269,6 +272,8 @@ PRELIMINARY MATCHING RESULTS:
 - Exact Matches: {len(preliminary_analysis.get('exact_matches', []))}
 - Partial Matches: {len(preliminary_analysis.get('partial_matches', []))}
 - AI Focus Areas: {', '.join(preliminary_analysis.get('ai_focus_areas', []))}
+
+{skill_mapping}
 
 {ai_analysis.get('detailed_analysis', '')}
 """
@@ -283,6 +288,57 @@ PRELIMINARY MATCHING RESULTS:
             recommendations=recommendations,
             detailed_analysis=detailed_analysis
         )
+    
+    def _generate_skill_mapping(self, preliminary_analysis: Dict) -> str:
+        """Generate skill mapping showing extracted job skills and their matches"""
+        mapping_lines = ["SKILL MAPPING (Job Skills → Matched Skills):"]
+        mapping_lines.append("=" * 60)
+        
+        # Get all extracted job skills
+        all_job_skills = set()
+        
+        # Add exact matches
+        for match in preliminary_analysis.get('exact_matches', []):
+            all_job_skills.add(match['job_skill'])
+        
+        # Add partial matches  
+        for match in preliminary_analysis.get('partial_matches', []):
+            all_job_skills.add(match['job_skill'])
+        
+        # Add unmatched skills
+        for skill in preliminary_analysis.get('unmatched_job_skills', []):
+            all_job_skills.add(skill)
+        
+        # Sort skills alphabetically
+        sorted_skills = sorted(all_job_skills)
+        
+        for job_skill in sorted_skills:
+            # Find if this skill has a match
+            matched_skill = None
+            match_type = None
+            
+            # Check exact matches
+            for match in preliminary_analysis.get('exact_matches', []):
+                if match['job_skill'] == job_skill:
+                    matched_skill = match['skill']
+                    match_type = "EXACT"
+                    break
+            
+            # Check partial matches
+            if not matched_skill:
+                for match in preliminary_analysis.get('partial_matches', []):
+                    if match['job_skill'] == job_skill:
+                        matched_skill = match['skill']
+                        match_type = "PARTIAL"
+                        break
+            
+            # Format the mapping line
+            if matched_skill:
+                mapping_lines.append(f"{job_skill} --> {matched_skill} ({match_type})")
+            else:
+                mapping_lines.append(f"{job_skill} ---------------------")
+        
+        return "\n".join(mapping_lines)
 
 if __name__ == "__main__":
     # Test the enhanced analyzer

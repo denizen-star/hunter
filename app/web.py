@@ -680,16 +680,13 @@ def view_reports():
 def get_reports_data():
     """Get reports data for specified period"""
     try:
-        from datetime import datetime, timedelta
-        import pytz
+        from datetime import datetime, timedelta, timezone
         
         period = request.args.get('period', 'today')
-        
-        # Get all applications
         applications = job_processor.list_all_applications()
         
-        # Calculate date ranges
-        now = datetime.now(pytz.timezone('US/Eastern'))
+        # Calculate date ranges based on period
+        now = datetime.now(timezone(timedelta(hours=-4)))
         
         if period == 'today':
             start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -704,8 +701,12 @@ def get_reports_data():
         elif period == '30days':
             start_date = now - timedelta(days=30)
             end_date = now
-        else:  # all
-            start_date = datetime(2020, 1, 1, tzinfo=pytz.timezone('US/Eastern'))
+        elif period == 'all':
+            start_date = datetime(2020, 1, 1, tzinfo=timezone(timedelta(hours=-4)))
+            end_date = now
+        else:
+            # Default to today
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = now
         
         # Filter applications by period
@@ -713,16 +714,16 @@ def get_reports_data():
         status_changes = []
         
         for app in applications:
-            # Check if application was created in period
-            if start_date <= app.created_at <= end_date:
+            # Convert application datetimes to the same timezone format for comparison
+            app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+            app_status_updated_at = app.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if app.status_updated_at else None
+            
+            if start_date <= app_created_at <= end_date:
                 period_applications.append(app)
             
-            # Check if status was updated in period (must be significantly different from creation)
-            if app.status_updated_at and start_date <= app.status_updated_at <= end_date:
-                # Check if the status update was significantly different from creation (more than 1 minute)
-                time_diff = abs((app.status_updated_at - app.created_at).total_seconds())
-                if time_diff > 60:  # More than 1 minute difference
-                    status_changes.append(app)
+            # Check if status was updated in period
+            if app_status_updated_at and start_date <= app_status_updated_at <= end_date:
+                status_changes.append(app)
         
         # Applications by status (for period) - count applications created in period by their current status
         applications_by_status = {}
@@ -740,7 +741,6 @@ def get_reports_data():
                 status_changes_count += 1
             status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
         
-        
         # Follow-up applications (more than one week without updates)
         one_week_ago = now - timedelta(days=7)
         followup_applications = []
@@ -750,7 +750,11 @@ def get_reports_data():
             if app.status.lower() in ['rejected', 'accepted']:
                 continue
             
-            last_update = app.status_updated_at or app.created_at
+            # Convert to same timezone for comparison
+            app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+            app_status_updated_at = app.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if app.status_updated_at else None
+            
+            last_update = app_status_updated_at or app_created_at
             if last_update < one_week_ago:
                 # Generate summary URL
                 summary_url = None

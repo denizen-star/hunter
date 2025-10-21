@@ -625,7 +625,13 @@ class DashboardGenerator:
                 default_display = 'none'
             
             # Sort applications by updated timestamp (newest first) by default
-            status_apps.sort(key=lambda x: x.status_updated_at or x.created_at, reverse=True)
+            # Use string comparison to avoid datetime timezone issues
+            def safe_datetime_sort_key(app):
+                if app.status_updated_at:
+                    return str(app.status_updated_at)
+                return str(app.created_at)
+            
+            status_apps.sort(key=safe_datetime_sort_key, reverse=True)
             
             cards_html = ""
             for app in status_apps:

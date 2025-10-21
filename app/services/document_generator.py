@@ -1639,6 +1639,14 @@ class DocumentGenerator:
                 if file_path and file_path.exists():
                     return read_text_file(file_path)
             
+            # Look for timestamped raw files (new pattern)
+            import glob
+            raw_files = list(folder_path.glob("*-raw.txt"))
+            if raw_files:
+                # Get the most recent raw file
+                raw_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+                return read_text_file(raw_files[0])
+            
             # Common patterns for original job description files
             possible_files = [
                 folder_path / "job_description.txt",
