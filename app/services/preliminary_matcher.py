@@ -189,9 +189,27 @@ class PreliminaryMatcher:
         matches['matched_count'] = exact_count + partial_count
         matches['missing_count'] = matches['total_required'] - matched_job_skills
         
-        # Calculate match score based on job requirements
+        # Calculate match score based on job requirements with overqualification bonus
         if total_job_skills > 0:
-            matches['match_score'] = round((matched_job_skills / total_job_skills) * 100, 2)
+            base_score = (matched_job_skills / total_job_skills) * 100
+            
+            # Apply overqualification bonus - if candidate has significantly more skills than required
+            total_candidate_skills = len(self.candidate_skills)
+            overqualification_ratio = total_candidate_skills / total_job_skills if total_job_skills > 0 else 1
+            
+            # If candidate is overqualified (has 2x+ more skills than required)
+            if overqualification_ratio >= 2.0:
+                # Apply significant overqualification bonus
+                if overqualification_ratio >= 4.0:  # 4x+ overqualified
+                    overqualification_bonus = 35  # 35% bonus for highly overqualified
+                elif overqualification_ratio >= 3.0:  # 3x+ overqualified
+                    overqualification_bonus = 25  # 25% bonus for very overqualified
+                else:  # 2x+ overqualified
+                    overqualification_bonus = 15  # 15% bonus for overqualified
+                
+                base_score = min(100, base_score + overqualification_bonus)
+            
+            matches['match_score'] = round(base_score, 2)
         else:
             # Fallback to candidate skills if no job skills found
             total_skills = len(self.candidate_skills)

@@ -1003,21 +1003,26 @@ class DocumentGenerator:
             research_prompt = f"""
             Please research the company "{company_name}" and provide detailed information in the following format:
 
-            COMPANY WEBSITE: [Official website URL if found]
+            COMPANY WEBSITE: [Official website URL if found - provide clean URL without markdown formatting]
 
-            MISSION STATEMENT: [Company's mission statement or purpose]
+            MISSION STATEMENT: [Company's mission statement or purpose - provide the actual mission statement]
 
-            VISION STATEMENT: [Company's vision statement or long-term goals]
+            VISION STATEMENT: [Company's vision statement or long-term goals - provide the actual vision statement]
 
-            PRODUCTS & SERVICES: [Detailed description of what the company does, their main products/services]
+            PRODUCTS & SERVICES: [Detailed description of what the company does, their main products/services - be specific about their business model and offerings]
 
-            COMPETITORS: [Main competitors in their industry]
+            COMPETITORS: [Main competitors in their industry - list specific competitor companies]
 
-            RECENT NEWS: [List 3-5 recent news items about the company with dates and sources]
+            RECENT NEWS: [List 3-5 recent news items about the company with dates and sources - provide actual recent news]
 
-            KEY PERSONNEL: [List key executives or personnel in data/technology roles with their titles]
+            KEY PERSONNEL: [List key executives or personnel in data/technology roles with their titles - provide actual names and titles]
 
-            Please provide specific, accurate information about {company_name}. If you cannot find specific information, please state "Information not readily available" rather than making up generic content.
+            IMPORTANT: 
+            - Provide specific, accurate information about {company_name}
+            - Use clean text without markdown formatting
+            - If you cannot find specific information, state "Information not readily available"
+            - Do not make up generic content
+            - Focus on factual, verifiable information
             """
             
             print(f"🔍 Generating comprehensive research for {company_name}...")
@@ -1055,8 +1060,10 @@ class DocumentGenerator:
             if website_match:
                 website = website_match.group(1).strip()
                 if website and not website.lower().startswith('information not'):
-                    # Clean up markdown formatting
+                    # Clean up markdown formatting and extract clean URL
                     website = re.sub(r'\*\*', '', website)
+                    website = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', website)  # Remove markdown links
+                    website = re.sub(r'^\s*\[|\]\s*$', '', website)  # Remove brackets
                     research_data['website'] = website
             
             # Extract mission
