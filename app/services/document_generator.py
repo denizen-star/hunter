@@ -652,15 +652,16 @@ class DocumentGenerator:
             
             # Company Website Section
             if research_data.get('website'):
-                html_parts.append('''
+                website_url = research_data['website']
+                html_parts.append(f'''
                 <div class="research-section">
                     <h3>🌐 Company Website</h3>
                     <div class="research-item">
                         <h4>Official Website</h4>
-                        <p><a href="{website}" target="_blank">{website}</a></p>
+                        <p><a href="{website_url}" target="_blank">{website_url}</a></p>
                     </div>
                 </div>
-                '''.format(website=research_data['website']))
+                ''')
             
             # Mission & Vision Section
             if research_data.get('mission') or research_data.get('vision'):
@@ -736,11 +737,12 @@ class DocumentGenerator:
                 
                 for news_item in research_data['news']:
                     source_badge = f'<span style="background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 600; margin-right: 8px;">{news_item.get("source", "News")}</span>'
+                    url_link = f'<a href="{news_item.get("url", "#")}" target="_blank" class="news-link">Read more →</a>' if news_item.get("url") else ''
                     html_parts.append(f'''
                     <div class="news-item">
                         <h5>{source_badge}{news_item["title"]}</h5>
                         <p>{news_item["summary"]}</p>
-                        <a href="{news_item["url"]}" target="_blank" class="news-link">Read more →</a>
+                        {url_link}
                     </div>
                     ''')
                 
@@ -983,6 +985,8 @@ class DocumentGenerator:
             
         except Exception as e:
             print(f"Error in company research: {e}")
+            import traceback
+            traceback.print_exc()
             # Fall back to placeholder data if search fails
             research_data = self._get_fallback_research_data(company_name)
         
@@ -991,42 +995,173 @@ class DocumentGenerator:
     def _search_company_info(self, company_name: str, research_data: dict) -> dict:
         """Search for company information using web search"""
         try:
-            # This is a placeholder for web search functionality
-            # In a real implementation, you would use:
-            # - Google Search API
-            # - Bing Search API  
-            # - News APIs (NewsAPI, Reuters, etc.)
-            # - Company database APIs (Crunchbase, etc.)
-            # - LinkedIn API for personnel
-            # - Glassdoor API for company reviews
-            # - Google News API for enhanced news search
+            # Use AI to generate comprehensive company research
+            from app.services.ai_analyzer import AIAnalyzer
+            ai_analyzer = AIAnalyzer()
             
-            # For now, we'll use a web search tool if available
-            search_query = f"{company_name} company website mission vision"
+            # Create a comprehensive research prompt
+            research_prompt = f"""
+            Please research the company "{company_name}" and provide detailed information in the following format:
+
+            COMPANY WEBSITE: [Official website URL if found]
+
+            MISSION STATEMENT: [Company's mission statement or purpose]
+
+            VISION STATEMENT: [Company's vision statement or long-term goals]
+
+            PRODUCTS & SERVICES: [Detailed description of what the company does, their main products/services]
+
+            COMPETITORS: [Main competitors in their industry]
+
+            RECENT NEWS: [List 3-5 recent news items about the company with dates and sources]
+
+            KEY PERSONNEL: [List key executives or personnel in data/technology roles with their titles]
+
+            Please provide specific, accurate information about {company_name}. If you cannot find specific information, please state "Information not readily available" rather than making up generic content.
+            """
             
-            # Try to use web search (this would need to be implemented with actual search APIs)
-            # For demonstration, we'll return structured placeholder data
+            print(f"🔍 Generating comprehensive research for {company_name}...")
             
-            # Company Mission & Vision (would be scraped from actual website)
-            research_data['mission'] = f"{company_name} is committed to delivering innovative solutions and exceptional value to our customers through cutting-edge technology, dedicated service, and continuous innovation in our industry."
-            research_data['vision'] = f"To be the leading company in our industry, recognized globally for excellence, innovation, and positive impact on our community, stakeholders, and the world we serve."
+            # Get AI research response
+            research_response = ai_analyzer._call_ollama(research_prompt, system_prompt="You are a company research specialist. Provide accurate, specific information about companies. If you don't know specific details, say 'Information not readily available' rather than making up generic content.")
             
-            # Products, Services & Competitors (using real web search)
-            print(f"🔍 Searching for products/services and competitors for {company_name}...")
-            products_services = self._search_company_products_services(company_name)
-            competitors = self._search_company_competitors(company_name)
-            
-            research_data['products_services'] = products_services
-            research_data['competitors'] = competitors
-            
-            # Enhanced Latest News (would come from news APIs including Glassdoor and Google News)
-            research_data['news'] = self._get_company_news(company_name)
-            
-            # Key Personnel (would come from LinkedIn API or company directories)
-            research_data['personnel'] = self._get_company_personnel(company_name)
+            # Parse the AI response to extract structured data
+            research_data = self._parse_research_response(research_response, company_name)
             
         except Exception as e:
-            print(f"Error searching company info: {e}")
+            print(f"Error in AI research: {e}")
+            # Fall back to basic web search if AI fails
+            research_data = self._fallback_web_search(company_name, research_data)
+        
+        return research_data
+    
+    def _parse_research_response(self, response: str, company_name: str) -> dict:
+        """Parse AI research response into structured data"""
+        import re
+        
+        research_data = {
+            'website': None,
+            'mission': None,
+            'vision': None,
+            'products_services': None,
+            'competitors': None,
+            'news': [],
+            'personnel': []
+        }
+        
+        try:
+            # Extract website
+            website_match = re.search(r'COMPANY WEBSITE:\s*(.+)', response, re.IGNORECASE)
+            if website_match:
+                website = website_match.group(1).strip()
+                if website and not website.lower().startswith('information not'):
+                    # Clean up markdown formatting
+                    website = re.sub(r'\*\*', '', website)
+                    research_data['website'] = website
+            
+            # Extract mission
+            mission_match = re.search(r'MISSION STATEMENT:\s*(.+?)(?=\n[A-Z]|\n\n|$)', response, re.IGNORECASE | re.DOTALL)
+            if mission_match:
+                mission = mission_match.group(1).strip()
+                if mission and not mission.lower().startswith('information not'):
+                    # Clean up markdown formatting
+                    mission = re.sub(r'\*\*', '', mission)
+                    research_data['mission'] = mission
+            
+            # Extract vision
+            vision_match = re.search(r'VISION STATEMENT:\s*(.+?)(?=\n[A-Z]|\n\n|$)', response, re.IGNORECASE | re.DOTALL)
+            if vision_match:
+                vision = vision_match.group(1).strip()
+                if vision and not vision.lower().startswith('information not'):
+                    # Clean up markdown formatting
+                    vision = re.sub(r'\*\*', '', vision)
+                    research_data['vision'] = vision
+            
+            # Extract products & services
+            products_match = re.search(r'PRODUCTS & SERVICES:\s*(.+?)(?=\n[A-Z]|\n\n|$)', response, re.IGNORECASE | re.DOTALL)
+            if products_match:
+                products = products_match.group(1).strip()
+                if products and not products.lower().startswith('information not'):
+                    research_data['products_services'] = products
+            
+            # Extract competitors
+            competitors_match = re.search(r'COMPETITORS:\s*(.+?)(?=\n[A-Z]|\n\n|$)', response, re.IGNORECASE | re.DOTALL)
+            if competitors_match:
+                competitors = competitors_match.group(1).strip()
+                if competitors and not competitors.lower().startswith('information not'):
+                    research_data['competitors'] = competitors
+            
+            # Extract news items
+            news_match = re.search(r'RECENT NEWS:\s*(.+?)(?=\n[A-Z]|\n\n|$)', response, re.IGNORECASE | re.DOTALL)
+            if news_match:
+                news_text = news_match.group(1).strip()
+                if news_text and not news_text.lower().startswith('information not'):
+                    # Parse news items (assume they're bullet points or numbered)
+                    news_items = []
+                    lines = news_text.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if line and (line.startswith('-') or line.startswith('*') or line.startswith('•') or re.match(r'^\d+\.', line)):
+                            # Clean up the line
+                            clean_line = re.sub(r'^[-*•]\s*|\d+\.\s*', '', line)
+                            if clean_line:
+                                news_items.append({
+                                    'title': clean_line,
+                                    'summary': clean_line,
+                                    'source': 'Research'
+                                })
+                    research_data['news'] = news_items
+            
+            # Extract personnel
+            personnel_match = re.search(r'KEY PERSONNEL:\s*(.+?)(?=\n[A-Z]|\n\n|$)', response, re.IGNORECASE | re.DOTALL)
+            if personnel_match:
+                personnel_text = personnel_match.group(1).strip()
+                if personnel_text and not personnel_text.lower().startswith('information not'):
+                    # Parse personnel (assume they're bullet points or numbered)
+                    personnel_items = []
+                    lines = personnel_text.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if line and (line.startswith('-') or line.startswith('*') or line.startswith('•') or re.match(r'^\d+\.', line)):
+                            # Clean up the line and try to extract name and title
+                            clean_line = re.sub(r'^[-*•]\s*|\d+\.\s*', '', line)
+                            if clean_line:
+                                # Try to split name and title (assume format: "Name - Title" or "Name, Title")
+                                if ' - ' in clean_line:
+                                    parts = clean_line.split(' - ', 1)
+                                    name, title = parts[0].strip(), parts[1].strip()
+                                elif ', ' in clean_line:
+                                    parts = clean_line.split(', ', 1)
+                                    name, title = parts[0].strip(), parts[1].strip()
+                                else:
+                                    name, title = clean_line, 'Unknown Title'
+                                
+                                personnel_items.append({
+                                    'name': name,
+                                    'title': title
+                                })
+                    research_data['personnel'] = personnel_items
+            
+        except Exception as e:
+            print(f"Error parsing research response: {e}")
+        
+        return research_data
+    
+    def _fallback_web_search(self, company_name: str, research_data: dict) -> dict:
+        """Fallback web search when AI research fails"""
+        try:
+            # Generate basic company website URL
+            company_clean = company_name.lower().replace(' ', '').replace(',', '').replace('.', '').replace('llc', '').replace('inc', '').replace('corp', '').replace('corporation', '')
+            research_data['website'] = f"https://www.{company_clean}.com"
+            
+            # Provide basic information
+            research_data['mission'] = f"Specific mission statement for {company_name} not available in current research."
+            research_data['vision'] = f"Specific vision statement for {company_name} not available in current research."
+            research_data['products_services'] = f"Detailed information about {company_name}'s products and services not available in current research."
+            research_data['competitors'] = f"Competitor analysis for {company_name} not available in current research."
+            
+        except Exception as e:
+            print(f"Error in fallback search: {e}")
         
         return research_data
     
