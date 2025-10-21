@@ -242,7 +242,10 @@ class PreliminaryMatcher:
         # Also extract specific skills mentioned in the job description
         specific_skills = [
             "python", "sql", "tableau", "power bi", "looker", "excel", "sheets",
-            "aws", "azure", "gcp", "cloud", "docker", "kubernetes",
+            "aws", "azure", "gcp", "cloud", "docker", "kubernetes", "terraform",
+            "snowflake", "bigquery", "spark", "hadoop", "kafka", "airflow",
+            "machine learning", "ai", "data science", "data engineering",
+            "business intelligence", "analytics", "etl", "data warehousing",
             "leadership", "management", "team", "mentoring", "coaching",
             "strategy", "strategic", "business intelligence", "analytics", "forecasting",
             "pricing", "modeling", "financial", "budget", "planning"
