@@ -1,37 +1,44 @@
-# Job Hunter Documentation
+# 📚 Job Hunter Documentation Index
 
 Welcome to the Job Hunter documentation! This guide will help you understand and use the AI-powered job application management system.
 
-## 📚 Documentation Overview
+## 🗂️ Documentation Overview
 
-### Getting Started
+### 📖 **Getting Started**
+- **[README.md](README.md)** - Main project overview and quick start guide
+- **[WHAT_IS_HUNTER.md](WHAT_IS_HUNTER.md)** - Friendly explanation of what Hunter does and why it's useful
 - **[Quick Start Guide](QUICKSTART.md)** - Get up and running in 5 minutes
 - **[Installation Guide](INSTALLATION.md)** - Detailed installation instructions
-- **[Configuration Guide](CONFIGURATION.md)** - How to configure the application
 
-### User Guides
+### 👤 **User Guides**
 - **[User Guide](USER_GUIDE.md)** - Complete guide to using Job Hunter
-- **[Resume Management](RESUME_MANAGEMENT.md)** - How to manage your base and custom resumes
-- **[Application Workflow](APPLICATION_WORKFLOW.md)** - Understanding the application creation process
-
-### Technical Documentation
-- **[Architecture](ARCHITECTURE.md)** - System architecture and design decisions
-- **[API Reference](API_REFERENCE.md)** - Complete REST API documentation
-- **[Development Guide](DEVELOPMENT.md)** - For developers who want to contribute
-
-### Advanced Topics
-- **[Feature Extraction & Matching](FEATURE_EXTRACTION.md)** - Complete guide to feature extraction capacity and matching
-- **[Enhanced Matching System](ENHANCED_MATCHING_SYSTEM.md)** - Two-phase matching system with preliminary matching + focused AI
-- **[Technical Reference](TECHNICAL_REFERENCE.md)** - API reference and technical documentation for developers
 - **[User Guide - Enhanced Matching](USER_GUIDE_ENHANCED_MATCHING.md)** - User guide for the enhanced matching system
+- **[Custom Resume Guide](CUSTOM_RESUME_GUIDE.md)** - How to manage and customize your resume
+
+### 🔧 **Technical Documentation**
+- **[Technical Specification](TECHNICAL_SPECIFICATION.md)** - Complete technical specification and architecture
+- **[Technical Reference](TECHNICAL_REFERENCE.md)** - API reference and technical documentation for developers
+- **[API Reference](API_REFERENCE.md)** - Complete REST API documentation
+- **[Enhanced Matching System](ENHANCED_MATCHING_SYSTEM.md)** - Two-phase matching system with preliminary matching + focused AI
+- **[Feature Extraction & Matching](FEATURE_EXTRACTION.md)** - Complete guide to feature extraction capacity and matching
+
+### 🐛 **Support & Troubleshooting**
 - **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Changelog](CHANGELOG.md)** - Version history and changes
+- **[Release Notes v2.0.0](RELEASE_NOTES_v2.0.0.md)** - Latest release notes
+
+### 🤝 **Development**
+- **[Contributing](CONTRIBUTING.md)** - How to contribute to the project
+
+### 📦 **Archive**
+- **[archive/](archive/)** - Outdated documentation and historical files
 
 ## 🚀 Quick Links
 
-- [Main README](../README.md)
-- [Technical Specification](../TECHNICAL_SPECIFICATION.md)
-- [Changelog](../CHANGELOG.md)
-- [Custom Resume Guide](../CUSTOM_RESUME_GUIDE.md)
+- [Main README](README.md)
+- [Technical Specification](TECHNICAL_SPECIFICATION.md)
+- [Changelog](CHANGELOG.md)
+- [Custom Resume Guide](CUSTOM_RESUME_GUIDE.md)
 
 ## 📖 What is Job Hunter?
 
