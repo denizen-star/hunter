@@ -1,6 +1,7 @@
 """AI analysis service using Ollama"""
 import json
 import re
+from datetime import datetime
 from typing import Dict, List, Optional
 import requests
 from app.models.qualification import QualificationAnalysis

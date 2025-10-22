@@ -1,0 +1,334 @@
+/* Cover Letter Styling - Professional Design System */
+
+.cover-letter-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  background: #ffffff;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.6;
+  color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Header Section */
+.cover-letter-header {
+  text-align: right;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.candidate-info {
+  margin-bottom: 10px;
+}
+
+.candidate-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.contact-info {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.date {
+  font-size: 14px;
+  color: #666;
+  margin-top: 15px;
+}
+
+/* Content Sections */
+.cover-letter-content {
+  margin-bottom: 40px;
+}
+
+.salutation {
+  font-size: 16px;
+  font-weight: normal;
+  margin-bottom: 20px;
+}
+
+.paragraph {
+  margin-bottom: 20px;
+  text-align: justify;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.paragraph:last-of-type {
+  margin-bottom: 30px;
+}
+
+.closing {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.signature {
+  margin-top: 40px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ML Findings Section */
+.ml-findings-section {
+  margin-top: 40px;
+  padding: 30px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ml-findings-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #007bff;
+}
+
+.ml-icon {
+  width: 32px;
+  height: 32px;
+  background: #007bff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.ml-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.ml-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Match Score Card */
+.match-score-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #28a745;
+}
+
+.match-score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.match-score-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.match-score-value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.match-score-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.match-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Features Compared */
+.features-compared {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #007bff;
+}
+
+.features-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.features-icon {
+  width: 20px;
+  height: 20px;
+  background: #007bff;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: white;
+  font-size: 12px;
+}
+
+.features-count {
+  font-size: 18px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Strong Matches Section */
+.strong-matches {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #28a745;
+}
+
+.strong-matches-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.strong-matches-icon {
+  width: 20px;
+  height: 20px;
+  background: #28a745;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: white;
+  font-size: 12px;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  background: #e8f5e8;
+  color: #2d5a2d;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #c3e6c3;
+}
+
+/* Methodology Section */
+.methodology {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #6f42c1;
+}
+
+.methodology-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.methodology-icon {
+  width: 20px;
+  height: 20px;
+  background: #6f42c1;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: white;
+  font-size: 12px;
+}
+
+.methodology-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cover-letter-container {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .match-score-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .match-score-value {
+    font-size: 28px;
+  }
+  
+  .skills-list {
+    justify-content: center;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .cover-letter-container {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 20px;
+  }
+  
+  .ml-findings-section {
+    background: #f8f9fa !important;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .match-score-card,
+  .features-compared,
+  .strong-matches,
+  .methodology {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+  }
+}
+

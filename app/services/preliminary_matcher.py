@@ -193,29 +193,55 @@ class PreliminaryMatcher:
             if self._is_skill_matched(job_skill, matched_skills):
                 matched_job_skills += 1
         
+        # Store the unmatched job skills for penalty calculation
+        matches['unmatched_job_skills'] = [skill for skill in job_skills_found if not self._is_skill_matched(skill, matched_skills)]
+        
         matches['total_required'] = total_job_skills if total_job_skills > 0 else len(self.candidate_skills)
-        matches['matched_count'] = exact_count + partial_count
+        matches['matched_count'] = matched_job_skills  # Use actual matched job skills count
         matches['missing_count'] = matches['total_required'] - matched_job_skills
         
         # Calculate match score based on job requirements with overqualification bonus
         if total_job_skills > 0:
             base_score = (matched_job_skills / total_job_skills) * 100
             
-            # Apply overqualification bonus - if candidate has significantly more skills than required
+            # Apply overqualification bonus ONLY if no critical skills are missing
+            # Critical skills are those explicitly required in the job description
+            critical_skills_missing = len(matches['unmatched_job_skills'])
             total_candidate_skills = len(self.candidate_skills)
             overqualification_ratio = total_candidate_skills / total_job_skills if total_job_skills > 0 else 1
             
-            # If candidate is overqualified (has 2x+ more skills than required)
-            if overqualification_ratio >= 2.0:
-                # Apply significant overqualification bonus
+            # Only apply overqualification bonus if:
+            # 1. Candidate is overqualified (has 2x+ more skills than required)
+            # 2. AND no critical skills are missing (or missing skills are minimal)
+            # 3. AND base score is already high (above 70%)
+            if (overqualification_ratio >= 2.0 and 
+                critical_skills_missing == 0 and 
+                base_score >= 70):
+                
+                # Apply conservative overqualification bonus
                 if overqualification_ratio >= 4.0:  # 4x+ overqualified
-                    overqualification_bonus = 35  # 35% bonus for highly overqualified
+                    overqualification_bonus = 15  # Reduced from 35% to 15%
                 elif overqualification_ratio >= 3.0:  # 3x+ overqualified
-                    overqualification_bonus = 25  # 25% bonus for very overqualified
+                    overqualification_bonus = 10  # Reduced from 25% to 10%
                 else:  # 2x+ overqualified
-                    overqualification_bonus = 15  # 15% bonus for overqualified
+                    overqualification_bonus = 5   # Reduced from 15% to 5%
                 
                 base_score = min(100, base_score + overqualification_bonus)
+            elif critical_skills_missing > 0:
+                # Apply penalty for missing critical skills (realistic approach)
+                # Distinguish between critical and nice-to-have skills
+                critical_penalty_skills = ['snowflake', 'bigquery', 'cloud', 'data engineering']
+                nice_to_have_skills = ['paid advertising', 'google ads', 'meta', 'advertising platforms', 'mentorship skills', 'problem-solving']
+                
+                critical_missing = sum(1 for skill in matches['unmatched_job_skills'] 
+                                     if any(critical in skill.lower() for critical in critical_penalty_skills))
+                nice_to_have_missing = sum(1 for skill in matches['unmatched_job_skills'] 
+                                         if any(nice in skill.lower() for nice in nice_to_have_skills))
+                
+                # Apply smaller penalties - 3% for critical, 1% for nice-to-have
+                penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
+                penalty = min(20, penalty)  # Cap penalty at 20%
+                base_score = max(0, base_score - penalty)
             
             matches['match_score'] = round(base_score, 2)
         else:
@@ -256,7 +282,11 @@ class PreliminaryMatcher:
             "business intelligence", "analytics", "etl", "data warehousing",
             "leadership", "management", "team", "mentoring", "coaching",
             "strategy", "strategic", "business intelligence", "analytics", "forecasting",
-            "pricing", "modeling", "financial", "budget", "planning"
+            "pricing", "modeling", "financial", "budget", "planning",
+            # Add more specific data engineering tools
+            "postgresql", "mysql", "oracle", "mongodb", "redis",
+            "aws lake formation", "amazon kinesis", "amazon q",
+            "paid advertising", "google ads", "meta", "amazon ads", "advertising platforms"
         ]
         
         for skill in specific_skills:
@@ -316,11 +346,16 @@ class PreliminaryMatcher:
         skill_equivalences = {
             'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],
             'amazon kinesis': ['aws', 'kinesis', 'streaming', 'data streaming'],
+            'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],
             'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],
             'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],
             'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'planning'],
             'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing'],
             'cloud platforms': ['aws', 'azure', 'gcp', 'cloud'],
+            'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
+            'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
+            'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
+            'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
         }
         
         for candidate_skill in matched_skills:
@@ -394,6 +429,7 @@ class PreliminaryMatcher:
             'exact_matches': matches['exact_matches'],
             'partial_matches': matches['partial_matches'],
             'missing_skills': matches['missing_skills'],
+            'unmatched_job_skills': matches['unmatched_job_skills'],  # Include unmatched job skills
             'job_requirements': requirements,
             'match_summary': {
                 'total_candidate_skills': matches['total_required'],

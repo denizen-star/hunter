@@ -2259,16 +2259,7 @@ class DocumentGenerator:
                 <!-- Introductory text before analysis summary -->
                 <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #667eea;">
                     <p style="color: #333; font-size: 14px; line-height: 1.5; margin: 0;">
-                        Yes, I've checked our compatibility based on job posting against my experience with my proprietary ML Model and these are my findings:
-                    </p>
-                </div>
-                
-                <!-- Methodology -->
-                <div style="margin-bottom: 10px;">
-                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Methodology</h4>
-                    <p style="color: #666; font-size: 11px; line-height: 1.4;">
-                        Our AI analyzes your resume against the job description using weighted scoring: 
-                        Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
+                        I reviewed our compatibility based on job posting, research and my experience with my proprietary ML Model and these are my findings:
                     </p>
                 </div>
                 
@@ -2288,12 +2279,13 @@ class DocumentGenerator:
                     </div>
                 </div>
                 
-                <!-- Missing Skills -->
+                <!-- Methodology -->
                 <div style="margin-bottom: 10px;">
-                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Missing Skills</h4>
-                    <div style="color: #666; font-size: 11px;">
-                        {self._generate_missing_skills_html(qualifications.missing_skills)}
-                    </div>
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Methodology</h4>
+                    <p style="color: #666; font-size: 11px; line-height: 1.4;">
+                        Our AI analyzes your resume against the job description using weighted scoring: 
+                        Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
+                    </p>
                 </div>
             </div>
             
@@ -2313,14 +2305,14 @@ class DocumentGenerator:
 
 {cover_letter}
 
-Yes, I've checked our compatibility based on job posting against my experience with my proprietary ML Model and these are my findings:
+I reviewed our compatibility based on job posting, research and my experience with my proprietary ML Model and these are my findings:
 
-Match Score: {qualifications.match_score:.0f}% - Application for {application.company} - {application.job_title}
+Match Score: {qualifications.match_score:.0f}%
 
-Methodology: Weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
 Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed
 Strong Matches: {', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else 'No strong matches identified'}
-Missing Skills: {', '.join(qualifications.missing_skills[:5]) if qualifications.missing_skills else 'No missing skills identified'}
+
+Methodology: Weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
 
 
 Sincerely,

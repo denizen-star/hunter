@@ -240,8 +240,14 @@ Provide an overall assessment considering both the preliminary matching results 
             strong_matches.append(match['skill'])
         strong_matches.extend(ai_analysis.get('strong_matches', []))
         
-        # Combine missing skills
+        # Combine missing skills from both preliminary analysis and AI analysis
         missing_skills = ai_analysis.get('missing_skills', [])
+        
+        # Add unmatched job skills from preliminary analysis as missing skills
+        preliminary_unmatched = preliminary_analysis.get('unmatched_job_skills', [])
+        for skill in preliminary_unmatched:
+            if skill not in missing_skills:
+                missing_skills.append(skill)
         
         # Combine partial matches
         partial_matches = []
