@@ -289,6 +289,37 @@ class DocumentGenerator:
         if 'Posted Date' in title or title_clean == 'Job Description Details':
             return f'<div class="job-meta">{formatted_content}</div>'
         
+        # Special formatting for Job URL section
+        if 'Job URL' in title_clean:
+            if 'Not specified' in formatted_content:
+                formatted_content = '''
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #6c757d;">
+                    <p style="margin: 0; color: #6c757d; font-style: italic;">
+                        <strong>Not specified</strong><br>
+                        No job URL was provided in the job posting.
+                    </p>
+                </div>
+                '''
+            return f'''
+        <div class="job-section">
+            <h3 class="job-section-title">🔗 {title_clean}</h3>
+            <div class="job-section-content">
+                {formatted_content}
+            </div>
+        </div>
+        '''
+        
+        # Special formatting for Other Information section
+        if 'Other Information' in title_clean:
+            return f'''
+        <div class="job-section">
+            <h3 class="job-section-title">ℹ️ {title_clean}</h3>
+            <div class="job-section-content">
+                {formatted_content}
+            </div>
+        </div>
+        '''
+        
         # Skip Additional Insights if content is "Not available", but always show Hiring Team Information
         if title_clean == 'Additional Insights' and ('Not available' in formatted_content or 'Not specified' in formatted_content):
             return ''
@@ -1906,6 +1937,7 @@ class DocumentGenerator:
         a:hover {{ text-decoration: underline; }}
         .timeline {{ margin-top: 20px; }}
         .timeline-item {{ padding: 15px; border-left: 3px solid #424242; margin-left: 10px; margin-bottom: 15px; background: #f9f9f9; border-radius: 4px; }}
+        .timeline-item img {{ max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
         
         /* Job Description Specific Styles */
         .job-meta {{ background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #424242; }}
@@ -2204,12 +2236,12 @@ class DocumentGenerator:
         
         <div class="tabs">
             <button class="tab active" onclick="showTab(event, 'job-desc')">Job Description</button>
-            <button class="tab" onclick="showTab(event, 'raw-entry')">Raw Entry</button>
-            <button class="tab" onclick="showTab(event, 'skills')">Skills</button>
-            <button class="tab" onclick="showTab(event, 'research')">Research</button>
-            <button class="tab" onclick="showTab(event, 'qualifications')">Qualifications Analysis</button>
-            <button class="tab" onclick="showTab(event, 'cover-letter')">Cover Letter</button>
-            <button class="tab" onclick="showTab(event, 'resume')">Customized Resume</button>
+            {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path)}
+            {self._generate_tab_button('skills', 'Skills', application.qualifications_path)}
+            {self._generate_tab_button('research', 'Research', application.research_path or application.hiring_manager_intros_path)}
+            {self._generate_tab_button('qualifications', 'Qualifications Analysis', application.qualifications_path)}
+            {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path)}
+            {self._generate_tab_button('resume', 'Customized Resume', application.custom_resume_path)}
             <button class="tab" onclick="showTab(event, 'updates')">Updates & Notes</button>
         </div>
         
@@ -2218,36 +2250,36 @@ class DocumentGenerator:
             {job_desc_html}
         </div>
         
-        <div id="raw-entry" class="tab-content">
+        {self._generate_tab_content('raw-entry', 'Raw Entry', f'''
             <h2>Raw Entry</h2>
             <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Original job description as provided during application creation:</p>
             <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">{self._get_raw_job_description(application)}</pre>
-        </div>
+        ''', application.raw_job_description_path)}
         
-        <div id="skills" class="tab-content">
+        {self._generate_tab_content('skills', 'Skills Analysis', f'''
             <h2>Skills Analysis</h2>
             <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Skills extracted from job description and matched against your resume:</p>
             
             <div class="tech-pills-container">
                 {self._generate_skills_analysis_html(qual_analysis)}
             </div>
-        </div>
+        ''', application.qualifications_path)}
         
-        <div id="research" class="tab-content">
+        {self._generate_tab_content('research', 'Company Research', f'''
             <h2>Company Research</h2>
             <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Research insights about {application.company} to help with your application:</p>
             
             <div class="research-container">
                 {self._generate_company_research_html(application.company, application)}
             </div>
-        </div>
+        ''', application.research_path or application.hiring_manager_intros_path)}
         
-        <div id="qualifications" class="tab-content">
+        {self._generate_tab_content('qualifications', 'Qualifications Analysis', f'''
             <h2>Qualifications Analysis</h2>
             <pre>{qual_analysis}</pre>
-        </div>
+        ''', application.qualifications_path)}
         
-        <div id="cover-letter" class="tab-content">
+        {self._generate_tab_content('cover-letter', 'Cover Letter', f'''
             <h2>Cover Letter</h2>
             
             <!-- Analysis Summary Box (similar to the one from application creation) -->
@@ -2343,12 +2375,12 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
 {self._get_intro_messages_content(application, 'recruiter')}
                 </div>
             </div>
-        </div>
+        ''', application.cover_letter_path)}
         
-        <div id="resume" class="tab-content">
+        {self._generate_tab_content('resume', 'Customized Resume', f'''
             <h2>Customized Resume</h2>
             <pre>{resume}</pre>
-        </div>
+        ''', application.custom_resume_path)}
         
         <div id="updates" class="tab-content">
             <h2>Updates & Notes</h2>
@@ -2432,11 +2464,51 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                             [{{ 'list': 'ordered'}}, {{ 'list': 'bullet' }}],
                             [{{ 'indent': '-1'}}, {{ 'indent': '+1' }}],
                             [{{ 'align': [] }}],
-                            ['link', 'blockquote', 'code-block'],
+                            ['link', 'image', 'blockquote', 'code-block'],
                             ['clean']
                         ]
                     }}
                 }});
+                
+                // Add image upload handler
+                const toolbar = quillEditor.getModule('toolbar');
+                toolbar.addHandler('image', function() {{
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.click();
+                    
+                    input.onchange = async function() {{
+                        const file = input.files[0];
+                        if (file) {{
+                            const formData = new FormData();
+                            formData.append('image', file);
+                            
+                            try {{
+                                showMessage('📤 Uploading image...', 'info');
+                                
+                                const response = await fetch('/api/upload-image', {{
+                                    method: 'POST',
+                                    body: formData
+                                }});
+                                
+                                const result = await response.json();
+                                
+                                if (result.success) {{
+                                    const range = quillEditor.getSelection();
+                                    quillEditor.insertEmbed(range.index, 'image', result.url);
+                                    showMessage('✅ Image uploaded successfully!', 'success');
+                                }} else {{
+                                    showMessage('❌ Failed to upload image: ' + result.error, 'error');
+                                }}
+                            }} catch (error) {{
+                                console.error('Image upload error:', error);
+                                showMessage('❌ Failed to upload image: ' + error.message, 'error');
+                            }}
+                        }}
+                    }};
+                }});
+                
                 console.log('✅ Quill editor initialized successfully');
             }} else {{
                 console.error('❌ Quill.js not loaded');
@@ -2672,12 +2744,11 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                     if app_id_match:
                         app_id = app_id_match.group(1).strip()
                     
-                    # Extract notes text
-                    notes_match = re.search(r'<div class="notes-text">([^<]*(?:<[^>]+>[^<]*)*?)</div>', html_content, re.DOTALL)
+                    # Extract notes text (including HTML content like images)
+                    notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
                     if notes_match:
                         notes_text = notes_match.group(1).strip()
-                        # Clean up the notes text
-                        notes_text = re.sub(r'\s+', ' ', notes_text).strip()
+                        # Don't clean up HTML content - preserve images and formatting
                         
             except Exception as e:
                 print(f"Warning: Could not extract content from {update['file']}: {e}")
@@ -2693,9 +2764,15 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 content_parts.append(f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #666;"><strong>Application ID:</strong> {app_id}</div>')
             
             if notes_text and notes_text not in ["No additional notes", ""]:
-                # Make URLs clickable
-                notes_with_links = re.sub(r'(https?://[^\s]+)', r'<a href="\1" target="_blank" style="color: #667eea; text-decoration: underline;">\1</a>', notes_text)
-                content_parts.append(f'<div style="margin-top: 8px; padding: 12px; background: #fff3e0; border-left: 3px solid #ff9800; border-radius: 4px; font-size: 14px; color: #000; white-space: pre-wrap;"><strong>📝 Notes:</strong><br>{notes_with_links}</div>')
+                # Handle HTML content (including images) - don't process URLs if content is already HTML
+                if '<' in notes_text and '>' in notes_text:
+                    # Content is already HTML, use as-is
+                    notes_display = notes_text
+                else:
+                    # Plain text, make URLs clickable
+                    notes_display = re.sub(r'(https?://[^\s]+)', r'<a href="\1" target="_blank" style="color: #667eea; text-decoration: underline;">\1</a>', notes_text)
+                
+                content_parts.append(f'<div style="margin-top: 8px; padding: 12px; background: #fff3e0; border-left: 3px solid #ff9800; border-radius: 4px; font-size: 14px; color: #000;"><strong>📝 Notes:</strong><br>{notes_display}</div>')
             
             content_html = "".join(content_parts)
             
@@ -2794,4 +2871,16 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             return '#f59e0b'  # Orange
         else:
             return '#ef4444'  # Red
+
+    def _generate_tab_button(self, tab_id: str, tab_name: str, file_path) -> str:
+        """Generate tab button HTML if file exists"""
+        if file_path and Path(file_path).exists():
+            return f'<button class="tab" onclick="showTab(event, \'{tab_id}\')">{tab_name}</button>'
+        return ''
+
+    def _generate_tab_content(self, tab_id: str, tab_name: str, content: str, file_path) -> str:
+        """Generate tab content HTML if file exists"""
+        if file_path and Path(file_path).exists():
+            return f'<div id="{tab_id}" class="tab-content">\n{content}\n</div>'
+        return ''
 

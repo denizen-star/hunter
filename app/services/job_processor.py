@@ -234,6 +234,10 @@ class JobProcessor:
         application.status = status
         application.status_updated_at = get_est_now()
         
+        # If status is rejected, clean up unnecessary files
+        if status.lower() == 'rejected':
+            self._cleanup_rejected_application_files(application)
+        
         # Always create status update file (even without notes)
         timestamp = format_datetime_for_filename()
         updates_dir = application.folder_path / "updates"
@@ -403,6 +407,13 @@ class JobProcessor:
         }}
         .notes-text a:hover {{
             text-decoration: underline;
+        }}
+        .notes-text img {{
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }}
         .back-link {{
             display: inline-block;
@@ -581,4 +592,118 @@ class JobProcessor:
             
         except Exception as e:
             print(f"Warning: Could not regenerate summary: {e}")
+
+    def _cleanup_rejected_application_files(self, application: Application) -> None:
+        """Clean up files for rejected applications, keeping only essential files"""
+        if not application.folder_path or not application.folder_path.exists():
+            return
+        
+        print(f"  → Cleaning up files for rejected application: {application.company} - {application.job_title}")
+        
+        # Files to delete for rejected applications
+        files_to_delete = []
+        
+        # Raw Entry Tab files
+        if application.raw_job_description_path and application.raw_job_description_path.exists():
+            files_to_delete.append(application.raw_job_description_path)
+        
+        # Research Tab files
+        if application.hiring_manager_intros_path and application.hiring_manager_intros_path.exists():
+            files_to_delete.append(application.hiring_manager_intros_path)
+        if application.recruiter_intros_path and application.recruiter_intros_path.exists():
+            files_to_delete.append(application.recruiter_intros_path)
+        if application.research_path and application.research_path.exists():
+            files_to_delete.append(application.research_path)
+        
+        # Qualifications Analysis Tab files
+        if application.qualifications_path and application.qualifications_path.exists():
+            files_to_delete.append(application.qualifications_path)
+        
+        # Cover Letter Tab files
+        if application.cover_letter_path and application.cover_letter_path.exists():
+            files_to_delete.append(application.cover_letter_path)
+        
+        # Customized Resume Tab files
+        if application.custom_resume_path and application.custom_resume_path.exists():
+            files_to_delete.append(application.custom_resume_path)
+        
+        # Summary Tab files
+        if application.summary_path and application.summary_path.exists():
+            files_to_delete.append(application.summary_path)
+        
+        # Also look for any additional files that match patterns
+        folder_path = application.folder_path
+        for file_path in folder_path.iterdir():
+            if file_path.is_file():
+                filename = file_path.name.lower()
+                # Delete files that match patterns for tabs we want to remove
+                if any(pattern in filename for pattern in [
+                    '-qualifications.md',
+                    '-cover-letter.html',
+                    '-resume.md',
+                    '-summary-',
+                    '-hiring-manager-intros.md',
+                    '-recruiter-intros.md',
+                    '-intro.md',
+                    '-raw.txt'
+                ]):
+                    if file_path not in files_to_delete:
+                        files_to_delete.append(file_path)
+        
+        # Delete the identified files
+        deleted_count = 0
+        for file_path in files_to_delete:
+            try:
+                if file_path.exists():
+                    file_path.unlink()
+                    deleted_count += 1
+                    print(f"    ✓ Deleted: {file_path.name}")
+            except Exception as e:
+                print(f"    ⚠ Could not delete {file_path.name}: {e}")
+        
+        # Clear the file paths from application metadata
+        application.raw_job_description_path = None
+        application.hiring_manager_intros_path = None
+        application.recruiter_intros_path = None
+        application.research_path = None
+        application.qualifications_path = None
+        application.cover_letter_path = None
+        application.custom_resume_path = None
+        application.summary_path = None
+        
+        # Save updated metadata
+        self._save_application_metadata(application)
+        
+        # Regenerate summary page with remaining content
+        print(f"  → Regenerating summary page with remaining content...")
+        try:
+            from app.services.document_generator import DocumentGenerator
+            from app.models.qualification import QualificationAnalysis
+            
+            # Create a minimal QualificationAnalysis object for rejected applications
+            qualifications = QualificationAnalysis(
+                match_score=0.0,  # No match score for rejected apps
+                features_compared=0,
+                strong_matches=[],
+                missing_skills=[],
+                partial_matches=[],
+                soft_skills=[],
+                recommendations=[],
+                detailed_analysis="Application was rejected - detailed analysis removed during cleanup."
+            )
+            
+            # Generate new summary page
+            doc_generator = DocumentGenerator()
+            doc_generator.generate_summary_page(application, qualifications)
+            
+            # Save updated metadata with new summary path
+            self._save_application_metadata(application)
+            
+            print(f"    ✓ Summary page regenerated")
+        except Exception as e:
+            print(f"    ⚠ Warning: Could not regenerate summary page: {e}")
+        
+        print(f"  ✓ Cleanup complete: {deleted_count} files deleted")
+        print(f"  ✓ Kept essential files: job description, application metadata, and updates")
+        print(f"  ✓ Summary page regenerated with remaining content")
 

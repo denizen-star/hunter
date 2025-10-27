@@ -4,9 +4,11 @@ Web UI for Job Hunting Follow-Ups
 Flask application providing REST API and web interface
 """
 import os
+import uuid
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 from app.services.resume_manager import ResumeManager
 from app.services.job_processor import JobProcessor
@@ -524,13 +526,27 @@ def update_status(app_id):
         # Update dashboard
         dashboard_generator.generate_index_page()
         
-        return jsonify({
+        # Generate response data
+        response_data = {
             'success': True,
             'message': f'Status updated to {status}',
             'application_id': application.id,
             'status': status,
             'updated_at': format_for_display(application.status_updated_at)
-        })
+        }
+        
+        # For rejected applications, include redirect information
+        print(f"DEBUG: Status received: '{status}' (lowercase: '{status.lower()}')")
+        print(f"DEBUG: Checking if status.lower() == 'rejected': {status.lower() == 'rejected'}")
+        if status.lower() == 'rejected':
+            response_data['redirect'] = 'http://localhost:51003/dashboard'  # Use absolute URL
+            response_data['message'] = f'Status updated to {status}. Application cleaned up and redirected to dashboard.'
+            print(f"DEBUG: Rejected application - adding redirect to dashboard")
+        else:
+            print(f"DEBUG: Not a rejected application, no redirect added")
+        
+        print(f"DEBUG: Response data: {response_data}")
+        return jsonify(response_data)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -671,6 +687,58 @@ def update_dashboard():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/upload-image', methods=['POST'])
+def upload_image():
+    """Upload image for status updates"""
+    try:
+        if 'image' not in request.files:
+            return jsonify({'success': False, 'error': 'No image file provided'}), 400
+        
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No image file selected'}), 400
+        
+        # Check file type
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if not ('.' in file.filename and 
+                file.filename.rsplit('.', 1)[1].lower() in allowed_extensions):
+            return jsonify({'success': False, 'error': 'Invalid file type. Allowed: PNG, JPG, JPEG, GIF, WEBP'}), 400
+        
+        # Create images directory
+        images_dir = Path('data/images')
+        images_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate unique filename
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        file_path = images_dir / unique_filename
+        
+        # Save file
+        file.save(file_path)
+        
+        # Return the URL for the image
+        image_url = f"/images/{unique_filename}"
+        
+        return jsonify({
+            'success': True,
+            'url': image_url,
+            'filename': unique_filename
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/images/<filename>')
+def serve_image(filename):
+    """Serve uploaded images"""
+    try:
+        images_dir = Path('data/images')
+        return send_from_directory(images_dir, filename)
+    except Exception as e:
+        return jsonify({'error': 'Image not found'}), 404
+
+
 @app.route('/reports')
 def view_reports():
     """View the reports page"""
@@ -732,13 +800,11 @@ def get_reports_data():
             applications_by_status[status] = applications_by_status.get(status, 0) + 1
         
         # Status changes by status (for period) - count status changes that happened in period by the new status
-        # Exclude status changes to rejected
         status_changes_by_status = {}
         status_changes_count = 0
         for app in status_changes:
             status = app.status.lower()
-            if status != 'rejected':  # Exclude rejected from status changes count
-                status_changes_count += 1
+            status_changes_count += 1  # Include all status changes
             status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
         
         # Follow-up applications (more than one week without updates)
@@ -775,8 +841,10 @@ def get_reports_data():
         # Sort follow-up applications by newest update first
         followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
         
+        # Calculate rejected applications from status changes (applications rejected in period)
+        rejected_count = status_changes_by_status.get('rejected', 0)
+        
         # Calculate active applications (total - rejected)
-        rejected_count = applications_by_status.get('rejected', 0)
         active_applications = len(period_applications) - rejected_count
         
         # Calculate total contact count from status_changes_by_status (matches the chart)
