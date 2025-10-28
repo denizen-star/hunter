@@ -744,6 +744,11 @@ def view_reports():
     """View the reports page"""
     return render_template('reports.html')
 
+@app.route('/daily-activities')
+def view_daily_activities():
+    """View the daily activities page"""
+    return render_template('daily_activities.html')
+
 @app.route('/api/reports', methods=['GET'])
 def get_reports_data():
     """Get reports data for specified period"""
@@ -854,6 +859,9 @@ def get_reports_data():
         if 'contacted hiring manager' in status_changes_by_status:
             total_contact_count += status_changes_by_status['contacted hiring manager']
         
+        # Calculate total actions (applications created + status changes) for the period
+        total_actions = len(period_applications) + status_changes_count
+        
         # Summary statistics
         summary = {
             'total_applications': len(period_applications),
@@ -862,7 +870,8 @@ def get_reports_data():
             'status_changes': status_changes_count,
             'rejected': rejected_count,
             'followup_needed': len(followup_applications),
-            'total_contact_count': total_contact_count
+            'total_contact_count': total_contact_count,
+            'total_actions': total_actions
         }
         
         return jsonify({
@@ -872,6 +881,93 @@ def get_reports_data():
             'applications_by_status': applications_by_status,
             'status_changes': status_changes_by_status,
             'followup_applications': followup_applications
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/daily-activities', methods=['GET'])
+def get_daily_activities():
+    """Get daily activities data"""
+    try:
+        from datetime import datetime, timezone, timedelta
+        
+        applications = job_processor.list_all_applications()
+        
+        # Group activities by date
+        daily_activities = {}
+        
+        for app in applications:
+            # Get all updates for this application
+            updates = job_processor.get_application_updates(app)
+            
+            # Add application creation as an activity
+            created_date = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).date()
+            if created_date not in daily_activities:
+                daily_activities[created_date] = []
+            
+            # Format timestamp for display
+            created_timestamp = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).strftime('%I:%M %p EST')
+            
+            daily_activities[created_date].append({
+                'company': app.company,
+                'position': app.job_title,
+                'timestamp': created_timestamp,
+                'activity': 'Application Created',
+                'status': 'Created',
+                'application_id': app.id,
+                'datetime': app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))  # Add datetime for sorting
+            })
+            
+            # Add status updates as activities
+            for update in updates:
+                try:
+                    # Parse timestamp from filename
+                    timestamp_str = update['timestamp']
+                    dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                    dt = dt.replace(tzinfo=timezone(timedelta(hours=-4)))
+                    update_date = dt.date()
+                    
+                    if update_date not in daily_activities:
+                        daily_activities[update_date] = []
+                    
+                    # Format timestamp for display
+                    display_timestamp = dt.strftime('%I:%M %p EST')
+                    
+                    daily_activities[update_date].append({
+                        'company': app.company,
+                        'position': app.job_title,
+                        'timestamp': display_timestamp,
+                        'activity': f'Status Changed to {update["status"]}',
+                        'status': update['status'],
+                        'application_id': app.id,
+                        'datetime': dt  # Add datetime for sorting
+                    })
+                except Exception as e:
+                    print(f"Error processing update {update}: {e}")
+                    continue
+        
+        # Sort activities within each day by datetime (newest first)
+        for date in daily_activities:
+            daily_activities[date].sort(key=lambda x: x['datetime'], reverse=True)
+            # Remove datetime field from final output (keep only for sorting)
+            for activity in daily_activities[date]:
+                del activity['datetime']
+        
+        # Convert to list format sorted by date (newest first)
+        activities_list = []
+        for date in sorted(daily_activities.keys(), reverse=True):
+            activities_list.append({
+                'date': date.strftime('%B %d, %Y'),
+                'activity_count': len(daily_activities[date]),
+                'activities': daily_activities[date]
+            })
+        
+        return jsonify({
+            'success': True,
+            'daily_activities': activities_list
         })
         
     except Exception as e:

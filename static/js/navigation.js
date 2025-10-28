@@ -60,6 +60,7 @@ class NavigationManager {
             'new-application': 'new-application-page',
             'resume-manager': 'resume-manager-page',
             'reports': 'reports-page',
+            'daily-activities': 'daily-activities-page',
             'settings': 'settings-page'
         };
         
@@ -99,6 +100,7 @@ class NavigationManager {
             'new-application': 'New Application',
             'resume-manager': 'Resume Manager',
             'reports': 'Reports',
+            'daily-activities': 'Daily Activities',
             'settings': 'Settings'
         };
 
