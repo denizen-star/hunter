@@ -14,7 +14,6 @@ class TechnologyMatcher:
         'java': ['java'],
         'javascript': ['javascript', 'js', 'node.js', 'nodejs', 'node js'],
         'typescript': ['typescript', 'ts'],
-        'scala': ['scala'],
         'go': ['golang', r'\bgo\b'],
         'rust': ['rust'],
         'c++': ['c++', 'cpp', 'c plus plus'],

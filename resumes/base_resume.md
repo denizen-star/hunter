@@ -113,7 +113,6 @@ Experienced Data Analytics and Business Intelligence professional with over 15 y
 ### Programming & Data Languages
 - Python
 - R
-- Scala
 - SQL
 - PL/SQL
 - Java

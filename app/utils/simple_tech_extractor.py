@@ -72,7 +72,6 @@ class SimpleTechExtractor:
         # Programming Languages
         'Python': ['python', 'py'],
         'Java': ['java'],
-        'Scala': ['scala'],
         'SQL': ['sql', 'structured query language'],
         'PL/SQL': ['pl/sql', 'plsql', 'pl sql'],
         'JavaScript': ['javascript', 'js', 'node.js', 'nodejs'],
@@ -292,7 +291,7 @@ class SimpleTechExtractor:
                 categories['Databases & Query Engines'].append(tech)
             elif any(keyword in tech_lower for keyword in ['tableau', 'power bi', 'looker', 'qlik', 'metabase', 'superset']):
                 categories['BI Tools'].append(tech)
-            elif any(keyword in tech_lower for keyword in ['python', 'java', 'scala', 'sql', 'javascript', 'typescript', 'r', 'go', 'rust', 'c++', 'c#']):
+            elif any(keyword in tech_lower for keyword in ['python', 'java', 'sql', 'javascript', 'typescript', 'r', 'go', 'rust', 'c++', 'c#']):
                 categories['Programming Languages'].append(tech)
             elif any(keyword in tech_lower for keyword in ['kubernetes', 'docker', 'terraform', 'jenkins', 'git', 'ci/cd', 'cloudformation']):
                 categories['DevOps & Infrastructure'].append(tech)

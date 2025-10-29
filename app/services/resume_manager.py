@@ -195,7 +195,7 @@ Brief summary of your professional background and key strengths (2-3 sentences).
     def _get_technology_category(self, tech_name: str) -> str:
         """Get the category for a technology based on the tech matcher's categories"""
         # Programming Languages
-        if tech_name in ['Python', 'Java', 'JavaScript', 'TypeScript', 'R', 'Scala', 'Go', 'Rust', 
+        if tech_name in ['Python', 'Java', 'JavaScript', 'TypeScript', 'R', 'Go', 'Rust', 
                         'C++', 'C#', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'Perl', 'Lua', 'Dart', 
                         'Elixir', 'Haskell', 'Objective-C', 'PowerShell', 'Bash', 'MATLAB', 'Julia', 'Groovy', 'PL/SQL']:
             return 'Programming Languages'
