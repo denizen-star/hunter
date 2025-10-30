@@ -2571,10 +2571,12 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 }}
                 // Re-sort after augmentation
                 templatesCache.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-                // Populate options
+                // Populate options (include Delivery Method in label when available)
                 selector.innerHTML = '<option value="">-- Select Template --</option>';
                 for (const t of templatesCache) {{
-                    const label = t.title || (t.delivery_method ? ('Template - ' + t.delivery_method) : 'Template');
+                    const baseTitle = t.title || 'Template';
+                    const method = t.delivery_method ? (' - ' + t.delivery_method) : '';
+                    const label = baseTitle + method;
                     const opt = document.createElement('option');
                     opt.value = t.id || ((t.title || '') + '|' + (t.delivery_method || ''));
                     opt.textContent = label;
