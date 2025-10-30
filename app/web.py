@@ -15,6 +15,7 @@ from app.services.job_processor import JobProcessor
 from app.services.ai_analyzer import AIAnalyzer
 from app.services.document_generator import DocumentGenerator
 from app.services.dashboard_generator import DashboardGenerator
+from app.services.template_manager import TemplateManager
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root
 
@@ -30,12 +31,15 @@ job_processor = JobProcessor()
 ai_analyzer = AIAnalyzer()
 doc_generator = DocumentGenerator()
 dashboard_generator = DashboardGenerator()
+template_manager = TemplateManager()
 
 
 @app.route('/')
 def index():
     """Dashboard as landing page"""
     from app.utils.file_utils import get_data_path
+    # Always regenerate dashboard to ensure navigation is up to date
+    dashboard_generator.generate_index_page()
     dashboard_path = get_data_path('output') / 'index.html'
     
     if dashboard_path.exists():
@@ -43,15 +47,7 @@ def index():
             dashboard_path.parent,
             dashboard_path.name
         )
-    else:
-        # Generate dashboard if it doesn't exist
-        dashboard_generator.generate_index_page()
-        if dashboard_path.exists():
-            return send_from_directory(
-                dashboard_path.parent,
-                dashboard_path.name
-            )
-        return "Dashboard not generated yet.", 404
+    return "Dashboard not generated yet.", 404
 
 @app.route('/new-application')
 def new_application():
@@ -749,6 +745,11 @@ def view_daily_activities():
     """View the daily activities page"""
     return render_template('daily_activities.html')
 
+@app.route('/templates')
+def view_templates():
+    """View the templates page"""
+    return render_template('templates.html')
+
 @app.route('/api/reports', methods=['GET'])
 def get_reports_data():
     """Get reports data for specified period"""
@@ -973,6 +974,61 @@ def get_daily_activities():
     except Exception as e:
         import traceback
         traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/templates', methods=['GET'])
+def get_templates():
+    """Get all templates"""
+    try:
+        templates = template_manager.list_templates()
+        return jsonify({
+            'success': True,
+            'templates': templates
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/templates', methods=['POST'])
+def create_template():
+    """Create a new template"""
+    try:
+        data = request.json
+        title = data.get('title')
+        delivery_method = data.get('delivery_method')
+        content = data.get('content')
+        
+        if not all([title, delivery_method, content]):
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: title, delivery_method, content'
+            }), 400
+        
+        template = template_manager.create_template(title, delivery_method, content)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Template created successfully',
+            'template': template
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/templates/<template_id>', methods=['DELETE'])
+def delete_template(template_id):
+    """Delete a template"""
+    try:
+        success = template_manager.delete_template(template_id)
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Template deleted successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Template not found'
+            }), 404
+    except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/dashboard')

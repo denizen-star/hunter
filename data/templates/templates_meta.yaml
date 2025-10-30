@@ -1,0 +1,13 @@
+templates:
+- content_file: 20251029133734.html
+  created_at: '2025-10-29T13:37:34.006448-04:00'
+  created_at_display: Oct 29, 2025 01:37 PM EST
+  delivery_method: Email
+  id: '20251029133734'
+  title: Competitors
+- content_file: 20251029135329.html
+  created_at: '2025-10-29T13:53:29.148011-04:00'
+  created_at_display: Oct 29, 2025 01:53 PM EST
+  delivery_method: Email
+  id: '20251029135329'
+  title: Generic

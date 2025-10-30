@@ -17,10 +17,20 @@ def format_datetime_for_filename(dt: datetime = None) -> str:
 
 
 def format_for_display(dt: datetime) -> str:
-    """Format datetime for display: Oct 13, 2025 2:30 PM"""
+    """Format datetime for display: Oct 13, 2025 2:30 PM EST"""
     if isinstance(dt, str):
         dt = datetime.fromisoformat(dt)
-    return dt.strftime("%b %d, %Y %I:%M %p")
+    
+    # Convert to EST timezone if needed
+    est = pytz.timezone('America/Toronto')
+    if dt.tzinfo is None:
+        # If not timezone-aware, assume it's EST
+        dt = est.localize(dt)
+    else:
+        # Convert from any timezone to EST
+        dt = dt.astimezone(est)
+    
+    return dt.strftime("%b %d, %Y %I:%M %p EST")
 
 
 def parse_datetime(dt_str: str) -> datetime:
