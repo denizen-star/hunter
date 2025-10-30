@@ -37,9 +37,8 @@ class DocumentGenerator:
         print("  → Generating intro messages...")
         self.generate_intro_messages(application, qualifications, resume.full_name)
         
-        # 3. Generate customized resume
-        print("  → Generating customized resume...")
-        self.generate_custom_resume(application, qualifications, resume.content)
+        # 3. Customized resume (deferred) - generated on demand from the Resume tab
+        print("  → Skipping customized resume (deferred; generate from Resume tab if needed)")
         
         # 4. Generate summary HTML page
         print("  → Generating summary page...")
@@ -103,22 +102,30 @@ class DocumentGenerator:
         qualifications: QualificationAnalysis,
         candidate_name: str
     ) -> None:
-        """Generate hiring manager and recruiter intro messages"""
-        # Generate hiring manager intro messages
-        hiring_manager_intros = self.ai_analyzer.generate_hiring_manager_intros(
-            qualifications,
-            application.company,
-            application.job_title,
-            candidate_name
-        )
+        """Generate hiring manager and recruiter intro messages in parallel"""
+        from concurrent.futures import ThreadPoolExecutor
         
-        # Generate recruiter intro messages
-        recruiter_intros = self.ai_analyzer.generate_recruiter_intros(
-            qualifications,
-            application.company,
-            application.job_title,
-            candidate_name
-        )
+        def hm():
+            return self.ai_analyzer.generate_hiring_manager_intros(
+                qualifications,
+                application.company,
+                application.job_title,
+                candidate_name
+            )
+        
+        def rec():
+            return self.ai_analyzer.generate_recruiter_intros(
+                qualifications,
+                application.company,
+                application.job_title,
+                candidate_name
+            )
+        
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            hm_future = executor.submit(hm)
+            rec_future = executor.submit(rec)
+            hiring_manager_intros = hm_future.result()
+            recruiter_intros = rec_future.result()
         
         # Save hiring manager intro messages
         name_clean = candidate_name.replace(' ', '')
@@ -2235,14 +2242,14 @@ class DocumentGenerator:
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="showTab(event, 'job-desc')">Job Description</button>
-            {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path)}
-            {self._generate_tab_button('skills', 'Skills', application.qualifications_path)}
-            {self._generate_tab_button('research', 'Research', application.research_path or application.hiring_manager_intros_path)}
-            {self._generate_tab_button('qualifications', 'Qualifications Analysis', application.qualifications_path)}
-            {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path)}
-            {self._generate_tab_button('resume', 'Customized Resume', application.custom_resume_path)}
-            <button class="tab" onclick="showTab(event, 'updates')">Updates & Notes</button>
+            <button type="button" class="tab active" onclick="showTab(this, 'job-desc')">Job Description</button>
+            {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path).replace("showTab(event,", "showTab(this,")}
+            {self._generate_tab_button('skills', 'Skills', application.qualifications_path).replace("showTab(event,", "showTab(this,")}
+            {self._generate_tab_button('research', 'Research', application.research_path or application.hiring_manager_intros_path).replace("showTab(event,", "showTab(this,")}
+            {self._generate_tab_button('qualifications', 'Qualifications Analysis', application.qualifications_path).replace("showTab(event,", "showTab(this,")}
+            {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path).replace("showTab(event,", "showTab(this,")}
+            <button type="button" class="tab" onclick="showTab(this, 'resume')">Customized Resume</button>
+            <button type="button" class="tab" onclick="showTab(this, 'updates')">Updates & Notes</button>
         </div>
         
         <div id="job-desc" class="tab-content active">
@@ -2377,10 +2384,7 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             </div>
         ''', application.cover_letter_path)}
         
-        {self._generate_tab_content('resume', 'Customized Resume', f'''
-            <h2>Customized Resume</h2>
-            <pre>{resume}</pre>
-        ''', application.custom_resume_path)}
+        {self._generate_resume_tab_html(application, resume)}
         
         <div id="updates" class="tab-content">
             <h2>Updates & Notes</h2>
@@ -2423,6 +2427,20 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                         <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
                     </div>
                     
+                    <!-- Template Inserter -->
+                    <div style="margin: 18px 0; padding: 12px; background: #ffffff; border: 1px dashed #cdd6e1; border-radius: 10px;">
+                        <label for="template_selector" style="display: block; margin-bottom: 6px; font-weight: 600; color: #333;">
+                            Insert from Template
+                        </label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="template_selector" style="flex: 1; padding: 10px; border: 1px solid #d0d7de; border-radius: 8px; font-size: 14px; background: #f8fafc;">
+                                <option value="">-- Select Template --</option>
+                            </select>
+                            <button type="button" id="clearTemplateBtn" style="background: #e9ecef; color: #333; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
+                        </div>
+                        <small style="color: #6c757d; margin-top: 8px; display: block;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
+                    </div>
+                    
                     <button type="submit" id="updateStatusBtn" style="background: #fd7e14; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; transition: all 0.3s;">
                         <span id="btnIcon" style="color: white; font-size: 12px;">📊</span>
                         <span id="btnText">Update Status</span>
@@ -2442,8 +2460,10 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
     </div>
     
     <script>
-        // Application ID for this summary page
+        // Application meta for this summary page
         const APPLICATION_ID = '{application.id}';
+        const COMPANY = '{application.company}';
+        const JOB_TITLE = '{application.job_title}';
         
         // Initialize Quill editor
         let quillEditor = null;
@@ -2510,16 +2530,127 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 }});
                 
                 console.log('✅ Quill editor initialized successfully');
+
+                // Load templates and wire interactions
+                loadTemplates();
+                const selector = document.getElementById('template_selector');
+                const clearBtn = document.getElementById('clearTemplateBtn');
+                if (selector) {{
+                    selector.addEventListener('change', onTemplateSelected);
+                }}
+                if (clearBtn) {{
+                    clearBtn.addEventListener('click', function() {{
+                        if (quillEditor) {{ quillEditor.setContents([]); quillEditor.focus(); }}
+                        const sel = document.getElementById('template_selector');
+                        if (sel) {{ sel.value = ''; }}
+                    }});
+                }}
             }} else {{
                 console.error('❌ Quill.js not loaded');
             }}
         }});
         
-        function showTab(event, tabId) {{
+        // Templates cache
+        let templatesCache = [];
+        
+        async function loadTemplates() {{
+            try {{
+                const resp = await fetch('/api/templates');
+                const data = await resp.json();
+                if (!data.success) return;
+                templatesCache = data.templates || [];
+                const selector = document.getElementById('template_selector');
+                if (!selector) return;
+                // Sort by title for UX
+                templatesCache.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                
+                // Augment with intro message boxes from this page
+                const introTemplates = collectIntroTemplates();
+                for (const t of introTemplates) {{
+                    templatesCache.push(t);
+                }}
+                // Re-sort after augmentation
+                templatesCache.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                // Populate options
+                selector.innerHTML = '<option value="">-- Select Template --</option>';
+                for (const t of templatesCache) {{
+                    const label = t.title || (t.delivery_method ? ('Template - ' + t.delivery_method) : 'Template');
+                    const opt = document.createElement('option');
+                    opt.value = t.id || ((t.title || '') + '|' + (t.delivery_method || ''));
+                    opt.textContent = label;
+                    selector.appendChild(opt);
+                }}
+            }} catch (e) {{
+                console.warn('Failed to load templates', e);
+            }}
+        }}
+        
+        function collectIntroTemplates() {{
+            const items = [];
+            const textToHtml = (t) => {{
+                if (!t) return '';
+                return t
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\\n/g, '<br>');
+            }};
+            // Add cover letter as a selectable template
+            try {{
+                const cl = document.getElementById('cover-letter-content');
+                if (cl) {{
+                    const content = textToHtml(cl.innerText || cl.textContent || '');
+                    if (content && content.trim().length > 0) {{
+                        const title = 'Cover Letter - ' + COMPANY + ' - ' + JOB_TITLE;
+                        items.push({{ id: 'cover-letter', title: title, delivery_method: 'Cover Letter', content: content }});
+                    }}
+                }}
+            }} catch (e) {{ /* ignore */ }}
+            const sections = [
+                {{ id: 'hiring-manager-content', prefix: 'Hiring Manager', method: 'Intro' }},
+                {{ id: 'recruiter-content', prefix: 'Recruiter', method: 'Intro' }}
+            ];
+            for (const sec of sections) {{
+                const container = document.getElementById(sec.id);
+                if (!container) continue;
+                const headers = container.querySelectorAll('h4');
+                let idx = 0;
+                headers.forEach(h => {{
+                    const card = h.closest('div');
+                    let content = '';
+                    if (card && card.nextElementSibling) {{
+                        content = textToHtml(card.nextElementSibling.innerText || card.nextElementSibling.textContent || '');
+                    }}
+                    const base = h.textContent ? h.textContent.trim() : 'Message';
+                    const title = `${{sec.prefix}} - ${{base}}`;
+                    const id = `intro:${{sec.method}}:${{++idx}}`;
+                    items.push({{ id, title, delivery_method: sec.method, content }});
+                }});
+            }}
+            return items;
+        }}
+        
+        function onTemplateSelected(event) {{
+            const value = event.target.value;
+            if (!value) return;
+            const match = templatesCache.find(t => (t.id && t.id === value) || (((t.title || '') + '|' + (t.delivery_method || '')) === value));
+            if (!match) return;
+            const content = match.content || '';
+            if (quillEditor) {{
+                // Insert as HTML to preserve formatting; place caret at end
+                quillEditor.clipboard.dangerouslyPasteHTML(content);
+                quillEditor.focus();
+                const len = quillEditor.getLength();
+                quillEditor.setSelection(len, 0);
+            }}
+        }}
+        
+        function showTab(tabEl, tabId) {{
             // Hide all tab contents
             var contents = document.getElementsByClassName('tab-content');
             for (var i = 0; i < contents.length; i++) {{
                 contents[i].classList.remove('active');
+                contents[i].style.display = 'none';
             }}
             
             // Remove active class from all tabs
@@ -2529,8 +2660,12 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             }}
             
             // Show selected tab
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            var target = document.getElementById(tabId);
+            if (target) {{
+                target.classList.add('active');
+                target.style.display = 'block';
+            }}
+            if (tabEl && tabEl.classList) {{ tabEl.classList.add('active'); }}
         }}
         
         async function submitStatusUpdate(event) {{
@@ -2713,6 +2848,27 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 }}, 2000);
             }});
         }}
+
+        async function generateCustomResume() {{
+            try {{
+                const btn = document.getElementById('generateResumeBtn');
+                if (btn) {{ btn.disabled = true; btn.textContent = 'Generating...'; btn.style.background = '#6c757d'; }}
+                const resp = await fetch('/api/applications/' + APPLICATION_ID + '/generate-resume', {{ method: 'POST' }});
+                const result = await resp.json();
+                if (result && result.success) {{
+                    // Reload to show resume tab content
+                    window.location.reload();
+                }} else {{
+                    const errMsg = (result && result.error) ? result.error : 'Unknown error';
+                    alert('Failed to generate resume: ' + errMsg);
+                    if (btn) {{ btn.disabled = false; btn.textContent = 'Generate Customized Resume'; btn.style.background = '#10b981'; }}
+                }}
+            }} catch (e) {{
+                alert('Failed to generate resume: ' + e.message);
+                const btn = document.getElementById('generateResumeBtn');
+                if (btn) {{ btn.disabled = false; btn.textContent = 'Generate Customized Resume'; btn.style.background = '#10b981'; }}
+            }}
+        }}
     </script>
 </body>
 </html>"""
@@ -2802,31 +2958,37 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             
             if file_path and Path(file_path).exists():
                 content = read_text_file(file_path)
-                return self._format_intro_messages_as_boxes(content, message_type)
+                return self._format_intro_messages_as_boxes(content, message_type, application.company)
             else:
                 return f"No {message_type.replace('_', ' ')} intro messages found."
         except Exception as e:
             return f"Error loading {message_type.replace('_', ' ')} intro messages: {str(e)}"
     
-    def _format_intro_messages_as_boxes(self, content: str, message_type: str) -> str:
-        """Format intro messages as separate copy-ready boxes"""
+    def _format_intro_messages_as_boxes(self, content: str, message_type: str, company: str) -> str:
+        """Format intro messages as separate copy-ready boxes
+        - Skip any preamble like "Here are three versions..."
+        - Remove metadata markers from copy: "**MESSAGE X:**", character count brackets, and generic closing lines
+        - Title each box as: "<Company> - Message: <#> - <N> characters total"
+        """
         try:
-            # Split content by MESSAGE markers
+            import re
+            # Collect only sections that start with a MESSAGE marker; drop any preamble
             messages = []
-            current_message = ""
-            
-            lines = content.split('\n')
-            for line in lines:
+            current_message_lines = []
+            in_message = False
+            for raw_line in content.split('\n'):
+                line = raw_line.rstrip('\n')
                 if line.strip().startswith('**MESSAGE'):
-                    if current_message.strip():
-                        messages.append(current_message.strip())
-                    current_message = line + '\n'
+                    if in_message and current_message_lines:
+                        messages.append('\n'.join(current_message_lines).strip())
+                        current_message_lines = []
+                    in_message = True
+                    current_message_lines.append(line)
                 else:
-                    current_message += line + '\n'
-            
-            # Add the last message
-            if current_message.strip():
-                messages.append(current_message.strip())
+                    if in_message:
+                        current_message_lines.append(line)
+            if in_message and current_message_lines:
+                messages.append('\n'.join(current_message_lines).strip())
             
             # If we don't have the expected format, return original content
             if len(messages) < 3:
@@ -2835,8 +2997,22 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
             # Create HTML for each message box
             html_boxes = []
             for i, message in enumerate(messages, 1):
-                # Clean up the message content
-                clean_message = message.replace('**MESSAGE {}:**'.format(i), '').strip()
+                # Remove the MESSAGE header
+                clean_message = re.sub(r"^\*\*MESSAGE\s+{}:\*\*\s*".format(i), "", message, flags=re.IGNORECASE).strip()
+                # Remove any bracketed character metadata from the copy
+                clean_message = re.sub(r"\[~?\d+\s*characters?[^\]]*\]", "", clean_message, flags=re.IGNORECASE).strip()
+                # Also remove parenthetical character counts like "(276 characters)"
+                clean_message = re.sub(r"\(\s*~?\d+\s*characters?[^\)]*\)", "", clean_message, flags=re.IGNORECASE)
+                # Remove any trailing helper line like "Let me know if you'd like me to make any changes!"
+                clean_message = re.sub(r"\n?\s*Let me know if you'd like me to make any changes!?\s*$", "", clean_message, flags=re.IGNORECASE)
+                # Remove common instruction lines that sometimes appear in the body
+                lines = [ln for ln in clean_message.split('\n') if not re.search(r"^\s*(each message is|uses the exact character counts|message\s*3\s*is\s*particularly|let me know if you'd like me to (?:make|adjust).*)\s*$", ln.strip(), flags=re.IGNORECASE)]
+                # Also drop standalone lines that are just character counts in brackets/parentheses
+                lines = [ln for ln in lines if not re.match(r"^\s*(?:\(\s*~?\d+\s*characters?[^\)]*\)|\[\s*~?\d+\s*characters?[^\]]*\])\s*$", ln.strip(), flags=re.IGNORECASE)]
+                clean_message = "\n".join(lines).strip()
+                # Compute actual character count as fallback (exclude newlines only)
+                computed_chars = len(clean_message.replace('\n', ''))
+                char_count = str(computed_chars)
                 
                 # Create individual copy button ID
                 copy_button_id = f"copy-{message_type}-{i}"
@@ -2845,7 +3021,7 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                 box_html = f"""
                 <div style="margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 8px; background: white; overflow: hidden;">
                     <div style="background: #f8f9fa; padding: 10px 15px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
-                        <h4 style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">Message {i}</h4>
+                        <h4 style="margin: 0; color: #333; font-size: 16px; font-weight: 600;">{company} - Message: {i} - {char_count} characters total</h4>
                         <button onclick="copyMessage('{content_id}')" id="{copy_button_id}" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
                             📋 Copy
                         </button>
@@ -2875,7 +3051,7 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
     def _generate_tab_button(self, tab_id: str, tab_name: str, file_path) -> str:
         """Generate tab button HTML if file exists"""
         if file_path and Path(file_path).exists():
-            return f'<button class="tab" onclick="showTab(event, \'{tab_id}\')">{tab_name}</button>'
+            return f'<button type="button" class="tab" onclick="showTab(event, \'{tab_id}\')">{tab_name}</button>'
         return ''
 
     def _generate_tab_content(self, tab_id: str, tab_name: str, content: str, file_path) -> str:
@@ -2883,4 +3059,23 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
         if file_path and Path(file_path).exists():
             return f'<div id="{tab_id}" class="tab-content">\n{content}\n</div>'
         return ''
+
+    def _generate_resume_tab_html(self, application: Application, resume: str) -> str:
+        """Generate the resume tab HTML (show content or a generate button)."""
+        try:
+            if application.custom_resume_path and Path(application.custom_resume_path).exists():
+                return f'''<div id="resume" class="tab-content">
+            <h2>Customized Resume</h2>
+            <pre>{resume}</pre>
+        </div>'''
+            else:
+                return '''<div id="resume" class="tab-content">
+            <h2>Customized Resume</h2>
+            <div style="margin: 12px 0; padding: 12px; background: #fffbe6; border: 1px solid #ffe58f; border-radius: 6px; color: #8c6d1f;">
+                No customized resume generated yet. Click the button below to generate one from your base resume and analysis.
+            </div>
+            <button id="generateResumeBtn" onclick="generateCustomResume()" style="background: #10b981; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Generate Customized Resume</button>
+        </div>'''
+        except Exception:
+            return ''
 

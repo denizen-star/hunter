@@ -11,3 +11,9 @@ templates:
   delivery_method: Email
   id: '20251029135329'
   title: Generic
+- content_file: 20251030101517.html
+  created_at: '2025-10-30T10:15:17.229450-04:00'
+  created_at_display: Oct 30, 2025 10:15 AM EST
+  delivery_method: Text
+  id: '20251030101517'
+  title: Excited

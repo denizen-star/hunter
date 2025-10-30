@@ -285,7 +285,7 @@ def create_application():
             job_url=job_url
         )
         
-        # Generate all documents
+        # Generate all documents synchronously
         doc_generator.generate_all_documents(application)
         
         # Save updated metadata with paths
@@ -297,25 +297,19 @@ def create_application():
         # Generate relative URL for summary
         summary_url = None
         if application.summary_path:
-            # Create relative path: /applications/folder-name/summary.html
             folder_name = application.folder_path.name
             summary_filename = application.summary_path.name
             summary_url = f"/applications/{folder_name}/{summary_filename}"
         
-        # Load qualifications analysis for detailed response
+        # Load qualifications analysis for detailed response (best-effort)
         qualifications_data = None
         if application.qualifications_path and application.qualifications_path.exists():
             try:
-                from app.models.qualification import QualificationAnalysis
                 from app.utils.file_utils import read_text_file
-                
-                # Parse qualifications from file to get structured data
                 qual_content = read_text_file(application.qualifications_path)
-                
-                # Create a basic QualificationAnalysis object from the match score
                 qualifications_data = {
                     'match_score': application.match_score or 0.0,
-                    'features_compared': 0,  # Will be parsed from content if available
+                    'features_compared': 0,
                     'strong_matches': [],
                     'missing_skills': [],
                     'partial_matches': [],
@@ -323,32 +317,23 @@ def create_application():
                     'recommendations': [],
                     'detailed_analysis': qual_content
                 }
-                
-                # Try to parse additional data from the content
                 import re
-                
-                # Extract features compared
                 features_match = re.search(r'Features Compared:?\s*(\d+)', qual_content, re.IGNORECASE)
                 if features_match:
                     qualifications_data['features_compared'] = int(features_match.group(1))
-                
-                # Extract strong matches
                 strong_section = re.search(r'Strong Matches:?\s*([^\n]+)', qual_content, re.IGNORECASE)
                 if strong_section:
                     qualifications_data['strong_matches'] = [s.strip() for s in strong_section.group(1).split(',')]
-                
-                # Extract missing skills
                 missing_section = re.search(r'Missing Skills:?\s*([^\n]+)', qual_content, re.IGNORECASE)
                 if missing_section:
                     qualifications_data['missing_skills'] = [s.strip() for s in missing_section.group(1).split(',')]
-                
             except Exception as e:
                 print(f"Warning: Could not load qualifications data: {e}")
                 qualifications_data = None
 
         return jsonify({
             'success': True,
-            'message': f'Application created successfully',
+            'message': 'Application created successfully',
             'application_id': application.id,
             'folder_path': str(application.folder_path),
             'summary_path': str(application.summary_path),
@@ -665,6 +650,52 @@ def set_custom_resume(app_id):
             'message': 'Custom resume set and documents regenerated',
             'resume_path': str(custom_resume_path)
         })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/applications/<app_id>/generate-resume', methods=['POST'])
+def generate_resume(app_id):
+    """Generate a customized resume from base resume and existing qualifications"""
+    try:
+        # Load application
+        application = job_processor.get_application_by_id(app_id)
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Ensure qualifications exist
+        if not application.qualifications_path or not application.qualifications_path.exists():
+            return jsonify({'success': False, 'error': 'Qualifications not found for this application'}), 400
+        
+        # Load base resume and qualifications content
+        resume = resume_manager.load_base_resume()
+        from app.utils.file_utils import read_text_file
+        qual_content = read_text_file(application.qualifications_path)
+        
+        # Build a minimal QualificationAnalysis instance from stored data
+        from app.models.qualification import QualificationAnalysis
+        qualifications = QualificationAnalysis(
+            match_score=application.match_score or 0.0,
+            features_compared=0,
+            strong_matches=[],
+            missing_skills=[],
+            partial_matches=[],
+            soft_skills=[],
+            recommendations=[],
+            detailed_analysis=qual_content
+        )
+        
+        # Generate resume
+        doc_generator.generate_custom_resume(application, qualifications, resume.content)
+        
+        # Regenerate summary to include resume tab/content
+        doc_generator.generate_summary_page(application, qualifications)
+        
+        # Save metadata and update dashboard
+        job_processor._save_application_metadata(application)
+        dashboard_generator.generate_index_page()
+        
+        return jsonify({'success': True, 'message': 'Customized resume generated successfully'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
