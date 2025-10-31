@@ -117,9 +117,9 @@ Generate a professional cover letter with these requirements:
 - 1-2 body paragraphs: Integrate the provided soft skills naturally and emphasize the candidate strengths listed above
 - Closing: Call to action
 - Tone: Professional yet personable
-- Length: 350-450 words (slightly longer to accommodate company interest section)
+- Length: 300-350 words (slightly longer to accommodate company interest section)
 
-Start directly with "Dear Hiring Manager," and end with "Sincerely, [Name]"
+Start directly with "Dear Hiring Manager," and end with "Thanks and best regards,"
 
 IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation.
 """

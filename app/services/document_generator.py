@@ -1,4 +1,5 @@
 """Document generation service"""
+import re
 from pathlib import Path
 from app.models.application import Application
 from app.models.qualification import QualificationAnalysis
@@ -84,6 +85,25 @@ class DocumentGenerator:
             application.job_title,
             candidate_name
         )
+        
+        # Insert compatibility text after "Dear Hiring Manager,"
+        compatibility_text = f"\n\nCompatibility based on job posting, research and my experience modeled match score: {qualifications.match_score:.0f}% - Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed Strong Matches: {', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'No strong matches identified'}\n\nMethodology weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%)."
+        
+        if "Dear Hiring Manager," in cover_letter:
+            # Insert after "Dear Hiring Manager," 
+            cover_letter = cover_letter.replace("Dear Hiring Manager,", "Dear Hiring Manager," + compatibility_text)
+        elif "Dear Hiring Manager" in cover_letter:
+            # Handle case without comma
+            cover_letter = cover_letter.replace("Dear Hiring Manager", "Dear Hiring Manager," + compatibility_text)
+        
+        # Remove the word "Scala" (case-insensitive) from cover letter - user prefers not to mention Scala
+        # Use word boundaries to match only whole words, not parts of other words like "scalable"
+        cover_letter = re.sub(r'\bScala\b', '', cover_letter, flags=re.IGNORECASE)
+        # Clean up any double SPACES (but preserve newlines for paragraph breaks)
+        cover_letter = re.sub(r'[ ]{2,}', ' ', cover_letter)  # Replace 2+ spaces with single space (only spaces, not newlines)
+        cover_letter = re.sub(r'[ ]+([.,;:!?])', r'\1', cover_letter)  # Remove space before punctuation (only spaces, not newlines)
+        # Clean up any triple+ newlines to double newlines (paragraph breaks)
+        cover_letter = re.sub(r'\n{3,}', '\n\n', cover_letter)  # Normalize multiple newlines to double newlines
         
         # Save to file
         name_clean = candidate_name.replace(' ', '')
@@ -478,6 +498,316 @@ class DocumentGenerator:
                 )
         
         return ''.join(html_parts)
+    
+    def _format_cover_letter_html(self, cover_letter_text: str) -> str:
+        """Format cover letter text with proper paragraph breaks and HTML formatting"""
+        if not cover_letter_text:
+            return ''
+        
+        from html import escape
+        
+        # First, handle compatibility text that might be embedded with Dear Hiring Manager
+        # Split by compatibility text first
+        if 'Compatibility based on' in cover_letter_text and 'Dear Hiring Manager' in cover_letter_text:
+            # Split at compatibility text
+            parts = cover_letter_text.split('Compatibility based on', 1)
+            if len(parts) == 2:
+                before_compat = parts[0].strip()
+                compat_and_after = 'Compatibility based on' + parts[1]
+                
+                # Extract methodology if present
+                if 'Methodology:' in compat_and_after:
+                    compat_parts = compat_and_after.split('Methodology:', 1)
+                    compat_text = compat_parts[0].strip()
+                    methodology_text = 'Methodology:' + compat_parts[1].strip()
+                    after_methodology = methodology_text.split('\n\n', 1)
+                    methodology_line = after_methodology[0].strip()
+                    rest_of_letter = after_methodology[1].strip() if len(after_methodology) > 1 else ''
+                else:
+                    compat_parts = compat_and_after.split('\n\n', 1)
+                    compat_text = compat_parts[0].strip()
+                    methodology_line = ''
+                    rest_of_letter = compat_parts[1].strip() if len(compat_parts) > 1 else ''
+                
+                # Process the parts before compatibility (should contain Dear Hiring Manager)
+                paragraphs = []
+                if before_compat:
+                    # Split by newlines - empty lines indicate paragraph breaks
+                    before_lines = before_compat.split('\n')
+                    current_para = []
+                    for line in before_lines:
+                        line = line.strip()
+                        if not line:
+                            if current_para:
+                                paragraphs.append(' '.join(current_para))
+                                current_para = []
+                        else:
+                            current_para.append(line)
+                    if current_para:
+                        paragraphs.append(' '.join(current_para))
+                
+                # Add compatibility and methodology as separate paragraphs
+                if compat_text:
+                    paragraphs.append(compat_text)
+                if methodology_line:
+                    paragraphs.append(methodology_line)
+                
+                # Process rest of letter - apply intelligent paragraph splitting
+                if rest_of_letter:
+                    # First try splitting by double newlines
+                    if '\n\n' in rest_of_letter:
+                        rest_paragraphs = [p.strip() for p in rest_of_letter.split('\n\n') if p.strip()]
+                    else:
+                        # Split by single newlines
+                        rest_lines = rest_of_letter.split('\n')
+                        rest_paragraphs = []
+                        current_para = []
+                        for line in rest_lines:
+                            line = line.strip()
+                            if not line:
+                                if current_para:
+                                    rest_paragraphs.append(' '.join(current_para))
+                                    current_para = []
+                            else:
+                                current_para.append(line)
+                        if current_para:
+                            rest_paragraphs.append(' '.join(current_para))
+                    
+                    # Apply intelligent splitting to rest paragraphs if they're too long
+                    for rest_para in rest_paragraphs:
+                        if len(rest_para) > 400:
+                            # Try splitting by transition phrases
+                            transition_patterns = [
+                                r'(?<=\.)\s+(With [a-z]+ [a-z]+,)',
+                                r'(?<=\.)\s+(My [a-z]+ [a-z]+)',
+                                r'(?<=\.)\s+(I [a-z]+ [a-z]+)',
+                                r'(?<=\.)\s+(In [a-z]+ [a-z]+)',
+                                r'(?<=\.)\s+(Through [a-z]+ [a-z]+)',
+                                r'(?<=\.)\s+(As [a-z]+ [a-z]+)',
+                            ]
+                            
+                            split_found = False
+                            for pattern in transition_patterns:
+                                matches = list(re.finditer(pattern, rest_para, re.IGNORECASE))
+                                if matches:
+                                    # Split at all transition points
+                                    split_points = [0] + [m.start() for m in matches] + [len(rest_para)]
+                                    for i in range(len(split_points) - 1):
+                                        part = rest_para[split_points[i]:split_points[i+1]].strip()
+                                        if part and len(part) > 30:
+                                            paragraphs.append(part)
+                                    split_found = True
+                                    break
+                            
+                            if not split_found:
+                                # Split by sentences
+                                sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', rest_para)
+                                if len(sentences) > 1:
+                                    current = []
+                                    for sentence in sentences:
+                                        sentence = sentence.strip()
+                                        if sentence:
+                                            current.append(sentence)
+                                            if len(' '.join(current)) > 200 or len(current) >= 3:
+                                                paragraphs.append(' '.join(current))
+                                                current = []
+                                    if current:
+                                        paragraphs.append(' '.join(current))
+                                else:
+                                    paragraphs.append(rest_para)
+                        else:
+                            paragraphs.append(rest_para)
+            else:
+                # Fallback: regular processing
+                paragraphs = []
+                lines = cover_letter_text.strip().split('\n')
+                current_paragraph = []
+                for line in lines:
+                    line = line.strip()
+                    if not line:
+                        if current_paragraph:
+                            paragraphs.append(' '.join(current_paragraph))
+                            current_paragraph = []
+                    else:
+                        current_paragraph.append(line)
+                if current_paragraph:
+                    paragraphs.append(' '.join(current_paragraph))
+        else:
+            # Regular paragraph detection: split by double newlines or single newlines after periods
+            # First try splitting by double newlines
+            if '\n\n' in cover_letter_text:
+                paragraphs = [p.strip() for p in cover_letter_text.split('\n\n') if p.strip()]
+            # If no double newlines, check if there are any newlines at all
+            elif '\n' in cover_letter_text:
+                # Try splitting by single newlines and detect paragraph boundaries
+                paragraphs = []
+                lines = cover_letter_text.strip().split('\n')
+                current_paragraph = []
+                
+                for i, line in enumerate(lines):
+                    line = line.strip()
+                    if not line:
+                        # Empty line = paragraph break
+                        if current_paragraph:
+                            paragraphs.append(' '.join(current_paragraph))
+                            current_paragraph = []
+                    elif line.endswith('.') and i < len(lines) - 1 and (not lines[i+1].strip() or lines[i+1].strip()[0].isupper()):
+                        # End of sentence and next line is new paragraph or starts with capital
+                        current_paragraph.append(line)
+                        if len(current_paragraph) >= 3:  # Group 3+ sentences into paragraphs
+                            paragraphs.append(' '.join(current_paragraph))
+                            current_paragraph = []
+                    else:
+                        current_paragraph.append(line)
+                
+                # Add remaining paragraph
+                if current_paragraph:
+                    paragraphs.append(' '.join(current_paragraph))
+            else:
+                # NO NEWLINES AT ALL - this is a continuous block, need to split intelligently
+                # Split by transition phrases first
+                paragraphs = []
+                text = cover_letter_text.strip()
+                
+                # Try to find transition phrases that indicate new paragraphs
+                transition_patterns = [
+                    r'(?<=\.)\s+(With [a-z]+ [a-z]+,)',
+                    r'(?<=\.)\s+(My [a-z]+ [a-z]+)',
+                    r'(?<=\.)\s+(I [a-z]+ [a-z]+)',
+                    r'(?<=\.)\s+(In [a-z]+ [a-z]+)',
+                    r'(?<=\.)\s+(Through [a-z]+ [a-z]+)',
+                    r'(?<=\.)\s+(As [a-z]+ [a-z]+)',
+                    r'(?<=\.)\s+(Furthermore,)',
+                    r'(?<=\.)\s+(Additionally,)',
+                    r'(?<=\.)\s+(Moreover,)',
+                ]
+                
+                split_found = False
+                for pattern in transition_patterns:
+                    matches = list(re.finditer(pattern, text, re.IGNORECASE))
+                    if matches:
+                        # Split at all transition points
+                        split_points = [0] + [m.start() for m in matches] + [len(text)]
+                        for i in range(len(split_points) - 1):
+                            part = text[split_points[i]:split_points[i+1]].strip()
+                            if part and len(part) > 30:
+                                paragraphs.append(part)
+                        split_found = True
+                        break
+                
+                if not split_found:
+                    # Fall back to splitting by sentences and grouping
+                    sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', text)
+                    if len(sentences) > 1:
+                        current = []
+                        for sentence in sentences:
+                            sentence = sentence.strip()
+                            if sentence:
+                                current.append(sentence)
+                                # Group 2-3 sentences per paragraph
+                                if len(' '.join(current)) > 200 or len(current) >= 3:
+                                    paragraphs.append(' '.join(current))
+                                    current = []
+                        if current:
+                            paragraphs.append(' '.join(current))
+                    else:
+                        # If we can't split by sentences, treat entire text as one paragraph
+                        paragraphs = [text]
+                
+                # If we still have very long paragraphs, try to split them intelligently
+                final_paragraphs = []
+                for para in paragraphs:
+                    # Very long paragraphs need to be split
+                    if len(para) > 400:
+                        # First try to split by common paragraph transition phrases
+                        transition_patterns = [
+                            r'(?<=\.)\s+(With [a-z]+ [a-z]+,)',
+                            r'(?<=\.)\s+(My [a-z]+ [a-z]+)',
+                            r'(?<=\.)\s+(I [a-z]+ [a-z]+)',
+                            r'(?<=\.)\s+(In [a-z]+ [a-z]+)',
+                            r'(?<=\.)\s+(Through [a-z]+ [a-z]+)',
+                            r'(?<=\.)\s+(As [a-z]+ [a-z]+)',
+                            r'(?<=\.)\s+(Furthermore,)',
+                            r'(?<=\.)\s+(Additionally,)',
+                            r'(?<=\.)\s+(Moreover,)',
+                            r'(?<=\.)\s+(Therefore,)',
+                            r'(?<=\.)\s+(However,)',
+                        ]
+                        
+                        split_found = False
+                        for pattern in transition_patterns:
+                            matches = list(re.finditer(pattern, para, re.IGNORECASE))
+                            if matches:
+                                # Split at the first strong transition
+                                split_point = matches[0].start()
+                                first_part = para[:split_point].strip()
+                                second_part = para[split_point:].strip()
+                                if len(first_part) > 50:
+                                    final_paragraphs.append(first_part)
+                                final_paragraphs.append(second_part)
+                                split_found = True
+                                break
+                        
+                        if not split_found:
+                            # Fall back to splitting by sentences
+                            sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', para)
+                            if len(sentences) > 1:
+                                current = []
+                                for sentence in sentences:
+                                    sentence = sentence.strip()
+                                    if sentence:
+                                        current.append(sentence)
+                                        # Group 2-3 sentences per paragraph (shorter paragraphs look better)
+                                        if len(' '.join(current)) > 200 or len(current) >= 3:
+                                            final_paragraphs.append(' '.join(current))
+                                            current = []
+                                if current:
+                                    final_paragraphs.append(' '.join(current))
+                            else:
+                                final_paragraphs.append(para)
+                    elif len(para) > 300 and '. ' in para:
+                        # Medium length paragraphs - split by sentences, group 2-3 sentences
+                        sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', para)
+                        if len(sentences) > 3:
+                            current = []
+                            for sentence in sentences:
+                                sentence = sentence.strip()
+                                if sentence:
+                                    current.append(sentence)
+                                    if len(' '.join(current)) > 200 or len(current) >= 2:
+                                        final_paragraphs.append(' '.join(current))
+                                        current = []
+                            if current:
+                                final_paragraphs.append(' '.join(current))
+                        else:
+                            final_paragraphs.append(para)
+                    else:
+                        final_paragraphs.append(para)
+                paragraphs = final_paragraphs
+        
+        # Format as HTML with proper paragraph tags
+        formatted_parts = []
+        for para in paragraphs:
+            if para.strip():
+                # Escape HTML special characters
+                escaped_para = escape(para.strip())
+                # Check if it's a salutation (starts with "Dear")
+                if para.strip().startswith('Dear'):
+                    formatted_parts.append(f'<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6;">{escaped_para}</p>')
+                # Check if it's compatibility text
+                elif para.strip().startswith('Compatibility based on'):
+                    formatted_parts.append(f'<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; font-weight: 500;">{escaped_para}</p>')
+                # Check if it's methodology
+                elif para.strip().startswith('Methodology:'):
+                    formatted_parts.append(f'<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; font-weight: 500;">{escaped_para}</p>')
+                # Check if it's a closing (contains "Sincerely" or similar)
+                elif para.strip().startswith('Sincerely') or para.strip().startswith('Best regards'):
+                    formatted_parts.append(f'<p style="margin-top: 20px; margin-bottom: 5px; font-size: 15px; line-height: 1.6;">{escaped_para}</p>')
+                # Regular paragraph
+                else:
+                    formatted_parts.append(f'<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">{escaped_para}</p>')
+        
+        return '\n'.join(formatted_parts)
     
     def _generate_missing_skills_html(self, missing_skills: list) -> str:
         """Generate HTML for missing skills pills"""
@@ -1907,6 +2237,11 @@ class DocumentGenerator:
     <title>{application.company} - {application.job_title}</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     
+    <!-- Google Fonts - Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
@@ -2132,9 +2467,24 @@ class DocumentGenerator:
         /* Quill Editor Styles */
         .ql-editor {{
             min-height: 120px;
-            font-size: 16px;
+            font-size: 11px !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 400 !important;
             line-height: 1.6;
             color: #4a5568;
+        }}
+        
+        /* Override any pasted content font styles */
+        .ql-editor * {{
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 11px !important;
+        }}
+        
+        .ql-editor p,
+        .ql-editor div,
+        .ql-editor span {{
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 11px !important;
         }}
         
         .ql-toolbar {{
@@ -2149,7 +2499,7 @@ class DocumentGenerator:
             border-top: none;
             border-radius: 0 0 12px 12px;
             background-color: rgba(255, 255, 255, 0.9);
-            font-family: inherit;
+            font-family: 'Montserrat', sans-serif;
         }}
         
         .ql-container.ql-snow:focus-within {{
@@ -2339,23 +2689,15 @@ class DocumentGenerator:
                 
                 <h4 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: 600;">**Cover Letter**</h4>
                 
-                <div id="cover-letter-content" style="background: #f5f5f5; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-height: 500px; overflow-y: auto;">
-{application.job_title} - {application.company} - Intro
-
-{cover_letter}
-
-I reviewed our compatibility based on job posting, research and my experience with my proprietary ML Model and these are my findings:
-
-Match Score: {qualifications.match_score:.0f}%
-
-Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed
-Strong Matches: {', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else 'No strong matches identified'}
-
-Methodology: Weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
-
-
-Sincerely,
-Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
+                <div id="cover-letter-content" style="background: #f5f5f5; padding: 30px 40px; border-radius: 8px; border: 1px solid #e0e0e0; font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; max-height: 600px; overflow-y: auto; color: #333;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 30px; font-weight: 600;">
+                        {application.job_title} - {application.company} - Intro
+                    </div>
+                    
+                    {self._format_cover_letter_html(cover_letter)}
+                    
+                    <p style="margin-top: 30px; margin-bottom: 5px; font-size: 15px; line-height: 1.6;">Sincerely,</p>
+                    <p style="margin-top: 5px; font-size: 15px; line-height: 1.6;">Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com</p>
                 </div>
             </div>
             
@@ -2422,7 +2764,12 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <label for="status_notes" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Notes (Optional)</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <label for="status_notes" style="display: block; font-weight: 600; color: #333;">Notes (Optional)</label>
+                            <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                📋 Copy Content
+                            </button>
+                        </div>
                         <div id="status_notes" placeholder="Add notes about this status update..."></div>
                         <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
                     </div>
@@ -2528,6 +2875,57 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                         }}
                     }};
                 }});
+                
+                // Add paste handler to normalize font styles to Montserrat 11px
+                quillEditor.clipboard.addMatcher(Node.TEXT_NODE, function(node, delta) {{
+                    // Remove any font-family or font-size attributes and normalize
+                    const ops = [];
+                    delta.ops.forEach(function(op) {{
+                        if (op.attributes) {{
+                            // Remove font-family and size attributes, they'll use the default
+                            delete op.attributes['font-family'];
+                            delete op.attributes['size'];
+                        }}
+                        ops.push(op);
+                    }});
+                    return {{ ops: ops }};
+                }});
+                
+                quillEditor.clipboard.addMatcher(Node.ELEMENT_NODE, function(node, delta) {{
+                    // Normalize all pasted elements
+                    if (node.nodeName === 'P' || node.nodeName === 'DIV' || node.nodeName === 'SPAN') {{
+                        const ops = [];
+                        delta.ops.forEach(function(op) {{
+                            if (op.attributes) {{
+                                delete op.attributes['font-family'];
+                                delete op.attributes['size'];
+                            }}
+                            ops.push(op);
+                        }});
+                        return {{ ops: ops }};
+                    }}
+                    return delta;
+                }});
+                
+                // Additional paste normalization after paste event
+                quillEditor.root.addEventListener('paste', function(e) {{
+                    setTimeout(function() {{
+                        const selection = quillEditor.getSelection();
+                        if (selection) {{
+                            // Get the content length that was pasted
+                            const currentLength = quillEditor.getLength();
+                            const pastedLength = currentLength - selection.index;
+                            
+                            if (pastedLength > 0) {{
+                                // Normalize the pasted content to remove font formatting
+                                quillEditor.formatText(selection.index, pastedLength, {{
+                                    'font': false,
+                                    'size': false
+                                }}, 'api');
+                            }}
+                        }}
+                    }}, 50);
+                }}, true);
                 
                 console.log('✅ Quill editor initialized successfully');
 
@@ -2812,6 +3210,76 @@ Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
                     button.style.background = '#667eea';
                 }}, 2000);
             }});
+        }}
+        
+        function copyStatusNotes(buttonElement) {{
+            // Access the global quillEditor variable
+            if (typeof quillEditor !== 'undefined' && quillEditor) {{
+                // Get HTML content from Quill editor to preserve formatting
+                const htmlContent = quillEditor.root.innerHTML;
+                const textContent = quillEditor.getText();
+                
+                // Create a clipboard item with both HTML and plain text
+                const clipboardItem = new ClipboardItem({{
+                    'text/html': new Blob([htmlContent], {{ type: 'text/html' }}),
+                    'text/plain': new Blob([textContent], {{ type: 'text/plain' }})
+                }});
+                
+                navigator.clipboard.write([clipboardItem]).then(function() {{
+                    // Show success message
+                    const button = buttonElement || event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {{
+                        button.innerHTML = originalText;
+                        button.style.background = '#667eea';
+                    }}, 2000);
+                }}).catch(function(err) {{
+                    // Fallback: copy as HTML string
+                    const textArea = document.createElement('textarea');
+                    textArea.value = htmlContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    // Show success message
+                    const button = buttonElement || event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {{
+                        button.innerHTML = originalText;
+                        button.style.background = '#667eea';
+                    }}, 2000);
+                }});
+            }} else {{
+                // Fallback if Quill editor is not available
+                const notesElement = document.getElementById('status_notes');
+                if (notesElement) {{
+                    const htmlContent = notesElement.innerHTML;
+                    const textArea = document.createElement('textarea');
+                    textArea.value = htmlContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    // Show success message
+                    const button = buttonElement || event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {{
+                        button.innerHTML = originalText;
+                        button.style.background = '#667eea';
+                    }}, 2000);
+                }}
+            }}
         }}
         
         function copyMessage(contentId) {{

@@ -6,6 +6,11 @@
     <title>Job Hunter - AI-Powered Application Manager</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     
+    <!-- Google Fonts - Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
@@ -489,9 +494,24 @@
         /* Quill Editor Styles */
         .ql-editor {
             min-height: 120px;
-            font-size: 16px;
+            font-size: 11px !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 400 !important;
             line-height: 1.6;
             color: #4a5568;
+        }
+        
+        /* Override any pasted content font styles */
+        .ql-editor * {
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 11px !important;
+        }
+        
+        .ql-editor p,
+        .ql-editor div,
+        .ql-editor span {
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 11px !important;
         }
         
         .ql-toolbar {
@@ -506,7 +526,7 @@
             border-top: none;
             border-radius: 0 0 12px 12px;
             background-color: rgba(255, 255, 255, 0.9);
-            font-family: inherit;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .ql-container.ql-snow:focus-within {
@@ -1130,6 +1150,58 @@
                             }
                         };
                     });
+                    
+                    // Add paste handler to normalize font styles to Montserrat 11px
+                    quillEditor.clipboard.addMatcher(Node.TEXT_NODE, function(node, delta) {
+                        // Remove any font-family or font-size attributes and normalize
+                        const ops = [];
+                        delta.ops.forEach(function(op) {
+                            if (op.attributes) {
+                                // Remove font-family and size attributes, they'll use the default
+                                delete op.attributes['font-family'];
+                                delete op.attributes['size'];
+                            }
+                            ops.push(op);
+                        });
+                        return { ops: ops };
+                    });
+                    
+                    quillEditor.clipboard.addMatcher(Node.ELEMENT_NODE, function(node, delta) {
+                        // Normalize all pasted elements
+                        if (node.nodeName === 'P' || node.nodeName === 'DIV' || node.nodeName === 'SPAN') {
+                            const ops = [];
+                            delta.ops.forEach(function(op) {
+                                if (op.attributes) {
+                                    delete op.attributes['font-family'];
+                                    delete op.attributes['size'];
+                                }
+                                ops.push(op);
+                            });
+                            return { ops: ops };
+                        }
+                        return delta;
+                    });
+                    
+                    // Additional paste normalization after paste event
+                    quillEditor.root.addEventListener('paste', function(e) {
+                        setTimeout(function() {
+                            const selection = quillEditor.getSelection();
+                            if (selection) {
+                                // Get the content length that was pasted
+                                const currentLength = quillEditor.getLength();
+                                const pastedLength = currentLength - selection.index;
+                                
+                                if (pastedLength > 0) {
+                                    // Normalize the pasted content to remove font formatting
+                                    quillEditor.formatText(selection.index, pastedLength, {
+                                        'font': false,
+                                        'size': false
+                                    }, 'api');
+                                }
+                            }
+                        }, 50);
+                    }, true);
+                    
                     console.log('Quill editor initialized successfully');
                 } catch (error) {
                     console.error('Error initializing Quill editor:', error);
