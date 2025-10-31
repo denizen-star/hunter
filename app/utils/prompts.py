@@ -119,9 +119,9 @@ Generate a professional cover letter with these requirements:
 - Tone: Professional yet personable
 - Length: 300-350 words (slightly longer to accommodate company interest section)
 
-Start directly with "Dear Hiring Manager," and end with "Thanks and best regards,"
+Start directly with "Dear Hiring Manager," and end with "Thanks and best regards."
 
-IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation.
+IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation. Do not add placeholders like [YOUR NAME] or [YOUR SIGNATURE].
 """
 
 
