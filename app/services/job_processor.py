@@ -111,18 +111,6 @@ class JobProcessor:
         # Clean the job description to remove LinkedIn metadata
         cleaned_job_description = self._clean_job_description(job_description)
         
-        # Extract comprehensive job details using AI
-        print("  → Extracting comprehensive job details...")
-        try:
-            structured_job_description = self.ai_analyzer.extract_comprehensive_job_details(
-                cleaned_job_description, 
-                raw_job_description
-            )
-        except Exception as e:
-            print(f"  ⚠ Warning: Could not extract structured job details: {e}")
-            print("  → Using cleaned job description instead")
-            structured_job_description = cleaned_job_description
-        
         # Generate application ID
         timestamp = format_datetime_for_filename()
         app_id = f"{timestamp}-{company}-{job_title}"
@@ -154,30 +142,63 @@ class JobProcessor:
         write_text_file(raw_job_description, raw_job_desc_path)
         application.raw_job_description_path = raw_job_desc_path
         
+        # Parallelize AI calls: extract comprehensive job details and extract job details
+        print("  → Extracting job details (parallel AI calls)...")
+        from concurrent.futures import ThreadPoolExecutor
+        
+        def extract_comprehensive():
+            try:
+                return self.ai_analyzer.extract_comprehensive_job_details(
+                    cleaned_job_description, 
+                    raw_job_description
+                )
+            except Exception as e:
+                print(f"  ⚠ Warning: Could not extract structured job details: {e}")
+                return cleaned_job_description
+        
+        def extract_details():
+            try:
+                return self.ai_analyzer.extract_job_details(raw_job_description)
+            except Exception as e:
+                print(f"  ⚠ Warning: Could not extract job details: {e}")
+                return {
+                    'posted_date': 'N/A',
+                    'salary_range': 'N/A',
+                    'location': 'N/A',
+                    'hiring_manager': 'N/A'
+                }
+        
+        structured_job_description = cleaned_job_description
+        job_details = {
+            'posted_date': 'N/A',
+            'salary_range': 'N/A',
+            'location': 'N/A',
+            'hiring_manager': 'N/A'
+        }
+        
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            comprehensive_future = executor.submit(extract_comprehensive)
+            details_future = executor.submit(extract_details)
+            
+            # Wait for both to complete
+            structured_job_description = comprehensive_future.result()
+            job_details = details_future.result()
+        
         # Save structured job description
         job_desc_filename = f"{timestamp}-{company}-{job_title}.md"
         job_desc_path = folder_path / job_desc_filename
         write_text_file(structured_job_description, job_desc_path)
         application.job_description_path = job_desc_path
         
-        # Extract job details from job description
-        print("  → Extracting job details...")
-        try:
-            job_details = self.ai_analyzer.extract_job_details(raw_job_description)
-            application.posted_date = job_details.get('posted_date', 'N/A')
-            application.salary_range = job_details.get('salary_range', 'N/A')
-            application.location = job_details.get('location', 'N/A')
-            application.hiring_manager = job_details.get('hiring_manager', 'N/A')
-            print(f"  ✓ Posted date: {application.posted_date}")
-            print(f"  ✓ Salary range: {application.salary_range}")
-            print(f"  ✓ Location: {application.location}")
-            print(f"  ✓ Hiring manager: {application.hiring_manager}")
-        except Exception as e:
-            print(f"  ⚠ Warning: Could not extract job details: {e}")
-            application.posted_date = 'N/A'
-            application.salary_range = 'N/A'
-            application.location = 'N/A'
-            application.hiring_manager = 'N/A'
+        # Set job details from parallel extraction
+        application.posted_date = job_details.get('posted_date', 'N/A')
+        application.salary_range = job_details.get('salary_range', 'N/A')
+        application.location = job_details.get('location', 'N/A')
+        application.hiring_manager = job_details.get('hiring_manager', 'N/A')
+        print(f"  ✓ Posted date: {application.posted_date}")
+        print(f"  ✓ Salary range: {application.salary_range}")
+        print(f"  ✓ Location: {application.location}")
+        print(f"  ✓ Hiring manager: {application.hiring_manager}")
         
         # Save application metadata
         self._save_application_metadata(application)

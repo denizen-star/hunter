@@ -34,9 +34,8 @@ class DocumentGenerator:
         print("  → Generating cover letter...")
         self.generate_cover_letter(application, qualifications, resume.full_name)
         
-        # 2.5. Generate intro messages
-        print("  → Generating intro messages...")
-        self.generate_intro_messages(application, qualifications, resume.full_name)
+        # 2.5. Intro messages (deferred) - generated on demand from the Cover Letter tab
+        print("  → Skipping intro messages (deferred; generate from Cover Letter tab if needed)")
         
         # 3. Customized resume (deferred) - generated on demand from the Resume tab
         print("  → Skipping customized resume (deferred; generate from Resume tab if needed)")
@@ -1346,12 +1345,18 @@ class DocumentGenerator:
         }
         
         try:
-            # Generate company website URL (simplified approach)
-            company_clean = company_name.lower().replace(' ', '').replace(',', '').replace('.', '').replace('llc', '').replace('inc', '').replace('corp', '').replace('corporation', '')
-            research_data['website'] = f"https://www.{company_clean}.com"
+            # Don't set a fallback URL - let AI find the actual website
+            # Only use a guessed URL if AI completely fails and we have no other option
             
             # Use web search to find company information
             research_data = self._search_company_info(company_name, research_data)
+            
+            # Only set a fallback URL if AI didn't find one AND we're using fallback data
+            if not research_data.get('website'):
+                # Try to generate a reasonable URL, but mark it as unverified
+                company_clean = company_name.lower().replace(' ', '').replace(',', '').replace('.', '').replace('llc', '').replace('inc', '').replace('corp', '').replace('corporation', '')
+                # Don't set it - let the display logic handle missing URLs gracefully
+                # research_data['website'] = f"https://www.{company_clean}.com"
             
         except Exception as e:
             print(f"Error in company research: {e}")
@@ -3341,6 +3346,33 @@ class DocumentGenerator:
                 if (btn) {{ btn.disabled = false; btn.textContent = 'Generate Customized Resume'; btn.style.background = '#10b981'; }}
             }}
         }}
+        
+        async function generateIntroMessages(messageType) {{
+            try {{
+                const btnId = 'generate' + messageType.replace('_', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'IntrosBtn';
+                const btn = document.getElementById(btnId);
+                if (btn) {{ btn.disabled = true; btn.textContent = 'Generating...'; btn.style.background = '#6c757d'; }}
+                const resp = await fetch('/api/applications/' + APPLICATION_ID + '/generate-intros', {{ 
+                    method: 'POST',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{ message_type: messageType }})
+                }});
+                const result = await resp.json();
+                if (result && result.success) {{
+                    // Reload to show intro messages content
+                    window.location.reload();
+                }} else {{
+                    const errMsg = (result && result.error) ? result.error : 'Unknown error';
+                    alert('Failed to generate intro messages: ' + errMsg);
+                    if (btn) {{ btn.disabled = false; btn.textContent = 'Generate ' + messageType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) + ' Intro Messages'; btn.style.background = '#10b981'; }}
+                }}
+            }} catch (e) {{
+                alert('Failed to generate intro messages: ' + e.message);
+                const btnId = 'generate' + messageType.replace('_', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'IntrosBtn';
+                const btn = document.getElementById(btnId);
+                if (btn) {{ btn.disabled = false; btn.textContent = 'Generate ' + messageType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) + ' Intro Messages'; btn.style.background = '#10b981'; }}
+            }}
+        }}
     </script>
 </body>
 </html>"""
@@ -3419,7 +3451,7 @@ class DocumentGenerator:
         return timeline_html
     
     def _get_intro_messages_content(self, application, message_type: str) -> str:
-        """Get intro messages content from file and format as separate copy-ready boxes"""
+        """Get intro messages content from file and format as separate copy-ready boxes, or show generate button"""
         try:
             if message_type == 'hiring_manager':
                 file_path = getattr(application, 'hiring_manager_intros_path', None)
@@ -3432,7 +3464,14 @@ class DocumentGenerator:
                 content = read_text_file(file_path)
                 return self._format_intro_messages_as_boxes(content, message_type, application.company)
             else:
-                return f"No {message_type.replace('_', ' ')} intro messages found."
+                # Show generate button if files don't exist
+                message_type_display = message_type.replace('_', ' ').title()
+                return f'''<div style="text-align: center; padding: 40px 20px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+                    <p style="color: #6c757d; margin-bottom: 20px; font-size: 14px;">
+                        No {message_type_display} intro messages generated yet. Click the button below to generate them.
+                    </p>
+                    <button id="generate{message_type.replace('_', '').title()}IntrosBtn" onclick="generateIntroMessages('{message_type}')" style="background: #10b981; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Generate {message_type_display} Intro Messages</button>
+                </div>'''
         except Exception as e:
             return f"Error loading {message_type.replace('_', ' ')} intro messages: {str(e)}"
     

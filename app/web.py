@@ -772,6 +772,57 @@ def generate_resume(app_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/applications/<app_id>/generate-intros', methods=['POST'])
+def generate_intros(app_id):
+    """Generate intro messages (hiring manager and/or recruiter) on demand"""
+    try:
+        data = request.json
+        message_type = data.get('message_type', 'both')  # 'hiring_manager', 'recruiter', or 'both'
+        
+        # Load application
+        application = job_processor.get_application_by_id(app_id)
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Ensure qualifications exist
+        if not application.qualifications_path or not application.qualifications_path.exists():
+            return jsonify({'success': False, 'error': 'Qualifications not found for this application'}), 400
+        
+        # Load resume and qualifications
+        resume = resume_manager.load_base_resume()
+        from app.utils.file_utils import read_text_file
+        qual_content = read_text_file(application.qualifications_path)
+        
+        # Build a minimal QualificationAnalysis instance from stored data
+        from app.models.qualification import QualificationAnalysis
+        qualifications = QualificationAnalysis(
+            match_score=application.match_score or 0.0,
+            features_compared=0,
+            strong_matches=[],
+            missing_skills=[],
+            partial_matches=[],
+            soft_skills=[],
+            recommendations=[],
+            detailed_analysis=qual_content
+        )
+        
+        # Generate intro messages (both types always generated together for efficiency)
+        doc_generator.generate_intro_messages(application, qualifications, resume.full_name)
+        
+        # Regenerate summary to include intro messages
+        doc_generator.generate_summary_page(application, qualifications)
+        
+        # Save metadata and update dashboard
+        job_processor._save_application_metadata(application)
+        dashboard_generator.generate_index_page()
+        
+        return jsonify({'success': True, 'message': 'Intro messages generated successfully'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/dashboard/update', methods=['POST'])
 def update_dashboard():
     """Update the dashboard"""
