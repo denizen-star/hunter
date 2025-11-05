@@ -86,8 +86,10 @@ class DocumentGenerator:
             candidate_name
         )
         
-        # Insert compatibility text after "Dear Hiring Manager,"
-        compatibility_text = f"\n\nCompatibility based on job posting, research and my experience modeled match score: {qualifications.match_score:.0f}% - Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed Strong Matches: {', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'No strong matches identified'}\n\nMethodology - Weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%)."
+        # Insert compatibility text after "Dear Hiring Manager," using new format
+        features_count = qualifications.features_compared if qualifications.features_compared > 0 else (len(qualifications.strong_matches) + len(qualifications.missing_skills))
+        strong_matches_str = ', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'essential technical and soft skills'
+        compatibility_text = f"\n\nMy profile shows a {qualifications.match_score:.0f}% compatibility score with the role, and {application.company} verified through weighted scoring methodology—prioritizing Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), and Soft Skills (10%) of {features_count} requirements. My strongest matched features include essential technical and soft skills such as {strong_matches_str}."
         
         if "Dear Hiring Manager," in cover_letter:
             # Insert after "Dear Hiring Manager," 

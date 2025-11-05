@@ -240,8 +240,24 @@ class AIAnalyzer:
         
         cover_letter = self._call_ollama(prompt)
         
-        # Replace placeholder name if exists
+        # Remove any placeholder name variations and ensure actual name is used
         cover_letter = cover_letter.replace('[Name]', candidate_name)
+        cover_letter = cover_letter.replace('[Your Name]', candidate_name)
+        cover_letter = cover_letter.replace('[YOUR NAME]', candidate_name)
+        cover_letter = cover_letter.replace('[your name]', candidate_name)
+        
+        # Ensure name appears after "Sincerely," if it's missing
+        if 'Sincerely,' in cover_letter:
+            # Find the last occurrence of "Sincerely,"
+            parts = cover_letter.rsplit('Sincerely,', 1)
+            if len(parts) == 2:
+                ending = parts[1].strip()
+                # If ending doesn't contain the name, add it on a new line
+                if ending and candidate_name.lower() not in ending.lower():
+                    cover_letter = parts[0] + 'Sincerely,\n' + candidate_name + '\n' + ending
+                elif not ending or ending == '':
+                    # If nothing after "Sincerely,", just add the name
+                    cover_letter = parts[0] + 'Sincerely,\n' + candidate_name
         
         return cover_letter
     
