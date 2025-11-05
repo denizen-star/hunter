@@ -42,7 +42,7 @@ class EnhancedQualificationsAnalyzer:
         """Enhanced qualifications analysis with preliminary matching"""
         
         # Step 1: Run preliminary matching
-        print("🔍 Running preliminary skills matching...")
+        # Reuse the existing matcher instance (it's stateless, so no state issues)
         preliminary_analysis = self.preliminary_matcher.generate_preliminary_analysis(job_description)
         
         # Step 2: Create focused AI prompt based on preliminary results
@@ -166,11 +166,15 @@ Provide an overall assessment considering both the preliminary matching results 
             'detailed_analysis': response
         }
         
-        # Extract match score
+        # Extract match score (but we'll ignore it - we use preliminary score instead)
+        # This is kept for logging/debugging purposes only
         import re
-        score_match = re.search(r'Match Score:\s*(\d+)', response)
+        score_match = re.search(r'Match Score:\s*(\d+(?:\.\d+)?)', response)
         if score_match:
+            # Store AI score but we won't use it - preliminary matcher is source of truth
             analysis['match_score'] = float(score_match.group(1))
+        else:
+            analysis['match_score'] = 0.0
         
         # Extract features compared
         features_match = re.search(r'Features Compared:\s*(\d+)', response)
@@ -231,8 +235,41 @@ Provide an overall assessment considering both the preliminary matching results 
     def _combine_analyses(self, preliminary_analysis: Dict, ai_analysis: Dict) -> QualificationAnalysis:
         """Combine preliminary and AI analysis results"""
         
-        # Use AI match score if available, otherwise use preliminary score
-        match_score = ai_analysis.get('match_score', preliminary_analysis.get('preliminary_match_score', 0.0))
+        # TRUST PRELIMINARY MATCHER SCORE as source of truth
+        # AI scores can be inconsistent, so we prioritize the preliminary matcher which uses
+        # exact, validated matching against known skills
+        
+        # FORCE PRELIMINARY SCORE - NO EXCEPTIONS
+        # Get score from preliminary analysis (the ONLY reliable source)
+        prelim_score_raw = preliminary_analysis.get('preliminary_match_score', None)
+        prelim_score_from_summary = None
+        if 'match_summary' in preliminary_analysis:
+            prelim_score_from_summary = preliminary_analysis['match_summary'].get('match_percentage', None)
+        
+        # Use the first available score
+        final_prelim_score = prelim_score_raw if prelim_score_raw is not None else prelim_score_from_summary
+        
+        if final_prelim_score is None:
+            # Last resort: recalculate from match data
+            exact_count = len(preliminary_analysis.get('exact_matches', []))
+            partial_count = len(preliminary_analysis.get('partial_matches', []))
+            unmatched_count = len(preliminary_analysis.get('unmatched_job_skills', []))
+            total_skills = exact_count + unmatched_count
+            if total_skills > 0:
+                final_prelim_score = (exact_count / total_skills) * 100
+            else:
+                final_prelim_score = 0.0
+        
+        # COMPLETELY IGNORE AI SCORE - IT'S UNRELIABLE
+        ai_score = ai_analysis.get('match_score', 0.0)
+        
+        # FORCE: Use preliminary score, no matter what
+        match_score_final = float(final_prelim_score)
+        match_score = match_score_final
+        
+        # Safety check: Warn if scores differ significantly
+        if abs(final_prelim_score - ai_score) > 5 and final_prelim_score > 0:
+            print(f"⚠️  WARNING: Score mismatch detected! Preliminary={final_prelim_score}%, AI={ai_score}%, USING PRELIMINARY={match_score_final}%")
         
         # Combine strong matches
         strong_matches = []
@@ -241,13 +278,25 @@ Provide an overall assessment considering both the preliminary matching results 
         strong_matches.extend(ai_analysis.get('strong_matches', []))
         
         # Combine missing skills from both preliminary analysis and AI analysis
-        missing_skills = ai_analysis.get('missing_skills', [])
-        
-        # Add unmatched job skills from preliminary analysis as missing skills
+        ai_missing_skills = ai_analysis.get('missing_skills', [])
         preliminary_unmatched = preliminary_analysis.get('unmatched_job_skills', [])
-        for skill in preliminary_unmatched:
-            if skill not in missing_skills:
-                missing_skills.append(skill)
+        
+        # VALIDATION: Trust preliminary matcher as the source of truth
+        # Only use preliminary unmatched skills to avoid AI hallucinations
+        # The AI tends to add specific skills (like "Stakeholder Management") when
+        # only generic terms (like "management") appear in the job description
+        
+        # Use preliminary unmatched skills as the base (these are actually from the job)
+        missing_skills = preliminary_unmatched.copy()
+        
+        # Only add AI skills if they EXACTLY match preliminary unmatched (avoid specifc -> generic)
+        for ai_skill in ai_missing_skills:
+            ai_skill_lower = ai_skill.lower().strip()
+            # Only add if exact match (case-insensitive)
+            if ai_skill_lower not in [s.lower() for s in missing_skills]:
+                # Check for exact match in preliminary
+                if any(ai_skill_lower == pre_skill.lower().strip() for pre_skill in preliminary_unmatched):
+                    missing_skills.append(ai_skill)
         
         # Combine partial matches
         partial_matches = []
@@ -271,17 +320,29 @@ Provide an overall assessment considering both the preliminary matching results 
         # Generate skill mapping
         skill_mapping = self._generate_skill_mapping(preliminary_analysis)
         
+        # Sanitize AI's detailed_analysis to replace any Match Score mentions with the correct preliminary score
+        # This prevents confusion from conflicting scores in the text
+        import re
+        ai_detailed = ai_analysis.get('detailed_analysis', '')
+        # Replace any "Match Score: X%" patterns with the correct preliminary score
+        ai_detailed = re.sub(
+            r'Match Score:\s*\d+(?:\.\d+)?%?',
+            f'Match Score: {match_score:.0f}% (using preliminary matcher score)',
+            ai_detailed,
+            flags=re.IGNORECASE
+        )
+        
         # Create detailed analysis
         detailed_analysis = f"""
 PRELIMINARY MATCHING RESULTS:
-- Match Score: {preliminary_analysis.get('preliminary_match_score', 0)}%
+- Match Score: {match_score:.0f}% (Source: Preliminary Matcher - validated skill matching)
 - Exact Matches: {len(preliminary_analysis.get('exact_matches', []))}
 - Partial Matches: {len(preliminary_analysis.get('partial_matches', []))}
 - AI Focus Areas: {', '.join(preliminary_analysis.get('ai_focus_areas', []))}
 
 {skill_mapping}
 
-{ai_analysis.get('detailed_analysis', '')}
+{ai_detailed}
 """
         
         return QualificationAnalysis(

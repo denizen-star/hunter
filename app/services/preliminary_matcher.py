@@ -13,11 +13,15 @@ class PreliminaryMatcher:
     """Preliminary matching system to reduce AI load"""
     
     def __init__(self):
-        self.skills_yaml_path = Path("/Users/kervinleacock/Documents/Development/hunter/data/resumes/skills.yaml")
-        self.job_skills_path = Path("/Users/kervinleacock/Documents/Development/hunter/Jobdescr-General Skils.md")
+        self.skills_yaml_path = Path("/Users/kervinleacock/Documents/Development/hunter/data/resumes/skills.yaml")                                              
+        self.job_skills_path = Path("/Users/kervinleacock/Documents/Development/hunter/Jobdescr-General Skils.md")                                              
         self.candidate_skills = {}
         self.job_skills = {}
+        # Performance optimization: Cache normalized candidate skills
+        self._normalized_candidate_skills_cache = {}
+        self._normalized_candidate_skills_set = set()
         self.load_skills_data()
+        self._build_normalization_cache()
     
     def load_skills_data(self):
         """Load both skills files"""
@@ -29,6 +33,23 @@ class PreliminaryMatcher:
         # Load job skills from markdown
         job_skills_content = read_text_file(self.job_skills_path)
         self.job_skills = self._parse_job_skills_markdown(job_skills_content)
+    
+    def _build_normalization_cache(self):
+        """Initialize empty cache - normalize lazily as needed"""
+        self._normalized_candidate_skills_cache = {}
+        self._normalized_candidate_skills_set = set()
+    
+    def _get_normalized_skill(self, skill_name: str) -> str:
+        """Get normalized skill from cache, or normalize and cache if not present"""
+        if skill_name in self._normalized_candidate_skills_cache:
+            return self._normalized_candidate_skills_cache[skill_name]
+        
+        # Normalize and cache
+        normalized = self.normalize_skill_name(skill_name)
+        if normalized:
+            self._normalized_candidate_skills_cache[skill_name] = normalized
+            self._normalized_candidate_skills_set.add(normalized)
+        return normalized or ""
     
     def _parse_job_skills_markdown(self, content: str) -> Dict[str, List[str]]:
         """Parse job skills from markdown file"""
@@ -178,23 +199,28 @@ class PreliminaryMatcher:
                 })
         
         # Find job skills that don't match candidate skills
+        # Use two-phase matching: fast check against matched_skills first, then fallback to all candidate skills
+        matched_job_skills = 0
+        unmatched_job_skills_list = []
+        all_candidate_skill_names = set(self.candidate_skills.keys())
+        
         for job_skill in job_skills_found:
-            if not self._is_skill_matched(job_skill, matched_skills):
-                matches['unmatched_job_skills'].append(job_skill)
+            # Phase 1: Quick check against skills already found in job description
+            if self._is_skill_matched(job_skill, matched_skills):
+                matched_job_skills += 1
+            # Phase 2: If not found, check against ALL candidate skills (for cases like "strategy" -> "Business Strategy")
+            elif self._is_skill_matched(job_skill, all_candidate_skill_names):
+                matched_job_skills += 1
+            else:
+                unmatched_job_skills_list.append(job_skill)
+        
+        # Store unmatched job skills
+        matches['unmatched_job_skills'] = unmatched_job_skills_list
         
         # Calculate match score based on job requirements, not candidate skills
         total_job_skills = len(job_skills_found)
         exact_count = len(matches['exact_matches'])
         partial_count = len(matches['partial_matches'])
-        
-        # Calculate how many job skills are matched by candidate
-        matched_job_skills = 0
-        for job_skill in job_skills_found:
-            if self._is_skill_matched(job_skill, matched_skills):
-                matched_job_skills += 1
-        
-        # Store the unmatched job skills for penalty calculation
-        matches['unmatched_job_skills'] = [skill for skill in job_skills_found if not self._is_skill_matched(skill, matched_skills)]
         
         matches['total_required'] = total_job_skills if total_job_skills > 0 else len(self.candidate_skills)
         matches['matched_count'] = matched_job_skills  # Use actual matched job skills count
@@ -339,43 +365,57 @@ class PreliminaryMatcher:
         return consolidated_skills
     
     def _is_skill_matched(self, job_skill: str, matched_skills: set) -> bool:
-        """Check if a job skill matches any candidate skill"""
+        """Check if a job skill matches any candidate skill (optimized with cache)"""
+        if not job_skill or not job_skill.strip():
+            return False
+            
         job_skill_normalized = self.normalize_skill_name(job_skill)
+        
+        # If normalization returns empty/None, use lowercase original as fallback                                                                               
+        if not job_skill_normalized:
+            job_skill_normalized = job_skill.lower().strip()
         
         # Define skill equivalence mappings
         skill_equivalences = {
-            'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],
+            'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],                                                                   
             'amazon kinesis': ['aws', 'kinesis', 'streaming', 'data streaming'],
-            'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],
-            'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],
-            'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],
-            'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'planning'],
-            'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing'],
+            'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],                                                                           
+            'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],                                                   
+            'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],                                                   
+            'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'planning'],                                                                                                                              
+            'strategy': ['strategic', 'business strategy', 'data strategy', 'product strategy', 'planning'],                                                    
+            'insights': ['insight', 'analytics', 'data insights', 'business insights'],                                                                         
+            'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing'],                                                                
             'cloud platforms': ['aws', 'azure', 'gcp', 'cloud'],
-            'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
-            'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
-            'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
-            'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
+            'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],                                                                    
+            'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],                                                                     
+            'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],                                                       
+            'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],                                             
         }
         
+        # Performance optimization: Use lazy cache - normalize only when needed
         for candidate_skill in matched_skills:
-            candidate_skill_normalized = self.normalize_skill_name(candidate_skill)
+            # Get normalized skill from cache (normalizes on first access, then caches)
+            candidate_skill_normalized = self._get_normalized_skill(candidate_skill)
             
-            # Direct match
+            if not candidate_skill_normalized:
+                continue
+            
+            # Direct match (fast check)
             if (job_skill_normalized == candidate_skill_normalized or 
                 job_skill_normalized in candidate_skill_normalized or
                 candidate_skill_normalized in job_skill_normalized):
                 return True
             
-            # Check for skill equivalences
+            # Check for skill equivalences (only if direct match failed)
             if job_skill_normalized in skill_equivalences:
                 for equivalent in skill_equivalences[job_skill_normalized]:
                     if equivalent in candidate_skill_normalized:
                         return True
             
-            # Check reverse equivalences
+            # Check reverse equivalences (only if direct match failed)
             for skill_key, equivalents in skill_equivalences.items():
-                if job_skill_normalized in equivalents and skill_key in candidate_skill_normalized:
+                if job_skill_normalized in equivalents and skill_key in candidate_skill_normalized:                                                             
                     return True
                     
         return False

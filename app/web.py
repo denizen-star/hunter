@@ -347,6 +347,78 @@ def create_application():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/applications/<app_id>/comparison', methods=['GET'])
+def get_normalization_comparison(app_id):
+    """Get side-by-side comparison of old vs new normalization"""
+    try:
+        from app.services.preliminary_matcher import PreliminaryMatcher
+        from app.utils.skill_normalizer import SkillNormalizer
+        from app.utils.file_utils import read_text_file
+        
+        application = job_processor.get_application_by_id(app_id)
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Load job description
+        job_text = read_text_file(application.raw_job_description_path)
+        
+        # Initialize matchers
+        matcher = PreliminaryMatcher()
+        
+        # Get old system results
+        old_matches = matcher.find_skill_matches(job_text)
+        old_extracted = matcher._extract_job_skills_from_description(job_text)
+        
+        # Get new system results (with normalization)
+        new_extracted = []
+        for skill in old_extracted:
+            normalized = matcher.normalize_skill_name(skill)
+            if normalized:
+                new_extracted.append(normalized)
+        
+        # Compare individual skills
+        skill_comparisons = []
+        test_skills = old_extracted[:20]  # First 20 for comparison
+        for skill in test_skills:
+            old_norm = matcher.normalize_skill_name(skill)
+            # Get canonical from new normalizer if available
+            if matcher.normalizer:
+                new_canonical = matcher.normalizer.normalize(skill, fuzzy=True)
+                new_category = matcher.normalizer.get_category(new_canonical) if new_canonical else None
+            else:
+                new_canonical = None
+                new_category = None
+            
+            skill_comparisons.append({
+                'original': skill,
+                'old_normalized': old_norm,
+                'new_canonical': new_canonical,
+                'new_category': new_category,
+                'different': (old_norm != new_canonical.lower() if new_canonical else False)
+            })
+        
+        return jsonify({
+            'success': True,
+            'comparison': {
+                'old_system': {
+                    'match_score': old_matches['match_score'],
+                    'extracted_count': len(old_extracted),
+                    'extracted_skills': old_extracted[:10]
+                },
+                'new_system': {
+                    'normalized_count': len(set(new_extracted)),
+                    'normalized_skills': list(set(new_extracted))[:10]
+                },
+                'skill_comparisons': skill_comparisons,
+                'improvements': len([s for s in skill_comparisons if s['different']])
+            }
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/applications', methods=['GET'])
 def list_applications():
     """List all applications"""

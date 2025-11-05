@@ -1,0 +1,3343 @@
+# Skill Normalization Taxonomy Configuration
+# Auto-generated from existing skill sources
+# Last Updated: 2025-11-01
+# Version: 1.0
+
+# Define canonical skill names and their aliases
+skills:
+  "1analytics, data strategy, or related roles":
+    canonical: "10+ years of experience in analytics, data strategy, or related roles"
+    aliases:
+      - analytics 
+      - data strategy
+      - analytics strategy
+      - data strategy and analytics
+      - roadmap and strategy
+      - roadmapping
+      - Roadmap
+      - center of excellence
+      - COE
+      - center of excellence
+      - Strategy Design
+      - Strategy Design and Implementation
+      - Data Strategy and Architecture
+      - Data Strategy and Architecture Design
+      - Data Strategy and Architecture Implementation
+      - Data Strategy and Architecture Design and Implementation
+      - Data Strategy and Architecture Design and Implementation
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  "data engineering or platform engineering":
+    canonical: "1data engineering or platform engineering"
+    aliases:
+      - data engineering
+      - platform engineering
+      - data engineering or platform engineering
+      - data eng
+      - dataeng
+      - data pipeline
+      - data pipelines
+      - data pipeline design
+      - data pipeline implementation
+      - data services
+      - data services design and implementation and JIRA and Confluence and Slack and Teams and Basecamp
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  "2team lead or management capacity":
+    canonical: "team lead or management capacity"
+    aliases:
+      - team lead
+      - management capacity
+      - team management
+      - project management
+      - project management capacity
+      - team mentoring
+      - team mentorship
+      - team coaching
+      - team growth
+      - team building
+      - building teams
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  "leadership":
+    canonical: "leadership"
+    aliases:
+      - leadership
+      - leadership skills
+      - leadership skills and management
+      - leadership skills and management and team management
+      - cross-functional collaboration
+      - cross-functional team management
+      - Managerial skills
+      - manager of managers
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  "hands-on software engineering experience":
+    canonical: "hands-on software engineering experience"
+    category: Experience Areas
+    aliases:
+      - data Engineering
+      - data engineer
+    tags: ['job_skills', 'experience-areas']
+
+  "cloud-based data architecture":
+    canonical: "cloud-based data architecture"
+    aliases:
+      - cloud-based data architecture
+      - cloud
+      - cloud based data architecture
+      - cloud data architecture
+      - cloud data architecture and AWS
+      - cloud data architecture and AWS and GCP and Azure
+      - cloud data architecture GCP 
+      - cloud data architecture Azure
+      - cloud data architecture Snowflake 
+      - cloud data architecture BigQuery
+      - cloud data architecture PostgreSQL
+      - cloud data architecture Redshift
+      - AWS
+      - GCP
+      - Azure
+      - Snowflake
+      - BigQuery
+      - PostgreSQL
+      - Redshift
+    category: Experience Areas
+    tags: ['job_skills', 'tools-&-technologies']
+
+
+  "data roles":
+    canonical: "data roles"
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+
+  "business intelligence, analytics, or pricing":
+    canonical: "business intelligence, analytics, or pricing"
+    aliases:
+      - business intelligence
+      - analytics
+      - pricing
+      - business intelligence and analytics
+      - business intelligence and analytics and pricing
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  "revenue operations":
+    canonical: "revenue operations"
+    aliases:
+      - revenue operations
+      - revenue operations and analytics
+      - reveops analytics
+      - revops
+      - financial operations
+      - financial reporting
+      - P&L
+      - Profit and Loss
+      - Profit and loss reporting
+      - financial forecasting
+      - financial budgeting
+      - financial planning
+      - financial analysis
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  AI:
+    canonical: AI
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  AI-driven workflows:
+    canonical: AI-driven workflows
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  AI-driven workflows (routing, pricing, recruiting, logistics):
+    canonical: AI-driven workflows (routing, pricing, recruiting, logistics)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  API:
+    canonical: API
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  AS400:
+    canonical: AS400
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  ASA:
+    canonical: ASA
+    aliases:
+      - adaptive server anywhere
+      - asa
+      - sybase adaptive server anywhere
+      - sybase asa
+    category: Other
+    tags: ['TECH']
+
+  ASE:
+    canonical: ASE
+    aliases:
+      - adaptive server enterprise
+      - ase
+      - sybase adaptive server enterprise
+      - sybase ase
+    category: Other
+    tags: ['TECH']
+
+  ASUG - Americas SAP user Group - Speaker:
+    canonical: ASUG - Americas SAP user Group - Speaker
+    aliases:
+      - asug - americas sap user group - speaker
+      - business intelligence - sap user group - speaker
+      - seasong conference speaker
+      - public speaker
+      - public speaking
+      - public speaking business intelligence
+      - public speaking SAP
+    category: Other
+    tags: ['skills.yaml', 'certifications']
+
+  AWS:
+    canonical: AWS
+    aliases:
+      - amazon aws
+      - amazon web services
+      - aws
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'job_skills', 'technical-skills', 'cloud-platforms', 'tools-&-technologies']
+
+  AWS (Amazon Web Services):
+    canonical: AWS (Amazon Web Services)
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  AWS (Amazon Web Services) experience (preferred):
+    canonical: AWS (Amazon Web Services) experience (preferred)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  AWS (cloud platform):
+    canonical: AWS (cloud platform)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  AWS Lake Formation:
+    canonical: AWS Lake Formation
+    aliases:
+      - aws lake formation
+      - lake formation
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'cloud-platforms', 'tools-&-technologies']
+
+  AWS Redshift:
+    canonical: AWS Redshift
+    aliases:
+      - aws redshift
+    category: Databases
+    tags: ['skills.yaml', 'job_skills', 'job_skills', 'databases', 'technical-skills', 'tools-&-technologies']
+
+  AWS Sagemaker:
+    canonical: AWS Sagemaker
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Ability to effectively interact with all levels of the organization:
+    canonical: Ability to effectively interact with all levels of the organization
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Ability to foster a culture of technical excellence, knowledge sharing, and continuous improvement:
+    canonical: Ability to foster a culture of technical excellence, knowledge sharing, and continuous improvement
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Ability to influence C-level stakeholders:
+    canonical: Ability to influence C-level stakeholders
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Ability to translate complex business requirements into scalable technical solutions:
+    canonical: Ability to translate complex business requirements into scalable technical solutions
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Ability to write optimized queries for large-scale data processing:
+    canonical: Ability to write optimized queries for large-scale data processing
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Advanced data analytics (R, Python):
+    canonical: Advanced data analytics (R, Python)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Agile:
+    canonical: Agile
+    aliases:
+      - agile
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Agile Methodology:
+    canonical: Agile Methodology
+    aliases:
+      - agile methodology
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Airbyte:
+    canonical: Airbyte
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Airflow:
+    canonical: Airflow
+    aliases:
+      - airflow
+    category: Databases
+    tags: ['skills.yaml', 'job_skills', 'job_skills', 'databases', 'technical-skills', 'tools-&-technologies']
+
+  Airflow/Dagster (for orchestration):
+    canonical: Airflow/Dagster (for orchestration)
+    aliases:
+      - airflow/dagster (for orchestration)
+      - airflow/dagster
+      - airflow/dagster for orchestration
+      - airflow/dagster for orchestration
+      - Dagster
+      - dag
+      - dags
+      - dag for orchestration
+      - Dagsfor orchestration
+      - dags for orchestration
+      - DAGS
+      - DAG
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Amazon Kinesis:
+    canonical: Amazon Kinesis
+    aliases:
+      - amazon kinesis
+      - kinesis
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'cloud-platforms', 'tools-&-technologies']
+
+  Amazon Q:
+    canonical: Amazon Q
+    aliases:
+      - amazon q
+    category: Databases
+    tags: ['skills.yaml', 'databases']
+
+  Amazon Redshift:
+    canonical: Amazon Redshift
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Amplitude:
+    canonical: Amplitude
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Analytical Thinking:
+    canonical: Analytical Thinking
+    aliases:
+      - analytical thinking
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Analytics:
+    canonical: Analytics
+    aliases:
+      - analytics
+    category: Technical Skills
+    tags: ['skills.yaml', 'job_skills', 'technical-skills', 'other']
+
+  Analytics best practices:
+    canonical: Analytics best practices
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Angular:
+    canonical: Angular
+    aliases:
+      - angular
+      - angularjs
+    category: Other
+    tags: ['TECH']
+
+  Apache Airflow:
+    canonical: Apache Airflow
+    aliases:
+      - airflow
+      - apache airflow
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'data-engineering', 'tools-&-technologies']
+
+  Apache Flink:
+    canonical: Apache Flink
+    aliases:
+      - apache flink
+      - flink
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'data-engineering', 'tools-&-technologies']
+
+  Apache Hudi:
+    canonical: Apache Hudi
+    aliases:
+      - apache hudi
+      - hudi
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'data-engineering', 'tools-&-technologies']
+
+  Apache Iceberg:
+    canonical: Apache Iceberg
+    aliases:
+      - apache iceberg
+      - iceberg
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'data-engineering', 'tools-&-technologies']
+
+  Apache Kafka:
+    canonical: Apache Kafka
+    aliases:
+      - apache kafka
+      - kafka
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'data-engineering', 'tools-&-technologies']
+
+  Apache NiFi:
+    canonical: Apache NiFi
+    aliases:
+      - apache nifi
+      - nifi
+    category: Data Engineering
+    tags: ['TECH', 'data-engineering']
+
+  Apache Spark:
+    canonical: Apache Spark
+    aliases:
+      - apache spark
+      - spark
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'data-engineering', 'tools-&-technologies']
+
+  Architecture:
+    canonical: Architecture
+    aliases:
+      - architecture
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Artificial Intelligence:
+    canonical: Artificial Intelligence
+    aliases:
+      - artificial intelligence
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  At least 12 years in the workforce with significant experience in data-intensive environments:
+    canonical: At least 12 years in the workforce with significant experience in data-intensive environments
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  At least 5 years of experience in a leadership position:
+    canonical: At least 5 years of experience in a leadership position
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Audit:
+    canonical: Audit
+    aliases:
+      - audit
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Aurora:
+    canonical: Aurora
+    aliases:
+      - amazon aurora
+      - aurora
+      - aws aurora
+    category: Other
+    tags: ['TECH']
+
+  Automating lead flows, attribution pipelines, and marketing operations:
+    canonical: Automating lead flows, attribution pipelines, and marketing operations
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Automation:
+    canonical: Automation
+    aliases:
+      - automation
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Azure:
+    canonical: Azure
+    aliases:
+      - azure
+      - microsoft azure
+    category: Cloud Platforms
+    tags: ['TECH', 'job_skills', 'cloud-platforms', 'tools-&-technologies']
+
+  Azure (cloud platform):
+    canonical: Azure (cloud platform)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Azure ML:
+    canonical: Azure ML
+    aliases:
+      - azure machine learning
+      - azure ml
+    category: Cloud Platforms
+    tags: ['TECH', 'cloud-platforms']
+
+  Azure or GCP cloud-based data architecture experience (acceptable alternative to AWS):
+    canonical: Azure or GCP cloud-based data architecture experience (acceptable alternative to AWS)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  BI platforms:
+    canonical: BI platforms
+    aliases:
+      - BI platforms (e.g., Looker, Tableau, PowerBI)
+      - BI platforms expertise
+      - BI platforms expertise Looker
+      - BI platforms expertise Tableau
+      - BI platforms expertise PowerBI
+      - Looker
+      - Tableau
+      - PowerBI
+      - BI tools
+      - BI tools expertise
+      - BI tools expertise Looker
+      - BI tools expertise Tableau
+      - BI tools expertise PowerBI
+      - business intelligence tools
+      - business intelligence tools expertise
+      - business intelligence tools expertise Looker
+      - business intelligence tools expertise Tableau
+      - business intelligence tools expertise PowerBI
+      - Visualization
+      - Visualization expertise
+      - Data visualization
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  BI tool expertise (Tableau, SQL, Power BI, Looker):
+    canonical: BI tool expertise (Tableau, SQL, Power BI, Looker)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+ 
+  Bachelor Degree:
+    canonical: Bachelor Degree
+    aliases:  
+      - Bachelor in Data Engineering 
+      - Bachelor in Computer Science
+      - Bachelor in Engineering
+      - Bachelor in Science
+      - Bachelor in Technology
+      - Bachelor in Management
+      - Bachelor in Business
+      - Bachelor in Accounting
+      - Bachelor in Economics
+      - Bachelor in Finance
+      - Bachelor in Mathematics
+      - Bachelor in Statistics
+      - Bachelor in Science
+      - Bachelor in Computer Science and Engineering
+      - Bachelor in Information Technology
+      - Bachelor in Information Systems
+      - Bachelor in Information Management
+    tags: ['job_skills', 'certifications']
+
+  Banking:
+    canonical: Banking
+    aliases:
+      - banking
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Big Data:
+    canonical: Big Data
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  BigQuery:
+    canonical: BigQuery
+    aliases:
+      - big query
+      - bigquery
+      - google bigquery
+    category: Tools & Technologies
+    tags: ['TECH', 'job_skills', 'tools-&-technologies']
+
+  Blockchain:
+    canonical: Blockchain
+    aliases:
+      - blockchain
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Blockchain Ledger:
+    canonical: Blockchain Ledger
+    aliases:
+      - blockchain
+      - blockchain ledger
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Boomi:
+    canonical: Boomi
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Braze:
+    canonical: Braze
+    aliases:
+      - braze
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  Bringing structure to ambiguity and driving results through data:
+    canonical: Bringing structure to ambiguity and driving results through data
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Brio:
+    canonical: Brio
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Budget Management:
+    canonical: Budget Management
+    aliases:
+      - budget management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Budgeting:
+    canonical: Budgeting
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Building a culture of excellence and continuous learning:
+    canonical: Building a culture of excellence and continuous learning
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Building and maintaining teams:
+    canonical: Building and maintaining teams
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Business Acumen:
+    canonical: Business Acumen
+    aliases:
+      - business acumen
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Business Intelligence:
+    canonical: Business Intelligence
+    aliases:
+      - business intelligence
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Business Intelligence (BI):
+    canonical: Business Intelligence (BI)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Business Objects:
+    canonical: Business Objects
+    aliases:
+      - business objects
+      - sap business objects
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'business-intelligence']
+
+  Business Strategy:
+    canonical: Business Strategy
+    aliases:
+      - business strategy
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Business acumen (deep understanding of SaaS metrics and how data drives business strategy):
+    canonical: Business acumen (deep understanding of SaaS metrics and how data drives business strategy)
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Business-first mindset:
+    canonical: Business-first mindset
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  "C#":
+    canonical: "C#"
+    aliases:
+      - c sharp
+      - c#
+      - csharp
+    category: Other
+    tags: ['TECH']
+
+  "C++":
+    canonical: "C++"
+    aliases:
+      - c plus plus
+      - c++
+      - cpp
+    category: Other
+    tags: ['TECH']
+
+  CBIP Preparation - Information Systems Core Exam:
+    canonical: CBIP Preparation - Information Systems Core Exam
+    aliases:
+      - cbip preparation - information systems core exam
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  CDC pipelines:
+    canonical: CDC pipelines
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  CI/CD:
+    canonical: CI/CD
+    aliases:
+      - ci/cd
+      - continuous delivery
+      - continuous integration
+    category: Other
+    tags: ['TECH', 'skills.yaml', 'other']
+
+  CRM analytics:
+    canonical: CRM analytics
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  CRM platforms (Salesforce, LeadPerfection, ImproveIt360, etc.):
+    canonical: CRM platforms (Salesforce, LeadPerfection, ImproveIt360, etc.)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  CRM/API integrations (Salesforce, LeadPerfection, custom workflows):
+    canonical: CRM/API integrations (Salesforce, LeadPerfection, custom workflows)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Campaign management:
+    canonical: Campaign management
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Cassandra:
+    canonical: Cassandra
+    aliases:
+      - cassandra
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Census:
+    canonical: Census
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Change-data-capture (CDC):
+    canonical: Change-data-capture (CDC)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Cisco Certified Network Associate:
+    canonical: Cisco Certified Network Associate
+    aliases:
+      - cisco certified network associate
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Client Management:
+    canonical: Client Management
+    aliases:
+      - client management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Cloud-based data architecture:
+    canonical: Cloud-based data architecture
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Cloud-based data infrastructure (BigQuery or equivalent):
+    canonical: Cloud-based data infrastructure (BigQuery or equivalent)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  CloudFormation:
+    canonical: CloudFormation
+    aliases:
+      - cloud formation
+      - cloudformation
+    category: Other
+    tags: ['TECH']
+
+  Clustering:
+    canonical: Clustering
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Coaching:
+    canonical: Coaching
+    aliases:
+      - coaching
+    category: Leadership
+    tags: ['skills.yaml', 'leadership']
+
+  Cognos:
+    canonical: Cognos
+    aliases:
+      - cognos
+      - ibm cognos
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'business-intelligence']
+
+  Collaboration:
+    canonical: Collaboration
+    aliases:
+      - collaboration
+    category: Soft Skills
+    tags: ['skills.yaml', 'job_skills', 'soft-skills', 'other']
+
+  Collaboration (cross-functional with departments like Finance, Product, and Marketing):
+    canonical: Collaboration (cross-functional with departments like Finance, Product, and Marketing)
+    category: Soft Skills
+    tags: ['job_skills', 'domain-expertise']
+
+  Collaboration cross-functionally with departments like Finance, Product, and Marketing:
+    canonical: Collaboration cross-functionally with departments like Finance, Product, and Marketing
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Collaboration with data management, security, and privacy teams to ensure compliance and governance:
+    canonical: Collaboration with data management, security, and privacy teams to ensure compliance and governance
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Collaboration with executive team:
+    canonical: Collaboration with executive team
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Comfortable working cross-functionally across Sales, Marketing, Finance, and Product teams:
+    canonical: Comfortable working cross-functionally across Sales, Marketing, Finance, and Product teams
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Communication:
+    canonical: Communication
+    aliases:
+      - communication
+    category: Soft Skills
+    tags: ['skills.yaml', 'job_skills', 'soft-skills', 'other']
+
+  Communication (translate complex data into actionable strategies for senior leadership):
+    canonical: Communication (translate complex data into actionable strategies for senior leadership)
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Communication to translate complex data into actionable strategies for senior leadership:
+    canonical: Communication to translate complex data into actionable strategies for senior leadership
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Compliance:
+    canonical: Compliance
+    aliases:
+      - compliance
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Consultation:
+    canonical: Consultation
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Consulting:
+    canonical: Consulting
+    aliases:
+      - consulting
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Continuous improvement through training and growth opportunities within the team based on merit:
+    canonical: Continuous improvement through training and growth opportunities within the team based on merit
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Continuous learning and optimization:
+    canonical: Continuous learning and optimization
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Critical Thinking:
+    canonical: Critical Thinking
+    aliases:
+      - critical thinking
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Cross-functional collaboration (with Data Engineering and Data Science teams):
+    canonical: Cross-functional collaboration (with Data Engineering and Data Science teams)
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Crystal Reports:
+    canonical: Crystal Reports
+    aliases:
+      - crystal reports
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'business-intelligence']
+
+  Cursor AI:
+    canonical: Cursor AI
+    aliases:
+      - cursor
+      - cursor ai
+    category: Other
+    tags: ['TECH', 'skills.yaml', 'other']
+
+  Custom APIs:
+    canonical: Custom APIs
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Customer Analytics:
+    canonical: Customer Analytics
+    aliases:
+      - customer analytics
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  DB2:
+    canonical: DB2
+    aliases:
+      - db2
+      - ibm db2
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  DBT (data build tool):
+    canonical: DBT (data build tool)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Dagster:
+    canonical: Dagster
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Dashboard:
+    canonical: Dashboard
+    aliases:
+      - dashboard
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Dashboards:
+    canonical: Dashboards
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Data Analytics:
+    canonical: Data Analytics
+    aliases:
+      - data analytics
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data Architecture:
+    canonical: Data Architecture
+    aliases:
+      - data architecture
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data Engineering:
+    canonical: Data Engineering
+    aliases:
+      - data engineering
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data Lake:
+    canonical: Data Lake
+    aliases:
+      - data lake
+      - datalake
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases', 'data-architecture']
+
+  Data Mart:
+    canonical: Data Mart
+    aliases:
+      - data mart
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data Marts:
+    canonical: Data Marts
+    aliases:
+      - data marts
+      - datamarts
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Data Mesh:
+    canonical: Data Mesh
+    aliases:
+      - data mesh
+      - datamesh
+    category: Data Architecture
+    tags: ['TECH', 'skills.yaml', 'data-architecture', 'domain-expertise']
+
+  Data Mining:
+    canonical: Data Mining
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data Modeling:
+    canonical: Data Modeling
+    aliases:
+      - data modeling
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Data Modeling techniques:
+    canonical: Data Modeling techniques
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data Ops:
+    canonical: Data Ops
+    aliases:
+      - data ops
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Data Pipeline:
+    canonical: Data Pipeline
+    aliases:
+      - data pipeline
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Data Science:
+    canonical: Data Science
+    aliases:
+      - data science
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data Strategy:
+    canonical: Data Strategy
+    aliases:
+      - data strategy
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data Warehouse:
+    canonical: Data Warehouse
+    aliases:
+      - data warehouse
+      - datawarehouse
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases', 'data-architecture']
+
+  Data Warehousing:
+    canonical: Data Warehousing
+    aliases:
+      - data warehousing
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Data architecture patterns:
+    canonical: Data architecture patterns
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data infrastructure technologies:
+    canonical: Data infrastructure technologies
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Data lake(s):
+    canonical: Data lake(s)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Data orchestration patterns (Airflow/Dagster):
+    canonical: Data orchestration patterns (Airflow/Dagster)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data pipelines (experience leading technical teams that build):
+    canonical: Data pipelines (experience leading technical teams that build)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data platforms:
+    canonical: Data platforms
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data storage strategies:
+    canonical: Data storage strategies
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data visualization tools:
+    canonical: Data visualization tools
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data visualization tools (Looker, Tableau, etc.):
+    canonical: Data visualization tools (Looker, Tableau, etc.)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Data visualization tools (not specified):
+    canonical: Data visualization tools (not specified)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Data warehouse platform(s):
+    canonical: Data warehouse platform(s)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  DataDog:
+    canonical: DataDog
+    aliases:
+      - data dog
+      - datadog
+    category: Other
+    tags: ['TECH', 'skills.yaml', 'other']
+
+  Database & BI architecture:
+    canonical: Database & BI architecture
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Databricks:
+    canonical: Databricks
+    aliases:
+      - databricks
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'databases', 'technical-skills']
+
+  Datatrace:
+    canonical: Datatrace
+    aliases:
+      - datatrace
+    category: Other
+    tags: ['TECH', 'skills.yaml', 'other']
+
+  Decision Trees:
+    canonical: Decision Trees
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Deep understanding of the full loan life cycle and P&L mechanics:
+    canonical: Deep understanding of the full loan life cycle and P&L mechanics
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  DevOps:
+    canonical: DevOps
+    aliases:
+      - devops
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Digital Transformation:
+    canonical: Digital Transformation
+    aliases:
+      - digital transformation
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Digital initiatives:
+    canonical: Digital initiatives
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Django:
+    canonical: Django
+    aliases:
+      - django
+    category: Programming Languages
+    tags: ['TECH', 'programming-languages']
+
+  Docker:
+    canonical: Docker
+    aliases:
+      - docker
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'cloud-platforms']
+
+  DocumentDB:
+    canonical: DocumentDB
+    aliases:
+      - amazon documentdb
+      - aws documentdb
+      - documentdb
+    category: Other
+    tags: ['TECH']
+
+  DynamoDB:
+    canonical: DynamoDB
+    aliases:
+      - dynamo db
+      - dynamodb
+    category: Other
+    tags: ['TECH']
+
+  ELK Stack:
+    canonical: ELK Stack
+    aliases:
+      - elasticsearch logstash kibana
+      - elk
+      - elk stack
+    category: Other
+    tags: ['TECH']
+
+  ERP systems (Oracle, Workday, SAP, PeopleSoft):
+    canonical: ERP systems (Oracle, Workday, SAP, PeopleSoft)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  ERPs:
+    canonical: ERPs
+    aliases:
+      - enterprise resource planning
+      - erp
+      - erps
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  ERwin:
+    canonical: ERwin
+    aliases:
+      - erwin
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  ETL:
+    canonical: ETL
+    aliases:
+      - etl
+    category: Other
+    tags: ['skills.yaml', 'job_skills', 'other', 'tools-&-technologies']
+
+  Efficiency:
+    canonical: Efficiency
+    aliases:
+      - efficiency
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Elasticsearch:
+    canonical: Elasticsearch
+    aliases:
+      - elastic search
+      - elasticsearch
+    category: Other
+    tags: ['TECH']
+
+  Enabling growth paths:
+    canonical: Enabling growth paths
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Enterprise mindset:
+    canonical: Enterprise mindset
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Ethical integrity:
+    canonical: Ethical integrity
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Excel:
+    canonical: Excel
+    aliases:
+      - excel
+      - microsoft excel
+      - ms excel
+    category: Tools & Technologies
+    tags: ['TECH', 'job_skills', 'tools-&-technologies']
+
+  Excellent collaboration and leadership skills:
+    canonical: Excellent collaboration and leadership skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Excellent communication skills:
+    canonical: Excellent communication skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Excellent data analysis skills with ability to extract meaningful insights:
+    canonical: Excellent data analysis skills with ability to extract meaningful insights
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Experience building customer or fan 360 platforms, identity resolution systems, and feature stores:
+    canonical: Experience building customer or fan 360 platforms, identity resolution systems, and feature stores
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience creating and managing budgets of ~$4M:
+    canonical: Experience creating and managing budgets of ~$4M
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience in ML / AI methodologies and event streaming (asset):
+    canonical: Experience in ML / AI methodologies and event streaming (asset)
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience in Team Leadership & Management:
+    canonical: Experience in Team Leadership & Management
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience in a related field or industry (not specified):
+    canonical: Experience in a related field or industry (not specified)
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience leading a turnaround or transformation initiative in an analytics function (preferred):
+    canonical: Experience leading a turnaround or transformation initiative in an analytics function (preferred)
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience with building corporate Business Intelligence strategy:
+    canonical: Experience with building corporate Business Intelligence strategy
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience with real-time or near-real-time data processing systems (preferred):
+    canonical: Experience with real-time or near-real-time data processing systems (preferred)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Experience working for a GSIB / Cat 1 Bank (preferred):
+    canonical: Experience working for a GSIB / Cat 1 Bank (preferred)
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience working in fintech, crypto, or other regulated industries (preferred):
+    canonical: Experience working in fintech, crypto, or other regulated industries (preferred)
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience working in high-growth B2B SaaS or marketplace companies:
+    canonical: Experience working in high-growth B2B SaaS or marketplace companies
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Experience working with marketing teams:
+    canonical: Experience working with marketing teams
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Expertise in advanced data analytics (R, Python):
+    canonical: Expertise in advanced data analytics (R, Python)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Expertise in journey analytics, funnel optimization, and experimentation:
+    canonical: Expertise in journey analytics, funnel optimization, and experimentation
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Express:
+    canonical: Express
+    aliases:
+      - express
+      - express.js
+      - expressjs
+    category: Other
+    tags: ['TECH']
+
+  FP&A systems (Oracle EPM, TM1/Cognos):
+    canonical: FP&A systems (Oracle EPM, TM1/Cognos)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Familiarity with Hyperion, Oracle Projects and/or OBI (Business Intelligence Objects):
+    canonical: Familiarity with Hyperion, Oracle Projects and/or OBI (Business Intelligence Objects)
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  FastAPI:
+    canonical: FastAPI
+    aliases:
+      - fast api
+      - fastapi
+    category: Other
+    tags: ['TECH']
+
+  Feedback provision:
+    canonical: Feedback provision
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Financial Management:
+    canonical: Financial Management
+    aliases:
+      - financial management
+    category: domain-expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Financial Services:
+    canonical: Financial Services
+    aliases:
+      - financial services
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Financial modeling:
+    canonical: Financial modeling
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills','domain-expertise']
+
+  Financial planning software:
+    canonical: Financial planning software
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Fintech:
+    canonical: Fintech
+    aliases:
+      - fintech
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Fivetran:
+    canonical: Fivetran
+    aliases:
+      - fivetran
+    category: Data Engineering
+    tags: ['TECH', 'job_skills', 'job_skills', 'technical-skills', 'data-engineering', 'tools-&-technologies']
+
+  Fivetran/Airbyte (for data ingestion):
+    canonical: Fivetran/Airbyte (for data ingestion)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Fivetran/Airbyte for data ingestion:
+    canonical: Fivetran/Airbyte for data ingestion
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Flask:
+    canonical: Flask
+    aliases:
+      - flask
+    category: Other
+    tags: ['TECH']
+
+  Forecasting:
+    canonical: Forecasting
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  GCP:
+    canonical: GCP
+    aliases:
+      - gcp
+      - google cloud
+      - google cloud platform
+    category: Cloud Platforms
+    tags: ['TECH', 'cloud-platforms']
+
+  GCP (Google Cloud Platform):
+    canonical: GCP (Google Cloud Platform)
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  GCP (cloud platform):
+    canonical: GCP (cloud platform)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  GTM tools:
+    canonical: GTM tools
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Git:
+    canonical: Git
+    aliases:
+      - git
+      - version control
+    category: Other
+    tags: ['TECH']
+
+  GitHub:
+    canonical: GitHub
+    aliases:
+      - git hub
+      - github
+    category: Other
+    tags: ['TECH']
+
+  GitLab:
+    canonical: GitLab
+    aliases:
+      - git lab
+      - gitlab
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'cloud-platforms']
+
+  Glue:
+    canonical: Glue
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Go:
+    canonical: Go
+    aliases:
+      - golang
+    category: Programming Languages
+    tags: ['TECH', 'programming-languages']
+
+  Google Cloud Platform (GCP):
+    canonical: Google Cloud Platform (GCP)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Google Cloud systems (BigQuery, Cloud Functions, Google Workspace tools):
+    canonical: Google Cloud systems (BigQuery, Cloud Functions, Google Workspace tools)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Google Workspace tools:
+    canonical: Google Workspace tools
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Grafana:
+    canonical: Grafana
+    aliases:
+      - grafana
+    category: Other
+    tags: ['TECH']
+
+  GraphQL:
+    canonical: GraphQL
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Great Expectations:
+    canonical: Great Expectations
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Hadoop Hortonworks/Cloudera:
+    canonical: Hadoop Hortonworks/Cloudera
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Hands-on mentorship:
+    canonical: Hands-on mentorship
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Hex:
+    canonical: Hex
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Hex (for analytics):
+    canonical: Hex (for analytics)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Hex for analytics:
+    canonical: Hex for analytics
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  High attention to detail:
+    canonical: High attention to detail
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  High bias for action:
+    canonical: High bias for action
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  High-performance database design:
+    canonical: High-performance database design
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Hyperion:
+    canonical: Hyperion
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Hyperion Essbase:
+    canonical: Hyperion Essbase
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Hyperion IR:
+    canonical: Hyperion IR
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Implementation:
+    canonical: Implementation
+    aliases:
+      - implementation
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Influencing across all levels of the organization:
+    canonical: Influencing across all levels of the organization
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Informatica:
+    canonical: Informatica
+    aliases:
+      - informatica
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Informatica IICS:
+    canonical: Informatica IICS
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Insights:
+    canonical: Insights
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Interpersonal flexibility:
+    canonical: Interpersonal flexibility
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Java:
+    canonical: Java
+    aliases:
+      - java
+    category: Programming Languages
+    tags: ['TECH', 'skills.yaml', 'programming-languages']
+
+  JavaScript:
+    canonical: JavaScript
+    aliases:
+      - javascript
+      - js
+      - node.js
+      - nodejs
+    category: Programming Languages
+    tags: ['TECH', 'programming-languages']
+
+  Jenkins:
+    canonical: Jenkins
+    aliases:
+      - jenkins
+    category: Other
+    tags: ['TECH']
+
+  Jupyter:
+    canonical: Jupyter
+    aliases:
+      - jupyter
+      - jupyter notebook
+      - jupyterlab
+    category: Other
+    tags: ['TECH']
+
+  Kafka:
+    canonical: Kafka
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Kinesis:
+    canonical: Kinesis
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Knowledge of cloud platforms (AWS, Azure, or GCP) and their data services (preferred):
+    canonical: Knowledge of cloud platforms (AWS, Azure, or GCP) and their data services (preferred)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Kubeflow:
+    canonical: Kubeflow
+    aliases:
+      - kubeflow
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Kubernetes:
+    canonical: Kubernetes
+    aliases:
+      - k8s
+      - kubernetes
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'cloud-platforms']
+
+  LLM frameworks (bonus):
+    canonical: LLM frameworks (bonus)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  LLM frameworks (logistics optimization) (bonus):
+    canonical: LLM frameworks (logistics optimization) (bonus)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  LLMs (multiple):
+    canonical: LLMs (multiple)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Lakehouse:
+    canonical: Lakehouse
+    aliases:
+      - lakehouse
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Lambda:
+    canonical: Lambda
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Leadership:
+    canonical: Leadership
+    aliases:
+      - leadership
+    category: Soft Skills
+    tags: ['skills.yaml', 'job_skills', 'soft-skills', 'leadership']
+
+  Leadership and team management abilities:
+    canonical: Leadership and team management abilities
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Leadership skills:
+    canonical: Leadership skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Leadership to build a team in a startup environment:
+    canonical: Leadership to build a team in a startup environment
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Ledger:
+    canonical: Ledger
+    aliases:
+      - ledger
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Liaisoning:
+    canonical: Liaisoning
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Looker:
+    canonical: Looker
+    aliases:
+      - looker
+    category: Business Intelligence
+    tags: ['TECH', 'job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies', 'business-intelligence']
+
+  Looker Studio:
+    canonical: Looker Studio
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  LucidArt:
+    canonical: LucidArt
+    aliases:
+      - lucid art
+      - lucidart
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  MBA a plus:
+    canonical: MBA a plus
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  MBA or CPA preferred:
+    canonical: MBA or CPA preferred
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  MDM (Master Data Management):
+    canonical: MDM (Master Data Management)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  ML (Machine Learning) implementations:
+    canonical: ML (Machine Learning) implementations
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  MLOps:
+    canonical: MLOps
+    aliases:
+      - mlops
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  MLflow:
+    canonical: MLflow
+    aliases:
+      - mlflow
+    category: Other
+    tags: ['TECH']
+
+  MS Access:
+    canonical: MS Access
+    aliases:
+      - access
+      - microsoft access
+      - ms access
+    category: Other
+    tags: ['TECH', 'skills.yaml', 'other']
+
+  MS Excel:
+    canonical: MS Excel
+    aliases:
+      - ms excel
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Machine Learning:
+    canonical: Machine Learning
+    aliases:
+      - machine learning
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Machine learning applications:
+    canonical: Machine learning applications
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Machine learning concepts:
+    canonical: Machine learning concepts
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Marketing Analytics:
+    canonical: Marketing Analytics
+    aliases:
+      - marketing analytics
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Martech stacks:
+    canonical: Martech stacks
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Master of Business Administration (20%):
+    canonical: Master of Business Administration (20%)
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Master of Science (17%):
+    canonical: Master of Science (17%)
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Masters Degree or higher (22%):
+    canonical: Masters Degree or higher (22%)
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Masters degree in Engineering Systems Management or a related field:
+    canonical: Masters degree in Engineering Systems Management or a related field
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Mentoring:
+    canonical: Mentoring
+    aliases:
+      - mentoring
+    category: Soft Skills
+    tags: ['skills.yaml', 'job_skills', 'soft-skills', 'leadership']
+
+  Mentorship skills:
+    canonical: Mentorship skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Metabase:
+    canonical: Metabase
+    aliases:
+      - metabase
+    category: Other
+    tags: ['TECH']
+
+  Microsoft Azure:
+    canonical: Microsoft Azure
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Microsoft Excel:
+    canonical: Microsoft Excel
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Microsoft Fabric:
+    canonical: Microsoft Fabric
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Microsoft Purview:
+    canonical: Microsoft Purview
+    aliases:
+      - microsoft purview
+      - purview
+    category: Other
+    tags: ['TECH']
+
+  Migration:
+    canonical: Migration
+    aliases:
+      - migration
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Minimum 10 years hands-on experience in data engineering:
+    canonical: Minimum 10 years hands-on experience in data engineering
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Minimum 10 years of progressive FP&A or related experience in a finance, data or tech environment:
+    canonical: Minimum 10 years of progressive FP&A or related experience in a finance, data or tech environment
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Minimum of 6 years in a role with direct reports:
+    canonical: Minimum of 6 years in a role with direct reports
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  ModelOps:
+    canonical: ModelOps
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Modeling performant data sets in modern cloud data warehouses (Snowflake, BigQuery, Redshift):
+    canonical: Modeling performant data sets in modern cloud data warehouses (Snowflake, BigQuery, Redshift)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Modern data orchestration patterns:
+    canonical: Modern data orchestration patterns
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Modern data stack (specifically BigQuery, dbt, Airflow, Looker):
+    canonical: Modern data stack (specifically BigQuery, dbt, Airflow, Looker)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  MongoDB:
+    canonical: MongoDB
+    aliases:
+      - mongo
+      - mongodb
+    category: Programming Languages
+    tags: ['TECH', 'programming-languages']
+
+  Monte Carlo:
+    canonical: Monte Carlo
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Mortgage:
+    canonical: Mortgage
+    aliases:
+      - mortgage
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  MuleSoft:
+    canonical: MuleSoft
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Multi-touch attribution models:
+    canonical: Multi-touch attribution models
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  MySQL:
+    canonical: MySQL
+    aliases:
+      - mysql
+    category: Programming Languages
+    tags: ['TECH', 'skills.yaml', 'databases', 'programming-languages']
+
+  N8N:
+    canonical: N8N
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  NMLS – Mortgage Loan Originator:
+    canonical: NMLS – Mortgage Loan Originator
+    aliases:
+      - nmls – mortgage loan originator
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Neptune:
+    canonical: Neptune
+    aliases:
+      - amazon neptune
+      - aws neptune
+      - neptune
+    category: Other
+    tags: ['TECH']
+
+  NetSuite:
+    canonical: NetSuite
+    aliases:
+      - netsuite
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  Neural Networks:
+    canonical: Neural Networks
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  New Relic:
+    canonical: New Relic
+    aliases:
+      - new relic
+      - newrelic
+    category: Other
+    tags: ['TECH']
+
+  No specific education or certification requirements mentioned:
+    canonical: No specific education or certification requirements mentioned
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Not explicitly mentioned.:
+    canonical: Not explicitly mentioned.
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Not specified:
+    canonical: Not specified
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  NumPy:
+    canonical: NumPy
+    aliases:
+      - numpy
+    category: Other
+    tags: ['TECH']
+
+  OBI (Business Intelligence Objects):
+    canonical: OBI (Business Intelligence Objects)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Omnichannel campaigns:
+    canonical: Omnichannel campaigns
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Optimization:
+    canonical: Optimization
+    aliases:
+      - optimization
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Optimization models (advance):
+    canonical: Optimization models (advance)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Oracle:
+    canonical: Oracle
+    aliases:
+      - oracle
+      - oracle database
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Oracle Exadata:
+    canonical: Oracle Exadata
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Oracle Projects:
+    canonical: Oracle Projects
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Organisational skills:
+    canonical: Organisational skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Other degrees (41%):
+    canonical: Other degrees (41%)
+    category: Certifications
+    tags: ['job_skills', 'certifications']
+
+  Outlook:
+    canonical: Outlook
+    aliases:
+      - microsoft outlook
+      - outlook
+    category: Other
+    tags: ['TECH']
+
+  Overseeing training frameworks:
+    canonical: Overseeing training frameworks
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  PL/SQL:
+    canonical: PL/SQL
+    aliases:
+      - pl sql
+      - pl/sql
+      - plsql
+    category: Programming Languages
+    tags: ['TECH', 'skills.yaml', 'programming-languages']
+
+  PLSQL:
+    canonical: PLSQL
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Pandas:
+    canonical: Pandas
+    aliases:
+      - pandas
+    category: Other
+    tags: ['TECH']
+
+  Partnership building:
+    canonical: Partnership building
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Passion for AI agents and their application in real operations:
+    canonical: Passion for AI agents and their application in real operations
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Peer code reviews:
+    canonical: Peer code reviews
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Pendo:
+    canonical: Pendo
+    aliases:
+      - pendo
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  Performance monitoring:
+    canonical: Performance monitoring
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Performance tuning for modern MPP OLAP systems and distributed query engines (e.g., Presto, Trino):
+    canonical: Performance tuning for modern MPP OLAP systems and distributed query engines (e.g., Presto, Trino)
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Pipelines:
+    canonical: Pipelines
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Planning and execution:
+    canonical: Planning and execution
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Post-campaign analysis and recommendations:
+    canonical: Post-campaign analysis and recommendations
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  PostgreSQL:
+    canonical: PostgreSQL
+    aliases:
+      - postgres
+      - postgresql
+    category: Programming Languages
+    tags: ['TECH', 'skills.yaml', 'databases', 'programming-languages']
+
+  Power BI:
+    canonical: Power BI
+    aliases:
+      - power bi
+      - powerbi
+    category: Business Intelligence
+    tags: ['TECH', 'job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies', 'business-intelligence']
+
+  PowerPoint:
+    canonical: PowerPoint
+    aliases:
+      - microsoft powerpoint
+      - power point
+      - powerpoint
+    category: Business Intelligence
+    tags: ['TECH', 'business-intelligence']
+
+  Pre-campaign analysis and planning:
+    canonical: Pre-campaign analysis and planning
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Predictive modeling:
+    canonical: Predictive modeling
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Preferably with global/cross-border experience:
+    canonical: Preferably with global/cross-border experience
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Presentation:
+    canonical: Presentation
+    aliases:
+      - presentation
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Presto:
+    canonical: Presto
+    aliases:
+      - presto
+      - prestodb
+    category: Tools & Technologies
+    tags: ['TECH', 'job_skills', 'tools-&-technologies']
+
+  Prior experience working with data governance and its application:
+    canonical: Prior experience working with data governance and its application
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Prioritization and delivery of data initiatives:
+    canonical: Prioritization and delivery of data initiatives
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Problem Solving:
+    canonical: Problem Solving
+    aliases:
+      - problem solving
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Problem-solving:
+    canonical: Problem-solving
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Problem-solving (unify fragmented BI systems into a scalable infrastructure):
+    canonical: Problem-solving (unify fragmented BI systems into a scalable infrastructure)
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Problem-solving ability:
+    canonical: Problem-solving ability
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Problem-solving skills:
+    canonical: Problem-solving skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Problem-solving to refine pricing models and unit economics:
+    canonical: Problem-solving to refine pricing models and unit economics
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Product Backlog:
+    canonical: Product Backlog
+    aliases:
+      - product backlog
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Product Management:
+    canonical: Product Management
+    aliases:
+      - product management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Product Management (General Assembly):
+    canonical: Product Management (General Assembly)
+    aliases:
+      - product management (general assembly)
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Proficiency in at least one advanced programming language (Python, Scala, or Java):
+    canonical: Proficiency in at least one advanced programming language (Python, Scala, or Java)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Profitability:
+    canonical: Profitability
+    aliases:
+      - profitability
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Project Delivery:
+    canonical: Project Delivery
+    aliases:
+      - project delivery
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Project Management:
+    canonical: Project Management
+    aliases:
+      - project management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Project management skills:
+    canonical: Project management skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Prometheus:
+    canonical: Prometheus
+    aliases:
+      - prometheus
+    category: Other
+    tags: ['TECH']
+
+  Proven ability to adapt to challenges:
+    canonical: Proven ability to adapt to challenges
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Proven ability to translate complex financial data into clear, concise, and actionable insights:
+    canonical: Proven ability to translate complex financial data into clear, concise, and actionable insights
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Proven experience building and maintaining cloud-based data infrastructure:
+    canonical: Proven experience building and maintaining cloud-based data infrastructure
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Proven experience leading digital or customer analytics teams:
+    canonical: Proven experience leading digital or customer analytics teams
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Proven leadership and team management abilities:
+    canonical: Proven leadership and team management abilities
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Proven track record of cross-functional partnership and stakeholder alignment:
+    canonical: Proven track record of cross-functional partnership and stakeholder alignment
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  PyTorch:
+    canonical: PyTorch
+    aliases:
+      - py torch
+      - pytorch
+    category: Other
+    tags: ['TECH']
+
+  Python:
+    canonical: Python
+    aliases:
+      - py
+      - python
+    category: Programming Languages
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'job_skills', 'programming-languages', 'tools-&-technologies', 'technical-skills']
+
+  Python (bonus):
+    canonical: Python (bonus)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Python for scripting, automation, or orchestration tasks:
+    canonical: Python for scripting, automation, or orchestration tasks
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Qlik:
+    canonical: Qlik
+    aliases:
+      - qlik
+      - qlik sense
+      - qlikview
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'business-intelligence']
+
+  QlikView Designer- Professional I & II:
+    canonical: QlikView Designer- Professional I & II
+    aliases:
+      - qlikview designer- professional i & ii
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Quality Assurance:
+    canonical: Quality Assurance
+    aliases:
+      - quality assurance
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Quantitative modeling (advanced):
+    canonical: Quantitative modeling (advanced)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Quicken:
+    canonical: Quicken
+    aliases:
+      - quicken
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  RStudio:
+    canonical: RStudio
+    aliases:
+      - r studio
+      - r studio desktop
+      - r studio server
+      - r studio server desktop
+      - r studio server desktop
+      - R
+      - RStudio
+      - r
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  RDM (Reference Data Management):
+    canonical: RDM (Reference Data Management)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  RDS:
+    canonical: RDS
+    aliases:
+      - amazon rds
+      - aws rds
+      - rds
+    category: Other
+    tags: ['TECH']
+
+  Random Forest and Tree:
+    canonical: Random Forest and Tree
+    category: Technical Skills
+    tags: ['job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  React:
+    canonical: React
+    aliases:
+      - react
+      - react.js
+      - reactjs
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'business-intelligence']
+
+  Real-time data streaming:
+    canonical: Real-time data streaming
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Redis:
+    canonical: Redis
+    aliases:
+      - redis
+    category: Databases
+    tags: ['TECH', 'databases']
+
+  Redshift:
+    canonical: Redshift
+    aliases:
+      - aws redshift
+      - redshift
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'job_skills', 'databases', 'technical-skills', 'tools-&-technologies']
+
+  Regression:
+    canonical: Regression
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Regulatory:
+    canonical: Regulatory
+    aliases:
+      - regulatory
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Regulatory Reporting:
+    canonical: Regulatory Reporting
+    aliases:
+      - regulatory reporting
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Relationship-building:
+    canonical: Relationship-building
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Reporting:
+    canonical: Reporting
+    aliases:
+      - reporting
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Reporting solutions:
+    canonical: Reporting solutions
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Resource Planning:
+    canonical: Resource Planning
+    aliases:
+      - resource planning
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Revenue Analytics:
+    canonical: Revenue Analytics
+    aliases:
+      - revenue analytics
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Rigorous documentation:
+    canonical: Rigorous documentation
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Risk Assessment:
+    canonical: Risk Assessment
+    aliases:
+      - risk assessment
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Risk Management:
+    canonical: Risk Management
+    aliases:
+      - risk management
+    category: Domain Expertise
+    tags: ['skills.yaml', 'domain-expertise']
+
+  Roadmap Development:
+    canonical: Roadmap Development
+    aliases:
+      - roadmap development
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Robust QA:
+    canonical: Robust QA
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Rust:
+    canonical: Rust
+    aliases:
+      - rust
+    category: Programming Languages
+    tags: ['TECH', 'programming-languages']
+
+  SAP:
+    canonical: SAP
+    aliases:
+      - sap
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  SAP Business Object - Business Intellgence - Official Trainer:
+    canonical: SAP Business Object - Business Intellgence - Official Trainer
+    aliases:
+      - sap business object - business intellgence - official trainer
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  SAP Business Objects:
+    canonical: SAP Business Objects
+    aliases:
+      - sap business objects
+    category: Business Intelligence
+    tags: ['skills.yaml', 'business-intelligence']
+
+  SQL:
+    canonical: SQL
+    aliases:
+      - sql
+      - structured query language
+    category: Programming Languages
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'job_skills', 'programming-languages', 'tools-&-technologies', 'technical-skills']
+
+  SQL (Azure & AWS):
+    canonical: SQL (Azure & AWS)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  SQL or equivalent data querying:
+    canonical: SQL or equivalent data querying
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  SageMaker:
+    canonical: SageMaker
+    aliases:
+      - aws sagemaker
+      - sagemaker
+    category: Other
+    tags: ['TECH']
+
+  Salesforce:
+    canonical: Salesforce
+    aliases:
+      - sales force
+      - salesforce
+    category: Technical Skills
+    tags: ['TECH', 'job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies']
+
+  Same as Technical Skills section:
+    canonical: Same as Technical Skills section
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Scala:
+    canonical: Scala
+    aliases:
+      - scala
+    category: Programming Languages
+    tags: ['skills.yaml', 'programming-languages']
+
+  Scalable data pipelines architecture, and governance:
+    canonical: Scalable data pipelines architecture, and governance
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Scikit-learn:
+    canonical: Scikit-learn
+    aliases:
+      - scikit learn
+      - scikit-learn
+      - sklearn
+    category: Other
+    tags: ['TECH']
+
+  Scrum:
+    canonical: Scrum
+    aliases:
+      - scrum
+      - scrum methodology
+      - JIRA
+      - JIRA and Confluence
+      - JIRA and Confluence and Slack
+      - JIRA and Confluence and Slack and Teams
+      - JIRA and Confluence and Slack and Teams and Basecamp
+      - JIRA and Confluence and Slack and Teams and Basecamp and Airtable
+      - JIRA and Confluence and Slack and Teams and Basecamp and Airtable and Notion
+      - JIRA and Confluence and Slack and Teams and Basecamp and Airtable and Notion and Clickup
+      - JIRA and Confluence and Slack and Teams and Basecamp and Airtable and Notion and Clickup and Basecamp
+      - Kanban
+      - Kanban methodology
+      - Kanban and JIRA
+      - Kanban and JIRA and Confluence
+      - Kanban and JIRA and Confluence and Slack
+      - Kanban and JIRA and Confluence and Slack and Teams
+      - Kanban and JIRA and Confluence and Slack and Teams and Basecamp
+      - Kanban and JIRA and Confluence and Slack and Teams and Basecamp and Airtable
+      - Kanban and JIRA and Confluence and Slack and Teams and Basecamp and Airtable and Notion
+      - Scrum Master
+      - Scrum Master Certified
+      - Scrum ceremonies
+      - sprint planning
+      - sprint backlog
+      - velocity tracking
+      - feature tracking
+      - feature flagging
+      - feature toggling
+      - feature branching
+      - feature merging
+      - feature releasing
+      - feature deploying
+      - feature testing
+      - feature monitoring
+      - feature logging
+      - feature debugging
+      - feature profiling
+      - feature optimization
+      - feature refactoring
+      - feature documentation
+      - feature testing
+      - feature monitoring
+      - release management
+      - release planning
+      - release planning and tracking
+    category: project-management
+    tags: ['skills.yaml', 'project-management']
+
+  SDLC:
+    canonical: SDLC
+    aliases:
+      - sdlc
+      - software development life cycle
+      - software development life cycle methodology
+      - milestone tracking 
+      - waterfall methodology
+      - waterfall
+      - gantt chart
+      - release notes
+    category: project-management
+    tags: ['skills.yaml', 'project-management']
+
+
+  high-volume transactional data:
+    canonical: high-volume transactional data
+    aliases:
+      - high-volume transactional data
+      - high-volume transactional data
+      - utility data 
+      - billing systems
+      - plaid data
+      - plaid data ingestion
+      - plaid data ingestion and processing
+      - plaid
+    category: Data Sources
+    tags: ['job_skills', 'experience-areas']
+
+  Sisense:
+    canonical: Sisense
+    aliases:
+      - sisense
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'business-intelligence']
+
+  Snowflake:
+    canonical: Snowflake
+    aliases:
+      - snowflake
+    category: Databases
+    tags: ['TECH', 'job_skills', 'job_skills', 'databases', 'technical-skills', 'tools-&-technologies']
+
+  Snowflake as a data platform (performance optimization, cost management, architecting for scale):
+    canonical: Snowflake as a data platform (performance optimization, cost management, architecting for scale)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Spark:
+    canonical: Spark
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Splunk:
+    canonical: Splunk
+    aliases:
+      - splunk
+    category: Other
+    tags: ['TECH']
+
+  Spreadmarts:
+    canonical: Spreadmarts
+    aliases:
+      - spreadmarts
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Spring:
+    canonical: Spring
+    aliases:
+      - spring
+      - spring boot
+      - spring framework
+    category: Other
+    tags: ['TECH']
+
+  Sprint Planning:
+    canonical: Sprint Planning
+    aliases:
+      - sprint planning
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Stakeholder Management:
+    canonical: Stakeholder Management
+    aliases:
+      - stakeholder management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Stakeholder management skills:
+    canonical: Stakeholder management skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  StarRocks:
+    canonical: StarRocks
+    aliases:
+      - star rocks
+      - starrocks
+    category: Tools & Technologies
+    tags: ['TECH', 'job_skills', 'tools-&-technologies']
+
+  Strategic Planning:
+    canonical: Strategic Planning
+    aliases:
+      - strategic planning
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Strategic enterprise data architecture engagement skills with executive level stakeholders:
+    canonical: Strategic enterprise data architecture engagement skills with executive level stakeholders
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strategic thinking:
+    canonical: Strategic thinking
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong commercial awareness:
+    canonical: Strong commercial awareness
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong communication:
+    canonical: Strong communication
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong communication and presentation skills:
+    canonical: Strong communication and presentation skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong communication skills:
+    canonical: Strong communication skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong communication, critical thinking, conceptual and analytical skills:
+    canonical: Strong communication, critical thinking, conceptual and analytical skills
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong communicator who uses data narratives to explain the solutions they build:
+    canonical: Strong communicator who uses data narratives to explain the solutions they build
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong interest in coaching and mentoring colleagues:
+    canonical: Strong interest in coaching and mentoring colleagues
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Strong understanding of data modeling, governance, and MDM principles:
+    canonical: Strong understanding of data modeling, governance, and MDM principles
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Superset:
+    canonical: Superset
+    aliases:
+      - apache superset
+      - superset
+    category: Other
+    tags: ['TECH']
+
+  Sybase:
+    canonical: Sybase
+    aliases:
+      - sybase
+    category: Other
+    tags: ['TECH']
+
+  "TDWI: Data Warehousing Concepts and Principles (speaker)":
+    canonical: "TDWI: Data Warehousing Concepts and Principles (speaker)"
+    aliases:
+      - tdwi: data warehousing concepts and principles (speaker)
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Tableau:
+    canonical: Tableau
+    aliases:
+      - tableau
+    category: Business Intelligence
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'job_skills', 'technical-skills', 'tools-&-technologies', 'business-intelligence']
+
+  Tagging:
+    canonical: Tagging
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Talend:
+    canonical: Talend
+    aliases:
+      - talend
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'databases']
+
+  Tatari:
+    canonical: Tatari
+    aliases:
+      - tatari
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  Team Management:
+    canonical: Team Management
+    aliases:
+      - team management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Ten (10) years of experience in data strategy, BI, or analytics leadership required:
+    canonical: Ten (10) years of experience in data strategy, BI, or analytics leadership required
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Ten (10) years of relevant experience:
+    canonical: Ten (10) years of relevant experience
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  TensorFlow:
+    canonical: TensorFlow
+    aliases:
+      - tensor flow
+      - tensorflow
+    category: Other
+    tags: ['TECH']
+
+  Terraform:
+    canonical: Terraform
+    aliases:
+      - terraform
+    category: Cloud Platforms
+    tags: ['TECH', 'skills.yaml', 'cloud-platforms']
+
+  Test/learn/optimize/pivot:
+    canonical: Test/learn/optimize/pivot
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Testing:
+    canonical: Testing
+    aliases:
+      - testing
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Three (3) years of supervisory experience required:
+    canonical: Three (3) years of supervisory experience required
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Timestream:
+    canonical: Timestream
+    aliases:
+      - amazon timestream
+      - aws timestream
+      - timestream
+    category: Other
+    tags: ['TECH']
+
+  Track record of leading data engineering teams and building robust data warehouses:
+    canonical: Track record of leading data engineering teams and building robust data warehouses
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  Transactional databases:
+    canonical: Transactional databases
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Transformation:
+    canonical: Transformation
+    aliases:
+      - transformation
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Translating complex data into actionable business strategies:
+    canonical: Translating complex data into actionable business strategies
+    category: Soft Skills
+    tags: ['job_skills', 'soft-skills']
+
+  Trino:
+    canonical: Trino
+    aliases:
+      - trino
+    category: Other
+    tags: ['TECH']
+
+  Tungsten (not explicitly defined, but likely a software or system):
+    canonical: Tungsten (not explicitly defined, but likely a software or system)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  TypeScript:
+    canonical: TypeScript
+    aliases:
+      - ts
+      - typescript
+    category: Programming Languages
+    tags: ['TECH', 'programming-languages']
+
+  Validation:
+    canonical: Validation
+    aliases:
+      - validation
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Variance analysis:
+    canonical: Variance analysis
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Vendor Management:
+    canonical: Vendor Management
+    aliases:
+      - vendor management
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Version control:
+    canonical: Version control
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Vertex AI:
+    canonical: Vertex AI
+    aliases:
+      - google vertex
+      - vertex
+      - vertex ai
+    category: Other
+    tags: ['TECH']
+
+  Vision:
+    canonical: Vision
+    aliases:
+      - vision
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Visualization:
+    canonical: Visualization
+    aliases:
+      - visualization
+    category: Other
+    tags: ['skills.yaml', 'other']
+
+  Vue:
+    canonical: Vue
+    aliases:
+      - vue
+      - vue.js
+      - vuejs
+    category: Other
+    tags: ['TECH']
+
+  Word:
+    canonical: Word
+    aliases:
+      - microsoft word
+      - ms word
+      - word
+    category: Tools & Technologies
+    tags: ['TECH', 'job_skills', 'tools-&-technologies']
+
+  Workato:
+    canonical: Workato
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  Workflow orchestrators (e.g. Airflow, Dagster):
+    canonical: Workflow orchestrators (e.g. Airflow, Dagster)
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  Zapier:
+    canonical: Zapier
+    aliases:
+      - zapier
+    category: Data Sources
+    tags: ['TECH', 'skills.yaml', 'data-sources']
+
+  Zapier/Make:
+    canonical: Zapier/Make
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  "[5] + years of hands-on experience in the Mortgage, Lending, or FinTech industries":
+    canonical: "[5] + years of hands-on experience in the Mortgage, Lending, or FinTech industries"
+    category: Experience Areas
+    tags: ['job_skills', 'experience-areas']
+
+  dbt:
+    canonical: dbt
+    aliases:
+      - data build tool
+      - dbt
+    category: Databases
+    tags: ['TECH', 'skills.yaml', 'job_skills', 'job_skills', 'databases', 'technical-skills', 'data-engineering', 'tools-&-technologies']
+
+  dbt (for transformation):
+    canonical: dbt (for transformation)
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  dbt for transformation:
+    canonical: dbt for transformation
+    category: Technical Skills
+    tags: ['job_skills', 'technical-skills']
+
+  iPaaS solutions:
+    canonical: iPaaS solutions
+    category: Tools & Technologies
+    tags: ['job_skills', 'tools-&-technologies']
+
+  # Relationship mapping for composite skills
+  relationships:
+    # Hierarchical relationships (parent -> children)
+    AWS:
+      - Amazon Kinesis
+      - AWS Lake Formation
+      - AWS Redshift
+
+
+# Category mappings
+categories:
+  Business Intelligence:
+    parent: Technical Skills
+    description: BI tools and platforms
+    examples: ['Business Objects', 'Cognos', 'Crystal Reports', 'Looker', 'Power BI']
+
+  Cloud Platforms:
+    parent: Technical Skills
+    description: Cloud infrastructure and services
+    examples: ['AWS', 'AWS Lake Formation', 'Amazon Kinesis', 'Azure', 'Azure ML']
+
+  Data Architecture:
+    parent: Domain Expertise
+    description: Data architecture concepts
+    examples: ['Data Mesh']
+
+  Data Engineering:
+    parent: Technical Skills
+    description: Data pipeline and orchestration tools
+    examples: ['Apache Airflow', 'Apache Flink', 'Apache Hudi', 'Apache Iceberg', 'Apache Kafka']
+
+  Databases:
+    parent: Technical Skills
+    description: Database systems and data storage
+    examples: ['AWS Redshift', 'Airflow', 'Amazon Q', 'Blockchain Ledger', 'Cassandra']
+
+  Domain Expertise:
+    parent: Soft Skills
+    description: Domain-specific knowledge
+    examples: ['Artificial Intelligence', 'Banking', 'Blockchain', 'Business Intelligence', 'Consulting']
+
+  Experience Areas:
+    parent: Soft Skills
+    description: Work experience and responsibilities
+    examples: ['10+ years of experience in analytics, data strategy, or related roles', '10+ years of progressive experience in data engineering or platform engineering', '12+ years of experience in the workforce with significant experience in data-intensive environments', '12+ years working with data', '15+ years of experience in data engineering, enterprise integrations, and analytics platforms']
+
+  Leadership:
+    parent: Soft Skills
+    description: Leadership and management capabilities
+    examples: ['Coaching']
+
+  Programming Languages:
+    parent: Technical Skills
+    description: Programming and scripting languages
+    examples: ['Django', 'Go', 'Java', 'JavaScript', 'MongoDB']
+
+  Soft Skills:
+    description: Interpersonal and professional skills
+    examples: ['Ability to effectively interact with all levels of the organization', 'Ability to foster a culture of technical excellence, knowledge sharing, and continuous improvement', 'Ability to influence C-level stakeholders', 'Ability to translate complex business requirements into scalable technical solutions', 'Bringing structure to ambiguity and driving results through data']
+
+  Technical Skills:
+    description: Technical knowledge and capabilities
+    examples: ['AI', 'AWS (Amazon Web Services)', 'AWS (Amazon Web Services) experience (preferred)', 'AWS Sagemaker', 'Ability to write optimized queries for large-scale data processing']
+
+
+# Fuzzy matching rules
+fuzzy_rules:
+  similarity_threshold: 0.85
+  word_replacements:
+    - ['aws', 'amazon web services']
+    - ['bi', 'business intelligence']
+    - ['sql', 'structured query language']
+    - ['etl', 'extract transform load']
+    - ['api', 'application programming interface']
+    - ['snowflake', 'snowflake data warehouse']
+    - ['ai', 'artificial intelligence']
+    - ['ml', 'machine learning']
+    - ['dl', 'deep learning']
+    - ['nlp', 'natural language processing']
+    - ['cv', 'computer vision']
+    - ['rl', 'reinforcement learning']
+    - ['ga', 'genetic algorithms']
+    - ['saas', 'software as a service']
+    - ['paas', 'platform as a service']
+    - ['iaas', 'infrastructure as a service']
+    - ['faas', 'function as a service']
+    - ['laas', 'log as a service']
+    - ['waas', 'web as a service']
+    - ['caas', 'container as a service']
+    - ['saas', 'software as a service']
+    - ['paas', 'platform as a service']
+    - ['iaas', 'infrastructure as a service']
+    - ['gcp', 'google cloud platform']
+    - ['azure', 'microsoft azure']
+    - ['kimball', 'kimball data warehouse']
+    - ['star', 'star schema']
+    - ['snowflake', 'snowflake data warehouse']
+    - ['bigquery', 'big query']
+    - ['bigquery', 'big query']
+    - ['3nf', 'third normal form']
+    - ['4nf', 'fourth normal form']
+    - ['5nf', 'fifth normal form']
+    - ['6nf', 'sixth normal form']
+    - ['7nf', 'seventh normal form']
+    - ['8nf', 'eighth normal form']
+    - ['9nf', 'ninth normal form']
+    - ['10nf', 'tenth normal form']
+    - ['11nf', 'eleventh normal form']
+    - ['mdm', 'master data management']
+    - ['sop', 'standard operating procedures']
+    - ['sops', 'standard operating procedures']
+    - ['cogs', 'cost of goods sold']
+    - ['kpi', 'key performance indicators']
+    - ['kpis', 'key performance indicators']
+    - ['okr', 'objectives and key results']
+    - ['okrs', 'objectives and key results']
+    - ['kr', 'key results']
+    - ['krs', 'key results']
+    - ['ltv', 'lifetime value']
+    - ['ltvs', 'lifetime value']
+    - ['cltv', 'customer lifetime value']
+    - ['clv', 'customer lifetime value']
+    - ['clvs', 'customer lifetime value']
+    - ['cac', 'customer acquisition cost']
+    - ['cacs', 'customer acquisition cost']
+    - ['mrr', 'monthly recurring revenue']
+    - ['mrrs', 'monthly recurring revenue']
+    - ['mrr', 'monthly recurring revenue']
+    - ['arr', 'annual recurring revenue']
+    - ['arrs', 'annual recurring revenue']
+    - ['arr', 'annual recurring revenue']
+    - ['ramp', 'revenue run rate']
+    - ['rpu', 'revenue per user']
+    - ['rpus', 'revenue per user']
+    - ['rpu', 'revenue per user']
+    - ['arpu', 'average revenue per user']
+    - ['arpus', 'average revenue per user']
+    - ['arpu', 'average revenue per user']
+    - ['json', 'javascript object notation']
+    - ['jsons ', 'javascript object notation']
+    - ['xml', 'extensible markup language']
+    - ['xmls', 'extensible markup language']
+    - ['csv', 'comma separated values']
+    - ['csvs', 'comma separated values']
+    - ['bicc', 'business intelligence competency center']
+    - ['biccs', 'business intelligence competency center']
+    - ['dataops', 'data operations']
+    - ['mlops', 'machine learning operations']
+    - ['devops', 'development operations']
+    - ['cicd', 'continuous integration continuous delivery']
+    - ['cicds', 'continuous integration continuous delivery']
+    - ['cicd', 'continuous integration continuous delivery']
+    - ['git', 'version control']
+    - ['github', 'github']
+    - ['gitlab', 'gitlab']
+    - ['bitbucket', 'bitbucket']
+    - ['azure devops', 'azure pipelines']
+ 
+    
+  ignore_punctuation: true
+  ignore_whitespace: true
+  strip_prefixes:
+    - microsoft
+    - amazon
+    - apache
+  strip_suffixes:
+    - experience
+    - knowledge
+    - skills
+    - expertise
+    - proficiency
+
+# Debug and validation
+metadata:
+  version: 1.0
+  last_updated: 2025-11-01
+  total_skills: 499
+  total_aliases: 325
+  notes: |
+    Auto-generated from existing skill sources

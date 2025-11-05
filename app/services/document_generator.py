@@ -87,7 +87,7 @@ class DocumentGenerator:
         )
         
         # Insert compatibility text after "Dear Hiring Manager,"
-        compatibility_text = f"\n\nCompatibility based on job posting, research and my experience modeled match score: {qualifications.match_score:.0f}% - Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed Strong Matches: {', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'No strong matches identified'}\n\nMethodology weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%)."
+        compatibility_text = f"\n\nCompatibility based on job posting, research and my experience modeled match score: {qualifications.match_score:.0f}% - Features Compared: {len(qualifications.strong_matches) + len(qualifications.missing_skills)} individual skills, technologies, and requirements analyzed Strong Matches: {', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'No strong matches identified'}\n\nMethodology - Weighted scoring: Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%)."
         
         if "Dear Hiring Manager," in cover_letter:
             # Insert after "Dear Hiring Manager," 
@@ -2697,7 +2697,7 @@ class DocumentGenerator:
                     {self._format_cover_letter_html(cover_letter)}
                     
                     <p style="margin-top: 30px; margin-bottom: 5px; font-size: 15px; line-height: 1.6;">Sincerely,</p>
-                    <p style="margin-top: 5px; font-size: 15px; line-height: 1.6;">Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com</p>
+                    <p style="margin-top: 5px; font-size: 15px; line-height: 1.6;">Kervin Leacock | 917.670.0693 | kervin.leacock@yahoo.com</p>
                 </div>
             </div>
             
