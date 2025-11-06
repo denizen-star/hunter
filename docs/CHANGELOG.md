@@ -1,5 +1,25 @@
 # Changelog
 
+## Version 4.0.0 - November 6, 2025
+
+### 🚩 Job Flagging Feature (NEW)
+**Feature:** Comprehensive job flagging system for organizing and tracking applications
+- Added flag/unflag functionality to application cards
+- New "Flagged" tab in dashboard showing all flagged jobs
+- Flagged applications section in Reports page
+- Persistent flag status stored in application metadata
+- Full REST API support for flagging operations
+
+**Files Changed:**
+- `app/models/application.py` - Added flagged field to Application model
+- `app/web.py` - Added flag API endpoint and updated reports endpoint
+- `app/services/dashboard_generator.py` - Added flag UI to dashboard
+- `app/templates/web/reports.html` - Added flagged applications section
+
+**Impact:** Better job organization, quick access to important applications, improved workflow management
+
+---
+
 ## Version 1.5.0 - October 13, 2025
 
 ### ✅ Enhanced Qualification Analysis (NEW)
