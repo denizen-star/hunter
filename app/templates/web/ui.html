@@ -190,6 +190,12 @@
             border: 1px solid #ffeaa7;
         }
         
+        .status-banner.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
         .form-group {
             margin-bottom: 25px;
         }
@@ -737,7 +743,7 @@
             </div>
             
             <div style="display: flex; gap: 15px;">
-                <button class="btn" onclick="saveResume()">Save Resume</button>
+                <button class="btn" id="save-resume-btn" onclick="saveResume(event)">Save Resume</button>
                 <button class="btn btn-secondary" onclick="hideResumeManager()">Cancel</button>
             </div>
         </div>
@@ -1041,6 +1047,17 @@
                 content: document.getElementById('resume_content').value
             };
             
+            // Disable button and show loading
+            const saveButton = event?.target || document.getElementById('save-resume-btn') || document.querySelector('button[onclick*="saveResume"]');
+            const originalText = saveButton?.textContent || 'Save Resume';
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.textContent = 'Saving & Extracting Skills...';
+            }
+            
+            // Show initial status
+            showStatus('💾 Saving resume and extracting skills... This may take 30-60 seconds. Please wait...', 'info');
+            
             console.log('Saving resume with content length:', data.content.length);
             console.log('Content preview:', data.content.substring(0, 200) + '...');
             
@@ -1057,16 +1074,33 @@
                 console.log('Save response:', result);
                 
                 if (result.success) {
-                    showStatus(' Resume saved successfully! Technologies extracted and cached.', 'success');
+                    let message = '✅ Resume saved successfully!';
+                    if (result.skills_extracted) {
+                        message += ` Skills extracted: ${result.skills_count} skills found.`;
+                    } else {
+                        message += ' (Note: Skill extraction may still be in progress or failed - check server logs)';
+                    }
+                    showStatus(message, 'success');
                     
                     // Show technologies section and reload technologies after saving
                     document.getElementById('technologies-section').style.display = 'block';
                     await loadTechnologies();
+                    
+                    // Reload page after 2 seconds to show updated skills
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
                 } else {
-                    showStatus(` Error: ${result.error}`, 'error');
+                    showStatus(` ❌ Error: ${result.error}`, 'error');
                 }
             } catch (error) {
-                showStatus(` Error: ${error.message}`, 'error');
+                showStatus(` ❌ Error: ${error.message}`, 'error');
+            } finally {
+                // Re-enable button
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = originalText;
+                }
             }
         }
         

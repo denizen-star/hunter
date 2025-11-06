@@ -181,11 +181,30 @@ def update_resume():
         resume.content = data.get('content', resume.content)
         
         print(f"Saving resume with content length: {len(resume.content)}")
+        
+        # Save resume (this will trigger technology and skill extraction)
         resume_manager.save_base_resume(resume)
+        
+        # Check if skills were extracted
+        from pathlib import Path
+        import yaml
+        skills_path = Path("data/resumes/skills.yaml")
+        skills_extracted = False
+        skills_count = 0
+        if skills_path.exists():
+            try:
+                with open(skills_path, 'r') as f:
+                    skills_data = yaml.safe_load(f)
+                    skills_count = skills_data.get('total_skills', 0)
+                    skills_extracted = True
+            except:
+                pass
         
         return jsonify({
             'success': True,
-            'message': 'Resume updated successfully'
+            'message': 'Resume updated successfully',
+            'skills_extracted': skills_extracted,
+            'skills_count': skills_count
         })
     except Exception as e:
         print(f"Error updating resume: {e}")

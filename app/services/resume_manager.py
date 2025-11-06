@@ -8,6 +8,7 @@ from app.utils.file_utils import (
     load_yaml, save_yaml, read_text_file, write_text_file
 )
 from app.utils.simple_tech_extractor import SimpleTechExtractor
+from app.services.skill_extractor import SkillExtractor
 
 
 class ResumeManager:
@@ -20,6 +21,8 @@ class ResumeManager:
         self.base_resume_metadata_path = self.resumes_dir / 'base_resume.yaml'
         self.tech_yaml_path = self.resumes_dir / 'tech.yaml'
         self.tech_extractor = SimpleTechExtractor()
+        # Skill extractor will be initialized lazily (requires AIAnalyzer)
+        self._skill_extractor = None
     
     def load_base_resume(self) -> Resume:
         """Load the base resume"""
@@ -46,7 +49,7 @@ class ResumeManager:
         )
     
     def save_base_resume(self, resume: Resume) -> None:
-        """Save the base resume and extract technologies"""
+        """Save the base resume and extract technologies and skills"""
         # Save content
         write_text_file(resume.content, self.base_resume_path)
         
@@ -62,8 +65,22 @@ class ResumeManager:
         }
         save_yaml(metadata, self.base_resume_metadata_path)
         
-        # Extract and save technologies
+        # Extract and save technologies (quick, rule-based)
         self.extract_and_save_technologies(resume.content)
+        
+        # Extract and save comprehensive skills (AI-based)
+        try:
+            print("🔍 Starting comprehensive skill extraction...")
+            skills_data = self.extract_and_save_skills(resume.content)
+            if skills_data and skills_data.get('total_skills', 0) > 0:
+                print(f"✅ Successfully extracted {skills_data['total_skills']} skills")
+            else:
+                print("⚠️ Warning: Skill extraction returned no skills")
+        except Exception as e:
+            import traceback
+            print(f"❌ Error extracting comprehensive skills: {e}")
+            traceback.print_exc()
+            print("   Technologies were saved, but skills.yaml was not updated.")
     
     def create_base_resume_template(self) -> None:
         """Create a base resume template"""
@@ -167,6 +184,31 @@ Brief summary of your professional background and key strengths (2-3 sentences).
         save_yaml(tech_data, self.tech_yaml_path)
         
         return tech_data
+    
+    def extract_and_save_skills(self, resume_content: str) -> Dict:
+        """Extract comprehensive skills from resume content and save to skills.yaml"""
+        # Lazy initialization of skill extractor (requires AIAnalyzer)
+        if self._skill_extractor is None:
+            try:
+                from app.services.ai_analyzer import AIAnalyzer
+                print("🔧 Initializing AI analyzer for skill extraction...")
+                ai_analyzer = AIAnalyzer()
+                if not ai_analyzer.check_connection():
+                    print("⚠️ Warning: Ollama not connected. Skill extraction will be skipped.")
+                    return {}
+                from app.services.skill_extractor import SkillExtractor
+                self._skill_extractor = SkillExtractor(ai_analyzer)
+                print("✅ Skill extractor initialized")
+            except Exception as e:
+                print(f"❌ Error initializing skill extractor: {e}")
+                import traceback
+                traceback.print_exc()
+                return {}
+        
+        # Extract and save skills
+        print(f"🔍 Extracting skills from resume ({len(resume_content)} characters)...")
+        skills_data = self._skill_extractor.extract_and_save_skills(resume_content)
+        return skills_data
     
     def load_technologies(self) -> Optional[Dict[str, any]]:
         """Load technologies from tech.yaml"""

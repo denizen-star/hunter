@@ -11,6 +11,8 @@ class SimpleTechExtractor:
     TECHNOLOGIES = {
         # Cloud Platforms
         'AWS': ['aws', 'amazon web services', 'amazon aws'],
+        'S3': ['s3', 'aws s3', 'amazon s3', 'simple storage service'],
+        'EC2': ['ec2', 'aws ec2', 'amazon ec2', 'elastic compute cloud'],
         'Azure': ['azure', 'microsoft azure'],
         'GCP': ['gcp', 'google cloud', 'google cloud platform'],
         'Amazon Kinesis': ['amazon kinesis', 'kinesis'],

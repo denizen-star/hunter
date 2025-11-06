@@ -2277,54 +2277,44 @@ skills:
     canonical: Problem Solving
     aliases:
       - problem solving
-    category: Other
-    tags: ['skills.yaml', 'other']
-
-  Problem-solving:
-    canonical: Problem-solving
+      - Problem-solving
+      - problem-solving
+      - problem solving ability
+      - problem solving skills
+      - problem-solving ability
+      - problem-solving skills
+      - problem solving ability
+      - problem solving skills
+      - problem solving ability
     category: Soft Skills
-    tags: ['job_skills', 'soft-skills']
-
-  Problem-solving (unify fragmented BI systems into a scalable infrastructure):
-    canonical: Problem-solving (unify fragmented BI systems into a scalable infrastructure)
-    category: Soft Skills
-    tags: ['job_skills', 'soft-skills']
-
-  Problem-solving ability:
-    canonical: Problem-solving ability
-    category: Soft Skills
-    tags: ['job_skills', 'soft-skills']
-
-  Problem-solving skills:
-    canonical: Problem-solving skills
-    category: Soft Skills
-    tags: ['job_skills', 'soft-skills']
-
-  Problem-solving to refine pricing models and unit economics:
-    canonical: Problem-solving to refine pricing models and unit economics
-    category: Soft Skills
-    tags: ['job_skills', 'soft-skills']
+    tags: ['skills.yaml', 'soft-skills']
 
   Product Backlog:
     canonical: Product Backlog
     aliases:
       - product backlog
-    category: Other
-    tags: ['skills.yaml', 'other']
+      - product backlog management
+      - product backlog management skills
+      - product backlog management skills
+      - product backlog management ability
+      - product backlog management ability
+    category: Product Management
+    tags: ['skills.yaml', 'product-management']
 
   Product Management:
     canonical: Product Management
     aliases:
       - product management
-    category: Other
-    tags: ['skills.yaml', 'other']
+      - product management skills
+      - product management ability
+      - product management skills
+      - product design
+      - product design skills
+      - product design ability
+      - product design skills
+    category: Product Management
+    tags: ['skills.yaml', 'product-management']
 
-  Product Management (General Assembly):
-    canonical: Product Management (General Assembly)
-    aliases:
-      - product management (general assembly)
-    category: Other
-    tags: ['skills.yaml', 'other']
 
   Proficiency in at least one advanced programming language (Python, Scala, or Java):
     canonical: Proficiency in at least one advanced programming language (Python, Scala, or Java)

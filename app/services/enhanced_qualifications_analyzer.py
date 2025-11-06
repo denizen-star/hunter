@@ -122,19 +122,23 @@ IMPORTANT: Be GENEROUS in recognizing skills and experience. Look for equivalent
 | [Domain skill] | [Quote from job description] | [Quote from resume or "Not demonstrated"] | Strong Match / Partial Match / No Match |
 
 ## Unmatched Skills Analysis
-List skills from the job description that are NOT found in the candidate's resume:
+CRITICAL: ONLY list skills that are in the "UNMATCHED JOB SKILLS" section from the preliminary matching results above.
+DO NOT add skills that are not explicitly listed in the preliminary unmatched skills.
+DO NOT infer or extrapolate skills - only use what the preliminary matcher actually found in the job description.
+
+If there are no unmatched skills listed in the preliminary results, write "None" for each category.
 
 ### Technical Skills Not Matched
-- [List technical skills from job that are missing from resume]
+- [ONLY list technical skills from preliminary unmatched list that are missing from resume]
 
 ### Leadership Skills Not Matched
-- [List leadership skills from job that are missing from resume]
+- [ONLY list leadership skills from preliminary unmatched list that are missing from resume]
 
 ### Business Skills Not Matched
-- [List business skills from job that are missing from resume]
+- [ONLY list business skills from preliminary unmatched list that are missing from resume]
 
 ### Domain Expertise Not Matched
-- [List domain expertise from job that are missing from resume]
+- [ONLY list domain expertise from preliminary unmatched list that are missing from resume]
 
 ## Recommendations
 Provide specific recommendations based on the preliminary matching results:

@@ -162,13 +162,27 @@ class PreliminaryMatcher:
             partial_match = False
             
             for variation in skill_variations:
-                if variation and variation in job_desc_lower:
-                    exact_match = True
-                    matched_skills.add(skill_name)
-                    break
-                elif variation and self._is_partial_match(variation, job_desc_lower):
-                    partial_match = True
-                    matched_skills.add(skill_name)
+                if not variation:
+                    continue
+                
+                # Use word boundary matching to avoid false positives (e.g., "ase" matching "base")
+                # For single-character skills, use special validation
+                if len(variation) == 1:
+                    # Single-character skills need special handling (e.g., "R" should not match "R&D")
+                    if self._is_valid_single_char_match(variation, job_description):
+                        exact_match = True
+                        matched_skills.add(skill_name)
+                        break
+                else:
+                    # Multi-character skills: use word boundary matching
+                    pattern = r'\b' + re.escape(variation) + r'\b'
+                    if re.search(pattern, job_desc_lower):
+                        exact_match = True
+                        matched_skills.add(skill_name)
+                        break
+                    elif self._is_partial_match(variation, job_desc_lower):
+                        partial_match = True
+                        matched_skills.add(skill_name)
             
             if exact_match:
                 # Find which job skill this matches
@@ -227,47 +241,87 @@ class PreliminaryMatcher:
         matches['missing_count'] = matches['total_required'] - matched_job_skills
         
         # Calculate match score based on job requirements with overqualification bonus
+        # IMPORTANT: Extra candidate skills should NEVER count against the score
+        # Being overqualified is a positive, not a negative
         if total_job_skills > 0:
             base_score = (matched_job_skills / total_job_skills) * 100
             
-            # Apply overqualification bonus ONLY if no critical skills are missing
-            # Critical skills are those explicitly required in the job description
+            # Check for CRITICAL missing requirements (education, domain expertise)
+            # These should severely penalize the score regardless of other matches
+            critical_requirements = []
+            education_keywords = ['phd', 'doctorate', 'master', 'bachelor', 'degree', 'abd']
+            domain_keywords = ['biology', 'chemistry', 'physics', 'mathematics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics']
+            
+            for unmatched_skill in matches['unmatched_job_skills']:
+                skill_lower = unmatched_skill.lower()
+                is_education = any(edu in skill_lower for edu in education_keywords)
+                is_domain = any(domain in skill_lower for domain in domain_keywords)
+                if is_education or is_domain:
+                    critical_requirements.append(unmatched_skill)
+            
+            # If critical requirements are missing, apply severe penalty
+            if critical_requirements:
+                # Each critical requirement is worth 30-50% penalty
+                # Missing PhD alone should drop score significantly
+                critical_penalty = min(70, len(critical_requirements) * 30)  # Cap at 70% penalty
+                base_score = max(0, base_score - critical_penalty)
+            
+            # Check if candidate is overqualified (has significantly more skills than required)
             critical_skills_missing = len(matches['unmatched_job_skills'])
             total_candidate_skills = len(self.candidate_skills)
             overqualification_ratio = total_candidate_skills / total_job_skills if total_job_skills > 0 else 1
             
-            # Only apply overqualification bonus if:
-            # 1. Candidate is overqualified (has 2x+ more skills than required)
-            # 2. AND no critical skills are missing (or missing skills are minimal)
-            # 3. AND base score is already high (above 70%)
-            if (overqualification_ratio >= 2.0 and 
-                critical_skills_missing == 0 and 
-                base_score >= 70):
+            # If overqualified (2x+ more skills), treat missing skills more leniently
+            # BUT: Don't apply overqualification bonus if critical requirements are missing
+            is_overqualified = overqualification_ratio >= 2.0 and not critical_requirements
+            
+            if is_overqualified:
+                # Overqualified candidates get more generous treatment
+                # Missing skills are less impactful when you have many more skills than required
                 
-                # Apply conservative overqualification bonus
-                if overqualification_ratio >= 4.0:  # 4x+ overqualified
-                    overqualification_bonus = 15  # Reduced from 35% to 15%
-                elif overqualification_ratio >= 3.0:  # 3x+ overqualified
-                    overqualification_bonus = 10  # Reduced from 25% to 10%
-                else:  # 2x+ overqualified
-                    overqualification_bonus = 5   # Reduced from 15% to 5%
+                # Calculate missing skill penalty (reduced for overqualified candidates)
+                if critical_skills_missing > 0:
+                    # Distinguish between critical and nice-to-have skills
+                    critical_penalty_skills = ['snowflake', 'bigquery', 'cloud', 'data engineering']
+                    nice_to_have_skills = ['paid advertising', 'google ads', 'meta', 'advertising platforms', 'mentorship skills', 'problem-solving']
+                    
+                    critical_missing = sum(1 for skill in matches['unmatched_job_skills'] 
+                                         if any(critical in skill.lower() for critical in critical_penalty_skills))
+                    nice_to_have_missing = sum(1 for skill in matches['unmatched_job_skills'] 
+                                             if any(nice in skill.lower() for nice in nice_to_have_skills))
+                    
+                    # Reduced penalties for overqualified candidates (50% reduction)
+                    # Overqualification means you have many alternative skills that can compensate
+                    penalty = (critical_missing * 1.5) + (nice_to_have_missing * 0.5)
+                    penalty = min(10, penalty)  # Cap penalty at 10% for overqualified (vs 20% for others)
+                    base_score = max(0, base_score - penalty)
                 
-                base_score = min(100, base_score + overqualification_bonus)
-            elif critical_skills_missing > 0:
-                # Apply penalty for missing critical skills (realistic approach)
-                # Distinguish between critical and nice-to-have skills
-                critical_penalty_skills = ['snowflake', 'bigquery', 'cloud', 'data engineering']
-                nice_to_have_skills = ['paid advertising', 'google ads', 'meta', 'advertising platforms', 'mentorship skills', 'problem-solving']
-                
-                critical_missing = sum(1 for skill in matches['unmatched_job_skills'] 
-                                     if any(critical in skill.lower() for critical in critical_penalty_skills))
-                nice_to_have_missing = sum(1 for skill in matches['unmatched_job_skills'] 
-                                         if any(nice in skill.lower() for nice in nice_to_have_skills))
-                
-                # Apply smaller penalties - 3% for critical, 1% for nice-to-have
-                penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
-                penalty = min(20, penalty)  # Cap penalty at 20%
-                base_score = max(0, base_score - penalty)
+                # Apply overqualification bonus if base score is decent (lowered threshold)
+                # Overqualified candidates should be rewarded, not penalized
+                if base_score >= 50:  # Lowered from 70% - being overqualified is valuable
+                    if overqualification_ratio >= 4.0:  # 4x+ overqualified
+                        overqualification_bonus = 15
+                    elif overqualification_ratio >= 3.0:  # 3x+ overqualified
+                        overqualification_bonus = 10
+                    else:  # 2x+ overqualified
+                        overqualification_bonus = 5
+                    
+                    base_score = min(100, base_score + overqualification_bonus)
+            else:
+                # Not overqualified - apply standard penalties for missing skills
+                if critical_skills_missing > 0:
+                    critical_penalty_skills = ['snowflake', 'bigquery', 'cloud', 'data engineering']
+                    nice_to_have_skills = ['paid advertising', 'google ads', 'meta', 'advertising platforms', 'mentorship skills', 'problem-solving']
+                    
+                    critical_missing = sum(1 for skill in matches['unmatched_job_skills'] 
+                                         if any(critical in skill.lower() for critical in critical_penalty_skills))
+                    nice_to_have_missing = sum(1 for skill in matches['unmatched_job_skills'] 
+                                             if any(nice in skill.lower() for nice in nice_to_have_skills))
+                    
+                    # Standard penalties for non-overqualified candidates
+                    penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
+                    penalty = min(20, penalty)  # Cap penalty at 20%
+                    base_score = max(0, base_score - penalty)
             
             matches['match_score'] = round(base_score, 2)
         else:
@@ -292,12 +346,88 @@ class PreliminaryMatcher:
             "key responsibilities and duties"
         ]
         
-        # Check against known job skills patterns (only exact matches to avoid noise)
+        # Check against known job skills patterns (use word boundaries to avoid false positives)
+        # Only extract skills that are ACTUALLY mentioned in the job description
         for category, skills in self.job_skills.items():
             for skill in skills:
                 skill_normalized = self.normalize_skill_name(skill)
-                if skill_normalized and skill_normalized in job_desc_lower:
-                    job_skills.append(skill)
+                if skill_normalized:
+                    # Extract the core skill name (remove parentheticals, qualifiers, etc.)
+                    # e.g., "Cloud platform requirements" -> "cloud platform"
+                    core_skill = skill_normalized
+                    
+                    # Remove parentheticals and qualifiers that might not be in JD
+                    # e.g., "AWS (Amazon Web Services) experience (preferred)" -> "aws"
+                    core_skill = re.sub(r'\s*\([^)]*\)', '', core_skill)  # Remove (parentheticals)
+                    core_skill = re.sub(r'\s*experience.*$', '', core_skill, flags=re.IGNORECASE)  # Remove "experience" suffix
+                    core_skill = re.sub(r'\s*\(preferred\)$', '', core_skill, flags=re.IGNORECASE)  # Remove "(preferred)"
+                    core_skill = re.sub(r'\s*\(required\)$', '', core_skill, flags=re.IGNORECASE)  # Remove "(required)"
+                    core_skill = re.sub(r'\s*requirements?$', '', core_skill, flags=re.IGNORECASE)  # Remove "requirements"
+                    core_skill = core_skill.strip()
+                    
+                    # Only add if the CORE skill (or close variant) appears in JD with word boundaries
+                    # This prevents "Cloud platform requirements" from matching if only "cloud" appears
+                    if len(core_skill) > 2:  # Must have meaningful content
+                        # Use word boundary matching for the core skill
+                        pattern = r'\b' + re.escape(core_skill) + r'\b'
+                        if re.search(pattern, job_desc_lower):
+                            # Only add the skill if it's not already in the list
+                            if skill not in job_skills:
+                                job_skills.append(skill)
+        
+        # Extract education requirements (CRITICAL - these are often required)
+        # Check both uppercase and lowercase versions
+        education_patterns = [
+            (r'\bph\.?d\.?\b', 'PhD'),
+            (r'\bphd\b', 'PhD'),  # Also check lowercase
+            (r'\bdoctorate\b', 'Doctorate'),
+            (r'\bmaster\s+of\s+science\b', 'Master of Science'),
+            (r'\bmaster\s+of\s+arts\b', 'Master of Arts'),
+            (r'\bmaster\'?s?\s+degree\b', "Master's Degree"),
+            (r'\bbachelor\s+of\s+science\b', 'Bachelor of Science'),
+            (r'\bbachelor\s+of\s+arts\b', 'Bachelor of Arts'),
+            (r'\bbachelor\'?s?\s+degree\b', "Bachelor's Degree"),
+            (r'\babd\b', 'ABD (All But Dissertation)'),
+        ]
+        for pattern, skill_name in education_patterns:
+            if re.search(pattern, job_description, re.IGNORECASE) and skill_name not in job_skills:
+                job_skills.append(skill_name)
+        
+        # Extract domain expertise (biology, chemistry, physics, etc.)
+        domain_patterns = [
+            (r'\bmolecular\s+biology\b', 'Molecular Biology'),
+            (r'\bgenetics\b', 'Genetics'),
+            (r'\bbiochemistry\b', 'Biochemistry'),
+            (r'\bimmunology\b', 'Immunology'),
+            (r'\bcell\s+biology\b', 'Cell Biology'),
+            (r'\bbioinformatics\b', 'Bioinformatics'),
+            (r'\bbiochemistry\b', 'Biochemistry'),
+            (r'\bbiotechnology\b', 'Biotechnology'),
+            (r'\bbiology\b', 'Biology'),  # Check last to avoid false positives
+            (r'\bchemistry\b', 'Chemistry'),
+            (r'\bphysics\b', 'Physics'),
+            (r'\bmathematics\b', 'Mathematics'),
+            (r'\bstatistics\b', 'Statistics'),
+            (r'\bcomputer\s+science\b', 'Computer Science'),
+            (r'\bdata\s+science\b', 'Data Science'),
+            (r'\bmachine\s+learning\b', 'Machine Learning'),
+        ]
+        for pattern, skill_name in domain_patterns:
+            if re.search(pattern, job_desc_lower, re.IGNORECASE) and skill_name not in job_skills:
+                job_skills.append(skill_name)
+        
+        # Extract research-related skills
+        research_patterns = [
+            (r'\bscientific\s+research\b', 'Scientific Research'),
+            (r'\bresearch\s+experience\b', 'Research Experience'),
+            (r'\bresearch\s+methodology\b', 'Research Methodology'),
+            (r'\bexperimental\s+design\b', 'Experimental Design'),
+            (r'\bexperimental\s+protocols\b', 'Experimental Protocols'),
+            (r'\bresearch\b', 'Research'),  # Check last
+        ]
+        for pattern, skill_name in research_patterns:
+            if re.search(pattern, job_desc_lower, re.IGNORECASE) and skill_name not in job_skills:
+                job_skills.append(skill_name)
         
         # Also extract specific skills mentioned in the job description
         specific_skills = [
@@ -340,6 +470,7 @@ class PreliminaryMatcher:
             r'^.*master.*$',  # Phrases about master's
             r'^.*minimum.*$',  # Phrases about minimum requirements
             r'^.*preferred.*$',  # Phrases about preferred qualifications
+            r'^none specified',  # "None specified" placeholder
         ]
         
         for skill in job_skills:
@@ -352,12 +483,42 @@ class PreliminaryMatcher:
                     break
             
             # Additional validation - must have meaningful content and be reasonable length
+            # AND verify the skill (or core part) actually appears in the job description
+            # BUT: Don't filter out education/domain skills that we explicitly extracted
+            is_education_skill = any(edu in skill_clean.lower() for edu in ['phd', 'doctorate', 'master', 'bachelor', 'abd'])
+            is_domain_skill = any(domain in skill_clean.lower() for domain in ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics'])
+            is_research_skill = any(research in skill_clean.lower() for research in ['research', 'experimental'])
+            
+            # Allow shorter skills if they're education/domain/research (PhD is 3 chars, so >= 3)
+            min_length = 2 if (is_education_skill or is_domain_skill or is_research_skill) else 3
+            
             if (is_valid and 
-                len(skill_clean) > 3 and 
+                len(skill_clean) >= min_length and 
                 len(skill_clean) < 50 and 
                 skill_clean not in filtered_skills and
-                not any(word in skill_clean.lower() for word in ['experience', 'years', 'degree', 'minimum', 'preferred', 'bachelor', 'master'])):
-                filtered_skills.append(skill_clean)
+                (is_education_skill or is_domain_skill or is_research_skill or 
+                 not any(word in skill_clean.lower() for word in ['experience', 'years', 'minimum', 'preferred']))):
+                
+                # Final validation: Verify the skill actually appears in JD (not just similar words)
+                # Extract core skill name (remove parentheticals, qualifiers)
+                core_skill_for_validation = skill_clean.lower()
+                core_skill_for_validation = re.sub(r'\s*\([^)]*\)', '', core_skill_for_validation)  # Remove parentheticals
+                core_skill_for_validation = re.sub(r'\s*requirements?$', '', core_skill_for_validation, flags=re.IGNORECASE)
+                core_skill_for_validation = core_skill_for_validation.strip()
+                
+                # Check if core skill appears in JD with word boundaries (more strict)
+                if len(core_skill_for_validation) >= 3:
+                    # For multi-word skills, require all words to appear
+                    words = core_skill_for_validation.split()
+                    if len(words) > 1:
+                        # All words must appear (but not necessarily consecutively)
+                        all_words_present = all(re.search(r'\b' + re.escape(word) + r'\b', job_desc_lower) for word in words if len(word) > 2)
+                        if all_words_present:
+                            filtered_skills.append(skill_clean)
+                    else:
+                        # Single word - check with word boundary
+                        if re.search(r'\b' + re.escape(core_skill_for_validation) + r'\b', job_desc_lower):
+                            filtered_skills.append(skill_clean)
         
         # CRITICAL: Deduplicate and consolidate similar skills
         consolidated_skills = self._consolidate_similar_skills(filtered_skills)
@@ -375,6 +536,10 @@ class PreliminaryMatcher:
         if not job_skill_normalized:
             job_skill_normalized = job_skill.lower().strip()
         
+        # Normalize hyphens and handle plurals for better matching
+        job_skill_normalized = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+        job_skill_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_normalized).strip()
+        
         # Define skill equivalence mappings
         skill_equivalences = {
             'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],                                                                   
@@ -382,15 +547,29 @@ class PreliminaryMatcher:
             'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],                                                                           
             'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],                                                   
             'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],                                                   
-            'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'planning'],                                                                                                                              
+            'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'data strategy', 'planning'],                                                                                                                              
             'strategy': ['strategic', 'business strategy', 'data strategy', 'product strategy', 'planning'],                                                    
+            'data strategy': ['strategy', 'strategic', 'product strategy', 'business strategy', 'planning'],
             'insights': ['insight', 'analytics', 'data insights', 'business insights'],                                                                         
-            'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing'],                                                                
+            'data analytics': ['analytics', 'data analytics', 'product analytics', 'business analytics'],
+            'analytics': ['data analytics', 'product analytics', 'business analytics', 'insights'],
+            'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing', 'pipelines', 'data pipelines', 'data engineering pipelines'],
+            'pipelines': ['data engineering', 'data pipelines', 'data pipeline', 'etl', 'data processing'],
+            'data pipelines': ['data engineering', 'pipelines', 'data pipeline', 'etl'],
+            'modeling': ['data modeling', 'data models', 'modeling techniques', 'data model'],
+            'data modeling': ['modeling', 'data models', 'modeling techniques', 'data model'],
+            'communication': ['communication skills', 'excellent communication', 'strong communication', 'excellent communication skills', 'strong communication skills'],
+            'communication skills': ['communication', 'excellent communication', 'strong communication'],
+            'excellent communication skills': ['communication', 'communication skills', 'strong communication skills'],
+            'strong communication skills': ['communication', 'communication skills', 'excellent communication skills'],
             'cloud platforms': ['aws', 'azure', 'gcp', 'cloud'],
             'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],                                                                    
             'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],                                                                     
             'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],                                                       
-            'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],                                             
+            'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
+            'problem solving': ['problem-solving', 'problem-solving skills', 'problem solving skills'],
+            'problem-solving': ['problem solving', 'problem-solving skills', 'problem solving skills'],
+            'problem-solving skills': ['problem solving', 'problem-solving'],
         }
         
         # Performance optimization: Use lazy cache - normalize only when needed
@@ -399,7 +578,12 @@ class PreliminaryMatcher:
             candidate_skill_normalized = self._get_normalized_skill(candidate_skill)
             
             if not candidate_skill_normalized:
-                continue
+                # Fallback: use candidate skill as-is
+                candidate_skill_normalized = candidate_skill.lower().strip()
+            
+            # Normalize hyphens and handle plurals for candidate skill too
+            candidate_skill_normalized = candidate_skill_normalized.replace('-', ' ').replace('_', ' ')
+            candidate_skill_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_skill_normalized).strip()
             
             # Direct match (fast check)
             if (job_skill_normalized == candidate_skill_normalized or 
@@ -421,17 +605,34 @@ class PreliminaryMatcher:
         return False
     
     def _is_partial_match(self, skill: str, job_desc: str) -> bool:
-        """Check for partial matches using fuzzy logic"""
+        """Check for partial matches using fuzzy logic with word boundaries"""
         # Split skill into words
         skill_words = skill.split()
+        job_desc_lower = job_desc.lower()
         
-        # If skill is a single word, check if it appears in job description
+        # If skill is a single word, use word boundary matching to avoid false positives
         if len(skill_words) == 1:
-            return skill in job_desc
+            # Use word boundary to avoid matching substrings (e.g., "ase" in "base")
+            if len(skill) <= 2:
+                # For very short skills (1-2 chars), require exact word boundary match
+                pattern = r'\b' + re.escape(skill) + r'\b'
+                return bool(re.search(pattern, job_desc_lower))
+            else:
+                # For longer skills, allow word boundary match
+                pattern = r'\b' + re.escape(skill) + r'\b'
+                return bool(re.search(pattern, job_desc_lower))
         
-        # For multi-word skills, check if most words appear
-        matches = sum(1 for word in skill_words if word in job_desc)
-        return matches >= len(skill_words) * 0.6  # 60% of words must match
+        # For multi-word skills, check if most words appear with word boundaries
+        matches = 0
+        for word in skill_words:
+            if len(word) > 2:  # Only check meaningful words (3+ chars)
+                pattern = r'\b' + re.escape(word) + r'\b'
+                if re.search(pattern, job_desc_lower):
+                    matches += 1
+        meaningful_words = [w for w in skill_words if len(w) > 2]
+        if not meaningful_words:
+            return False
+        return matches >= len(meaningful_words) * 0.6  # 60% of meaningful words must match
     
     def extract_job_requirements(self, job_description: str) -> Dict[str, List[str]]:
         """Extract specific requirements from job description"""
@@ -589,14 +790,28 @@ Please focus your analysis on the areas above and provide detailed insights on:
             
             # Analytics and BI
             'business intelligence': ['business intelligence', 'bi', 'bi platforms'],
-            'data analytics': ['data analytics', 'analytics'],
+            'data analytics': ['data analytics', 'analytics', 'product analytics'],
             'data science': ['data science'],
             'machine learning': ['machine learning', 'ml'],
+            
+            # Data Engineering
+            'data engineering': ['data engineering', 'data engineering pipelines', 'data pipeline engineering'],
+            'pipelines': ['pipelines', 'data pipelines', 'data pipeline', 'pipeline'],
+            'data pipelines': ['data pipelines', 'pipelines', 'data pipeline'],
+            
+            # Modeling
+            'modeling': ['modeling', 'data modeling', 'data models', 'modeling techniques'],
+            'data modeling': ['data modeling', 'modeling', 'data models'],
+            
+            # Communication
+            'communication': ['communication', 'communication skills', 'excellent communication', 'strong communication', 'excellent communication skills', 'strong communication skills'],
+            'communication skills': ['communication skills', 'communication', 'excellent communication skills', 'strong communication skills'],
             
             # Leadership and management
             'leadership': ['leadership', 'team leadership'],
             'management': ['management', 'team management', 'project management'],
-            'strategy': ['strategy', 'strategic', 'strategic planning'],
+            'strategy': ['strategy', 'strategic', 'strategic planning', 'product strategy', 'data strategy', 'business strategy'],
+            'problem solving': ['problem solving', 'problem-solving', 'problem-solving skills', 'problem solving skills'],
             
             # Programming
             'python': ['python'],
@@ -613,10 +828,23 @@ Please focus your analysis on the areas above and provide detailed insights on:
                 continue
                 
             # Check if this skill belongs to a group
+            # First normalize: remove hyphens, handle plurals, etc.
+            skill_normalized = skill_lower.replace('-', ' ').replace('_', ' ')
+            # Remove common suffixes like "skills", "experience", etc.
+            skill_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', skill_normalized).strip()
+            
             found_group = False
             for group_name, group_members in skill_groups.items():
+                group_normalized = group_name.replace('-', ' ').replace('_', ' ')
+                # Check against normalized skill
                 for member in group_members:
-                    if member in skill_lower or skill_lower in member:
+                    member_normalized = member.replace('-', ' ').replace('_', ' ')
+                    member_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', member_normalized).strip()
+                    
+                    # Check if normalized versions match
+                    if (member_normalized in skill_normalized or 
+                        skill_normalized in member_normalized or
+                        member_normalized == skill_normalized):
                         # Use the canonical name
                         if group_name not in [s.lower() for s in consolidated]:
                             consolidated.append(group_name)
