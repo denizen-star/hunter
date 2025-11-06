@@ -90,7 +90,8 @@ def recent_applications():
             'job_title': app.job_title,
             'status': app.status,
             'created_at': app.created_at.isoformat(),
-            'match_score': app.match_score
+            'match_score': app.match_score,
+            'flagged': app.flagged
         } for app in recent])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -100,6 +101,13 @@ def get_all_applications():
     """Get all applications for dashboard cards"""
     try:
         applications = job_processor.list_all_applications()
+        
+        # Filter by flagged status if requested
+        flagged_filter = request.args.get('flagged', '').lower()
+        if flagged_filter == 'true':
+            applications = [app for app in applications if app.flagged]
+        elif flagged_filter == 'false':
+            applications = [app for app in applications if not app.flagged]
         
         return jsonify([{
             'id': app.id,
@@ -114,7 +122,8 @@ def get_all_applications():
             'salary_range': app.salary_range,
             'location': app.location,
             'hiring_manager': app.hiring_manager,
-            'summary_path': str(app.summary_path) if app.summary_path else None
+            'summary_path': str(app.summary_path) if app.summary_path else None,
+            'flagged': app.flagged
         } for app in applications])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -391,22 +400,19 @@ def get_normalization_comparison(app_id):
         # Get new system results (with normalization)
         new_extracted = []
         for skill in old_extracted:
-            normalized = matcher.normalize_skill_name(skill)
-            if normalized:
-                new_extracted.append(normalized)
+            # Use SkillNormalizer directly for canonical names
+            normalized_result = matcher.skill_normalizer.normalize(skill, fuzzy=True)
+            if normalized_result:
+                new_extracted.append(normalized_result)
         
         # Compare individual skills
         skill_comparisons = []
         test_skills = old_extracted[:20]  # First 20 for comparison
         for skill in test_skills:
-            old_norm = matcher.normalize_skill_name(skill)
-            # Get canonical from new normalizer if available
-            if matcher.normalizer:
-                new_canonical = matcher.normalizer.normalize(skill, fuzzy=True)
-                new_category = matcher.normalizer.get_category(new_canonical) if new_canonical else None
-            else:
-                new_canonical = None
-                new_category = None
+            # Use SkillNormalizer for both old and new normalization
+            old_norm = matcher.normalize_skill_name(skill)  # Returns lowercase string
+            new_canonical = matcher.skill_normalizer.normalize(skill, fuzzy=True)  # Returns canonical name
+            new_category = matcher.skill_normalizer.get_category(new_canonical) if new_canonical else None
             
             skill_comparisons.append({
                 'original': skill,
@@ -455,7 +461,8 @@ def list_applications():
                 'updated_at': format_for_display(app.status_updated_at),
                 'folder_path': str(app.folder_path),
                 'summary_path': str(app.summary_path) if app.summary_path else None,
-                'match_score': app.match_score
+                'match_score': app.match_score,
+                'flagged': app.flagged
             })
         
         return jsonify({
@@ -496,6 +503,7 @@ def get_application(app_id):
                 'hiring_manager': application.hiring_manager,
                 'folder_path': str(application.folder_path),
                 'summary_path': str(application.summary_path) if application.summary_path else None,
+                'flagged': application.flagged,
                 'updates': updates
             }
         })
@@ -521,6 +529,7 @@ def search_applications():
                     'company': app.company,
                     'job_title': app.job_title,
                     'status': app.status,
+                    'flagged': app.flagged,
                     'display_text': f"{app.company} - {app.job_title} ({app.id})"
                 })
         
@@ -666,6 +675,44 @@ def update_job_details(app_id):
                 'hiring_manager': application.hiring_manager
             },
             'updated_at': format_for_display(application.status_updated_at)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/applications/<app_id>/flag', methods=['PUT'])
+def toggle_flag(app_id):
+    """Toggle flag status for an application"""
+    try:
+        data = request.json
+        flagged = data.get('flagged')
+        
+        if flagged is None:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: flagged (boolean)'
+            }), 400
+        
+        # Load application
+        application = job_processor.get_application_by_id(app_id)
+        
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Update flagged status
+        application.flagged = bool(flagged)
+        
+        # Save updated metadata
+        job_processor._save_application_metadata(application)
+        
+        # Update dashboard
+        dashboard_generator.generate_index_page()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Application {"flagged" if application.flagged else "unflagged"} successfully',
+            'application_id': application.id,
+            'flagged': application.flagged
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1020,6 +1067,31 @@ def get_reports_data():
         # Sort follow-up applications by newest update first
         followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
         
+        # Flagged applications
+        flagged_applications = []
+        for app in applications:
+            if app.flagged:
+                # Generate summary URL
+                summary_url = None
+                if app.summary_path and app.summary_path.exists():
+                    folder_name = app.folder_path.name
+                    summary_filename = app.summary_path.name
+                    summary_url = f"/applications/{folder_name}/{summary_filename}"
+                
+                last_update = app.status_updated_at or app.created_at
+                flagged_applications.append({
+                    'company': app.company,
+                    'job_title': app.job_title,
+                    'match_score': round(app.match_score or 0),
+                    'last_updated': format_for_display(last_update),
+                    'summary_url': summary_url,
+                    'contact_count': app.calculate_contact_count(),
+                    'status': app.status
+                })
+        
+        # Sort flagged applications by newest update first
+        flagged_applications.sort(key=lambda x: x['last_updated'], reverse=True)
+        
         # Calculate rejected applications from status changes (applications rejected in period)
         rejected_count = status_changes_by_status.get('rejected', 0)
         
@@ -1054,7 +1126,8 @@ def get_reports_data():
             'summary': summary,
             'applications_by_status': applications_by_status,
             'status_changes': status_changes_by_status,
-            'followup_applications': followup_applications
+            'followup_applications': followup_applications,
+            'flagged_applications': flagged_applications
         })
         
     except Exception as e:

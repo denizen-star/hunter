@@ -294,11 +294,34 @@ class DashboardGenerator:
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(74, 85, 104, 0.15);
         }}
+        .card-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }}
         .card-company {{
             font-size: 24px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 8px;
+            flex: 1;
+        }}
+        .flag-btn {{
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 10px;
+            transition: transform 0.2s;
+            opacity: 0.6;
+        }}
+        .flag-btn:hover {{
+            transform: scale(1.2);
+            opacity: 1;
+        }}
+        .flag-btn.flagged {{
+            opacity: 1;
         }}
         .card-title {{
             font-size: 18px;
@@ -382,6 +405,7 @@ class DashboardGenerator:
             <li><a href="/reports" class="nav-link">Reports</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
@@ -547,6 +571,52 @@ class DashboardGenerator:
             }}
         }}
         
+        // Toggle flag for an application
+        async function toggleFlag(appId, currentFlagged) {{
+            try {{
+                const newFlagged = !currentFlagged;
+                const response = await fetch(`/api/applications/${{appId}}/flag`, {{
+                    method: 'PUT',
+                    headers: {{
+                        'Content-Type': 'application/json'
+                    }},
+                    body: JSON.stringify({{ flagged: newFlagged }})
+                }});
+                
+                const data = await response.json();
+                
+                if (data.success) {{
+                    // Find the card by looking for the button with matching onclick attribute
+                    const flagBtn = Array.from(document.querySelectorAll('.flag-btn')).find(btn => 
+                        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${{appId}}'`)
+                    );
+                    
+                    if (flagBtn) {{
+                        flagBtn.textContent = newFlagged ? '🚩' : '⚐';
+                        flagBtn.className = `flag-btn ${{newFlagged ? 'flagged' : 'unflagged'}}`;
+                        flagBtn.title = newFlagged ? 'Unflag this job' : 'Flag this job';
+                        flagBtn.setAttribute('onclick', `toggleFlag('${{appId}}', ${{String(newFlagged).toLowerCase()}})`);
+                        
+                        // Update the card's data-flagged attribute
+                        const card = flagBtn.closest('.card');
+                        if (card) {{
+                            card.setAttribute('data-flagged', String(newFlagged).toLowerCase());
+                        }}
+                    }}
+                    
+                    // Reload the page to update the flagged tab count and ensure consistency
+                    setTimeout(() => {{
+                        window.location.reload();
+                    }}, 300);
+                }} else {{
+                    alert('Failed to update flag: ' + (data.error || 'Unknown error'));
+                }}
+            }} catch (error) {{
+                console.error('Error toggling flag:', error);
+                alert('Error updating flag. Please try again.');
+            }}
+        }}
+        
         // Initialize with active tab as default
         document.addEventListener('DOMContentLoaded', function() {{
             // Activate 'active' tab by default (landing page)
@@ -563,10 +633,11 @@ class DashboardGenerator:
     
     def _create_tabs_html(self, applications: List[Application], status_counts: dict) -> str:
         """Create the tabbed interface HTML"""
-        # Define status order with 'active' first (as landing page), then 'all', then as shown in the image
+        # Define status order with 'active' first (as landing page), then 'all', then 'flagged', then as shown in the image
         status_order = [
             'active',
             'all',
+            'flagged',
             'pending',
             'applied', 
             'contacted someone',
@@ -587,6 +658,9 @@ class DashboardGenerator:
             elif status == 'all':
                 count = len(applications)  # Total count for all applications
                 status_display = "All"
+            elif status == 'flagged':
+                count = len([app for app in applications if app.flagged])
+                status_display = "Flagged"
             else:
                 count = status_counts.get(status, 0)
                 # Shorten long tab titles to prevent overlap
@@ -615,6 +689,10 @@ class DashboardGenerator:
                 status_apps = applications  # All applications
                 status_title = "All Applications"
                 default_display = 'none'  # No longer the default
+            elif status == 'flagged':
+                status_apps = [app for app in applications if app.flagged]
+                status_title = "Flagged Applications"
+                default_display = 'none'
             else:
                 status_apps = [app for app in applications if app.status.lower() == status]
                 # Use full names in content area for clarity
@@ -684,14 +762,27 @@ class DashboardGenerator:
         applied_at = app.created_at
         match_score = app.match_score or 0
         
+        # Flag button HTML
+        flag_icon = '🚩' if app.flagged else '⚐'
+        flag_class = 'flagged' if app.flagged else 'unflagged'
+        flag_title = 'Unflag this job' if app.flagged else 'Flag this job'
+        
         return f"""
         <div class="card" 
              data-updated-at="{updated_at.isoformat()}" 
              data-applied-at="{applied_at.isoformat()}" 
-             data-match-score="{match_score}">
-            <div class="card-company">
-                {app.company}
-                {match_score_html}
+             data-match-score="{match_score}"
+             data-flagged="{str(app.flagged).lower()}">
+            <div class="card-header">
+                <div class="card-company">
+                    {app.company}
+                    {match_score_html}
+                </div>
+                <button class="flag-btn {flag_class}" 
+                        onclick="toggleFlag('{app.id}', {str(app.flagged).lower()})" 
+                        title="{flag_title}">
+                    {flag_icon}
+                </button>
             </div>
             <div class="card-title">{app.job_title}</div>
             <div>

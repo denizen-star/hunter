@@ -416,6 +416,7 @@
             <li><a href="/reports" class="nav-link active">Reports</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
@@ -466,6 +467,17 @@
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>Loading follow-up applications...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="report-card">
+            <h3>Flagged Applications</h3>
+            <p style="color: #718096; margin-bottom: 30px; font-size: 16px;">Applications you've flagged for review</p>
+            <div id="flagged-list" class="followup-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading flagged applications...</p>
                 </div>
             </div>
         </div>
@@ -560,6 +572,10 @@
                     console.log('About to call updateFollowupList with:', data.followup_applications);
                     updateFollowupList(data.followup_applications);
                     
+                    // Update flagged applications list
+                    console.log('About to call updateFlaggedList with:', data.flagged_applications);
+                    updateFlaggedList(data.flagged_applications);
+                    
                     // Set a timeout to show text fallback ONLY if charts don't appear
                     setTimeout(() => {
                         const chart1 = document.getElementById('applicationsByStatusChart');
@@ -582,6 +598,15 @@
                         if (followupContainer && followupContainer.innerHTML.includes('Loading')) {
                             console.log('Follow-up section still loading, forcing update');
                             updateFollowupList(data.followup_applications);
+                        }
+                    }, 500);
+                    
+                    // Force flagged section to update if it's still loading
+                    setTimeout(() => {
+                        const flaggedContainer = document.getElementById('flagged-list');
+                        if (flaggedContainer && flaggedContainer.innerHTML.includes('Loading')) {
+                            console.log('Flagged section still loading, forcing update');
+                            updateFlaggedList(data.flagged_applications);
                         }
                     }, 500);
                 } else {
@@ -862,6 +887,63 @@
                         <div class="empty-state">
                             <div class="empty-state-icon">!</div>
                             <p>Error loading follow-up applications</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">
+                                Please refresh the page to try again.
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Update flagged applications list
+        function updateFlaggedList(applications) {
+            try {
+                const container = document.getElementById('flagged-list');
+                
+                console.log('Flagged applications received:', applications);
+                console.log('Container element:', container);
+                
+                if (!container) {
+                    console.error('Flagged container not found');
+                    return;
+                }
+                
+                if (!applications || applications.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🚩</div>
+                            <p>No flagged applications at this time!</p>
+                        </div>
+                    `;
+                    console.log('Flagged list updated with empty state');
+                    return;
+                }
+            
+                const html = applications.map(app => `
+                    <div class="followup-item">
+                        <div class="followup-info">
+                            <div class="followup-company">${app.company}</div>
+                            <div class="followup-position">${app.job_title}</div>
+                            <div class="followup-match">${app.match_score}% Match • ${app.contact_count} Contacts • Status: ${app.status}</div>
+                        </div>
+                        <div class="followup-timestamp">
+                            Last updated: ${app.last_updated}
+                        </div>
+                        <a href="${app.summary_url || '#'}" class="followup-link" target="_blank">View Summary →</a>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = html;
+                console.log('Flagged list updated with applications');
+            } catch (error) {
+                console.error('Error updating flagged list:', error);
+                const container = document.getElementById('flagged-list');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading flagged applications</p>
                             <p style="font-size: 14px; color: #999; margin-top: 10px;">
                                 Please refresh the page to try again.
                             </p>

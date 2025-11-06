@@ -44,6 +44,9 @@ class Application:
     # Contact tracking
     contact_count: Optional[int] = None
     
+    # Flagging
+    flagged: bool = False
+    
     def __post_init__(self):
         """Convert string paths to Path objects and strings to datetime objects"""
         if isinstance(self.created_at, str):
@@ -85,7 +88,8 @@ class Application:
             salary_range=data.get('salary_range'),
             location=data.get('location'),
             hiring_manager=data.get('hiring_manager'),
-            contact_count=data.get('contact_count')
+            contact_count=data.get('contact_count'),
+            flagged=data.get('flagged', False)
         )
     
     def to_dict(self) -> dict:
@@ -114,7 +118,8 @@ class Application:
             'salary_range': self.salary_range,
             'location': self.location,
             'hiring_manager': self.hiring_manager,
-            'contact_count': self.contact_count
+            'contact_count': self.contact_count,
+            'flagged': self.flagged
         }
     
     def get_folder_name(self) -> str:
