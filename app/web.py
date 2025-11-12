@@ -33,6 +33,33 @@ doc_generator = DocumentGenerator()
 dashboard_generator = DashboardGenerator()
 template_manager = TemplateManager()
 
+STATUS_NORMALIZATION_MAP = {
+    'contacted hiring manager': 'company response',
+    'company response': 'company response',
+    'interviewed': 'interview notes',
+    'interview notes': 'interview notes',
+    'interview follow up': 'interview - follow up',
+    'interview follow-up': 'interview - follow up',
+    'interview - follow up': 'interview - follow up',
+}
+
+
+def normalize_status_label(status: str) -> str:
+    """Normalize status strings for consistent downstream reporting."""
+    if not status:
+        return ''
+    normalized = status.strip().lower()
+    normalized = normalized.replace('–', '-').replace('—', '-')
+    normalized = normalized.replace('  ', ' ')
+    return STATUS_NORMALIZATION_MAP.get(normalized, normalized)
+
+
+def status_matches(current_status: str, *targets: str) -> bool:
+    """Check whether a status matches any of the target labels (with normalization)."""
+    normalized_status = normalize_status_label(current_status)
+    normalized_targets = {normalize_status_label(target) for target in targets}
+    return normalized_status in normalized_targets
+
 
 @app.route('/')
 def index():
@@ -61,15 +88,23 @@ def dashboard_stats():
     try:
         applications = job_processor.list_all_applications()
         
+        def count_status(*labels):
+            return sum(1 for app in applications if status_matches(app.status, *labels))
+
         stats = {
             'total': len(applications),
-            'pending': len([app for app in applications if app.status.lower() == 'pending']),
-            'applied': len([app for app in applications if app.status.lower() == 'applied']),
-            'interviewed': len([app for app in applications if app.status.lower() == 'interviewed']),
-            'offered': len([app for app in applications if app.status.lower() == 'offered']),
-            'rejected': len([app for app in applications if app.status.lower() == 'rejected']),
-            'accepted': len([app for app in applications if app.status.lower() == 'accepted'])
+            'pending': count_status('pending'),
+            'applied': count_status('applied'),
+            'contacted_someone': count_status('contacted someone'),
+            'company_response': count_status('company response', 'contacted hiring manager'),
+            'scheduled_interview': count_status('scheduled interview'),
+            'interview_notes': count_status('interview notes', 'interviewed'),
+            'interview_follow_up': count_status('interview - follow up'),
+            'offered': count_status('offered'),
+            'rejected': count_status('rejected'),
+            'accepted': count_status('accepted')
         }
+        stats['interviewed'] = stats['interview_notes']
         
         return jsonify(stats)
     except Exception as e:
@@ -617,9 +652,10 @@ def update_status(app_id):
         }
         
         # For rejected applications, include redirect information
-        print(f"DEBUG: Status received: '{status}' (lowercase: '{status.lower()}')")
-        print(f"DEBUG: Checking if status.lower() == 'rejected': {status.lower() == 'rejected'}")
-        if status.lower() == 'rejected':
+        normalized_status = normalize_status_label(status)
+        print(f"DEBUG: Status received: '{status}' (normalized: '{normalized_status}')")
+        print(f"DEBUG: Checking if normalized status == 'rejected': {normalized_status == 'rejected'}")
+        if normalized_status == 'rejected':
             response_data['redirect'] = 'http://localhost:51003/dashboard'  # Use absolute URL
             response_data['message'] = f'Status updated to {status}. Application cleaned up and redirected to dashboard.'
             print(f"DEBUG: Rejected application - adding redirect to dashboard")
@@ -1022,14 +1058,14 @@ def get_reports_data():
         # Applications by status (for period) - count applications created in period by their current status
         applications_by_status = {}
         for app in period_applications:
-            status = app.status.lower()
+            status = normalize_status_label(app.status)
             applications_by_status[status] = applications_by_status.get(status, 0) + 1
         
         # Status changes by status (for period) - count status changes that happened in period by the new status
         status_changes_by_status = {}
         status_changes_count = 0
         for app in status_changes:
-            status = app.status.lower()
+            status = normalize_status_label(app.status)
             status_changes_count += 1  # Include all status changes
             status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
         
@@ -1039,7 +1075,7 @@ def get_reports_data():
         
         for app in applications:
             # Skip applications that are already rejected or accepted
-            if app.status.lower() in ['rejected', 'accepted']:
+            if normalize_status_label(app.status) in ['rejected', 'accepted']:
                 continue
             
             # Convert to same timezone for comparison
@@ -1102,6 +1138,8 @@ def get_reports_data():
         total_contact_count = 0
         if 'contacted someone' in status_changes_by_status:
             total_contact_count += status_changes_by_status['contacted someone']
+        if 'company response' in status_changes_by_status:
+            total_contact_count += status_changes_by_status['company response']
         if 'contacted hiring manager' in status_changes_by_status:
             total_contact_count += status_changes_by_status['contacted hiring manager']
         

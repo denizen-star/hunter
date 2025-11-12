@@ -60,7 +60,7 @@ class EnhancedQualificationsAnalyzer:
         
         # Step 4: Combine preliminary and AI results
         print("📊 Combining preliminary and AI analysis results...")
-        combined_analysis = self._combine_analyses(preliminary_analysis, ai_analysis)
+        combined_analysis = self._combine_analyses(preliminary_analysis, ai_analysis, job_description)
         
         return combined_analysis
     
@@ -236,7 +236,7 @@ Provide an overall assessment considering both the preliminary matching results 
         
         return items
     
-    def _combine_analyses(self, preliminary_analysis: Dict, ai_analysis: Dict) -> QualificationAnalysis:
+    def _combine_analyses(self, preliminary_analysis: Dict, ai_analysis: Dict, job_description: str) -> QualificationAnalysis:
         """Combine preliminary and AI analysis results"""
         
         # TRUST PRELIMINARY MATCHER SCORE as source of truth
@@ -276,10 +276,48 @@ Provide an overall assessment considering both the preliminary matching results 
             print(f"⚠️  WARNING: Score mismatch detected! Preliminary={final_prelim_score}%, AI={ai_score}%, USING PRELIMINARY={match_score_final}%")
         
         # Combine strong matches
+        # CRITICAL: Only include technologies that were actually extracted from the job description
+        # Extract technologies from JD to validate against
+        job_technologies = set(self.preliminary_matcher.tech_extractor.extract_technologies(job_description))
+        job_technologies_lower = {tech.lower() for tech in job_technologies}
+        
+        # Get all known technology names for validation
+        known_technologies_lower = {tech.lower() for tech in self.preliminary_matcher.tech_extractor.TECHNOLOGIES.keys()}
+        
         strong_matches = []
         for match in preliminary_analysis.get('exact_matches', []):
-            strong_matches.append(match['skill'])
-        strong_matches.extend(ai_analysis.get('strong_matches', []))
+            skill = match['skill']
+            skill_lower = skill.lower()
+            
+            # Check if this is a known technology
+            is_technology = skill_lower in known_technologies_lower
+            
+            if is_technology:
+                # It's a technology - only include if it was extracted from the JD
+                if skill_lower in job_technologies_lower:
+                    strong_matches.append(skill)
+                # Otherwise, skip it (technology not mentioned in JD)
+            else:
+                # Not a technology (e.g., "Leadership", "Strategy") - allow it
+                strong_matches.append(skill)
+        
+        # Filter AI strong matches to only include technologies found in JD
+        for ai_match in ai_analysis.get('strong_matches', []):
+            ai_match_lower = ai_match.lower()
+            
+            # Check if it's a known technology
+            is_technology = ai_match_lower in known_technologies_lower
+            
+            if is_technology:
+                # It's a technology - only include if it was extracted from the JD
+                if ai_match_lower in job_technologies_lower:
+                    if ai_match not in strong_matches:
+                        strong_matches.append(ai_match)
+                # Otherwise, skip it (technology not mentioned in JD)
+            else:
+                # Not a technology (e.g., "Leadership", "Strategy") - allow it
+                if ai_match not in strong_matches:
+                    strong_matches.append(ai_match)
         
         # Combine missing skills from both preliminary analysis and AI analysis
         ai_missing_skills = ai_analysis.get('missing_skills', [])

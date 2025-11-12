@@ -201,6 +201,18 @@ Return ONLY the YAML format, no additional text."""
                 'variations_found': [tech.lower()],
                 'source': 'technical_skills'
             }
+
+        # Ensure education credentials are captured
+        education_skills = self._extract_education_skills(resume_content)
+        for edu_skill in education_skills:
+            skill_name = edu_skill['name']
+            if skill_name not in skills:
+                skills[skill_name] = {
+                    'category': edu_skill['category'],
+                    'display_name': skill_name,
+                    'variations_found': edu_skill['variations'],
+                    'source': 'education'
+                }
         
         # CORE SKILLS EXTRACTION: Extract explicitly mentioned core skills from resume
         # Look for common patterns that indicate core skills
@@ -351,6 +363,66 @@ Return ONLY the YAML format, no additional text."""
             'skills': skills,
             'total_skills': len(skills)
         }
+
+    def _extract_education_skills(self, resume_content: str) -> List[Dict[str, any]]:
+        """Extract education credentials (degrees and fields of study) from resume text."""
+        education_entries = []
+        education_text = []
+        capture = False
+        for line in resume_content.split('\n'):
+            if re.match(r'^\s*##\s*Education', line, re.IGNORECASE):
+                capture = True
+                continue
+            if capture:
+                if re.match(r'^\s*##\s+', line):
+                    break
+                education_text.append(line)
+        education_block = '\n'.join(education_text)
+        
+        degree_patterns = [
+            r'\b(?:B\.?S\.?|Bachelors?|Bachelor\'s)(?:\s+of)?(?:\s+Science)?(?:\s+in)?\s+([A-Za-z&/\-\s]{3,})',
+            r'\b(?:B\.?A\.?|Bachelors?|Bachelor\'s)(?:\s+of)?(?:\s+Arts)?(?:\s+in)?\s+([A-Za-z&/\-\s]{3,})',
+            r'\b(?:M\.?S\.?|Masters?|Master\'s)(?:\s+of)?(?:\s+Science)?(?:\s+in)?\s+([A-Za-z&/\-\s]{3,})',
+            r'\b(?:M\.?B\.?A\.?|Master of Business Administration)\b',
+            r'\b(?:Ph\.?D\.?|Doctorate)(?:\s+in)?\s+([A-Za-z&/\-\s]{3,})'
+        ]
+        
+        unique_skills = set()
+        for pattern in degree_patterns:
+            for match in re.finditer(pattern, education_block, re.IGNORECASE):
+                field = match.group(1) if match.lastindex else match.group(0)
+                if not field:
+                    continue
+                field_clean = re.sub(r'[-–].*$', '', field).strip()
+                field_clean = re.sub(r'\s{2,}', ' ', field_clean)
+                field_clean = field_clean.rstrip('.')
+                if len(field_clean) < 3:
+                    continue
+                canonical = field_clean.title()
+                # Normalize common phrases
+                canonical = canonical.replace('Bs ', '').replace('Ms ', '').replace('Bachelor\'S', "Bachelor's")
+                canonical = canonical.replace('Master\'S', "Master's").strip()
+                # Extract primary field (e.g., Computer Science)
+                for delimiter in [' In ', ' Of ']:
+                    if delimiter in canonical:
+                        canonical = canonical.split(delimiter, 1)[-1].strip()
+                # Specific cleanup for common resume phrasing
+                canonical = canonical.replace('Science', 'Science').replace('Business Administration', 'Business Administration')
+                canonical = re.sub(r'\s*University.*$', '', canonical, flags=re.IGNORECASE).strip()
+                if not canonical:
+                    continue
+                if canonical.lower().endswith('degree'):
+                    canonical = canonical[:-6].strip()
+                canonical = canonical.replace('  ', ' ')
+                key = canonical.lower()
+                if key not in unique_skills:
+                    unique_skills.add(key)
+                    education_entries.append({
+                        'name': canonical,
+                        'category': 'Certifications',
+                        'variations': [canonical.lower()]
+                    })
+        return education_entries
     
     def _clean_and_validate_skills(self, skills: Dict) -> Dict:
         """Clean and validate extracted skills"""

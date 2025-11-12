@@ -133,7 +133,7 @@ class Application:
         return f"{company}-{job_title}"
     
     def calculate_contact_count(self) -> int:
-        """Calculate the number of times 'Contacted Someone' or 'Contacted Hiring Manager' status updates occurred"""
+        """Calculate contact count from status updates (including legacy labels)"""
         if not self.folder_path:
             return 0
             
@@ -149,7 +149,7 @@ class Application:
                 filename_parts = update_file.stem.split('-', 1)
                 if len(filename_parts) == 2:
                     status = filename_parts[1]
-                    if status in ['Contacted Someone', 'Contacted Hiring Manager']:
+                    if status in ['Contacted Someone', 'Contacted Hiring Manager', 'Company Response']:
                         contact_count += 1
         
         return contact_count

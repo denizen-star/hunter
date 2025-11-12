@@ -272,6 +272,19 @@ class JobProcessor:
         display_timestamp = application.status_updated_at.strftime('%B %d, %Y %I:%M %p EST')
         
         # Create HTML content (notes are now HTML formatted from rich text editor)
+        status_class = (
+            status.strip()
+            .lower()
+            .replace("&", "and")
+            .replace("/", "-")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("'", "")
+            .replace(".", "")
+            .replace(",", "")
+            .replace(" - ", "-")
+            .replace(" ", "-")
+        )
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -312,7 +325,11 @@ class JobProcessor:
         .status-applied {{ background-color: #d1ecf1; color: #0c5460; }}
         .status-contacted-someone {{ background-color: #d4edda; color: #155724; }}
         .status-contacted-hiring-manager {{ background-color: #cce5ff; color: #004085; }}
+        .status-company-response {{ background-color: #cce5ff; color: #004085; }}
+        .status-scheduled-interview {{ background-color: #ffeeba; color: #856404; }}
         .status-interviewed {{ background-color: #f8d7da; color: #721c24; }}
+        .status-interview-notes {{ background-color: #f8d7da; color: #721c24; }}
+        .status-interview-follow-up {{ background-color: #ffeef8; color: #b21f66; }}
         .status-offered {{ background-color: #d1ecf1; color: #0c5460; }}
         .status-rejected {{ background-color: #f8d7da; color: #721c24; }}
         .status-accepted {{ background-color: #d4edda; color: #155724; }}
@@ -454,7 +471,7 @@ class JobProcessor:
         
         <div class="header">
             <h1>Status Update: {status}</h1>
-            <span class="status-badge status-{status.lower().replace(' ', '-')}">{status}</span>
+            <span class="status-badge status-{status_class}">{status}</span>
             <div class="timestamp">{display_timestamp}</div>
         </div>
         
@@ -471,7 +488,7 @@ class JobProcessor:
                     <strong>Application ID:</strong> {application.id}
                 </div>
                 <div class="info-item">
-                    <strong>Current Status:</strong> <span class="status-badge status-{status.lower().replace(' ', '-')}">{status}</span>
+                    <strong>Current Status:</strong> <span class="status-badge status-{status_class}">{status}</span>
                 </div>
             </div>
         </div>

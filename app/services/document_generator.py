@@ -30,17 +30,21 @@ class DocumentGenerator:
             application, job_description, resume.content
         )
         
-        # 2. Generate cover letter
+        # 2. Generate company research
+        print("  → Generating company research...")
+        self.generate_research(application)
+        
+        # 3. Generate cover letter
         print("  → Generating cover letter...")
         self.generate_cover_letter(application, qualifications, resume.full_name)
         
-        # 2.5. Intro messages (deferred) - generated on demand from the Cover Letter tab
+        # 3.5. Intro messages (deferred) - generated on demand from the Cover Letter tab
         print("  → Skipping intro messages (deferred; generate from Cover Letter tab if needed)")
         
-        # 3. Customized resume (deferred) - generated on demand from the Resume tab
+        # 4. Customized resume (deferred) - generated on demand from the Resume tab
         print("  → Skipping customized resume (deferred; generate from Resume tab if needed)")
         
-        # 4. Generate summary HTML page
+        # 5. Generate summary HTML page
         print("  → Generating summary page...")
         self.generate_summary_page(application, qualifications)
         
@@ -71,6 +75,16 @@ class DocumentGenerator:
         
         return qualifications
     
+    def _load_research_content(self, application: Application) -> str:
+        """Load research content from application if available"""
+        if application.research_path and application.research_path.exists():
+            try:
+                return read_text_file(application.research_path)
+            except Exception as e:
+                print(f"  ⚠️ Warning: Could not load research file: {e}")
+                return None
+        return None
+    
     def generate_cover_letter(
         self,
         application: Application,
@@ -78,17 +92,21 @@ class DocumentGenerator:
         candidate_name: str
     ) -> None:
         """Generate cover letter"""
+        # Load research content if available
+        research_content = self._load_research_content(application)
+        
         cover_letter = self.ai_analyzer.generate_cover_letter(
             qualifications,
             application.company,
             application.job_title,
-            candidate_name
+            candidate_name,
+            research_content=research_content
         )
         
         # Insert compatibility text after "Dear Hiring Manager," using new format
         features_count = qualifications.features_compared if qualifications.features_compared > 0 else (len(qualifications.strong_matches) + len(qualifications.missing_skills))
-        strong_matches_str = ', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'essential technical and soft skills'
-        compatibility_text = f"\n\nMy profile shows a {qualifications.match_score:.0f}% compatibility score with the role, and {application.company} verified through weighted scoring methodology—prioritizing Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), and Soft Skills (10%) of {features_count} requirements. My strongest matched features include essential technical and soft skills such as {strong_matches_str}."
+        strong_matches_str = ', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'core strengths'
+        compatibility_text = f"\n\nMy profile shows a {qualifications.match_score:.0f}% compatibility score with the role, and {application.company} verified through weighted scoring methodology: Technical Skills (40%), Tools (30%), Experience (15%), and Soft Skills (10%) across {features_count} requirements. My strongest matched capabilities include {strong_matches_str}."
         
         if "Dear Hiring Manager," in cover_letter:
             # Insert after "Dear Hiring Manager," 
@@ -117,6 +135,110 @@ class DocumentGenerator:
         write_text_file(cover_letter, cover_letter_path)
         application.cover_letter_path = cover_letter_path
     
+    def generate_research(self, application: Application) -> None:
+        """Generate company research file for an application"""
+        try:
+            # Create a detailed, structured research prompt
+            research_prompt = f"""You are a professional business researcher. Generate a comprehensive, company-specific research section for a job application.
+
+COMPANY: {application.company}
+JOB TITLE: {application.job_title}
+JOB URL: {application.job_url if application.job_url else 'Not provided'}
+
+Please provide a detailed, company-specific research section that follows this EXACT structure and format:
+
+# Company Research: {application.company}
+
+**Company Website:** https://www.{application.company.lower().replace(' ', '').replace(',', '').replace('-', '').replace('.', '')}.com
+
+## Company Overview & Mission
+- Provide a specific, accurate overview of {application.company}
+- Include their actual mission statement and company values
+- Mention their industry focus and market position
+- Include company size, headquarters location, and key facts
+
+## Recent News & Developments
+- List 3-5 recent news items, developments, or announcements from {application.company}
+- Include specific dates, achievements, partnerships, or expansions
+- Focus on business-relevant news that shows company growth and direction
+
+## Products & Services
+- Detail the specific products and services that {application.company} offers
+- Include their core business model and revenue streams
+- Mention any unique or innovative offerings
+
+## Market Position & Competitors
+- Identify {application.company}'s main competitors in their industry
+- Describe their competitive advantages and market position
+- Include any industry rankings or recognition
+
+# Role-Specific Research
+
+## Key Personnel (Data & Analytics)
+Research and identify key personnel at {application.company} who work in data, analytics, business intelligence, or technology roles. Include:
+- Names and titles of key executives (CEO, CTO, VP of Data, Head of Analytics, etc.)
+- Employees with leadership roles in Data, Business Intelligence, and Analytics
+- Brief descriptions of their backgrounds and expertise
+- Focus on people who would be relevant to a {application.job_title} role
+
+## Key Challenges
+- Specific challenges that {application.company} faces in data and analytics
+- Industry-wide challenges that affect their business
+- How a {application.job_title} role would address these challenges
+
+## Why This Role/Company
+
+### Career Alignment
+- Specific reasons why this {application.job_title} role at {application.company} aligns with career goals
+- How the role fits into the candidate's career progression
+- Unique learning and growth opportunities
+
+### Mission Resonance
+- How {application.company}'s mission and values align with personal and professional goals
+- Specific aspects of their culture and approach that are appealing
+- How the candidate's values match the company's direction
+
+### Unique Opportunities
+- Specific opportunities this role offers that are unique to {application.company}
+- Projects, technologies, or initiatives the candidate would work on
+- Potential for impact and career advancement
+
+# Research Sources
+- List the specific sources used for this research
+- Include company website, news articles, LinkedIn profiles, industry reports
+- Note any limitations in publicly available information
+
+IMPORTANT: 
+1. Make this research specific to {application.company}, not generic
+2. Use real information about the company, their industry, and their specific challenges and opportunities
+3. Avoid generic statements that could apply to any company
+4. Include actual URLs where possible
+5. Use the EXACT heading structure shown above
+6. Format as clean markdown with proper bullet points and sections
+
+Format this as a professional research document that demonstrates thorough preparation and genuine interest in {application.company} specifically."""
+
+            # Generate research content using AI
+            print(f"  🤖 Generating structured research for {application.company}...")
+            research_content = self.ai_analyzer._call_ollama(research_prompt)
+            
+            # Save to file
+            company_clean = application.company.replace(' ', '-')
+            job_title_clean = application.job_title.replace(' ', '-')
+            research_filename = f"{company_clean}-{job_title_clean}-Research.md"
+            research_path = application.folder_path / research_filename
+            
+            write_text_file(research_content, research_path)
+            application.research_path = research_path
+            print(f"  ✅ Research file generated: {research_path}")
+            
+        except Exception as e:
+            print(f"  ❌ Error generating research file: {e}")
+            import traceback
+            traceback.print_exc()
+            # Don't fail the entire document generation if research fails
+            # The Research tab will simply not appear
+    
     def generate_intro_messages(
         self,
         application: Application,
@@ -126,12 +248,16 @@ class DocumentGenerator:
         """Generate hiring manager and recruiter intro messages in parallel"""
         from concurrent.futures import ThreadPoolExecutor
         
+        # Load research content if available
+        research_content = self._load_research_content(application)
+        
         def hm():
             return self.ai_analyzer.generate_hiring_manager_intros(
                 qualifications,
                 application.company,
                 application.job_title,
-                candidate_name
+                candidate_name,
+                research_content=research_content
             )
         
         def rec():
@@ -139,7 +265,8 @@ class DocumentGenerator:
                 qualifications,
                 application.company,
                 application.job_title,
-                candidate_name
+                candidate_name,
+                research_content=research_content
             )
         
         with ThreadPoolExecutor(max_workers=2) as executor:
@@ -504,6 +631,11 @@ class DocumentGenerator:
         """Format cover letter text with proper paragraph breaks and HTML formatting"""
         if not cover_letter_text:
             return ''
+        
+        # Remove any residual signature or placeholder blocks before formatting
+        cover_letter_text = re.sub(r'\n\s*Sincerely[^\n]*?(?:\n.*)?$', '', cover_letter_text, flags=re.IGNORECASE | re.DOTALL).strip()
+        cover_letter_text = cover_letter_text.replace('[Your Contact Information]', '917.670.0693 or leacock.kervin@gmail.com')
+        cover_letter_text = cover_letter_text.replace('[Your Actual Name]', 'Kervin Leacock')
         
         from html import escape
         
@@ -2271,9 +2403,16 @@ class DocumentGenerator:
         .status-badge {{ display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: capitalize; }}
         .status-pending {{ background: #fff3cd; color: #856404; }}
         .status-applied {{ background: #d1ecf1; color: #0c5460; }}
+        .status-contacted-someone {{ background: #e2e3e5; color: #383d41; }}
+        .status-company-response {{ background: #cce5ff; color: #004085; }}
+        .status-contacted-hiring-manager {{ background: #cce5ff; color: #004085; }}
+        .status-scheduled-interview {{ background: #ffeeba; color: #856404; }}
         .status-interviewed {{ background: #d4edda; color: #155724; }}
+        .status-interview-notes {{ background: #d4edda; color: #155724; }}
+        .status-interview-follow-up {{ background: #ffeef8; color: #b21f66; }}
         .status-offered {{ background: #c3e6cb; color: #155724; }}
         .status-rejected {{ background: #f8d7da; color: #721c24; }}
+        .status-accepted {{ background: #d4edda; color: #155724; }}
         .tabs {{ display: flex; border-bottom: 2px solid #e0e0e0; padding: 0 40px; background: #fafafa; }}
         .tab {{ padding: 15px 25px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: 500; color: #666; transition: all 0.3s; }}
         .tab:hover {{ color: #424242; }}
@@ -2549,7 +2688,7 @@ class DocumentGenerator:
             <h1>{application.company}</h1>
             <h2>{application.job_title}</h2>
             <div style="margin-top: 15px;">
-                <span class="status-badge status-{application.status.lower()}" style="font-size: 16px; padding: 8px 20px;">{application.status}</span>
+                <span class="status-badge status-{self._status_to_class(application.status)}" style="font-size: 16px; padding: 8px 20px;">{application.status}</span>
             </div>
         </div>
         
@@ -2563,7 +2702,7 @@ class DocumentGenerator:
             <div class="summary-grid">
                 <div class="summary-item">
                     <label>Status</label>
-                    <value><span class="status-badge status-{application.status.lower()}">{application.status}</span></value>
+                    <value><span class="status-badge status-{self._status_to_class(application.status)}">{application.status}</span></value>
                 </div>
                 <div class="summary-item">
                     <label>Salary Range</label>
@@ -2704,7 +2843,7 @@ class DocumentGenerator:
                     {self._format_cover_letter_html(cover_letter)}
                     
                     <p style="margin-top: 30px; margin-bottom: 5px; font-size: 15px; line-height: 1.6;">Sincerely,</p>
-                    <p style="margin-top: 5px; font-size: 15px; line-height: 1.6;">Kervin Leacock | 917.670.0693 | kervin.leacock@yahoo.com</p>
+                    <p style="margin-top: 5px; font-size: 15px; line-height: 1.6;">Kervin Leacock | 917.670.0693 | leacock.kervin@gmail.com</p>
                 </div>
             </div>
             
@@ -2739,7 +2878,7 @@ class DocumentGenerator:
             <h2>Updates & Notes</h2>
             <div style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-left: 4px solid #667eea; border-radius: 4px;">
                 <strong style="color: #667eea;">Current Status:</strong> 
-                <span class="status-badge status-{application.status.lower()}" style="margin-left: 10px;">{application.status}</span>
+                <span class="status-badge status-{self._status_to_class(application.status)}" style="margin-left: 10px;">{application.status}</span>
                 <div style="margin-top: 8px; font-size: 14px; color: #666;">
                     Last Updated: {format_for_display(application.status_updated_at)}
                 </div>
@@ -2762,8 +2901,10 @@ class DocumentGenerator:
                             <option value="Pending">⏳ Pending</option>
                             <option value="Applied">✉️ Applied</option>
                             <option value="Contacted Someone">👥 Contacted Someone</option>
-                            <option value="Contacted Hiring Manager">👔 Contacted Hiring Manager</option>
-                            <option value="Interviewed">🎤 Interviewed</option>
+                            <option value="Company Response">🏢 Company Response</option>
+                            <option value="Scheduled Interview">🗓️ Scheduled Interview</option>
+                            <option value="Interview Notes">📝 Interview Notes</option>
+                            <option value="Interview - Follow Up">🔁 Interview - Follow Up</option>
                             <option value="Offered">🎉 Offered</option>
                             <option value="Rejected">❌ Rejected</option>
                             <option value="Accepted">✅ Accepted</option>
@@ -2777,7 +2918,12 @@ class DocumentGenerator:
                                 📋 Copy Content
                             </button>
                         </div>
-                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                            <div style="display: flex; justify-content: flex-end;">
+                                <small id="status_notes_character_count" style="color: #6c757d;">0 characters</small>
+                            </div>
+                        </div>
                         <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
                     </div>
                     
@@ -2821,8 +2967,27 @@ class DocumentGenerator:
         
         // Initialize Quill editor
         let quillEditor = null;
+        let statusNotesCharacterCount = null;
+        
+        function updateStatusNotesCharacterCount() {{
+            if (!statusNotesCharacterCount) {{
+                return;
+            }}
+            
+            if (!quillEditor) {{
+                statusNotesCharacterCount.textContent = '0 characters';
+                return;
+            }}
+            
+            const text = quillEditor.getText();
+            const normalizedText = text.endsWith('\\n') ? text.slice(0, -1) : text;
+            const length = normalizedText.length;
+            
+            statusNotesCharacterCount.textContent = `${{length}} ${{length === 1 ? 'character' : 'characters'}}`;
+        }}
         
         document.addEventListener('DOMContentLoaded', function() {{
+            statusNotesCharacterCount = document.getElementById('status_notes_character_count');
             if (typeof Quill !== 'undefined') {{
                 console.log('✅ Quill.js loaded successfully');
                 
@@ -2843,6 +3008,9 @@ class DocumentGenerator:
                         ]
                     }}
                 }});
+                
+                quillEditor.on('text-change', updateStatusNotesCharacterCount);
+                updateStatusNotesCharacterCount();
                 
                 // Add image upload handler
                 const toolbar = quillEditor.getModule('toolbar');
@@ -2945,7 +3113,11 @@ class DocumentGenerator:
                 }}
                 if (clearBtn) {{
                     clearBtn.addEventListener('click', function() {{
-                        if (quillEditor) {{ quillEditor.setContents([]); quillEditor.focus(); }}
+                        if (quillEditor) {{
+                            quillEditor.setContents([]);
+                            quillEditor.focus();
+                            updateStatusNotesCharacterCount();
+                        }}
                         const sel = document.getElementById('template_selector');
                         if (sel) {{ sel.value = ''; }}
                     }});
@@ -3049,6 +3221,7 @@ class DocumentGenerator:
                 quillEditor.focus();
                 const len = quillEditor.getLength();
                 quillEditor.setSelection(len, 0);
+                updateStatusNotesCharacterCount();
             }}
         }}
         
@@ -3095,6 +3268,7 @@ class DocumentGenerator:
             document.getElementById('statusUpdateForm').reset();
             if (quillEditor) {{
                 quillEditor.setContents([]);
+                updateStatusNotesCharacterCount();
             }}
             
             // Show processing state
@@ -3378,6 +3552,24 @@ class DocumentGenerator:
 </html>"""
         return html
     
+    def _status_to_class(self, status: str) -> str:
+        """Convert a status label into a CSS-friendly class suffix."""
+        if not status:
+            return "unknown"
+        return (
+            status.strip()
+            .lower()
+            .replace("&", "and")
+            .replace("/", "-")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("'", "")
+            .replace(".", "")
+            .replace(",", "")
+            .replace(" - ", "-")
+            .replace(" ", "-")
+        )
+    
     def _generate_updates_timeline(self, application: Application) -> str:
         """Generate HTML for status updates timeline"""
         from app.services.job_processor import JobProcessor
@@ -3414,8 +3606,8 @@ class DocumentGenerator:
                 print(f"Warning: Could not extract content from {update['file']}: {e}")
             
             # Build status badge HTML
-            status_class = f"status-{update['status'].lower()}"
-            status_badge = f'<span class="status-badge" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #d1ecf1; color: #0c5460; margin-left: 10px;">{update["status"]}</span>'
+            status_class = self._status_to_class(update['status'])
+            status_badge = f'<span class="status-badge status-{status_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #d1ecf1; color: #0c5460; margin-left: 10px;">{update["status"]}</span>'
             
             # Build content sections
             content_parts = []

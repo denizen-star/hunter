@@ -73,6 +73,9 @@ def fix_application_research_and_intros(application_folder):
         
         print(f"  📊 Research data: {len(research_data.get('products_services', ''))} chars products, {len(research_data.get('news', []))} news items, {len(research_data.get('personnel', []))} personnel")
         
+        # Load research content if available
+        research_content = document_generator._load_research_content(application)
+        
         # Generate intro messages with real qualifications
         print("  💬 Generating intro messages...")
         try:
@@ -81,7 +84,8 @@ def fix_application_research_and_intros(application_folder):
                 qualifications,
                 application.company,
                 application.job_title,
-                "Kervin Leacock"  # Use real name
+                "Kervin Leacock",  # Use real name
+                research_content=research_content
             )
             print(f"  ✅ Generated hiring manager intros: {len(hiring_manager_intros)} chars")
             
@@ -90,7 +94,8 @@ def fix_application_research_and_intros(application_folder):
                 qualifications,
                 application.company,
                 application.job_title,
-                "Kervin Leacock"  # Use real name
+                "Kervin Leacock",  # Use real name
+                research_content=research_content
             )
             print(f"  ✅ Generated recruiter intros: {len(recruiter_intros)} chars")
             
@@ -177,6 +182,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 

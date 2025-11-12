@@ -6,6 +6,16 @@ from app.services.job_processor import JobProcessor
 from app.utils.file_utils import get_data_path, ensure_dir_exists, write_text_file
 from app.utils.datetime_utils import format_for_display
 
+STATUS_NORMALIZATION_MAP = {
+    'contacted hiring manager': 'company response',
+    'company response': 'company response',
+    'interviewed': 'interview notes',
+    'interview notes': 'interview notes',
+    'interview follow up': 'interview - follow up',
+    'interview follow-up': 'interview - follow up',
+    'interview - follow up': 'interview - follow up',
+}
+
 
 class DashboardGenerator:
     """Generates HTML dashboard"""
@@ -15,6 +25,39 @@ class DashboardGenerator:
         ensure_dir_exists(self.output_dir)
         self.job_processor = JobProcessor()
     
+    def _normalize_status(self, status: str) -> str:
+        """Normalize status strings for consistent reporting."""
+        if not status:
+            return ''
+        normalized = status.strip().lower()
+        normalized = normalized.replace('–', '-').replace('—', '-')
+        normalized = normalized.replace('  ', ' ')
+        return STATUS_NORMALIZATION_MAP.get(normalized, normalized)
+
+    def _status_matches(self, status: str, *targets: str) -> bool:
+        """Return True if status matches any target labels after normalization."""
+        normalized_status = self._normalize_status(status)
+        normalized_targets = {self._normalize_status(target) for target in targets}
+        return normalized_status in normalized_targets
+
+    def _status_to_class(self, status: str) -> str:
+        """Convert status label into CSS-friendly class suffix."""
+        if not status:
+            return "unknown"
+        return (
+            status.strip()
+            .lower()
+            .replace("&", "and")
+            .replace("/", "-")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("'", "")
+            .replace(".", "")
+            .replace(",", "")
+            .replace(" - ", "-")
+            .replace(" ", "-")
+        )
+
     def generate_index_page(self) -> None:
         """Generate the main dashboard HTML page"""
         applications = self.job_processor.list_all_applications()
@@ -29,18 +72,24 @@ class DashboardGenerator:
     def _create_dashboard_html(self, applications: List[Application]) -> str:
         """Create the HTML dashboard"""
         # Calculate stats for all possible statuses
-        total = len(applications)
+        def count_status(*labels):
+            return len([a for a in applications if self._status_matches(a.status, *labels)])
+
         status_counts = {
-            'pending': len([a for a in applications if a.status.lower() == 'pending']),
-            'applied': len([a for a in applications if a.status.lower() == 'applied']),
-            'contacted someone': len([a for a in applications if a.status.lower() == 'contacted someone']),
-            'contacted hiring manager': len([a for a in applications if a.status.lower() == 'contacted hiring manager']),
-            'interviewed': len([a for a in applications if a.status.lower() == 'interviewed']),
-            'offered': len([a for a in applications if a.status.lower() == 'offered']),
-            'rejected': len([a for a in applications if a.status.lower() == 'rejected']),
-            'accepted': len([a for a in applications if a.status.lower() == 'accepted'])
+            'pending': count_status('pending'),
+            'applied': count_status('applied'),
+            'contacted someone': count_status('contacted someone'),
+            'company response': count_status('company response', 'contacted hiring manager'),
+            'scheduled interview': count_status('scheduled interview'),
+            'interview notes': count_status('interview notes', 'interviewed'),
+            'interview - follow up': count_status('interview - follow up'),
+            'offered': count_status('offered'),
+            'rejected': count_status('rejected'),
+            'accepted': count_status('accepted')
         }
         
+        total = len(applications)
+
         # Generate tabbed content for each status
         tabs_html = self._create_tabs_html(applications, status_counts)
         
@@ -339,9 +388,13 @@ class DashboardGenerator:
         }}
         .status-pending {{ background: #fff3cd; color: #856404; }}
         .status-applied {{ background: #d1ecf1; color: #0c5460; }}
-        .status-contacted someone {{ background: #e2e3e5; color: #383d41; }}
-        .status-contacted hiring manager {{ background: #f8d7da; color: #721c24; }}
+        .status-contacted-someone {{ background: #e2e3e5; color: #383d41; }}
+        .status-contacted-hiring-manager {{ background: #f8d7da; color: #721c24; }}
+        .status-company-response {{ background: #cce5ff; color: #004085; }}
+        .status-scheduled-interview {{ background: #ffeeba; color: #856404; }}
         .status-interviewed {{ background: #d4edda; color: #155724; }}
+        .status-interview-notes {{ background: #d4edda; color: #155724; }}
+        .status-interview-follow-up {{ background: #ffeef8; color: #b21f66; }}
         .status-offered {{ background: #c3e6cb; color: #155724; }}
         .status-rejected {{ background: #f8d7da; color: #721c24; }}
         .status-accepted {{ background: #d4edda; color: #155724; }}
@@ -641,8 +694,10 @@ class DashboardGenerator:
             'pending',
             'applied', 
             'contacted someone',
-            'contacted hiring manager',
-            'interviewed',
+            'company response',
+            'scheduled interview',
+            'interview notes',
+            'interview - follow up',
             'offered',
             'rejected',
             'accepted'
@@ -666,8 +721,14 @@ class DashboardGenerator:
                 # Shorten long tab titles to prevent overlap
                 if status == 'contacted someone':
                     status_display = "Contacted"
-                elif status == 'contacted hiring manager':
-                    status_display = "Hiring Mgr"
+                elif status == 'company response':
+                    status_display = "Company"
+                elif status == 'scheduled interview':
+                    status_display = "Scheduled"
+                elif status == 'interview notes':
+                    status_display = "Interview Notes"
+                elif status == 'interview - follow up':
+                    status_display = "Follow Up"
                 else:
                     status_display = status.replace('_', ' ').title()
             tab_headers += f'''
@@ -694,12 +755,18 @@ class DashboardGenerator:
                 status_title = "Flagged Applications"
                 default_display = 'none'
             else:
-                status_apps = [app for app in applications if app.status.lower() == status]
+                status_apps = [app for app in applications if self._status_matches(app.status, status)]
                 # Use full names in content area for clarity
                 if status == 'contacted someone':
                     status_title = "Contacted Someone Applications"
-                elif status == 'contacted hiring manager':
-                    status_title = "Contacted Hiring Manager Applications"
+                elif status == 'company response':
+                    status_title = "Company Response Applications"
+                elif status == 'scheduled interview':
+                    status_title = "Scheduled Interview Applications"
+                elif status == 'interview notes':
+                    status_title = "Interview Notes Applications"
+                elif status == 'interview - follow up':
+                    status_title = "Interview - Follow Up Applications"
                 else:
                     status_title = f"{status.replace('_', ' ').title()} Applications"
                 default_display = 'none'
@@ -786,7 +853,7 @@ class DashboardGenerator:
             </div>
             <div class="card-title">{app.job_title}</div>
             <div>
-                <span class="card-status status-{app.status.lower()}">{app.status}</span>
+                <span class="card-status status-{self._status_to_class(app.status)}">{app.status}</span>
             </div>
             <div class="card-meta">
                 📅 Applied: {format_for_display(app.created_at)}

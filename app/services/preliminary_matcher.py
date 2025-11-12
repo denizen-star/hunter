@@ -6,20 +6,26 @@ Preliminary Skills Matcher - Reduces AI load by doing initial matching
 import yaml
 import re
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Optional
 from app.utils.file_utils import read_text_file
+from app.utils.skill_normalizer import SkillNormalizer
+from app.utils.simple_tech_extractor import SimpleTechExtractor
 
 class PreliminaryMatcher:
     """Preliminary matching system to reduce AI load"""
     
     def __init__(self):
-        self.skills_yaml_path = Path("/Users/kervinleacock/Documents/Development/hunter/data/resumes/skills.yaml")                                              
-        self.job_skills_path = Path("/Users/kervinleacock/Documents/Development/hunter/Jobdescr-General Skils.md")                                              
+        self.skills_yaml_path = Path("/Users/kervinleacock/Documents/Development/hunter/data/resumes/skills.yaml")
+        self.job_skills_path = Path("/Users/kervinleacock/Documents/Development/hunter/Jobdescr-General Skils.md")
         self.candidate_skills = {}
         self.job_skills = {}
         # Performance optimization: Cache normalized candidate skills
         self._normalized_candidate_skills_cache = {}
         self._normalized_candidate_skills_set = set()
+        # Initialize advanced skill normalizer
+        self.skill_normalizer = SkillNormalizer()
+        # Initialize technology extractor (comprehensive 157+ technologies)
+        self.tech_extractor = SimpleTechExtractor()
         self.load_skills_data()
         self._build_normalization_cache()
     
@@ -44,12 +50,13 @@ class PreliminaryMatcher:
         if skill_name in self._normalized_candidate_skills_cache:
             return self._normalized_candidate_skills_cache[skill_name]
         
-        # Normalize and cache
-        normalized = self.normalize_skill_name(skill_name)
+        # Normalize using advanced SkillNormalizer
+        normalized_result = self.skill_normalizer.normalize(skill_name, fuzzy=True)
+        normalized = normalized_result.lower() if normalized_result else ""
         if normalized:
             self._normalized_candidate_skills_cache[skill_name] = normalized
             self._normalized_candidate_skills_set.add(normalized)
-        return normalized or ""
+        return normalized
     
     def _parse_job_skills_markdown(self, content: str) -> Dict[str, List[str]]:
         """Parse job skills from markdown file"""
@@ -82,47 +89,21 @@ class PreliminaryMatcher:
         return skills
     
     def normalize_skill_name(self, skill: str) -> str:
-        """Normalize skill names for better matching"""
-        # Convert to lowercase and remove extra spaces
-        skill = skill.lower().strip()
+        """
+        Normalize skill names for better matching (DEPRECATED - uses SkillNormalizer internally).
+        This method is kept for backward compatibility but now uses the advanced SkillNormalizer.
         
-        # Skip invalid skills early
-        invalid_patterns = [
-            r'^etc\.\)?$',  # "etc.)" or "etc."
-            r'^\)$',        # Just ")"
-            r'^\d+\)?$',    # Just numbers
-            r'^[^a-zA-Z]+$', # No letters
-            r'^.{1,2}$'     # Too short (1-2 characters)
-        ]
-        
-        for pattern in invalid_patterns:
-            if re.match(pattern, skill, re.IGNORECASE):
-                return ""  # Return empty string for invalid skills
-        
-        # Remove common prefixes/suffixes
-        prefixes_to_remove = [
-            'experience with', 'knowledge of', 'proficiency in', 'expertise in',
-            'strong', 'excellent', 'advanced', 'basic', 'working knowledge of',
-            'familiarity with', 'hands-on experience with', 'demonstrated expertise in'
-        ]
-        
-        for prefix in prefixes_to_remove:
-            if skill.startswith(prefix):
-                skill = skill[len(prefix):].strip()
-                break
-        
-        # Remove parenthetical information
-        if '(' in skill and ')' in skill:
-            skill = skill.split('(')[0].strip()
-        
-        # Remove common suffixes
-        suffixes_to_remove = ['experience', 'knowledge', 'skills', 'expertise', 'proficiency']
-        for suffix in suffixes_to_remove:
-            if skill.endswith(suffix):
-                skill = skill[:-len(suffix)].strip()
-                break
-        
-        return skill
+        Args:
+            skill: Skill name to normalize
+            
+        Returns:
+            Normalized skill name (lowercase) or empty string if not found
+        """
+        # Use advanced SkillNormalizer
+        normalized_result = self.skill_normalizer.normalize(skill, fuzzy=True)
+        if normalized_result:
+            return normalized_result.lower()
+        return ""
     
     def find_skill_matches(self, job_description: str) -> Dict[str, any]:
         """Find matches between job description and candidate skills"""
@@ -149,7 +130,9 @@ class PreliminaryMatcher:
         # Check each candidate skill against job description
         matched_skills = set()
         for skill_name, skill_data in self.candidate_skills.items():
-            skill_normalized = self.normalize_skill_name(skill_name)
+            # Use advanced SkillNormalizer
+            normalized_result = self.skill_normalizer.normalize(skill_name, fuzzy=True)
+            skill_normalized = normalized_result.lower() if normalized_result else ""
             
             # Skip invalid or empty skills
             if not skill_normalized:
@@ -289,7 +272,7 @@ class PreliminaryMatcher:
                                          if any(critical in skill.lower() for critical in critical_penalty_skills))
                     nice_to_have_missing = sum(1 for skill in matches['unmatched_job_skills'] 
                                              if any(nice in skill.lower() for nice in nice_to_have_skills))
-                    
+                
                     # Reduced penalties for overqualified candidates (50% reduction)
                     # Overqualification means you have many alternative skills that can compensate
                     penalty = (critical_missing * 1.5) + (nice_to_have_missing * 0.5)
@@ -319,9 +302,9 @@ class PreliminaryMatcher:
                                              if any(nice in skill.lower() for nice in nice_to_have_skills))
                     
                     # Standard penalties for non-overqualified candidates
-                    penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
-                    penalty = min(20, penalty)  # Cap penalty at 20%
-                    base_score = max(0, base_score - penalty)
+                penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
+                penalty = min(20, penalty)  # Cap penalty at 20%
+                base_score = max(0, base_score - penalty)
             
             matches['match_score'] = round(base_score, 2)
         else:
@@ -350,7 +333,9 @@ class PreliminaryMatcher:
         # Only extract skills that are ACTUALLY mentioned in the job description
         for category, skills in self.job_skills.items():
             for skill in skills:
-                skill_normalized = self.normalize_skill_name(skill)
+                # Use advanced SkillNormalizer
+                normalized_result = self.skill_normalizer.normalize(skill, fuzzy=True)
+                skill_normalized = normalized_result.lower() if normalized_result else ""
                 if skill_normalized:
                     # Extract the core skill name (remove parentheticals, qualifiers, etc.)
                     # e.g., "Cloud platform requirements" -> "cloud platform"
@@ -429,25 +414,42 @@ class PreliminaryMatcher:
             if re.search(pattern, job_desc_lower, re.IGNORECASE) and skill_name not in job_skills:
                 job_skills.append(skill_name)
         
-        # Also extract specific skills mentioned in the job description
-        specific_skills = [
-            "python", "sql", "tableau", "power bi", "looker", "excel", "sheets",
-            "aws", "azure", "gcp", "cloud", "docker", "kubernetes", "terraform",
-            "snowflake", "bigquery", "spark", "hadoop", "kafka", "airflow",
-            "machine learning", "ai", "data science", "data engineering",
-            "business intelligence", "analytics", "etl", "data warehousing",
-            "leadership", "management", "team", "mentoring", "coaching",
-            "strategy", "strategic", "business intelligence", "analytics", "forecasting",
-            "pricing", "modeling", "financial", "budget", "planning",
-            # Add more specific data engineering tools
-            "postgresql", "mysql", "oracle", "mongodb", "redis",
-            "aws lake formation", "amazon kinesis", "amazon q",
-            "paid advertising", "google ads", "meta", "amazon ads", "advertising platforms"
-        ]
+        # Extract data-related skills from context (even if exact phrase not mentioned)
+        # If job mentions "data engineers" or "data engineering" → extract "Data Engineering"
+        if (re.search(r'\bdata\s+engineers?\b', job_desc_lower, re.IGNORECASE) or 
+            re.search(r'\bdata\s+engineering\b', job_desc_lower, re.IGNORECASE)) and 'Data Engineering' not in job_skills:
+            job_skills.append('Data Engineering')
         
-        for skill in specific_skills:
-            if skill in job_desc_lower and skill not in [s.lower() for s in job_skills]:
-                job_skills.append(skill.title())
+        # If job mentions "strategy" in data context → extract "Data Strategy"
+        if (re.search(r'\bstrategy\b', job_desc_lower, re.IGNORECASE) and 
+            (re.search(r'\bdata\b', job_desc_lower, re.IGNORECASE) or 
+             re.search(r'\bml\s+initiatives\b', job_desc_lower, re.IGNORECASE) or
+             re.search(r'\bdata\s+platforms?\b', job_desc_lower, re.IGNORECASE) or
+             re.search(r'\bdata\s+products?\b', job_desc_lower, re.IGNORECASE)) and 
+            'Data Strategy' not in job_skills):
+            job_skills.append('Data Strategy')
+        
+        # If job mentions "BI tools", "visualization", or "data visualization" → extract "Data Visualization"
+        if ((re.search(r'\bbi\s+tools?\b', job_desc_lower, re.IGNORECASE) or 
+             re.search(r'\bvisualization\b', job_desc_lower, re.IGNORECASE) or
+             re.search(r'\bdata\s+visualization\b', job_desc_lower, re.IGNORECASE) or
+             re.search(r'\breporting\b', job_desc_lower, re.IGNORECASE)) and 
+            'Data Visualization' not in job_skills):
+            job_skills.append('Data Visualization')
+        
+        # Extract technologies using SimpleTechExtractor (comprehensive 157+ technologies)
+        # This replaces the hardcoded list and ensures consistency across the codebase
+        extracted_technologies = self.tech_extractor.extract_technologies(job_description)
+        for tech in extracted_technologies:
+            # Normalize technology using SkillNormalizer to get canonical name
+            normalized_tech = self.skill_normalizer.normalize(tech, fuzzy=True)
+            # Use canonical name if found, otherwise use original
+            tech_to_add = normalized_tech if normalized_tech else tech
+            
+            # Add technology if not already in job_skills (case-insensitive check)
+            tech_lower = tech_to_add.lower()
+            if tech_to_add not in job_skills and tech_lower not in [s.lower() for s in job_skills]:
+                job_skills.append(tech_to_add)
         
         # Filter out invalid skills and clean up the list
         filtered_skills = []
@@ -530,7 +532,9 @@ class PreliminaryMatcher:
         if not job_skill or not job_skill.strip():
             return False
             
-        job_skill_normalized = self.normalize_skill_name(job_skill)
+        # Use advanced SkillNormalizer
+        normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
+        job_skill_normalized = normalized_result.lower() if normalized_result else ""
         
         # If normalization returns empty/None, use lowercase original as fallback                                                                               
         if not job_skill_normalized:
@@ -542,11 +546,11 @@ class PreliminaryMatcher:
         
         # Define skill equivalence mappings
         skill_equivalences = {
-            'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],                                                                   
+            'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],
             'amazon kinesis': ['aws', 'kinesis', 'streaming', 'data streaming'],
-            'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],                                                                           
-            'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],                                                   
-            'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],                                                   
+            'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],
+            'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],
+            'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],
             'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'data strategy', 'planning'],                                                                                                                              
             'strategy': ['strategic', 'business strategy', 'data strategy', 'product strategy', 'planning'],                                                    
             'data strategy': ['strategy', 'strategic', 'product strategy', 'business strategy', 'planning'],
@@ -563,9 +567,9 @@ class PreliminaryMatcher:
             'excellent communication skills': ['communication', 'communication skills', 'strong communication skills'],
             'strong communication skills': ['communication', 'communication skills', 'excellent communication skills'],
             'cloud platforms': ['aws', 'azure', 'gcp', 'cloud'],
-            'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],                                                                    
-            'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],                                                                     
-            'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],                                                       
+            'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
+            'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
+            'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
             'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
             'problem solving': ['problem-solving', 'problem-solving skills', 'problem solving skills'],
             'problem-solving': ['problem solving', 'problem-solving skills', 'problem solving skills'],
@@ -599,7 +603,7 @@ class PreliminaryMatcher:
             
             # Check reverse equivalences (only if direct match failed)
             for skill_key, equivalents in skill_equivalences.items():
-                if job_skill_normalized in equivalents and skill_key in candidate_skill_normalized:                                                             
+                if job_skill_normalized in equivalents and skill_key in candidate_skill_normalized:
                     return True
                     
         return False
@@ -649,7 +653,9 @@ class PreliminaryMatcher:
         # Check against known job skills patterns
         for category, skills in self.job_skills.items():
             for skill in skills:
-                skill_normalized = self.normalize_skill_name(skill)
+                # Use advanced SkillNormalizer
+                normalized_result = self.skill_normalizer.normalize(skill, fuzzy=True)
+                skill_normalized = normalized_result.lower() if normalized_result else ""
                 if skill_normalized in job_desc_lower or self._is_partial_match(skill_normalized, job_desc_lower):
                     requirements[category].append(skill)
         
@@ -866,7 +872,9 @@ Please focus your analysis on the areas above and provide detailed insights on:
         """Find which job skill matches a candidate skill"""
         # First try to find exact matches by checking if the candidate skill matches any job skill
         for job_skill in job_skills:
-            job_skill_normalized = self.normalize_skill_name(job_skill)
+            # Use advanced SkillNormalizer
+            normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
+            job_skill_normalized = normalized_result.lower() if normalized_result else ""
             
             # Check for exact matches
             if candidate_skill_normalized == job_skill_normalized:
@@ -882,7 +890,9 @@ Please focus your analysis on the areas above and provide detailed insights on:
         best_score = 0
         
         for job_skill in job_skills:
-            job_skill_normalized = self.normalize_skill_name(job_skill)
+            # Use advanced SkillNormalizer
+            normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
+            job_skill_normalized = normalized_result.lower() if normalized_result else ""
             
             # Calculate word overlap score
             candidate_words = set(candidate_skill_normalized.split())

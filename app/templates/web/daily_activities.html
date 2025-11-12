@@ -337,6 +337,26 @@
             background: #e2e3e5;
             color: #383d41;
         }
+        
+        .status-company-response {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-scheduled-interview {
+            background: #ffeeba;
+            color: #856404;
+        }
+        
+        .status-interview-notes {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-interview-follow-up {
+            background: #ffeef8;
+            color: #b21f66;
+        }
     </style>
 </head>
 <body>
@@ -352,6 +372,7 @@
             <li><a href="/reports" class="nav-link">Reports</a></li>
             <li><a href="/daily-activities" class="nav-link active">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
@@ -414,7 +435,12 @@
             
             const html = activities.map(day => {
                 const activitiesHtml = day.activities.map(activity => {
-                    const statusClass = `status-${activity.status.toLowerCase().replace(' ', '-')}`;
+                    const statusClass = `status-${activity.status
+                        .toLowerCase()
+                        .replace(/&/g, 'and')
+                        .replace(/\s*-\s*/g, '-')
+                        .replace(/[()'.,]/g, '')
+                        .replace(/\s+/g, '-')}`;
                     return `
                         <div class="activity-item">
                             <div class="activity-info">

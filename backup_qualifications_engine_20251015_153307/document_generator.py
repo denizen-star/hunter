@@ -823,7 +823,7 @@ Missing Skills: {', '.join(qualifications.missing_skills[:5]) if qualifications.
 
 
 Sincerely,
-Kervin Leacock | 305.306.3514 | kervin.leacock@yahoo.com
+Kervin Leacock | 305.306.3514 | leacock.kervin@gmail.com
                 </div>
             </div>
         </div>

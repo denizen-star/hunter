@@ -185,11 +185,20 @@ def process_insight_global():
                 detailed_analysis=qual_content
             )
             
+            # Load research content if available
+            research_content = None
+            if application.research_path and Path(application.research_path).exists():
+                try:
+                    research_content = read_text_file(application.research_path)
+                except Exception as e:
+                    print(f"  ⚠️ Warning: Could not load research file: {e}")
+            
             hiring_manager_intros = ai_analyzer.generate_hiring_manager_intros(
                 qualifications,
                 company,
                 job_title,
-                "Kervin Leacock"
+                "Kervin Leacock",
+                research_content=research_content
             )
         else:
             print("❌ Qualifications file not found for intro generation")
@@ -211,11 +220,20 @@ def process_insight_global():
     # 3. Generate recruiter intro messages
     print("\n3️⃣ Generating Recruiter Intro Messages...")
     try:
+        # Load research content if available (reload in case it wasn't loaded above)
+        research_content = None
+        if application.research_path and Path(application.research_path).exists():
+            try:
+                research_content = read_text_file(application.research_path)
+            except Exception as e:
+                print(f"  ⚠️ Warning: Could not load research file: {e}")
+        
         recruiter_intros = ai_analyzer.generate_recruiter_intros(
             qualifications,
             company,
             job_title,
-            "Kervin Leacock"
+            "Kervin Leacock",
+            research_content=research_content
         )
         
         # Save recruiter intro messages

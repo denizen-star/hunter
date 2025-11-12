@@ -111,16 +111,18 @@ SOFT SKILLS TO EMPHASIZE (use 50% of these):
 COMPANY: {company}
 JOB TITLE: {job_title}
 
+{research_section}
+
 Generate a professional cover letter following this structure and style:
 
 **STRUCTURE:**
-- Opening paragraph: Express interest and state why you're a great fit. Lead with years of experience and "numerous roles of responsibility." Emphasize steadfast dedication to delivering high-level customer satisfaction and achieving success by aligning products/services with bottom-line organizational goals. Close with "my pleasure to present my résumé for your consideration."
+- Opening paragraph: Express interest and state why you're a great fit. Lead with years of experience and "numerous roles of responsibility." Emphasize steadfast dedication to delivering high-level customer satisfaction and achieving success by aligning products/services with bottom-line organizational goals. Close with "my pleasure to present my resume for your consideration."
 
 - Body paragraph 1 (Leadership & Strategic Impact): Showcase leadership skills as critical in developing strategic plans that align with corporate strategies. Demonstrate a proactive, innovative mindset: passionate about redirecting focus, shifting from traditional methodologies to drive alignment and unleash unprecedented growth opportunities. Highlight track record of "piecing together the larger picture, devising critical solutions to streamline processes." Emphasize ability to analyze inefficiencies and sluggish workflows, then mastermind successful solutions. Mention ability to "unify teams and impress even the toughest of customers."
 
-- Body paragraph 2 (Personal Attributes & Teamwork): Position yourself as a "natural leader, owning a rare blend of adaptability and vision." Emphasize "unique mix of people management skills" leading to outstanding results across all segments. Describe yourself as an "excellent communicator and firm believer in the value of relationships." Highlight ability to "easily connect with others, shaping top-performing, cross-functional teams." Add specific details about why the company is a great fit for you and why you are a great fit for the company. Include soft skills and strong matches from the qualifications analysis.
+- Body paragraph 2 (Personal Attributes & Teamwork): Position yourself as a "natural leader, owning a rare blend of adaptability and vision." Emphasize "unique mix of people management skills" leading to outstanding results across all segments. Describe yourself as an "excellent communicator and firm believer in the value of relationships." Highlight ability to "easily connect with others, shaping top-performing, cross-functional teams." Add specific details about why the company is a great fit for you and why you are a great fit for the company. Use the research information provided above to reference specific company details such as their mission, recent news, products/services, or market position. Include soft skills and strong matches from the qualifications analysis.
 
-- Closing paragraph: Thank the reader for their time in reviewing your résumé. Provide a clear call to action inviting them to discuss your skills, professional experiences, and career accomplishments further.
+- Closing paragraph: Thank the reader for their time in reviewing your resume. Provide a clear call to action inviting them to discuss your skills, professional experiences, and career accomplishments further.
 
 **TONE & STYLE REQUIREMENTS:**
 - Professional yet confident, sophisticated and personable
@@ -132,7 +134,7 @@ Generate a professional cover letter following this structure and style:
 - Use strong action verbs: "piecing together," "devising," "mastermind," "unify," "shaping," "redirecting," "unleashing"
 - Clear, concise language that conveys competence and dedication
 - Sound like a human, not a robot - current, relevant, and confident
-- Personalize it to each job description and company. 
+- Personalize it to each job description and company using the research information provided
 
 **LENGTH:** 300-350 words (slightly longer to accommodate company interest section)
 
@@ -144,7 +146,7 @@ Generate a professional cover letter following this structure and style:
 
 Start directly with "Dear Hiring Manager," and end with "Sincerely," followed by the actual name.
 
-IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation. Never use placeholders like [YOUR NAME], [YOUR SIGNATURE], or [Name] anywhere in the letter.
+IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation. Never use placeholders like [YOUR NAME], [YOUR SIGNATURE], or [Name] anywhere in the letter. Use the research information naturally and organically to demonstrate genuine interest in the company.
 """
 
 
@@ -279,6 +281,8 @@ CANDIDATE NAME: {candidate_name}
 
 CANDIDATE BACKGROUND: 15+ years data leadership, managed $3T daily transactions at BoNY Mellon, VP BI experience, led 250+ employees, Databricks/MLOps expertise, lakehouse solutions, data governance.
 
+{research_section}
+
 **TONE & STYLE REQUIREMENTS:**
 - Professional yet confident, sophisticated and personable
 - Experience-driven: Emphasize years of experience and diverse roles
@@ -289,38 +293,39 @@ CANDIDATE BACKGROUND: 15+ years data leadership, managed $3T daily transactions 
 - Use strong action verbs: "piecing together," "devising," "mastermind," "unify," "shaping," "redirecting," "unleashing"
 - Clear, concise language that conveys competence and dedication
 - Sound like a human, not a robot - current, relevant, and confident
+- Use the research information to reference specific company details naturally (mission, recent news, products/services, challenges) to demonstrate genuine interest
 
-Create exactly 3 versions with specific character counts. Be specific about actual achievements and experience.
+Create exactly 3 versions with specific character counts. Be specific about actual achievements and experience. Where appropriate and within character limits, naturally incorporate relevant research details about the company.
 
 Format each message as:
 "RE: " {job_title}
 
 "Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com)." [intro message with specified character count]
+I recently applied for this role (leacock.kervin@gmail.com)." [intro message with specified character count]
 
 **MESSAGE 1:**
 RE: {job_title}
 
 Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com). [~275 characters total - Emphasize years of experience and "numerous roles of responsibility." Be specific about $3T transactions, 250+ team leadership, and key technical achievements. Use professional yet confident tone with strong action verbs.]
+I recently applied for this role (leacock.kervin@gmail.com). [~275 characters total - Emphasize years of experience and "numerous roles of responsibility." Be specific about $3T transactions, 250+ team leadership, and key technical achievements. Use professional yet confident tone with strong action verbs. If space allows, briefly reference a relevant company detail from the research.]
 
 **MESSAGE 2:**
 RE: {job_title}
 
 Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - Showcase leadership skills in developing strategic plans. Demonstrate proactive, innovative mindset: passionate about redirecting focus and unleashing growth opportunities. Highlight track record of piecing together the larger picture and devising critical solutions. Be specific about Databricks/lakehouse, data governance, and business impact. Emphasize ability to unify teams and deliver outstanding results.]
+I recently applied for this role (leacock.kervin@gmail.com). [~500 characters total - Showcase leadership skills in developing strategic plans. Demonstrate proactive, innovative mindset: passionate about redirecting focus and unleashing growth opportunities. Highlight track record of piecing together the larger picture and devising critical solutions. Be specific about Databricks/lakehouse, data governance, and business impact. Emphasize ability to unify teams and deliver outstanding results. Reference specific company details from the research (mission, recent news, or challenges) to show genuine interest and alignment.]
 
 **MESSAGE 3:**
 RE: {job_title}
 
 Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about achievements]
+I recently applied for this role (leacock.kervin@gmail.com). [~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about achievements. Use research details strategically to demonstrate deep understanding of the company's direction and how your expertise aligns with their needs.]
 
-Each message should be direct, specific about actual achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional."""
+Each message should be direct, specific about actual achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
 
 
 RECRUITER_INTRO_PROMPT = """You are creating professional intro messages for recruiters. Generate 3 versions of an intro message based on the provided information.
@@ -332,6 +337,8 @@ STRONG MATCHES: {strong_matches}
 CANDIDATE NAME: {candidate_name}
 
 CANDIDATE BACKGROUND: 15+ years data leadership, managed $3T daily transactions at BoNY Mellon, VP BI experience, led 250+ employees, Databricks/MLOps expertise, lakehouse solutions, data governance.
+
+{research_section}
 
 IMPORTANT: Recruiters are typically not technical, so avoid jargon and technical terms. Use business language. Focus on business impact and leadership achievements.
 
@@ -346,38 +353,39 @@ IMPORTANT: Recruiters are typically not technical, so avoid jargon and technical
 - Clear, concise language that conveys competence and dedication
 - Sound like a human, not a robot - current, relevant, and confident
 - Use business language, not technical jargon
+- Use the research information to reference specific company details naturally (mission, recent news, products/services) in business terms to demonstrate genuine interest
 
-Create exactly 3 versions with specific character counts. Be specific about actual business achievements.
+Create exactly 3 versions with specific character counts. Be specific about actual business achievements. Where appropriate and within character limits, naturally incorporate relevant research details about the company in business language.
 
 Format each message as:
 "RE: " {job_title}
 
 "Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com)." [intro message with specified character count]
+I recently applied for this role (leacock.kervin@gmail.com)." [intro message with specified character count]
 
 **MESSAGE 1:**
 RE: {job_title}
 
 Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com). [~275 characters total - Emphasize years of experience and "numerous roles of responsibility." Be specific about $3T transactions, 250+ team leadership, and business impact. Use professional yet confident tone with strong action verbs. Avoid technical jargon - focus on business value and results.]
+I recently applied for this role (leacock.kervin@gmail.com). [~275 characters total - Emphasize years of experience and "numerous roles of responsibility." Be specific about $3T transactions, 250+ team leadership, and business impact. Use professional yet confident tone with strong action verbs. Avoid technical jargon - focus on business value and results. If space allows, briefly reference a relevant company detail from the research in business terms.]
 
 **MESSAGE 2:**
 RE: {job_title}
 
 Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - Showcase leadership skills in developing strategic plans that align with corporate strategies. Demonstrate proactive, innovative mindset: passionate about redirecting focus and unleashing unprecedented growth opportunities. Highlight track record of piecing together the larger picture and devising critical solutions to streamline processes. Be specific about VP BI achievements, data strategy, and business value. Emphasize ability to unify teams and deliver outstanding results across all segments. Focus on results and business impact - avoid technical jargon.]
+I recently applied for this role (leacock.kervin@gmail.com). [~500 characters total - Showcase leadership skills in developing strategic plans that align with corporate strategies. Demonstrate proactive, innovative mindset: passionate about redirecting focus and unleashing unprecedented growth opportunities. Highlight track record of piecing together the larger picture and devising critical solutions to streamline processes. Be specific about VP BI achievements, data strategy, and business value. Emphasize ability to unify teams and deliver outstanding results across all segments. Focus on results and business impact - avoid technical jargon. Reference specific company details from the research (mission, recent news, or market position) in business language to show genuine interest and alignment.]
 
 **MESSAGE 3:**
 RE: {job_title}
 
 Hi Person, 
 
-I recently applied for this role (kervin.leacock@yahoo.com). [~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about business achievements]
+I recently applied for this role (leacock.kervin@gmail.com). [~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about business achievements. Use research details strategically in business terms to demonstrate deep understanding of the company's direction and how your expertise aligns with their business needs.]
 
-Each message should be direct, specific about actual business achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional. Avoid technical jargon - use business language throughout."""
+Each message should be direct, specific about actual business achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional. Avoid technical jargon - use business language throughout. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
 
 
 def get_prompt(prompt_name: str, **kwargs) -> str:

@@ -218,7 +218,8 @@ class AIAnalyzer:
         qualifications: QualificationAnalysis, 
         company: str,
         job_title: str,
-        candidate_name: str
+        candidate_name: str,
+        research_content: str = None
     ) -> str:
         """Generate a cover letter based on qualifications analysis"""
         # Select 50% of soft skills
@@ -229,13 +230,23 @@ class AIAnalyzer:
         strong_matches_str = ', '.join(qualifications.strong_matches) if qualifications.strong_matches else "Technical expertise, Data analysis, Project management"
         missing_skills_str = ', '.join(qualifications.missing_skills) if qualifications.missing_skills else "None identified"
         
+        # Format research section for prompt
+        if research_content:
+            research_section = f"""COMPANY RESEARCH:
+{research_content}
+
+Use this research information to personalize the cover letter with specific details about the company's mission, recent news, products/services, market position, and challenges. Reference this information naturally to demonstrate genuine interest and alignment."""
+        else:
+            research_section = "COMPANY RESEARCH: Not available. Focus on general company interest and alignment."
+        
         prompt = get_prompt(
             'cover_letter',
             strong_matches=strong_matches_str,
             missing_skills=missing_skills_str,
             soft_skills=soft_skills_str,
             company=company,
-            job_title=job_title
+            job_title=job_title,
+            research_section=research_section
         )
         
         cover_letter = self._call_ollama(prompt)
@@ -245,19 +256,24 @@ class AIAnalyzer:
         cover_letter = cover_letter.replace('[Your Name]', candidate_name)
         cover_letter = cover_letter.replace('[YOUR NAME]', candidate_name)
         cover_letter = cover_letter.replace('[your name]', candidate_name)
+        cover_letter = cover_letter.replace('[Your Actual Name]', candidate_name)
+        cover_letter = cover_letter.replace('[YOUR ACTUAL NAME]', candidate_name)
+        cover_letter = cover_letter.replace('[Your Full Name]', candidate_name)
         
-        # Ensure name appears after "Sincerely," if it's missing
-        if 'Sincerely,' in cover_letter:
-            # Find the last occurrence of "Sincerely,"
-            parts = cover_letter.rsplit('Sincerely,', 1)
-            if len(parts) == 2:
-                ending = parts[1].strip()
-                # If ending doesn't contain the name, add it on a new line
-                if ending and candidate_name.lower() not in ending.lower():
-                    cover_letter = parts[0] + 'Sincerely,\n' + candidate_name + '\n' + ending
-                elif not ending or ending == '':
-                    # If nothing after "Sincerely,", just add the name
-                    cover_letter = parts[0] + 'Sincerely,\n' + candidate_name
+        contact_replacement = '917.670.0693 or leacock.kervin@gmail.com'
+        cover_letter = cover_letter.replace('[Your Contact Information]', contact_replacement)
+        cover_letter = cover_letter.replace('[YOUR CONTACT INFORMATION]', contact_replacement)
+        cover_letter = cover_letter.replace('[Contact Information]', contact_replacement)
+        
+        # Remove any signature block so the standardized block can be appended downstream
+        signature_pattern = re.compile(r'\n\s*Sincerely[^\n]*?(?:\n.*)?$', re.IGNORECASE | re.DOTALL)
+        cover_letter = re.sub(signature_pattern, '', cover_letter).strip()
+        
+        # Clean up stray placeholder brackets that might remain
+        cover_letter = cover_letter.replace('[Your Actual Name]', candidate_name)
+        cover_letter = cover_letter.replace('[Your Contact Information]', contact_replacement)
+        cover_letter = cover_letter.replace('[Your Name]', candidate_name)
+        cover_letter = cover_letter.strip()
         
         return cover_letter
     
@@ -463,11 +479,21 @@ Be specific and only extract information that is explicitly stated."""
         qualifications: QualificationAnalysis,
         company: str,
         job_title: str,
-        candidate_name: str
+        candidate_name: str,
+        research_content: str = None
     ) -> str:
         """Generate hiring manager intro messages (3 versions)"""
         # Extract strong matches for cleaner prompt
         strong_matches_str = ', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else "Technical expertise, Data analysis, Project management"
+        
+        # Format research section for prompt
+        if research_content:
+            research_section = f"""COMPANY RESEARCH:
+{research_content}
+
+Use this research information to personalize the intro messages with specific details about the company's mission, recent news, products/services, challenges, or key personnel. Reference this information naturally within character limits to demonstrate genuine interest and alignment."""
+        else:
+            research_section = "COMPANY RESEARCH: Not available. Focus on general company interest and alignment."
         
         prompt = get_prompt(
             'hiring_manager_intro',
@@ -475,7 +501,8 @@ Be specific and only extract information that is explicitly stated."""
             job_title=job_title,
             match_score=qualifications.match_score,
             strong_matches=strong_matches_str,
-            candidate_name=candidate_name
+            candidate_name=candidate_name,
+            research_section=research_section
         )
         
         intro_messages = self._call_ollama(prompt)
@@ -486,11 +513,21 @@ Be specific and only extract information that is explicitly stated."""
         qualifications: QualificationAnalysis,
         company: str,
         job_title: str,
-        candidate_name: str
+        candidate_name: str,
+        research_content: str = None
     ) -> str:
         """Generate recruiter intro messages (3 versions, non-technical)"""
         # Extract strong matches for cleaner prompt, avoiding technical jargon
         strong_matches_str = ', '.join(qualifications.strong_matches[:5]) if qualifications.strong_matches else "Business expertise, Data analysis, Project management"
+        
+        # Format research section for prompt (use business language)
+        if research_content:
+            research_section = f"""COMPANY RESEARCH:
+{research_content}
+
+Use this research information to personalize the intro messages with specific details about the company's mission, recent news, products/services, or market position. Express these details in business language (avoid technical jargon). Reference this information naturally within character limits to demonstrate genuine interest and alignment."""
+        else:
+            research_section = "COMPANY RESEARCH: Not available. Focus on general company interest and alignment in business terms."
         
         prompt = get_prompt(
             'recruiter_intro',
@@ -498,7 +535,8 @@ Be specific and only extract information that is explicitly stated."""
             job_title=job_title,
             match_score=qualifications.match_score,
             strong_matches=strong_matches_str,
-            candidate_name=candidate_name
+            candidate_name=candidate_name,
+            research_section=research_section
         )
         
         intro_messages = self._call_ollama(prompt)

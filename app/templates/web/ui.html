@@ -581,6 +581,7 @@
             <li><a href="/reports" class="nav-link">Reports</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="checkOllama(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
@@ -769,8 +770,10 @@
                         <option value="Pending">Pending</option>
                         <option value="Applied">Applied</option>
                         <option value="Contacted Someone">Contacted Someone</option>
-                        <option value="Contacted Hiring Manager">Contacted Hiring Manager</option>
-                        <option value="Interviewed">Interviewed</option>
+                        <option value="Company Response">Company Response</option>
+                        <option value="Scheduled Interview">Scheduled Interview</option>
+                        <option value="Interview Notes">Interview Notes</option>
+                        <option value="Interview - Follow Up">Interview - Follow Up</option>
                         <option value="Offered">Offered</option>
                         <option value="Rejected">Rejected</option>
                         <option value="Accepted">Accepted</option>
@@ -779,7 +782,12 @@
                 
                 <div class="form-group">
                     <label for="status_notes">Notes (Optional)</label>
-                    <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <small id="status_notes_character_count" style="color: #6c757d;">0 characters</small>
+                        </div>
+                    </div>
                     <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
                 </div>
                 
@@ -1108,6 +1116,24 @@
         let selectedApplicationId = null;
         let searchTimeout = null;
         let quillEditor = null;
+        const statusNotesCharacterCount = document.getElementById('status_notes_character_count');
+        
+        function updateStatusNotesCharacterCount() {
+            if (!statusNotesCharacterCount) {
+                return;
+            }
+            
+            if (!quillEditor) {
+                statusNotesCharacterCount.textContent = '0 characters';
+                return;
+            }
+            
+            const text = quillEditor.getText();
+            const normalizedText = text.endsWith('\n') ? text.slice(0, -1) : text;
+            const length = normalizedText.length;
+            
+            statusNotesCharacterCount.textContent = `${length} ${length === 1 ? 'character' : 'characters'}`;
+        }
         
         async function showStatusUpdate() {
             document.getElementById('application-form').classList.add('hidden');
@@ -1237,6 +1263,9 @@
                     }, true);
                     
                     console.log('Quill editor initialized successfully');
+
+                    quillEditor.on('text-change', updateStatusNotesCharacterCount);
+                    updateStatusNotesCharacterCount();
                 } catch (error) {
                     console.error('Error initializing Quill editor:', error);
                     showStatus(' Error initializing rich text editor. Please refresh the page.', 'error');
@@ -1244,6 +1273,7 @@
             } else {
                 // Clear the editor content
                 quillEditor.setContents([]);
+                updateStatusNotesCharacterCount();
             }
             
             // Add event listeners
@@ -1494,6 +1524,15 @@
                 console.log('✅ Quill.js loaded successfully');
             } else {
                 console.error('❌ Quill.js not loaded');
+            }
+            
+            // Check if resume parameter is present in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('resume') === 'true') {
+                // Auto-show resume manager
+                if (typeof showResumeManager === 'function') {
+                    showResumeManager();
+                }
             }
         });
     </script>

@@ -1,7 +1,7 @@
 # Kervin Leacock
 
 ## Contact Information
-- **Email:** kervin.leacock@yahoo.com
+- **Email:** leacock.kervin@gmail.com
 - **Phone:** 917.670.0693
 - **Locations:** New York, NY, Miami, FL, Toronto, ON
 - **LinkedIn:** https://www.linkedin.com/in/kleacock/
