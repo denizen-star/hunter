@@ -312,7 +312,7 @@ Incorporate key terms, phrases, and language patterns from the job description n
 - Sound like a human, not a robot - current, relevant, and confident
 - Use the research information to reference specific company details naturally (mission, recent news, products/services, challenges) to demonstrate genuine interest
 
-Create exactly 3 versions with specific character counts. Be specific about actual achievements and experience. Where appropriate and within character limits, weave in relevant research details about the company.
+Create exactly 3 versions with specific character counts. CRITICAL: Message 1 MUST be under 280 characters total. Messages 2 and 3 MUST be under 500 characters total each. Be specific about actual achievements and experience. Where appropriate and within character limits, weave in relevant research details about the company.
 
 Format each message as:
 "RE: " {job_title}
@@ -326,23 +326,23 @@ RE: {job_title}
 
 Hi Person, 
 
-[~275 characters total - Practical and direct tone. Start with a clear positioning statement: "I am a [role type] Leader with [X]+ years driving [key capabilities]." Directly mention that you applied to the [job title/role area]. End with an engaging question or call to action about collaboration, team impact, or profitable outcomes. Use professional yet personable tone - confident and straightforward. Close with "Cheers," followed by candidate name.]
+[CRITICAL: MAXIMUM 280 characters total including greeting and closing. Keep it SHORT and concise. Practical and direct tone. Structure: (1) Brief positioning: "I am a [role type] Leader with [X]+ years driving [key capabilities]." (2) Direct statement: "I applied to [job title/role]." (3) Short engaging question about collaboration or profitable outcomes. (4) Close with "Cheers," and candidate name. Be extremely brief - every word must count. Do NOT exceed 280 characters.]
 
 **MESSAGE 2:**
 RE: {job_title}
 
 Hi Person, 
 
-[~500 characters total - Showcase leadership skills in developing strategic plans. Demonstrate proactive, innovative mindset. (Optionally mention redirecting focus and unleashing growth opportunities). (Optionally highlight track record of piecing together the larger picture and devising critical solutions). Be specific about business impact. (Optionally emphasize ability to unify teams and deliver outstanding results). Reference specific company details from the research (mission, recent news, or challenges) to show genuine interest and alignment.]
+[CRITICAL: MAXIMUM 500 characters total including greeting and closing. Keep it concise - every word must count. Showcase leadership skills in developing strategic plans. Demonstrate proactive, innovative mindset. (Optionally mention redirecting focus and unleashing growth opportunities). (Optionally highlight track record of piecing together the larger picture and devising critical solutions). Be specific about business impact. (Optionally emphasize ability to unify teams and deliver outstanding results). Reference specific company details from the research (mission, recent news, or challenges) to show genuine interest and alignment. Do NOT exceed 500 characters.]
 
 **MESSAGE 3:**
 RE: {job_title}
 
 Hi Person, 
 
-[~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about achievements. Use research details strategically to demonstrate deep understanding of the company's direction and how your expertise aligns with their needs.]
+[CRITICAL: MAXIMUM 500 characters total including greeting and closing. Keep it concise - every word must count. VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about achievements. Use research details strategically to demonstrate deep understanding of the company's direction and how your expertise aligns with their needs. Do NOT exceed 500 characters.]
 
-Each message should be direct, specific about actual achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
+Each message should be direct, specific about actual achievements, and use the exact character counts specified. CRITICAL: Message 1 MUST NOT exceed 280 characters. Messages 2 and 3 MUST NOT exceed 500 characters each - prioritize brevity over detail. Message 3 should be particularly attention-grabbing while remaining professional. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
 
 
 RECRUITER_INTRO_PROMPT = """You are creating professional intro messages for recruiters. Generate 3 versions of an intro message based on the provided information.
@@ -376,7 +376,7 @@ IMPORTANT: Recruiters are typically not technical, so avoid jargon and technical
 - Use business language, not technical jargon
 - Use the research information to reference specific company details naturally (mission, recent news, products/services) in business terms to demonstrate genuine interest
 
-Create exactly 3 versions with specific character counts. Be specific about actual business achievements. Where appropriate and within character limits, weave in relevant research details about the company in business language.
+Create exactly 3 versions with specific character counts. CRITICAL: Message 1 MUST be under 280 characters total. Messages 2 and 3 MUST be under 500 characters total each. Be specific about actual business achievements. Where appropriate and within character limits, weave in relevant research details about the company in business language.
 
 Format each message as:
 "RE: " {job_title}
@@ -390,23 +390,23 @@ RE: {job_title}
 
 Hi Person, 
 
-[~275 characters total - Practical and direct tone. Start with a clear positioning statement: "I am a [role type] Leader with [X]+ years driving [key capabilities]." Directly mention that you applied to the [job title/role area]. End with an engaging question or call to action about collaboration, team impact, or profitable outcomes. Use professional yet personable tone - confident and straightforward. Avoid technical jargon - focus on business value and results. Close with "Cheers," followed by candidate name.]
+[CRITICAL: MAXIMUM 280 characters total including greeting and closing. Keep it SHORT and concise. Practical and direct tone. Structure: (1) Brief positioning: "I am a [role type] Leader with [X]+ years driving [key capabilities]." (2) Direct statement: "I applied to [job title/role]." (3) Short engaging question about collaboration or profitable outcomes. (4) Close with "Cheers," and candidate name. Be extremely brief - every word must count. Avoid technical jargon - focus on business value. Do NOT exceed 280 characters.]
 
 **MESSAGE 2:**
 RE: {job_title}
 
 Hi Person, 
 
-[~500 characters total - Showcase leadership skills in developing strategic plans. (Optionally mention that plans align with corporate strategies). Demonstrate proactive, innovative mindset. (Optionally mention redirecting focus and unleashing growth opportunities). (Optionally highlight track record of piecing together the larger picture and devising critical solutions). (Optionally mention streamlining processes). Be specific about business value. (Optionally emphasize ability to unify teams and deliver outstanding results). Focus on results and business impact - avoid technical jargon. Reference specific company details from the research (mission, recent news, or market position) in business language to show genuine interest and alignment.]
+[CRITICAL: MAXIMUM 500 characters total including greeting and closing. Keep it concise - every word must count. Showcase leadership skills in developing strategic plans. (Optionally mention that plans align with corporate strategies). Demonstrate proactive, innovative mindset. (Optionally mention redirecting focus and unleashing growth opportunities). (Optionally highlight track record of piecing together the larger picture and devising critical solutions). (Optionally mention streamlining processes). Be specific about business value. (Optionally emphasize ability to unify teams and deliver outstanding results). Focus on results and business impact - avoid technical jargon. Reference specific company details from the research (mission, recent news, or market position) in business language to show genuine interest and alignment. Do NOT exceed 500 characters.]
 
 **MESSAGE 3:**
 RE: {job_title}
 
 Hi Person, 
 
-[~500 characters total - VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about business achievements. Use research details strategically in business terms to demonstrate deep understanding of the company's direction and how your expertise aligns with their business needs.]
+[CRITICAL: MAXIMUM 500 characters total including greeting and closing. Keep it concise - every word must count. VP/SVP/Director tone with business language and outrageous touch to drive attention. Be bold and confident about business achievements. Use research details strategically in business terms to demonstrate deep understanding of the company's direction and how your expertise aligns with their business needs. Do NOT exceed 500 characters.]
 
-Each message should be direct, specific about actual business achievements, and use the exact character counts specified. Message 3 should be particularly attention-grabbing while remaining professional. Avoid technical jargon - use business language throughout. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
+Each message should be direct, specific about actual business achievements, and use the exact character counts specified. CRITICAL: Message 1 MUST NOT exceed 280 characters. Messages 2 and 3 MUST NOT exceed 500 characters each - prioritize brevity over detail. Message 3 should be particularly attention-grabbing while remaining professional. Avoid technical jargon - use business language throughout. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
 
 
 def get_prompt(prompt_name: str, **kwargs) -> str:
