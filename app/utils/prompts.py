@@ -105,7 +105,7 @@ CANDIDATE STRENGTHS:
 MISSING SKILLS TO ADDRESS:
 {missing_skills}
 
-SOFT SKILLS TO EMPHASIZE (use 50% of these):
+SOFT SKILLS TO EMPHASIZE (use approximately 50% of these throughout the letter):
 {soft_skills}
 
 COMPANY: {company}
@@ -113,16 +113,19 @@ JOB TITLE: {job_title}
 
 {research_section}
 
+**JOB DESCRIPTION LANGUAGE INTEGRATION:**
+Incorporate key terms, phrases, and language patterns from the job description naturally throughout the cover letter. Mirror important terminology used in the job posting, especially when describing relevant experience and skills. Use job description language to demonstrate alignment with the role's requirements and the company's communication style. Ensure the integration feels natural and authentic, not forced or overly repetitive.
+
 Generate a professional cover letter following this structure and style:
 
 **STRUCTURE:**
-- Opening paragraph: Express interest and state why you're a great fit. Lead with years of experience and "numerous roles of responsibility." Emphasize steadfast dedication to delivering high-level customer satisfaction and achieving success by aligning products/services with bottom-line organizational goals. Close with "my pleasure to present my resume for your consideration."
+- Opening paragraph: Express interest and state why you're a great fit. Lead with years of experience and (optionally mention numerous roles of responsibility or similar experience-based language). (Optionally emphasize dedication to customer satisfaction or similar results-oriented language) and achieving success by aligning products/services with bottom-line organizational goals. Close with a statement expressing your pleasure to present your resume for consideration.
 
-- Body paragraph 1 (Leadership & Strategic Impact): Showcase leadership skills as critical in developing strategic plans that align with corporate strategies. Demonstrate a proactive, innovative mindset: passionate about redirecting focus, shifting from traditional methodologies to drive alignment and unleash unprecedented growth opportunities. Highlight track record of "piecing together the larger picture, devising critical solutions to streamline processes." Emphasize ability to analyze inefficiencies and sluggish workflows, then mastermind successful solutions. Mention ability to "unify teams and impress even the toughest of customers."
+- Body paragraph 1 (Leadership & Strategic Impact): Showcase leadership skills as critical in developing strategic plans that align with corporate strategies. Emphasize your hands-on leadership approach - you are a leader who gets directly involved from day one to ensure high-quality deliverables and immediate contribution. Demonstrate a proactive, innovative mindset: (optionally mention redirecting focus, shifting methodologies, or similar language about driving alignment and growth opportunities). Highlight track record of piecing together the larger picture and (optionally mention devising solutions to streamline processes or similar problem-solving language). (Optionally emphasize ability to analyze inefficiencies and develop successful solutions or similar analytical language). Mention ability to build strong teams and deliver exceptional results.
 
-- Body paragraph 2 (Personal Attributes & Teamwork): Position yourself as a "natural leader, owning a rare blend of adaptability and vision." Emphasize "unique mix of people management skills" leading to outstanding results across all segments. Describe yourself as an "excellent communicator and firm believer in the value of relationships." Highlight ability to "easily connect with others, shaping top-performing, cross-functional teams." Add specific details about why the company is a great fit for you and why you are a great fit for the company. Use the research information provided above to reference specific company details such as their mission, recent news, products/services, or market position. Include soft skills and strong matches from the qualifications analysis.
+- Body paragraph 2 (Personal Attributes & Teamwork): Position yourself as (optionally a natural leader with adaptability and vision or similar leadership language). (Optionally emphasize people management skills leading to outstanding results or similar team leadership language). Describe yourself as an excellent communicator and firm believer in the value of relationships. Highlight ability to easily connect with others, shaping top-performing, cross-functional teams. Add specific details about why the company is a great fit for you and why you are a great fit for the company. Use the research information provided above to reference specific company details such as their mission, recent news, products/services, or market position. Integrate approximately 50% of the provided soft skills and strong matches from the qualifications analysis naturally throughout this paragraph.
 
-- Closing paragraph: Thank the reader for their time in reviewing your resume. Provide a clear call to action inviting them to discuss your skills, professional experiences, and career accomplishments further.
+- Closing paragraph: Thank them for reviewing your resume. Invite discussion about your skills and career accomplishments.
 
 **TONE & STYLE REQUIREMENTS:**
 - Professional yet confident, sophisticated and personable
@@ -130,13 +133,15 @@ Generate a professional cover letter following this structure and style:
 - Results-oriented: Focus on customer satisfaction, bottom-line goals, profitable conclusions, and outstanding results
 - Strategic and analytical: Highlight strategic planning, identifying trends, analyzing inefficiencies, and devising critical solutions
 - Leadership and team-focused: Stress leadership skills, unifying teams, people management, and shaping cross-functional teams
+- Hands-on leadership: Emphasize direct involvement, immediate contribution from day one, and commitment to ensuring high-quality deliverables
 - Proactive and innovative: Mention shifting methodologies and unleashing growth opportunities
 - Use strong action verbs: "piecing together," "devising," "mastermind," "unify," "shaping," "redirecting," "unleashing"
 - Clear, concise language that conveys competence and dedication
 - Sound like a human, not a robot - current, relevant, and confident
 - Personalize it to each job description and company using the research information provided
+- Incorporate job description language naturally throughout
 
-**LENGTH:** 300-350 words (slightly longer to accommodate company interest section)
+**LENGTH:** 300-400 words (guideline: aim for 300-350 words, but up to 400 words is acceptable to accommodate company interest section and comprehensive coverage)
 
 **CLOSING FORMAT:**
 - End with "Sincerely," on its own line
@@ -146,7 +151,15 @@ Generate a professional cover letter following this structure and style:
 
 Start directly with "Dear Hiring Manager," and end with "Sincerely," followed by the actual name.
 
-IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation. Never use placeholders like [YOUR NAME], [YOUR SIGNATURE], or [Name] anywhere in the letter. Use the research information naturally and organically to demonstrate genuine interest in the company.
+IMPORTANT: Generate the actual cover letter content. Do not include any introductory text like "Here is a cover letter" or explanations. Start immediately with the salutation. Never use placeholders like [YOUR NAME], [YOUR SIGNATURE], or [Name] anywhere in the letter. Use the research information naturally and organically to demonstrate genuine interest in the company. Incorporate job description language throughout the letter to show alignment with the role.
+
+**CRITICAL - AVOID "CURRENT ROLE" REFERENCES:**
+- NEVER mention "current role", "current position", "current job", or similar phrases
+- When referencing past experience, either:
+  1. Use specific company names from the resume, OR
+  2. Reference company size/type (e.g., "at a Fortune 500 company", "at a leading financial institution"), OR
+  3. Simply omit company references and focus on achievements and skills
+- Focus on experience, achievements, and skills rather than current employment status
 """
 
 

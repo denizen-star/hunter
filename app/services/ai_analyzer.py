@@ -267,6 +267,54 @@ Use this research information to personalize the cover letter with specific deta
         
         # Remove any signature block so the standardized block can be appended downstream
         signature_pattern = re.compile(r'\n\s*Sincerely[^\n]*?(?:\n.*)?$', re.IGNORECASE | re.DOTALL)
+        
+        return cover_letter
+    
+    def scan_and_improve_cover_letter(self, cover_letter: str) -> str:
+        """Scan cover letter for grammar issues and remove repetitive phrases"""
+        scan_prompt = f"""You are an expert editor reviewing a cover letter. Your task is to:
+
+1. Review the cover letter for grammatical errors and fix them
+2. Identify and remove repetitive phrases or redundant language
+3. Ensure the letter flows naturally and maintains its professional tone
+4. Keep all the original content and meaning - only improve clarity and remove repetition
+5. Do NOT change the structure, salutation, or closing format
+6. Do NOT add new content - only refine what exists
+7. CRITICAL: Remove any references to "current role", "current position", "current job", or similar phrases. When such references exist, either:
+   - Replace with a specific company name from the resume, OR
+   - Replace with company size/type reference (e.g., "at a Fortune 500 company"), OR
+   - Remove the reference entirely and focus on achievements and skills
+
+COVER LETTER TO REVIEW:
+{cover_letter}
+
+Return the improved cover letter with:
+- All grammatical errors corrected
+- Repetitive phrases removed or rephrased
+- All "current role/position/job" references removed or replaced as specified above
+- Natural flow maintained
+- Original meaning and structure preserved
+
+Start directly with the salutation and return the complete improved letter."""
+        
+        try:
+            improved_letter = self._call_ollama(scan_prompt)
+            # Ensure the candidate name is preserved if it was in the original
+            # Extract name from original if it exists
+            original_name_match = re.search(r'Sincerely,\s*\n\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)', cover_letter, re.MULTILINE)
+            if original_name_match:
+                original_name = original_name_match.group(1)
+                # Ensure the improved version has the name
+                improved_letter = re.sub(
+                    r'Sincerely,\s*\n\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)',
+                    f'Sincerely,\n{original_name}',
+                    improved_letter,
+                    flags=re.MULTILINE
+                )
+            return improved_letter
+        except Exception as e:
+            print(f"  ⚠️ Warning: Cover letter scan failed: {e}. Using original version.")
+            return cover_letter
         cover_letter = re.sub(signature_pattern, '', cover_letter).strip()
         
         # Clean up stray placeholder brackets that might remain

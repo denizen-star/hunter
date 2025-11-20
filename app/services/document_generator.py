@@ -124,6 +124,18 @@ class DocumentGenerator:
         # Clean up any triple+ newlines to double newlines (paragraph breaks)
         cover_letter = re.sub(r'\n{3,}', '\n\n', cover_letter)  # Normalize multiple newlines to double newlines
         
+        # Remove any "current role/position/job" references as a backup cleanup
+        # This catches any that might slip through the AI generation
+        cover_letter = re.sub(r'\b(in|at|from)\s+my\s+current\s+(role|position|job|employer)\b', '', cover_letter, flags=re.IGNORECASE)
+        cover_letter = re.sub(r'\bmy\s+current\s+(role|position|job|employer)\b', '', cover_letter, flags=re.IGNORECASE)
+        cover_letter = re.sub(r'\bcurrent\s+(role|position|job)\b', '', cover_letter, flags=re.IGNORECASE)
+        # Clean up any double spaces created by removals
+        cover_letter = re.sub(r'[ ]{2,}', ' ', cover_letter)
+        
+        # Scan and improve the cover letter: fix grammar and remove repetitive phrases
+        print("  → Scanning cover letter for grammar and repetitive phrases...")
+        cover_letter = self.ai_analyzer.scan_and_improve_cover_letter(cover_letter)
+        
         # Save to file
         name_clean = candidate_name.replace(' ', '')
         company_clean = application.company.replace(' ', '-')
