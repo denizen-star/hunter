@@ -2625,24 +2625,43 @@ Format this as a professional research document that demonstrates thorough prepa
         /* Quill Editor Styles */
         .ql-editor {{
             min-height: 120px;
-            font-size: 11px !important;
+            font-size: 11pt !important;
             font-family: 'Montserrat', sans-serif !important;
             font-weight: 400 !important;
-            line-height: 1.6;
-            color: #4a5568;
+            line-height: 1.5 !important;
+            color: black !important;
+            text-align: justify !important;
         }}
         
         /* Override any pasted content font styles */
         .ql-editor * {{
             font-family: 'Montserrat', sans-serif !important;
-            font-size: 11px !important;
+            font-size: 11pt !important;
+            color: black !important;
         }}
         
         .ql-editor p,
         .ql-editor div,
         .ql-editor span {{
             font-family: 'Montserrat', sans-serif !important;
-            font-size: 11px !important;
+            font-size: 11pt !important;
+            color: black !important;
+            text-align: justify !important;
+            line-height: 1.5 !important;
+        }}
+        
+        /* Paragraph spacing and alignment */
+        .ql-editor p {{
+            margin-bottom: 0.5em !important;
+            text-align: justify !important;
+            line-height: 1.5 !important;
+        }}
+        
+        /* Ensure all text elements use justified alignment */
+        .ql-editor p[style*="text-align"],
+        .ql-editor div[style*="text-align"],
+        .ql-editor span[style*="text-align"] {{
+            text-align: justify !important;
         }}
         
         .ql-toolbar {{
@@ -3233,6 +3252,44 @@ Format this as a professional research document that demonstrates thorough prepa
                 quillEditor.focus();
                 const len = quillEditor.getLength();
                 quillEditor.setSelection(len, 0);
+                
+                // Normalize content to apply CSS styles (11pt, black, justified, 1.5 line-height)
+                setTimeout(function() {{
+                    if (quillEditor) {{
+                        const editorLength = quillEditor.getLength();
+                        if (editorLength > 1) {{
+                            // Remove inline formatting that overrides CSS
+                            quillEditor.formatText(0, editorLength - 1, {{
+                                'font': false,
+                                'size': false,
+                                'color': false,
+                                'align': false
+                            }}, 'api');
+                            
+                            // Remove inline styles from HTML elements
+                            const editorElement = quillEditor.root;
+                            const allElements = editorElement.querySelectorAll('*');
+                            allElements.forEach(function(el) {{
+                                if (el.hasAttribute('style')) {{
+                                    const style = el.getAttribute('style');
+                                    const newStyle = style
+                                        .replace(/font-size\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/font-family\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/color\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/text-align\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/line-height\s*:\s*[^;]+;?/gi, '');
+                                    
+                                    if (newStyle.trim()) {{
+                                        el.setAttribute('style', newStyle.trim());
+                                    }} else {{
+                                        el.removeAttribute('style');
+                                    }}
+                                }}
+                            }});
+                        }}
+                    }}
+                }}, 100);
+                
                 updateStatusNotesCharacterCount();
             }}
         }}
