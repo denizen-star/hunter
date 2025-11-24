@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Detail - Justworks - Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar - Smaller */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 16px 16px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: #f9fafb;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+        }
+        
+        .sidebar-menu a.active {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        /* Main Container */
+        .container {
+            margin-left: 180px;
+            min-height: 100vh;
+            background: #fafafa;
+        }
+        
+        /* Header */
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        
+        .header .match-percentage-large {
+            font-size: 36px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 0;
+        }
+        
+        .header .match-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        
+        /* Content */
+        .content {
+            padding: 32px;
+            max-width: 1200px;
+        }
+        
+        /* Application Header Card */
+        .app-header-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .app-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .meta-icon {
+            width: 16px;
+            height: 16px;
+            color: #9ca3af;
+        }
+        
+        /* Status Tags */
+        .status-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .tag {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .tag-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .tag-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag-yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .tag-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Status and Match Pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .match-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        
+        .match-pill:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .match-percentage {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .match-percentage.green {
+            color: #10b981;
+        }
+        
+        .match-percentage.yellow {
+            color: #f59e0b;
+        }
+        
+        .match-percentage.red {
+            color: #ef4444;
+        }
+        
+        .match-score-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .section-content {
+            color: #4b5563;
+            line-height: 1.8;
+        }
+        
+        .section-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 20px 0 12px 0;
+        }
+        
+        .section-content h3:first-child {
+            margin-top: 0;
+        }
+        
+        .section-content p {
+            margin-bottom: 12px;
+        }
+        
+        .section-content ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        
+        .section-content li {
+            margin-bottom: 8px;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 0 2px #e5e7eb;
+        }
+        
+        .timeline-date {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        
+        .timeline-content {
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
+        .timeline-status {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        @media (max-width: 968px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Tabs Container */
+        .tabs-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafafa;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            color: #1f2937;
+            background: #f9fafb;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: #ffffff;
+        }
+        
+        .tab-content {
+            padding: 24px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Tech Pills Styles */
+        .tech-pills-container {
+            margin-top: 20px;
+        }
+        
+        .tech-pills-section {
+            margin-bottom: 24px;
+        }
+        
+        .tech-pills-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tech-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tech-pill {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .tech-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tech-pill-green {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .tech-pill-yellow {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
+        .tech-pill-red {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        /* Research Section Styles */
+        .research-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .research-section h3 {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .research-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .research-item h4 {
+            color: #1f2937;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .research-item p {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .person-item {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .person-item h5 {
+            color: #1f2937;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .person-item .title {
+            color: #6b7280;
+            font-size: 13px;
+            font-style: italic;
+        }
+        
+        /* Summary Items */
+        .summary-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .summary-item label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        .summary-item value {
+            display: block;
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+        
+        /* Checklist Styles (for header) */
+        .checklist-container {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* Checklist Styles */
+        .checklist-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        
+        .checklist-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1f2937;
+        }
+        
+        .checklist-toggle {
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .checklist-toggle:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        .checklist-toggle svg {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .checklist-toggle.expanded svg {
+            transform: rotate(180deg);
+        }
+        
+        .checklist-collapsed {
+            display: none !important;
+        }
+        
+        .checklist-expanded {
+            display: block;
+        }
+        
+        .checklist-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+        
+        .checklist-item label {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .checklist-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+            flex-shrink: 0;
+        }
+        
+        .checklist-item label {
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+            color: #1f2937;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        
+        .checklist-item input[type="checkbox"]:checked + label {
+            font-weight: 500;
+        }
+        
+        .checklist-item:hover {
+            background: transparent;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 160px;
+            }
+            
+            .container {
+                margin-left: 160px;
+            }
+            
+            .app-header-top {
+                flex-direction: column;
+            }
+            
+            .app-match-info {
+                text-align: left;
+                margin-top: 16px;
+            }
+            
+            .tabs-header {
+                overflow-x: auto;
+            }
+            
+            .tab {
+                font-size: 12px;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">New Application</a></li>
+            <li><a href="#" class="active">Reports</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">Templates</a></li>
+            <li><a href="#">Progress</a></li>
+            <li><a href="#">Daily Activities</a></li>
+            <li><a href="#">Manage Resume</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div style="flex: 1;">
+                    <a href="#" class="back-link" style="display: inline-block; margin-bottom: 8px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Back to Applications
+                    </a>
+                    <h1 style="margin: 0 0 4px 0;">Justworks - Manager, Analytics Engineering</h1>
+                    <div class="header-subtitle">Application ID: justworks-2025-01-15</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+                    <div class="header-actions">
+                        <button class="btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            Flag
+                        </button>
+                        <button class="btn btn-primary">Update Status</button>
+                    </div>
+                    
+                    <!-- Application Checklist in Header - Directly under buttons -->
+                    <div class="header-checklist">
+                        <div class="checklist-container">
+                            <div class="checklist-header" onclick="toggleChecklist()">
+                                <div class="checklist-title">APPLICATION CHECKLIST</div>
+                                <button type="button" class="checklist-toggle" onclick="event.stopPropagation(); toggleChecklist()">
+                                    <span id="checklist-toggle-text">Show</span>
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="checklist-content" class="checklist-collapsed">
+                                <div class="checklist-grid">
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="check-1" checked>
+                                        <label for="check-1">Resume customized</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="check-2" checked>
+                                        <label for="check-2">Cover letter generated</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="check-3" checked>
+                                        <label for="check-3">Application submitted</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="check-4" checked>
+                                        <label for="check-4">Thank you sent</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="check-5">
+                                        <label for="check-5">Follow-up scheduled</label>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <input type="checkbox" id="check-6">
+                                        <label for="check-6">References prepared</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Application Header Card -->
+            <div class="app-header-card">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <span class="status-pill tag tag-green">Interview Notes</span>
+                    <span class="status-pill tag tag-gray">Thank You Sent</span>
+                    <span class="match-pill">
+                        <span class="match-percentage" data-score="90" style="color: #10b981;">90%</span>
+                        <span class="match-score-label">Match Score</span>
+                    </span>
+                </div>
+                <div class="app-meta" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Remote</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>$150k - $180k</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Applied: Jan 15, 2025</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Posted: Jan 10, 2025</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span>Updated: Jan 20, 2025</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Contact #: 3</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        <a href="#" style="color: #3b82f6; text-decoration: none;">View Job Posting</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs Section -->
+            <div class="tabs-container">
+                <div class="tabs-header">
+                    <button class="tab active" onclick="showTab(this, 'job-desc')">Job Description</button>
+                    <button class="tab" onclick="showTab(this, 'raw-entry')">Raw Entry</button>
+                    <button class="tab" onclick="showTab(this, 'skills')">Skills Analysis</button>
+                    <button class="tab" onclick="showTab(this, 'research')">Research</button>
+                    <button class="tab" onclick="showTab(this, 'qualifications')">Qualifications Analysis</button>
+                    <button class="tab" onclick="showTab(this, 'cover-letter')">Cover Letter</button>
+                    <button class="tab" onclick="showTab(this, 'resume')">Customized Resume</button>
+                    <button class="tab" onclick="showTab(this, 'updates')">Updates & Notes</button>
+                </div>
+                
+                <!-- Job Description Tab -->
+                <div id="job-desc" class="tab-content active">
+                    <h2 class="section-title">Job Description</h2>
+                    <div class="section-content">
+                        <p>We are seeking a Manager, Analytics Engineering to lead our analytics team and drive data-driven decision making across the organization. The ideal candidate will have extensive experience in building scalable data pipelines and leading cross-functional teams.</p>
+                        
+                        <h3>Responsibilities</h3>
+                        <ul>
+                            <li>Lead and mentor a team of analytics engineers</li>
+                            <li>Design and implement scalable data pipelines using modern tools</li>
+                            <li>Collaborate with stakeholders to understand business requirements</li>
+                            <li>Ensure data quality and reliability across all analytics products</li>
+                            <li>Drive best practices in data engineering and analytics</li>
+                        </ul>
+                        
+                        <h3>Requirements</h3>
+                        <ul>
+                            <li>5+ years of experience in analytics engineering or data engineering</li>
+                            <li>Strong proficiency in SQL and Python</li>
+                            <li>Experience with cloud data warehouses (Snowflake, BigQuery, Redshift)</li>
+                            <li>Experience with dbt or similar transformation tools</li>
+                            <li>Strong leadership and communication skills</li>
+                            <li>Experience with orchestration tools (Airflow, Prefect, etc.)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Raw Entry Tab -->
+                <div id="raw-entry" class="tab-content">
+                    <h2 class="section-title">Raw Entry</h2>
+                    <div class="section-content">
+                        <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Original job description as provided during application creation:</p>
+                        <pre style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">[Raw job description text would appear here]</pre>
+                    </div>
+                </div>
+                
+                <!-- Skills Analysis Tab -->
+                <div id="skills" class="tab-content">
+                    <h2 class="section-title">Skills Analysis</h2>
+                    <div class="section-content">
+                        <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Skills extracted from job description and matched against your resume:</p>
+                        
+                        <div class="tech-pills-container">
+                            <div class="tech-pills-section">
+                                <div class="tech-pills-label">
+                                    <span style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; display: inline-block;"></span>
+                                    Strong Matches
+                                </div>
+                                <div class="tech-pills">
+                                    <span class="tech-pill tech-pill-green">SQL</span>
+                                    <span class="tech-pill tech-pill-green">Python</span>
+                                    <span class="tech-pill tech-pill-green">Snowflake</span>
+                                    <span class="tech-pill tech-pill-green">Data Engineering</span>
+                                    <span class="tech-pill tech-pill-green">Leadership</span>
+                                </div>
+                            </div>
+                            
+                            <div class="tech-pills-section">
+                                <div class="tech-pills-label">
+                                    <span style="width: 12px; height: 12px; background: #f59e0b; border-radius: 50%; display: inline-block;"></span>
+                                    Partial Matches
+                                </div>
+                                <div class="tech-pills">
+                                    <span class="tech-pill tech-pill-yellow">dbt</span>
+                                    <span class="tech-pill tech-pill-yellow">Looker</span>
+                                </div>
+                            </div>
+                            
+                            <div class="tech-pills-section">
+                                <div class="tech-pills-label">
+                                    <span style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
+                                    Missing Skills
+                                </div>
+                                <div class="tech-pills">
+                                    <span class="tech-pill tech-pill-red">Airflow</span>
+                                    <span class="tech-pill tech-pill-red">Looker Modeling</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Research Tab -->
+                <div id="research" class="tab-content">
+                    <h2 class="section-title">Company Research</h2>
+                    <div class="section-content">
+                        <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Research insights about Justworks to help with your application:</p>
+                        
+                        <div class="research-section">
+                            <h3>Company Overview</h3>
+                            <div class="research-item">
+                                <h4>About Justworks</h4>
+                                <p>Justworks is a technology company that provides HR, payroll, and benefits solutions for small businesses. Founded in 2012, the company has grown to serve thousands of businesses across the United States.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="research-section">
+                            <h3>Key Personnel</h3>
+                            <div class="person-item">
+                                <h5>John Smith</h5>
+                                <div class="title">VP of Data & Analytics</div>
+                            </div>
+                            <div class="person-item">
+                                <h5>Jane Doe</h5>
+                                <div class="title">Head of Analytics Engineering</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Qualifications Analysis Tab -->
+                <div id="qualifications" class="tab-content">
+                    <h2 class="section-title">Qualifications Analysis</h2>
+                    <div class="section-content">
+                        <pre style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">[Detailed qualifications analysis would appear here]</pre>
+                    </div>
+                </div>
+                
+                <!-- Cover Letter Tab -->
+                <div id="cover-letter" class="tab-content">
+                    <h2 class="section-title">Cover Letter</h2>
+                    <div class="section-content">
+                        <div style="border: 1px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 8px; background: white;">
+                            <h3 style="color: #1f2937; margin-bottom: 10px; font-size: 16px;">
+                                Match Score: 90% - Application for Justworks - Manager, Analytics Engineering
+                            </h3>
+                            <div style="margin-bottom: 15px; padding: 10px; background: #f9fafb; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                                <p style="color: #1f2937; font-size: 14px; line-height: 1.5; margin: 0;">
+                                    I reviewed our compatibility based on job posting, research and my experience with my proprietary ML Model and these are my findings:
+                                </p>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <h4 style="color: #3b82f6; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Features Compared</h4>
+                                <p style="color: #6b7280; font-size: 11px;">24 individual skills, technologies, and requirements analyzed</p>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <h4 style="color: #3b82f6; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Strong Matches</h4>
+                                <p style="color: #6b7280; font-size: 11px;">SQL, Python, Snowflake, Data Engineering, Leadership</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 style="margin: 0; color: #1f2937;">Cover Letter Content</h3>
+                            <button class="btn btn-primary" onclick="copyCoverLetter()">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy Cover Letter
+                            </button>
+                        </div>
+                        
+                        <div id="cover-letter-content" style="background: #f9fafb; padding: 30px 40px; border-radius: 8px; border: 1px solid #e5e7eb; font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; color: #1f2937;">
+                            <div style="font-size: 14px; color: #6b7280; margin-bottom: 30px; font-weight: 600;">
+                                Manager, Analytics Engineering - Justworks - Intro
+                            </div>
+                            <p>[Cover letter content would appear here]</p>
+                            <p style="margin-top: 30px; margin-bottom: 5px;">Sincerely,</p>
+                            <p style="margin-top: 5px;">Kervin Leacock | 917.670.0693 | leacock.kervin@gmail.com</p>
+                        </div>
+                        
+                        <!-- Hiring Manager Intro Messages -->
+                        <div style="margin-top: 30px; border: 1px solid #10b981; padding: 15px; border-radius: 8px; background: white;">
+                            <h3 style="margin: 0 0 5px 0; color: #1f2937; font-size: 18px; font-weight: 600;">Hiring Manager Intro Messages</h3>
+                            <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">Three ready-to-copy messages for hiring managers</p>
+                            <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                                <p style="margin: 0; font-size: 14px; line-height: 1.6;">[Hiring manager intro message 1]</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Recruiter Intro Messages -->
+                        <div style="margin-top: 20px; border: 1px solid #3b82f6; padding: 15px; border-radius: 8px; background: white;">
+                            <h3 style="margin: 0 0 5px 0; color: #1f2937; font-size: 18px; font-weight: 600;">Recruiter Intro Messages</h3>
+                            <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">Three ready-to-copy messages for recruiters</p>
+                            <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 10px;">
+                                <p style="margin: 0; font-size: 14px; line-height: 1.6;">[Recruiter intro message 1]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customized Resume Tab -->
+                <div id="resume" class="tab-content">
+                    <h2 class="section-title">Customized Resume</h2>
+                    <div class="section-content">
+                        <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Your resume customized for this position:</p>
+                        <div style="background: #f9fafb; padding: 30px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <p style="color: #6b7280; font-style: italic;">[Customized resume content would appear here]</p>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary">Generate Customized Resume</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Updates & Notes Tab -->
+                <div id="updates" class="tab-content">
+                    <h2 class="section-title">Updates & Notes</h2>
+                    <div class="section-content">
+                        <div style="margin-bottom: 20px; padding: 15px; background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 4px;">
+                            <strong style="color: #3b82f6;">Current Status:</strong> 
+                            <span class="tag tag-green" style="margin-left: 10px;">Interview Notes</span>
+                            <div style="margin-top: 8px; font-size: 14px; color: #6b7280;">
+                                Last Updated: Jan 20, 2025 2:00 PM
+                            </div>
+                        </div>
+                        
+                        <!-- Update Status Form -->
+                        <div style="margin-bottom: 30px; padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <h3 style="color: #1f2937; margin-bottom: 15px;">Update Status</h3>
+                            
+                            <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
+                                <div style="margin-bottom: 15px;">
+                                    <label for="new_status" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">New Status</label>
+                                    <select id="new_status" required style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; background: white;">
+                                        <option value="">-- Select Status --</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Applied">Applied</option>
+                                        <option value="Contacted Someone">Contacted Someone</option>
+                                        <option value="Company Response">Company Response</option>
+                                        <option value="Scheduled Interview">Scheduled Interview</option>
+                                        <option value="Interview Notes">Interview Notes</option>
+                                        <option value="Interview - Follow Up">Interview - Follow Up</option>
+                                        <option value="Offered">Offered</option>
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="Accepted">Accepted</option>
+                                    </select>
+                                </div>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                        <label for="status_notes" style="display: block; font-weight: 600; color: #1f2937;">Notes (Optional)</label>
+                                        <button type="button" onclick="copyStatusNotes(this)" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                            📋 Copy Content
+                                        </button>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                                        <div style="display: flex; justify-content: flex-end;">
+                                            <small id="status_notes_character_count" style="color: #6b7280;">0 characters</small>
+                                        </div>
+                                    </div>
+                                    <small style="color: #6b7280; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
+                                </div>
+                                
+                                <!-- Template Inserter -->
+                                <div style="margin: 18px 0; padding: 12px; background: #ffffff; border: 1px dashed #d1d5db; border-radius: 10px;">
+                                    <label for="template_selector" style="display: block; margin-bottom: 6px; font-weight: 600; color: #1f2937;">
+                                        Insert from Template
+                                    </label>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <select id="template_selector" style="flex: 1; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: #f9fafb;">
+                                            <option value="">-- Select Template --</option>
+                                        </select>
+                                        <button type="button" id="clearTemplateBtn" style="background: #e5e7eb; color: #1f2937; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
+                                    </div>
+                                    <small style="color: #6b7280; margin-top: 8px; display: block;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
+                                </div>
+                                
+                                <button type="submit" id="updateStatusBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                    <span id="btnIcon">📊</span>
+                                    <span id="btnText">Update Status</span>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Timeline -->
+                        <h3 style="color: #1f2937; margin-bottom: 15px;">Application Timeline</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">Jan 15, 2025 2:30 PM</div>
+                                <div class="timeline-content">
+                                    Application submitted
+                                    <span class="tag tag-blue" style="margin-left: 8px;">Applied</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Jan 16, 2025 10:15 AM</div>
+                                <div class="timeline-content">
+                                    Company viewed profile
+                                    <span class="tag tag-blue" style="margin-left: 8px;">Company Response</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Jan 17, 2025 3:45 PM</div>
+                                <div class="timeline-content">
+                                    Phone screen scheduled
+                                    <span class="tag tag-green" style="margin-left: 8px;">Interview Scheduled</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Jan 20, 2025 11:00 AM</div>
+                                <div class="timeline-content">
+                                    Phone screen completed
+                                    <span class="tag tag-green" style="margin-left: 8px;">Interview Notes</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Jan 20, 2025 2:00 PM</div>
+                                <div class="timeline-content">
+                                    Thank you email sent
+                                    <span class="tag tag-gray" style="margin-left: 8px;">Thank You Sent</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Two Column Layout - After Tabs -->
+            <div class="two-column">
+                <!-- Qualifications Summary -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Qualifications Summary</h2>
+                    </div>
+                    <div class="section-content">
+                        <h3>Strong Matches</h3>
+                        <ul>
+                            <li>5+ years of experience in analytics engineering</li>
+                            <li>Proficiency in SQL and Python</li>
+                            <li>Experience with data warehousing (Snowflake, BigQuery)</li>
+                            <li>Strong communication and leadership skills</li>
+                        </ul>
+                        
+                        <h3>Partial Matches</h3>
+                        <ul>
+                            <li>Experience with dbt (some experience, not extensive)</li>
+                            <li>Knowledge of Looker/Tableau (basic familiarity)</li>
+                        </ul>
+                        
+                        <h3>Missing Skills</h3>
+                        <ul>
+                            <li>Experience with Airflow or similar orchestration tools</li>
+                            <li>Deep expertise in Looker modeling</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Application Timeline -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Application Timeline</h2>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">Jan 15, 2025 2:30 PM</div>
+                            <div class="timeline-content">
+                                Application submitted
+                                <span class="timeline-status tag tag-blue">Applied</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Jan 16, 2025 10:15 AM</div>
+                            <div class="timeline-content">
+                                Company viewed profile
+                                <span class="timeline-status tag tag-blue">Company Response</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Jan 17, 2025 3:45 PM</div>
+                            <div class="timeline-content">
+                                Phone screen scheduled
+                                <span class="timeline-status tag tag-green">Interview Scheduled</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Jan 20, 2025 11:00 AM</div>
+                            <div class="timeline-content">
+                                Phone screen completed
+                                <span class="timeline-status tag tag-green">Interview Notes</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Jan 20, 2025 2:00 PM</div>
+                            <div class="timeline-content">
+                                Thank you email sent
+                                <span class="timeline-status tag tag-gray">Thank You Sent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(button, tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabId);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Add active class to clicked tab
+            button.classList.add('active');
+        }
+        
+        function copyCoverLetter() {
+            const content = document.getElementById('cover-letter-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Cover letter copied to clipboard!');
+            });
+        }
+        
+        // Initialize Quill editor
+        let quillEditor = null;
+        let statusNotesCharacterCount = null;
+        
+        function updateStatusNotesCharacterCount() {
+            if (!statusNotesCharacterCount) {
+                return;
+            }
+            
+            if (!quillEditor) {
+                statusNotesCharacterCount.textContent = '0 characters';
+                return;
+            }
+            
+            const text = quillEditor.getText();
+            const normalizedText = text.endsWith('\n') ? text.slice(0, -1) : text;
+            const length = normalizedText.length;
+            
+            statusNotesCharacterCount.textContent = `${length} ${length === 1 ? 'character' : 'characters'}`;
+        }
+        
+        function copyStatusNotes(button) {
+            if (!quillEditor) {
+                alert('Editor not initialized');
+                return;
+            }
+            
+            const text = quillEditor.getText();
+            if (!text.trim()) {
+                alert('No content to copy');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '✓ Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#3b82f6';
+                }, 2000);
+            });
+        }
+        
+        // Templates cache
+        let templatesCache = [];
+        
+        async function loadTemplates() {
+            try {
+                const resp = await fetch('/api/templates');
+                const data = await resp.json();
+                
+                if (data.success && data.templates) {
+                    templatesCache = data.templates;
+                    const selector = document.getElementById('template_selector');
+                    if (selector) {
+                        // Clear existing options except the first one
+                        selector.innerHTML = '<option value="">-- Select Template --</option>';
+                        
+                        // Add template options
+                        data.templates.forEach(template => {
+                            const option = document.createElement('option');
+                            option.value = template.id;
+                            option.textContent = `${template.title} (${template.delivery_method})`;
+                            selector.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading templates:', error);
+            }
+        }
+        
+        function onTemplateSelected(event) {
+            const templateId = event.target.value;
+            if (!templateId || !quillEditor) {
+                return;
+            }
+            
+            const template = templatesCache.find(t => t.id === templateId);
+            if (template && template.content) {
+                quillEditor.clipboard.dangerouslyPasteHTML(template.content);
+                quillEditor.focus();
+                updateStatusNotesCharacterCount();
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            statusNotesCharacterCount = document.getElementById('status_notes_character_count');
+            
+            if (typeof Quill !== 'undefined') {
+                // Initialize Quill editor
+                quillEditor = new Quill('#status_notes', {
+                    theme: 'snow',
+                    placeholder: 'Add notes about this status update...',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'indent': '-1'}, { 'indent': '+1' }],
+                            [{ 'align': [] }],
+                            ['link', 'image', 'blockquote', 'code-block'],
+                            ['clean']
+                        ]
+                    }
+                });
+                
+                quillEditor.on('text-change', updateStatusNotesCharacterCount);
+                updateStatusNotesCharacterCount();
+                
+                // Load templates and wire interactions
+                loadTemplates();
+                const selector = document.getElementById('template_selector');
+                const clearBtn = document.getElementById('clearTemplateBtn');
+                if (selector) {
+                    selector.addEventListener('change', onTemplateSelected);
+                }
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        if (quillEditor) {
+                            quillEditor.setContents([]);
+                            quillEditor.focus();
+                            updateStatusNotesCharacterCount();
+                        }
+                        const sel = document.getElementById('template_selector');
+                        if (sel) { sel.value = ''; }
+                    });
+                }
+            } else {
+                console.error('Quill.js not loaded');
+            }
+        });
+        
+        function submitStatusUpdate(event) {
+            event.preventDefault();
+            // Status update logic would go here
+            alert('Status update functionality would be implemented here');
+        }
+        
+        
+        function toggleChecklist() {
+            const content = document.getElementById('checklist-content');
+            const toggleButton = document.querySelector('.checklist-toggle');
+            const toggleText = document.getElementById('checklist-toggle-text');
+            
+            if (content.classList.contains('checklist-collapsed')) {
+                content.classList.remove('checklist-collapsed');
+                content.classList.add('checklist-expanded');
+                toggleText.textContent = 'Hide';
+                toggleButton.classList.add('expanded');
+            } else {
+                content.classList.remove('checklist-expanded');
+                content.classList.add('checklist-collapsed');
+                toggleText.textContent = 'Show';
+                toggleButton.classList.remove('expanded');
+            }
+        }
+        
+        
+        // Function to determine match score color
+        function getMatchScoreColor(score) {
+            if (score >= 80) return '#10b981'; // green
+            if (score >= 60) return '#f59e0b'; // yellow
+            return '#ef4444'; // red
+        }
+        
+        // Apply color on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const matchPercentage = document.querySelector('.match-percentage');
+            if (matchPercentage) {
+                const score = parseInt(matchPercentage.getAttribute('data-score') || matchPercentage.textContent);
+                matchPercentage.style.color = getMatchScoreColor(score);
+            }
+        });
+    </script>
+</body>
+</html>
+
