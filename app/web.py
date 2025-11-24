@@ -16,6 +16,7 @@ from app.services.ai_analyzer import AIAnalyzer
 from app.services.document_generator import DocumentGenerator
 from app.services.dashboard_generator import DashboardGenerator
 from app.services.template_manager import TemplateManager
+from app.services.analytics_generator import AnalyticsGenerator
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root
 
@@ -32,6 +33,7 @@ ai_analyzer = AIAnalyzer()
 doc_generator = DocumentGenerator()
 dashboard_generator = DashboardGenerator()
 template_manager = TemplateManager()
+analytics_generator = AnalyticsGenerator()
 
 STATUS_NORMALIZATION_MAP = {
     'contacted hiring manager': 'company response',
@@ -808,8 +810,9 @@ def update_checklist(app_id):
         except Exception as e:
             print(f"Warning: Could not regenerate summary page: {e}")
         
-        # Regenerate dashboard to show updated progress pills
+        # Regenerate both dashboards to show updated progress pills
         dashboard_generator.generate_index_page()
+        dashboard_generator.generate_progress_dashboard()
         
         return jsonify({
             'success': True,
@@ -997,10 +1000,11 @@ def update_dashboard():
     """Update the dashboard"""
     try:
         dashboard_generator.generate_index_page()
+        dashboard_generator.generate_progress_dashboard()
         
         return jsonify({
             'success': True,
-            'message': 'Dashboard updated successfully'
+            'message': 'Dashboards updated successfully'
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1063,6 +1067,11 @@ def view_reports():
     """View the reports page"""
     return render_template('reports.html')
 
+@app.route('/analytics')
+def view_analytics():
+    """View the analytics page"""
+    return render_template('analytics.html')
+
 @app.route('/daily-activities')
 def view_daily_activities():
     """View the daily activities page"""
@@ -1079,7 +1088,8 @@ def get_reports_data():
     try:
         from datetime import datetime, timedelta, timezone
         
-        period = request.args.get('period', 'today')
+        period = request.args.get('period', '30days')
+        gap_period = request.args.get('gap_period', 'all')  # For skill gaps: 'daily', 'weekly', 'monthly', 'all'
         applications = job_processor.list_all_applications()
         
         # Calculate date ranges based on period
@@ -1382,6 +1392,33 @@ def delete_template(template_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/analytics', methods=['GET'])
+def get_analytics():
+    """Get comprehensive analytics data for specified period"""
+    try:
+        period = request.args.get('period', '30days')
+        
+        # Validate period
+        valid_periods = ['today', '7days', '30days', 'all']
+        if period not in valid_periods:
+            period = '30days'
+        
+        # Generate analytics
+        gap_period = request.args.get('gap_period', 'all')  # For skill gaps: 'daily', 'weekly', 'monthly', 'all'
+        analytics_data = analytics_generator.generate_analytics(period, gap_period)
+        
+        return jsonify({
+            'success': True,
+            **analytics_data
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/dashboard')
 def view_dashboard():
     """View the generated dashboard"""
@@ -1400,6 +1437,28 @@ def view_dashboard():
             return send_from_directory(
                 dashboard_path.parent,
                 dashboard_path.name
+            )
+        else:
+            return "Dashboard not found", 404
+
+@app.route('/progress')
+def view_progress_dashboard():
+    """View the generated progress dashboard"""
+    from app.utils.file_utils import get_data_path
+    progress_path = get_data_path('output') / 'progress.html'
+    
+    if progress_path.exists():
+        return send_from_directory(
+            progress_path.parent,
+            progress_path.name
+        )
+    else:
+        # Generate progress dashboard if it doesn't exist
+        dashboard_generator.generate_progress_dashboard()
+        if progress_path.exists():
+            return send_from_directory(
+                progress_path.parent,
+                progress_path.name
             )
         return "Dashboard not generated yet.", 404
 

@@ -69,6 +69,17 @@ class DashboardGenerator:
         
         print(f"Dashboard generated: {dashboard_path}")
     
+    def generate_progress_dashboard(self) -> None:
+        """Generate the progress dashboard HTML page"""
+        applications = self.job_processor.list_all_applications()
+        
+        html = self._create_progress_dashboard_html(applications)
+        
+        dashboard_path = self.output_dir / 'progress.html'
+        write_text_file(html, dashboard_path)
+        
+        print(f"Progress dashboard generated: {dashboard_path}")
+    
     def _create_dashboard_html(self, applications: List[Application]) -> str:
         """Create the HTML dashboard"""
         # Calculate stats for all possible statuses
@@ -470,6 +481,7 @@ class DashboardGenerator:
             <li><a href="/" class="nav-link">Home</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
+            <li><a href="/progress" class="nav-link">Progress</a></li>
             <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
@@ -911,6 +923,595 @@ class DashboardGenerator:
         
         display_name = checklist_definitions.get(latest_item, latest_item)
         return f'<span class="card-progress-pill">{display_name}</span>'
+    
+    def _create_progress_dashboard_html(self, applications: List[Application]) -> str:
+        """Create the progress dashboard HTML"""
+        # Filter out rejected applications
+        active_apps = [app for app in applications if app.status.lower() != 'rejected']
+        
+        # Group applications by their latest completed checklist item
+        progress_groups = {}
+        no_progress = []
+        
+        checklist_definitions = {
+            "application_submitted": "Application Submitted",
+            "linkedin_message_sent": "LinkedIn Message Sent",
+            "contact_email_found": "Contact Email Found",
+            "email_verified": "Email Verified",
+            "email_sent": "Email Sent",
+            "message_read": "Message Read",
+            "profile_viewed": "Profile Viewed",
+            "response_received": "Response Received",
+            "followup_sent": "Follow-up Sent",
+            "interview_scheduled": "Interview Scheduled",
+            "interview_completed": "Interview Completed",
+            "thank_you_sent": "Thank You Sent"
+        }
+        
+        # Define progress order
+        progress_order = list(checklist_definitions.keys())
+        
+        for app in active_apps:
+            latest_item = app.get_latest_completed_checklist_item()
+            if latest_item:
+                if latest_item not in progress_groups:
+                    progress_groups[latest_item] = []
+                progress_groups[latest_item].append(app)
+            else:
+                no_progress.append(app)
+        
+        # Calculate counts
+        progress_counts = {key: len(progress_groups.get(key, [])) for key in progress_order}
+        progress_counts['no_progress'] = len(no_progress)
+        progress_counts['all'] = len(active_apps)
+        
+        # Generate tabs HTML
+        tabs_html = self._create_progress_tabs_html(active_apps, progress_groups, no_progress, progress_counts, checklist_definitions, progress_order)
+        
+        total = len(active_apps)
+        
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Dashboard - Job Applications</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+        }}
+        .container {{ 
+            width: calc(100vw - 250px);
+            margin: 0;
+            padding: 0 20px 20px 20px;
+            margin-left: 250px;
+            box-sizing: border-box;
+        }}
+        
+        .sidebar {{
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #8b9dc3;
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }}
+        
+        .sidebar-header {{
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }}
+        
+        .sidebar-header h3 {{
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }}
+        
+        .sidebar-menu {{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }}
+        
+        .sidebar-menu li {{
+            margin: 0;
+        }}
+        
+        .sidebar-menu a {{
+            display: block;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+        }}
+        
+        .sidebar-menu a:hover {{
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
+        }}
+        
+        .sidebar-menu a.active {{
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: white;
+        }}
+        
+        .header {{
+            background: linear-gradient(135deg, #8b9dc3 0%, #6c7b95 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(108, 123, 149, 0.2);
+        }}
+        
+        .header h1 {{
+            font-size: 32px;
+            margin-bottom: 10px;
+        }}
+        
+        .header p {{
+            font-size: 16px;
+            opacity: 0.9;
+        }}
+        
+        .tabs-container {{
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }}
+        
+        .tabs-header {{
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+            padding: 0;
+        }}
+        
+        .tab {{
+            padding: 15px 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }}
+        
+        .tab:hover {{
+            background: rgba(139, 157, 195, 0.1);
+            color: #8b9dc3;
+        }}
+        
+        .tab.active {{
+            background: white;
+            color: #8b9dc3;
+            border-bottom: 3px solid #8b9dc3;
+        }}
+        
+        .tab-count {{
+            font-size: 12px;
+            opacity: 0.7;
+            margin-left: 5px;
+        }}
+        
+        .tab-content {{
+            padding: 30px;
+            min-height: 400px;
+        }}
+        
+        .sort-controls {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }}
+        
+        .sort-select {{
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }}
+        
+        .applications-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }}
+        
+        .card {{
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(74, 85, 104, 0.1);
+            border: 1px solid rgba(74, 85, 104, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }}
+        
+        .card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(74, 85, 104, 0.15);
+        }}
+        
+        .card-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }}
+        
+        .card-company {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+        }}
+        
+        .flag-btn {{
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }}
+        
+        .flag-btn:hover {{
+            opacity: 1;
+        }}
+        
+        .flag-btn.flagged {{
+            opacity: 1;
+        }}
+        
+        .card-title {{
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }}
+        
+        .card-status-container {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }}
+        
+        .card-status {{
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }}
+        
+        .card-progress-pill {{
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(139, 157, 195, 0.2);
+            color: #6c7b95;
+            border: 1px solid rgba(139, 157, 195, 0.3);
+        }}
+        
+        .status-pending {{ background: #fff3cd; color: #856404; }}
+        .status-applied {{ background: #d1ecf1; color: #0c5460; }}
+        .status-contacted-someone {{ background: #e2e3e5; color: #383d41; }}
+        .status-company-response {{ background: #cce5ff; color: #004085; }}
+        .status-scheduled-interview {{ background: #ffeeba; color: #856404; }}
+        .status-interview-notes {{ background: #d4edda; color: #155724; }}
+        .status-interview-follow-up {{ background: #ffeef8; color: #b21f66; }}
+        .status-offered {{ background: #c3e6cb; color: #155724; }}
+        .status-rejected {{ background: #f8d7da; color: #721c24; }}
+        .status-accepted {{ background: #d4edda; color: #155724; }}
+        
+        .card-meta {{
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 8px;
+        }}
+        
+        .card-actions {{
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }}
+        
+        .card-btn {{
+            display: inline-block;
+            background: #8b9dc3;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }}
+        
+        .card-btn:hover {{
+            background: #7a8bb0;
+        }}
+        
+        .empty-state {{
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            color: #999;
+        }}
+        
+        .empty-state-icon {{
+            font-size: 64px;
+            margin-bottom: 20px;
+        }}
+        
+        .empty-state-text {{
+            font-size: 20px;
+        }}
+        
+        .match-score {{
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }}
+        .hidden {{ display: none; }}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Job Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/templates" class="nav-link">Templates</a></li>
+            <li><a href="/progress" class="nav-link active">Progress</a></li>
+            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
+        </ul>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Progress Dashboard - {total} Applications</h1>
+            <p>Track your application progress by latest completed checklist item</p>
+        </div>
+        
+        {tabs_html}
+    </div>
+    
+    <script>
+        function switchTab(progressKey) {{
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {{
+                content.style.display = 'none';
+            }});
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            const target = document.getElementById('progress-' + progressKey);
+            if (target) {{
+                target.style.display = 'block';
+            }}
+            
+            // Activate clicked tab
+            const clickedTab = document.querySelector(`[data-progress="${{progressKey}}"]`);
+            if (clickedTab) {{
+                clickedTab.classList.add('active');
+            }}
+        }}
+        
+        function sortCards(selectElement, progressKey) {{
+            const tabContent = document.getElementById('progress-' + progressKey);
+            if (!tabContent) return;
+            
+            const cards = Array.from(tabContent.querySelectorAll('.card'));
+            const sortBy = selectElement.value;
+            
+            cards.sort((a, b) => {{
+                if (sortBy === 'date-applied') {{
+                    return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                }} else if (sortBy === 'date-updated') {{
+                    return new Date(b.dataset.updatedAt) - new Date(a.dataset.updatedAt);
+                }} else if (sortBy === 'match-score') {{
+                    return parseFloat(b.dataset.matchScore) - parseFloat(a.dataset.matchScore);
+                }} else if (sortBy === 'company') {{
+                    return a.querySelector('.card-company').textContent.localeCompare(b.querySelector('.card-company').textContent);
+                }}
+                return 0;
+            }});
+            
+            const grid = tabContent.querySelector('.applications-grid');
+            cards.forEach(card => grid.appendChild(card));
+        }}
+        
+        async function toggleFlag(appId, currentFlagged) {{
+            try {{
+                const response = await fetch(`/api/applications/${{appId}}/flag`, {{
+                    method: 'PUT',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{ flagged: !currentFlagged }})
+                }});
+                
+                const result = await response.json();
+                if (result.success) {{
+                    location.reload();
+                }} else {{
+                    alert('Error updating flag. Please try again.');
+                }}
+            }} catch (error) {{
+                console.error('Error toggling flag:', error);
+                alert('Error updating flag. Please try again.');
+            }}
+        }}
+        
+        // Initialize with 'all' tab as default
+        document.addEventListener('DOMContentLoaded', function() {{
+            const allTab = document.querySelector('[data-progress="all"]');
+            if (allTab) {{
+                switchTab('all');
+            }}
+        }});
+    </script>
+</body>
+</html>"""
+        return html
+    
+    def _create_progress_tabs_html(self, applications: List[Application], progress_groups: dict, no_progress: List[Application], progress_counts: dict, checklist_definitions: dict, progress_order: list) -> str:
+        """Create the progress tabs HTML"""
+        # Create tab headers
+        tab_headers = ""
+        
+        # Add 'all' tab first
+        tab_headers += f'''
+            <button class="tab active" data-progress="all" onclick="switchTab('all')">
+                All
+                <span class="tab-count">({progress_counts['all']})</span>
+            </button>
+        '''
+        
+        # Add 'no_progress' tab
+        if progress_counts['no_progress'] > 0:
+            tab_headers += f'''
+                <button class="tab" data-progress="no_progress" onclick="switchTab('no_progress')">
+                    No Progress
+                    <span class="tab-count">({progress_counts['no_progress']})</span>
+                </button>
+            '''
+        
+        # Add tabs for each progress stage
+        for progress_key in progress_order:
+            if progress_counts.get(progress_key, 0) > 0:
+                display_name = checklist_definitions[progress_key]
+                # Shorten long names for tabs
+                if len(display_name) > 20:
+                    short_name = display_name.split(',')[0] if ',' in display_name else display_name[:17] + '...'
+                else:
+                    short_name = display_name
+                
+                tab_headers += f'''
+                    <button class="tab" data-progress="{progress_key}" onclick="switchTab('{progress_key}')">
+                        {short_name}
+                        <span class="tab-count">({progress_counts[progress_key]})</span>
+                    </button>
+                '''
+        
+        # Create tab contents
+        tab_contents = ""
+        
+        # 'all' tab
+        cards_html = ''.join([self._create_application_card(app) for app in applications])
+        tab_contents += f'''
+            <div id="progress-all" class="tab-content" style="display: block;">
+                <div class="sort-controls">
+                    <label>Sort by:</label>
+                    <select class="sort-select" onchange="sortCards(this, 'all')">
+                        <option value="date-updated">Date Updated</option>
+                        <option value="date-applied">Date Applied</option>
+                        <option value="match-score">Match Score</option>
+                        <option value="company">Company</option>
+                    </select>
+                </div>
+                <div class="applications-grid">{cards_html}</div>
+            </div>
+        '''
+        
+        # 'no_progress' tab
+        if no_progress:
+            cards_html = ''.join([self._create_application_card(app) for app in no_progress])
+            tab_contents += f'''
+                <div id="progress-no_progress" class="tab-content" style="display: none;">
+                    <div class="sort-controls">
+                        <label>Sort by:</label>
+                        <select class="sort-select" onchange="sortCards(this, 'no_progress')">
+                            <option value="date-updated">Date Updated</option>
+                            <option value="date-applied">Date Applied</option>
+                            <option value="match-score">Match Score</option>
+                            <option value="company">Company</option>
+                        </select>
+                    </div>
+                    <div class="applications-grid">{cards_html}</div>
+                </div>
+            '''
+        else:
+            tab_contents += f'''
+                <div id="progress-no_progress" class="tab-content" style="display: none;">
+                    {self._create_empty_state('no progress')}
+                </div>
+            '''
+        
+        # Tabs for each progress stage
+        for progress_key in progress_order:
+            apps = progress_groups.get(progress_key, [])
+            if apps:
+                cards_html = ''.join([self._create_application_card(app) for app in apps])
+                display_name = checklist_definitions[progress_key]
+                tab_contents += f'''
+                    <div id="progress-{progress_key}" class="tab-content" style="display: none;">
+                        <div class="sort-controls">
+                            <label>Sort by:</label>
+                            <select class="sort-select" onchange="sortCards(this, '{progress_key}')">
+                                <option value="date-updated">Date Updated</option>
+                                <option value="date-applied">Date Applied</option>
+                                <option value="match-score">Match Score</option>
+                                <option value="company">Company</option>
+                            </select>
+                        </div>
+                        <div class="applications-grid">{cards_html}</div>
+                    </div>
+                '''
+        
+        return f'''
+        <div class="tabs-container">
+            <div class="tabs-header">
+                {tab_headers}
+            </div>
+            {tab_contents}
+        </div>
+        '''
     
     def _create_empty_state(self, status: str = None) -> str:
         """Create empty state HTML"""

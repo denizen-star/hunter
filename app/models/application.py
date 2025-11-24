@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 
 @dataclass
@@ -50,6 +50,11 @@ class Application:
     # Checklist tracking
     checklist_items: Optional[dict] = None
     
+    # Analytics fields (optional, for advanced analytics)
+    company_type: Optional[str] = None
+    extracted_skills: Optional[List[str]] = None
+    response_received_at: Optional[datetime] = None
+    
     def __post_init__(self):
         """Convert string paths to Path objects and strings to datetime objects"""
         if isinstance(self.created_at, str):
@@ -57,6 +62,9 @@ class Application:
         
         if isinstance(self.status_updated_at, str) and self.status_updated_at:
             self.status_updated_at = datetime.fromisoformat(self.status_updated_at)
+        
+        if isinstance(self.response_received_at, str) and self.response_received_at:
+            self.response_received_at = datetime.fromisoformat(self.response_received_at)
         
         for field_name in ['job_description_path', 'raw_job_description_path', 'qualifications_path', 'cover_letter_path', 
                           'custom_resume_path', 'summary_path', 'hiring_manager_intros_path', 'recruiter_intros_path', 'research_path', 'folder_path']:
@@ -93,7 +101,10 @@ class Application:
             hiring_manager=data.get('hiring_manager'),
             contact_count=data.get('contact_count'),
             flagged=data.get('flagged', False),
-            checklist_items=data.get('checklist_items')
+            checklist_items=data.get('checklist_items'),
+            company_type=data.get('company_type'),
+            extracted_skills=data.get('extracted_skills'),
+            response_received_at=data.get('response_received_at')
         )
     
     def to_dict(self) -> dict:
@@ -124,7 +135,10 @@ class Application:
             'hiring_manager': self.hiring_manager,
             'contact_count': self.contact_count,
             'flagged': self.flagged,
-            'checklist_items': self.checklist_items
+            'checklist_items': self.checklist_items,
+            'company_type': self.company_type,
+            'extracted_skills': self.extracted_skills,
+            'response_received_at': self.response_received_at.isoformat() if self.response_received_at and isinstance(self.response_received_at, datetime) else self.response_received_at
         }
     
     def get_folder_name(self) -> str:
@@ -184,6 +198,65 @@ class Application:
         for item_key in reversed(checklist_order):
             if self.checklist_items.get(item_key, False):
                 return item_key
+        
+        return None
+    
+    def get_response_received_at(self) -> Optional[datetime]:
+        """
+        Get the datetime when response was received.
+        Checks response_received_at field, checklist item, and status updates.
+        Returns None if response not yet received.
+        """
+        # First check if response_received_at is already set
+        if self.response_received_at:
+            return self.response_received_at
+        
+        # Check if response_received checklist item is checked
+        if self.checklist_items and self.checklist_items.get('response_received', False):
+            # If checklist is checked, try to determine when from status updates
+            if not self.folder_path:
+                return None
+            
+            updates_dir = self.folder_path / "updates"
+            if not updates_dir.exists():
+                return None
+            
+            # Look for status updates that indicate a response
+            # Statuses that typically indicate a company response
+            response_statuses = [
+                'Company Response',
+                'Contacted Hiring Manager',
+                'Contacted Someone',
+                'Scheduled Interview'
+            ]
+            
+            earliest_response_time = None
+            
+            for update_file in sorted(updates_dir.iterdir()):
+                if update_file.is_file() and update_file.suffix == '.html':
+                    filename_parts = update_file.stem.split('-', 1)
+                    if len(filename_parts) == 2:
+                        timestamp_str = filename_parts[0]
+                        status = filename_parts[1]
+                        
+                        # Check if this status indicates a response
+                        if any(response_status.lower() in status.lower() for response_status in response_statuses):
+                            try:
+                                dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                                if earliest_response_time is None or dt < earliest_response_time:
+                                    earliest_response_time = dt
+                            except (ValueError, TypeError):
+                                continue
+            
+            # If we found a response status, return that time
+            if earliest_response_time:
+                return earliest_response_time
+            
+            # Fallback: if checklist is checked but no status update found,
+            # use status_updated_at if status indicates a response
+            normalized_status = self.status.lower() if self.status else ''
+            if any(rs.lower() in normalized_status for rs in response_statuses):
+                return self.status_updated_at
         
         return None
 

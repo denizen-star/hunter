@@ -388,8 +388,21 @@ Be specific and only extract information that is explicitly stated."""
         location_match = re.search(r'Location:?\s*([^\n]+)', response, re.IGNORECASE)
         if location_match:
             location = location_match.group(1).strip()
-            if not location or location.lower() in ['not found', 'not mentioned']:
+            if not location or location.lower() in ['not found', 'not mentioned', 'n/a', 'na']:
                 location = "N/A"
+        
+        # If location is N/A, check job description for remote indicators
+        if location.upper() == "N/A" and job_description:
+            job_desc_lower = job_description.lower()
+            # Check for remote patterns
+            remote_patterns = [
+                r'\bremote\b', r'\bwork from home\b', r'\bwfh\b',
+                r'\bvirtual\b', r'\banywhere\b', r'\bdistributed\b'
+            ]
+            for pattern in remote_patterns:
+                if re.search(pattern, job_desc_lower, re.IGNORECASE):
+                    location = "Remote"
+                    break
         
         # Extract hiring manager
         manager_match = re.search(r'Hiring Manager:?\s*([^\n]+)', response, re.IGNORECASE)

@@ -59,3 +59,9 @@ templates:
   delivery_method: Email
   id: '20251114102421'
   title: Someone Passed my Information to Hiring Team
+- content_file: 20251121094459.html
+  created_at: '2025-11-21T09:44:59.955905-05:00'
+  created_at_display: Nov 21, 2025 09:44 AM EST
+  delivery_method: LinkedIn Connection
+  id: '20251121094459'
+  title: LI Recruiter 296
