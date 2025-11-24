@@ -713,7 +713,7 @@
         <div id="status-banner" class="status-banner hidden"></div>
         
         <div class="card" id="application-form">
-            <h2 class="card-title">Create New Application</h2>
+            <h2 class="card-title"></h2>
             
             <form id="jobForm" onsubmit="submitApplication(event)">
                 <div class="form-group">
@@ -727,9 +727,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="job_url">Job URL (Optional)</label>
+                    <label for="job_url">Job URL</label>
                     <input type="url" id="job_url" name="job_url" placeholder="https://...">
-                    <small>Link to the job posting</small>
                 </div>
                 
                 <div class="form-group">
@@ -894,7 +893,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="status_notes">Notes (Optional)</label>
+                    <label for="status_notes">Notes</label>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
                         <div id="status_notes" placeholder="Add notes about this status update..."></div>
                         <div style="display: flex; justify-content: flex-end;">

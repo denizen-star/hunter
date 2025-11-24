@@ -453,6 +453,19 @@
             margin-bottom: var(--space-lg);
         }
         
+        .followup-flagged-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            max-width: 1200px;
+            margin: 0 auto var(--space-lg) auto;
+            width: 100%;
+        }
+        
+        .followup-flagged-container .report-card {
+            width: 100%;
+        }
+        
         .report-card {
             background: var(--bg-primary);
             border: 1px solid var(--border-primary);
@@ -767,6 +780,9 @@
                 </div>
             </div>
             
+        </div>
+        
+        <div class="followup-flagged-container">
             <div class="report-card">
                 <div class="report-card-header" onclick="toggleCollapse(this)">
                     <h3>Applications Requiring Follow-up</h3>
