@@ -2364,6 +2364,60 @@ Format this as a professional research document that demonstrates thorough prepa
         </div>
         '''
     
+    def _generate_checklist_html(self, application: Application) -> str:
+        """Generate checklist HTML for the Hero section"""
+        checklist_items = application.checklist_items or {}
+        latest_item = application.get_latest_completed_checklist_item()
+        
+        # Define checklist items with display names
+        checklist_definitions = {
+            "application_submitted": "Application Submitted",
+            "linkedin_message_sent": "LinkedIn Message Sent",
+            "contact_email_found": "Contact Email Found",
+            "email_verified": "Email Verified",
+            "email_sent": "Email Sent",
+            "message_read": "Message Read",
+            "profile_viewed": "Profile Viewed",
+            "response_received": "Response Received",
+            "followup_sent": "Follow-up Sent",
+            "interview_scheduled": "Interview Scheduled",
+            "interview_completed": "Interview Completed",
+            "thank_you_sent": "Thank You Sent"
+        }
+        
+        # Get latest item display name
+        latest_display = checklist_definitions.get(latest_item, "") if latest_item else ""
+        
+        # Generate checklist items HTML
+        checklist_items_html = []
+        for key, display_name in checklist_definitions.items():
+            checked = "checked" if checklist_items.get(key, False) else ""
+            checklist_items_html.append(f'''
+                <div class="checklist-item">
+                    <input type="checkbox" id="checklist_{key}" {checked} onchange="updateChecklistItem('{key}', this.checked)">
+                    <label for="checklist_{key}" style="cursor: pointer;">{display_name}</label>
+                </div>
+            ''')
+        
+        checklist_grid = '\n'.join(checklist_items_html)
+        
+        return f'''
+        <div class="checklist-container">
+            <div class="checklist-header" onclick="toggleChecklist()">
+                <span class="checklist-title">Progress</span>
+                <button class="checklist-toggle" id="checklistToggle">▼</button>
+            </div>
+            <div class="checklist-pill" id="checklistPill" style="display: {'block' if latest_display else 'none'}">
+                {latest_display}
+            </div>
+            <div class="checklist-expanded checklist-collapsed" id="checklistExpanded">
+                <div class="checklist-grid">
+                    {checklist_grid}
+                </div>
+            </div>
+        </div>
+        '''
+    
     def _create_summary_html(
         self,
         application: Application,
@@ -2401,11 +2455,30 @@ Format this as a professional research document that demonstrates thorough prepa
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }}
         .container {{ max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
-        .header {{ background: #424242; color: white; padding: 40px; border-radius: 12px 12px 0 0; }}
+        .header {{ background: #424242; color: white; padding: 40px; border-radius: 12px 12px 0 0; display: flex; gap: 40px; align-items: flex-start; }}
+        .header-left {{ flex: 1; }}
+        .header-right {{ flex: 0 0 300px; }}
         .header h1 {{ font-size: 32px; margin-bottom: 10px; }}
         .header h2 {{ font-size: 24px; font-weight: normal; opacity: 0.9; }}
         .back-btn {{ display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-bottom: 20px; transition: all 0.3s ease; }}
         .back-btn:hover {{ background: rgba(255,255,255,0.3); color: white; text-decoration: none; }}
+        
+        /* Checklist Styles */
+        .checklist-container {{ background: rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; }}
+        .checklist-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; }}
+        .checklist-title {{ font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }}
+        .checklist-toggle {{ background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; }}
+        .checklist-toggle:hover {{ background: rgba(255,255,255,0.3); }}
+        .checklist-collapsed {{ display: none !important; }}
+        .checklist-expanded {{ display: block; }}
+        .checklist-pill {{ display: inline-block; background: rgba(255,255,255,0.25); color: white; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 500; margin-top: 8px; }}
+        .checklist-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }}
+        .checklist-item {{ display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; transition: background 0.2s; }}
+        .checklist-item:hover {{ background: rgba(255,255,255,0.1); }}
+        .checklist-item label {{ cursor: pointer; user-select: none; }}
+        .checklist-item input[type="checkbox"] {{ width: 16px; height: 16px; cursor: pointer; accent-color: #8b9dc3; }}
+        .checklist-item label {{ font-size: 13px; cursor: pointer; flex: 1; opacity: 0.95; line-height: 1.4; }}
+        .checklist-item input[type="checkbox"]:checked + label {{ opacity: 1; font-weight: 500; }}
         .summary {{ padding: 30px 40px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }}
         .summary-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }}
         .summary-item {{ background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #424242; }}
@@ -2715,11 +2788,16 @@ Format this as a professional research document that demonstrates thorough prepa
 <body>
     <div class="container">
         <div class="header">
-            <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
-            <h1>{application.company}</h1>
-            <h2>{application.job_title}</h2>
-            <div style="margin-top: 15px;">
-                <span class="status-badge status-{self._status_to_class(application.status)}" style="font-size: 16px; padding: 8px 20px;">{application.status}</span>
+            <div class="header-left">
+                <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+                <h1>{application.company}</h1>
+                <h2>{application.job_title}</h2>
+                <div style="margin-top: 15px;">
+                    <span class="status-badge status-{self._status_to_class(application.status)}" style="font-size: 16px; padding: 8px 20px;">{application.status}</span>
+                </div>
+            </div>
+            <div class="header-right">
+                {self._generate_checklist_html(application)}
             </div>
         </div>
         
@@ -3316,6 +3394,101 @@ Format this as a professional research document that demonstrates thorough prepa
             }}
             if (tabEl && tabEl.classList) {{ tabEl.classList.add('active'); }}
         }}
+        
+        // Checklist functionality
+        let checklistExpanded = false;
+        
+        function toggleChecklist() {{
+            checklistExpanded = !checklistExpanded;
+            const expanded = document.getElementById('checklistExpanded');
+            const pill = document.getElementById('checklistPill');
+            const toggle = document.getElementById('checklistToggle');
+            
+            if (checklistExpanded) {{
+                expanded.classList.remove('checklist-collapsed');
+                expanded.classList.add('checklist-expanded');
+                pill.style.display = 'none';
+                toggle.textContent = '▲';
+            }} else {{
+                expanded.classList.remove('checklist-expanded');
+                expanded.classList.add('checklist-collapsed');
+                updateChecklistPill();
+                toggle.textContent = '▼';
+            }}
+        }}
+        
+        function updateChecklistPill() {{
+            const pill = document.getElementById('checklistPill');
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
+            const checklistDefinitions = {{
+                'application_submitted': 'Application Submitted',
+                'linkedin_message_sent': 'LinkedIn Message Sent',
+                'contact_email_found': 'Contact Email Found',
+                'email_verified': 'Email Verified',
+                'email_sent': 'Email Sent',
+                'message_read': 'Message Read',
+                'profile_viewed': 'Profile Viewed',
+                'response_received': 'Response Received',
+                'followup_sent': 'Follow-up Sent',
+                'interview_scheduled': 'Interview Scheduled',
+                'interview_completed': 'Interview Completed',
+                'thank_you_sent': 'Thank You Sent'
+            }};
+            
+            // Find the last checked item in order
+            const order = ['application_submitted', 'linkedin_message_sent', 'contact_email_found', 
+                          'email_verified', 'email_sent', 'message_read', 'profile_viewed', 
+                          'response_received', 'followup_sent', 'interview_scheduled', 
+                          'interview_completed', 'thank_you_sent'];
+            
+            let latestItem = null;
+            for (let i = order.length - 1; i >= 0; i--) {{
+                const checkbox = document.getElementById('checklist_' + order[i]);
+                if (checkbox && checkbox.checked) {{
+                    latestItem = checklistDefinitions[order[i]];
+                    break;
+                }}
+            }}
+            
+            if (latestItem) {{
+                pill.textContent = latestItem;
+                pill.style.display = 'block';
+            }} else {{
+                pill.style.display = 'none';
+            }}
+        }}
+        
+        async function updateChecklistItem(itemKey, checked) {{
+            try {{
+                const response = await fetch(`/api/applications/${{APPLICATION_ID}}/checklist`, {{
+                    method: 'PUT',
+                    headers: {{ 'Content-Type': 'application/json' }},
+                    body: JSON.stringify({{ checklist: {{ [itemKey]: checked }} }})
+                }});
+                
+                const result = await response.json();
+                if (result.success) {{
+                    // Update the pill immediately
+                    updateChecklistPill();
+                    console.log('Checklist updated successfully');
+                }} else {{
+                    console.error('Failed to update checklist:', result.error);
+                    // Revert checkbox
+                    const checkbox = document.getElementById('checklist_' + itemKey);
+                    if (checkbox) checkbox.checked = !checked;
+                }}
+            }} catch (error) {{
+                console.error('Error updating checklist:', error);
+                // Revert checkbox
+                const checkbox = document.getElementById('checklist_' + itemKey);
+                if (checkbox) checkbox.checked = !checked;
+            }}
+        }}
+        
+        // Initialize checklist state
+        document.addEventListener('DOMContentLoaded', function() {{
+            updateChecklistPill();
+        }});
         
         async function submitStatusUpdate(event) {{
             event.preventDefault();

@@ -47,6 +47,9 @@ class Application:
     # Flagging
     flagged: bool = False
     
+    # Checklist tracking
+    checklist_items: Optional[dict] = None
+    
     def __post_init__(self):
         """Convert string paths to Path objects and strings to datetime objects"""
         if isinstance(self.created_at, str):
@@ -89,7 +92,8 @@ class Application:
             location=data.get('location'),
             hiring_manager=data.get('hiring_manager'),
             contact_count=data.get('contact_count'),
-            flagged=data.get('flagged', False)
+            flagged=data.get('flagged', False),
+            checklist_items=data.get('checklist_items')
         )
     
     def to_dict(self) -> dict:
@@ -119,7 +123,8 @@ class Application:
             'location': self.location,
             'hiring_manager': self.hiring_manager,
             'contact_count': self.contact_count,
-            'flagged': self.flagged
+            'flagged': self.flagged,
+            'checklist_items': self.checklist_items
         }
     
     def get_folder_name(self) -> str:
@@ -153,4 +158,32 @@ class Application:
                         contact_count += 1
         
         return contact_count
+    
+    def get_latest_completed_checklist_item(self) -> Optional[str]:
+        """Get the latest completed checklist item key for pill display"""
+        if not self.checklist_items:
+            return None
+        
+        # Define order of checklist items
+        checklist_order = [
+            "application_submitted",
+            "linkedin_message_sent",
+            "contact_email_found",
+            "email_verified",
+            "email_sent",
+            "message_read",
+            "profile_viewed",
+            "response_received",
+            "followup_sent",
+            "interview_scheduled",
+            "interview_completed",
+            "thank_you_sent"
+        ]
+        
+        # Find the last completed item in order
+        for item_key in reversed(checklist_order):
+            if self.checklist_items.get(item_key, False):
+                return item_key
+        
+        return None
 

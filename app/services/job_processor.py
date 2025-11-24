@@ -556,6 +556,21 @@ class JobProcessor:
         
         return updates
     
+    def update_application_checklist(
+        self,
+        application: Application,
+        checklist_updates: dict
+    ) -> None:
+        """Update application checklist items"""
+        if application.checklist_items is None:
+            application.checklist_items = {}
+        
+        # Merge updates into existing checklist
+        application.checklist_items.update(checklist_updates)
+        
+        # Save updated metadata
+        self._save_application_metadata(application)
+    
     def update_job_details(
         self,
         application: Application,

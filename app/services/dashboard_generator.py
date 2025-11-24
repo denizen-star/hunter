@@ -377,6 +377,13 @@ class DashboardGenerator:
             color: #666;
             margin-bottom: 15px;
         }}
+        .card-status-container {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }}
         .card-status {{
             display: inline-block;
             padding: 6px 16px;
@@ -384,7 +391,16 @@ class DashboardGenerator:
             font-size: 13px;
             font-weight: 600;
             text-transform: capitalize;
-            margin-bottom: 15px;
+        }}
+        .card-progress-pill {{
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(139, 157, 195, 0.2);
+            color: #6c7b95;
+            border: 1px solid rgba(139, 157, 195, 0.3);
         }}
         .status-pending {{ background: #fff3cd; color: #856404; }}
         .status-applied {{ background: #d1ecf1; color: #0c5460; }}
@@ -852,8 +868,9 @@ class DashboardGenerator:
                 </button>
             </div>
             <div class="card-title">{app.job_title}</div>
-            <div>
+            <div class="card-status-container">
                 <span class="card-status status-{self._status_to_class(app.status)}">{app.status}</span>
+                {self._get_progress_pill_html(app)}
             </div>
             <div class="card-meta">
                 📅 Applied: {format_for_display(app.created_at)}
@@ -869,6 +886,31 @@ class DashboardGenerator:
             </div>
         </div>
         """
+    
+    def _get_progress_pill_html(self, app: Application) -> str:
+        """Get progress pill HTML for dashboard card"""
+        latest_item = app.get_latest_completed_checklist_item()
+        
+        if not latest_item:
+            return ""
+        
+        checklist_definitions = {
+            "application_submitted": "Application Submitted",
+            "linkedin_message_sent": "LinkedIn Message Sent",
+            "contact_email_found": "Contact Email Found",
+            "email_verified": "Email Verified",
+            "email_sent": "Email Sent",
+            "message_read": "Message Read",
+            "profile_viewed": "Profile Viewed",
+            "response_received": "Response Received",
+            "followup_sent": "Follow-up Sent",
+            "interview_scheduled": "Interview Scheduled",
+            "interview_completed": "Interview Completed",
+            "thank_you_sent": "Thank You Sent"
+        }
+        
+        display_name = checklist_definitions.get(latest_item, latest_item)
+        return f'<span class="card-progress-pill">{display_name}</span>'
     
     def _create_empty_state(self, status: str = None) -> str:
         """Create empty state HTML"""

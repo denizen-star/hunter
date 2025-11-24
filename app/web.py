@@ -539,6 +539,7 @@ def get_application(app_id):
                 'folder_path': str(application.folder_path),
                 'summary_path': str(application.summary_path) if application.summary_path else None,
                 'flagged': application.flagged,
+                'checklist_items': application.checklist_items,
                 'updates': updates
             }
         })
@@ -749,6 +750,72 @@ def toggle_flag(app_id):
             'message': f'Application {"flagged" if application.flagged else "unflagged"} successfully',
             'application_id': application.id,
             'flagged': application.flagged
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/applications/<app_id>/checklist', methods=['PUT'])
+def update_checklist(app_id):
+    """Update application checklist items"""
+    try:
+        data = request.json
+        checklist_updates = data.get('checklist', {})
+        
+        if not checklist_updates:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: checklist (dict)'
+            }), 400
+        
+        # Load application
+        application = job_processor.get_application_by_id(app_id)
+        
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Update checklist
+        job_processor.update_application_checklist(application, checklist_updates)
+        
+        # Regenerate summary page to reflect checklist changes
+        try:
+            if application.qualifications_path and Path(application.qualifications_path).exists():
+                from app.utils.file_utils import read_text_file
+                qual_content = read_text_file(application.qualifications_path)
+                
+                # Extract match score from qualifications
+                import re
+                match_score = 0.0
+                score_match = re.search(r'Match Score:?\s*(\d+)', qual_content, re.IGNORECASE)
+                if score_match:
+                    match_score = float(score_match.group(1))
+                
+                # Create QualificationAnalysis object
+                from app.models.qualification import QualificationAnalysis
+                qualifications = QualificationAnalysis(
+                    match_score=match_score,
+                    features_compared=24,
+                    strong_matches=[],
+                    missing_skills=[],
+                    partial_matches=[],
+                    soft_skills=[],
+                    recommendations=[],
+                    detailed_analysis=qual_content
+                )
+                
+                # Regenerate summary page with updated checklist
+                doc_generator.generate_summary_page(application, qualifications)
+        except Exception as e:
+            print(f"Warning: Could not regenerate summary page: {e}")
+        
+        # Regenerate dashboard to show updated progress pills
+        dashboard_generator.generate_index_page()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Checklist updated successfully',
+            'application_id': application.id,
+            'checklist': application.checklist_items
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
