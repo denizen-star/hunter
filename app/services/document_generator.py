@@ -2365,9 +2365,8 @@ Format this as a professional research document that demonstrates thorough prepa
         '''
     
     def _generate_checklist_html(self, application: Application) -> str:
-        """Generate checklist HTML for the Hero section"""
+        """Generate checklist HTML for the Hero section - matches sample design"""
         checklist_items = application.checklist_items or {}
-        latest_item = application.get_latest_completed_checklist_item()
         
         # Define checklist items with display names
         checklist_definitions = {
@@ -2385,9 +2384,6 @@ Format this as a professional research document that demonstrates thorough prepa
             "thank_you_sent": "Thank You Sent"
         }
         
-        # Get latest item display name
-        latest_display = checklist_definitions.get(latest_item, "") if latest_item else ""
-        
         # Generate checklist items HTML
         checklist_items_html = []
         for key, display_name in checklist_definitions.items():
@@ -2395,24 +2391,47 @@ Format this as a professional research document that demonstrates thorough prepa
             checklist_items_html.append(f'''
                 <div class="checklist-item">
                     <input type="checkbox" id="checklist_{key}" {checked} onchange="updateChecklistItem('{key}', this.checked)">
-                    <label for="checklist_{key}" style="cursor: pointer;">{display_name}</label>
+                                        <label for="checklist_{key}">{display_name}</label>
                 </div>
             ''')
         
         checklist_grid = '\n'.join(checklist_items_html)
         
+        # Get latest completed item for pill display
+        latest_item = application.get_latest_completed_checklist_item()
+        checklist_definitions = {
+            "application_submitted": "Application Submitted",
+            "linkedin_message_sent": "LinkedIn Message Sent",
+            "contact_email_found": "Contact Email Found",
+            "email_verified": "Email Verified",
+            "email_sent": "Email Sent",
+            "message_read": "Message Read",
+            "profile_viewed": "Profile Viewed",
+            "response_received": "Response Received",
+            "followup_sent": "Follow-up Sent",
+            "interview_scheduled": "Interview Scheduled",
+            "interview_completed": "Interview Completed",
+            "thank_you_sent": "Thank You Sent"
+        }
+        latest_display = checklist_definitions.get(latest_item, "") if latest_item else ""
+        
         return f'''
+                    <div class="header-checklist">
         <div class="checklist-container">
             <div class="checklist-header" onclick="toggleChecklist()">
-                <span class="checklist-title">Progress</span>
-                <button class="checklist-toggle" id="checklistToggle">▼</button>
+                                <div class="checklist-title">APPLICATION CHECKLIST</div>
+                                <button type="button" class="checklist-toggle" onclick="event.stopPropagation(); toggleChecklist()">
+                                    <span id="checklist-toggle-text">Show</span>
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
             </div>
-            <div class="checklist-pill" id="checklistPill" style="display: {'block' if latest_display else 'none'}">
-                {latest_display}
-            </div>
-            <div class="checklist-expanded checklist-collapsed" id="checklistExpanded">
+                            <div class="checklist-pill" id="checklistPill" style="display: {'block' if latest_display else 'none'}; margin-top: 8px; padding: 4px 10px; background: #f3f4f6; color: #6b7280; border-radius: 12px; font-size: 11px; font-weight: 500;">{latest_display or ''}</div>
+                            <div id="checklist-content" class="checklist-collapsed">
                 <div class="checklist-grid">
                     {checklist_grid}
+                                </div>
                 </div>
             </div>
         </div>
@@ -2434,6 +2453,10 @@ Format this as a professional research document that demonstrates thorough prepa
         # Parse job description markdown into formatted HTML
         job_desc_html = self._parse_job_description_markdown(job_desc)
         
+        # Generate status tags HTML
+        status_tags = self._get_status_tags(application)
+        status_tags_html = ''.join([f'                    <span class="status-pill tag {tag_class}">{tag_name}</span>\n' for tag_name, tag_class in status_tags])
+        
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2442,100 +2465,780 @@ Format this as a professional research document that demonstrates thorough prepa
     <title>{application.company} - {application.job_title}</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     
-    <!-- Google Fonts - Montserrat -->
+    <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
     
     <style>
+        :root {{
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-xs: 12px;
+            --font-sm: 14px;
+            --font-base: 16px;
+            --font-lg: 18px;
+            --font-xl: 20px;
+            --font-2xl: 24px;
+            --font-3xl: 32px;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
-        .header {{ background: #424242; color: white; padding: 40px; border-radius: 12px 12px 0 0; display: flex; gap: 40px; align-items: flex-start; }}
-        .header-left {{ flex: 1; }}
-        .header-right {{ flex: 0 0 300px; }}
-        .header h1 {{ font-size: 32px; margin-bottom: 10px; }}
-        .header h2 {{ font-size: 24px; font-weight: normal; opacity: 0.9; }}
-        .back-btn {{ display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; margin-bottom: 20px; transition: all 0.3s ease; }}
-        .back-btn:hover {{ background: rgba(255,255,255,0.3); color: white; text-decoration: none; }}
+        body {{ 
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
+        }}
+        
+        /* Sidebar - Smaller */
+        .sidebar {{
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }}
+        
+        .sidebar-header {{
+            padding: 0 16px 16px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }}
+        
+        .sidebar-header h3 {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }}
+        
+        .sidebar-menu {{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }}
+        
+        .sidebar-menu li {{
+            margin: 0;
+        }}
+        
+        .sidebar-menu a {{
+            display: block;
+            padding: 10px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }}
+        
+        .sidebar-menu a:hover {{
+            background: #f9fafb;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+        }}
+        
+        .sidebar-menu a.active {{
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+            font-weight: 600;
+        }}
+        
+        /* Main Container */
+        .container {{
+            margin-left: 180px;
+            min-height: 100vh;
+            background: #fafafa;
+        }}
+        
+        /* Header */
+        .header {{
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }}
+        
+        .header-top {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }}
+        
+        .header-top > div:first-child {{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }}
+        
+        .back-link {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }}
+        
+        .back-link:hover {{
+            color: #2563eb;
+        }}
+        
+        .header-actions {{
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }}
+        
+        .btn {{
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        
+        .btn:hover {{
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }}
+        
+        .btn-primary {{
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }}
+        
+        .btn-primary:hover {{
+            background: #2563eb;
+            border-color: #2563eb;
+        }}
+        
+        .header h1 {{
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }}
+        
+        .header-subtitle {{
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }}
+        
+        /* Content */
+        .content {{
+            padding: 32px;
+            max-width: 100%;
+        }}
+        
+        /* Application Header Card */
+        .app-header-card {{
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }}
+        
+        .app-meta {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }}
+        
+        .meta-item {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }}
+        
+        .meta-icon {{
+            width: 16px;
+            height: 16px;
+            color: #9ca3af;
+        }}
+        
+        .tag {{
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }}
+        
+        .tag-green {{
+            background: #d1fae5;
+            color: #065f46;
+        }}
+        
+        .tag-blue {{
+            background: #dbeafe;
+            color: #1e40af;
+        }}
+        
+        .tag-gray {{
+            background: #f3f4f6;
+            color: #4b5563;
+        }}
+        
+        .status-pill {{
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }}
+        
+        .match-pill {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }}
+        
+        .match-percentage {{
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+        }}
+        
+        .match-score-label {{
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+        }}
+        
+        /* Two Column Layout */
+        .two-column {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 100%;
+        }}
+        
+        @media (max-width: 968px) {{
+            .two-column {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        
+        .content-section {{
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }}
+        
+        .section-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }}
+        
+        .section-title {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }}
+        
+        .section-content {{
+            color: #4b5563;
+            line-height: 1.8;
+        }}
+        
+        .section-content h3 {{
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 20px 0 12px 0;
+        }}
+        
+        .section-content h3:first-child {{
+            margin-top: 0;
+        }}
+        
+        .section-content ul {{
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }}
+        
+        .section-content li {{
+            margin-bottom: 8px;
+        }}
+        
+        .timeline {{
+            position: relative;
+            padding-left: 40px;
+        }}
+        
+        .timeline::before {{
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }}
+        
+        .timeline-item {{
+            position: relative;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }}
+        
+        .timeline-item::before {{
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 2px #e5e7eb;
+            z-index: 1;
+        }}
+        
+        .timeline-date {{
+            font-size: 13px;
+            color: #6b7280;
+            min-width: 140px;
+            flex-shrink: 0;
+        }}
+        
+        .timeline-content {{
+            flex: 1;
+            font-size: 14px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        
+        .timeline-description {{
+            flex: 1;
+        }}
+        
+        .timeline-status {{
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 16px;
+            white-space: nowrap;
+        }}
+        
+        /* Tabs Container */
+        .tabs-container {{
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }}
+        
+        .tabs-header {{
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafafa;
+            overflow-x: auto;
+        }}
+        
+        .tabs {{
+            display: flex;
+            border-bottom: 1px solid var(--border-primary);
+            padding: 0 var(--space-xl);
+            background: var(--bg-secondary);
+            overflow-x: auto;
+        }}
+        
+        .back-btn {{ 
+            display: inline-block; 
+            background: var(--bg-hover); 
+            color: var(--text-primary); 
+            padding: 10px var(--space-md); 
+            border-radius: var(--radius-sm); 
+            text-decoration: none; 
+            margin-bottom: var(--space-lg); 
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-primary);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+        }}
+        .back-btn:hover {{ 
+            background: var(--bg-active); 
+            color: var(--text-primary); 
+            text-decoration: none; 
+        }}
         
         /* Checklist Styles */
-        .checklist-container {{ background: rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; }}
-        .checklist-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; }}
-        .checklist-title {{ font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }}
-        .checklist-toggle {{ background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; }}
-        .checklist-toggle:hover {{ background: rgba(255,255,255,0.3); }}
+        .checklist-container {{ 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-md); 
+            padding: var(--space-md); 
+            border: 1px solid var(--border-primary);
+        }}
+        .checklist-header {{ 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: var(--space-sm); 
+            cursor: pointer; 
+            padding: var(--space-sm);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+        }}
+        .checklist-header:hover {{
+            background: var(--bg-hover);
+        }}
+        .checklist-title {{ 
+            font-size: var(--font-xs); 
+            font-weight: var(--font-semibold); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            color: var(--text-primary);
+        }}
+        .checklist-toggle {{ 
+            background: transparent; 
+            border: none; 
+            color: var(--text-secondary); 
+            padding: 4px 8px; 
+            border-radius: var(--radius-sm); 
+            cursor: pointer; 
+            font-size: var(--font-xs); 
+            transition: all 0.2s; 
+        }}
+        .checklist-toggle:hover {{ 
+            background: var(--bg-active); 
+            color: var(--text-primary);
+        }}
         .checklist-collapsed {{ display: none !important; }}
         .checklist-expanded {{ display: block; }}
-        .checklist-pill {{ display: inline-block; background: rgba(255,255,255,0.25); color: white; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 500; margin-top: 8px; }}
-        .checklist-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }}
-        .checklist-item {{ display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; transition: background 0.2s; }}
-        .checklist-item:hover {{ background: rgba(255,255,255,0.1); }}
-        .checklist-item label {{ cursor: pointer; user-select: none; }}
-        .checklist-item input[type="checkbox"] {{ width: 16px; height: 16px; cursor: pointer; accent-color: #8b9dc3; }}
-        .checklist-item label {{ font-size: 13px; cursor: pointer; flex: 1; opacity: 0.95; line-height: 1.4; }}
-        .checklist-item input[type="checkbox"]:checked + label {{ opacity: 1; font-weight: 500; }}
-        .summary {{ padding: 30px 40px; border-bottom: 1px solid #e0e0e0; background: #fafafa; }}
-        .summary-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }}
-        .summary-item {{ background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #424242; }}
-        .summary-item label {{ display: block; font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 600; }}
-        .summary-item value {{ display: block; font-size: 16px; color: #333; }}
-        .match-score {{ font-size: 48px; font-weight: bold; color: {match_score_color}; text-align: center; padding: 20px; background: white; border-radius: 8px; }}
-        .status-badge {{ display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; text-transform: capitalize; }}
-        .status-pending {{ background: #fff3cd; color: #856404; }}
-        .status-applied {{ background: #d1ecf1; color: #0c5460; }}
-        .status-contacted-someone {{ background: #e2e3e5; color: #383d41; }}
-        .status-company-response {{ background: #cce5ff; color: #004085; }}
-        .status-contacted-hiring-manager {{ background: #cce5ff; color: #004085; }}
-        .status-scheduled-interview {{ background: #ffeeba; color: #856404; }}
-        .status-interviewed {{ background: #d4edda; color: #155724; }}
-        .status-interview-notes {{ background: #d4edda; color: #155724; }}
-        .status-interview-follow-up {{ background: #ffeef8; color: #b21f66; }}
-        .status-offered {{ background: #c3e6cb; color: #155724; }}
-        .status-rejected {{ background: #f8d7da; color: #721c24; }}
-        .status-accepted {{ background: #d4edda; color: #155724; }}
-        .tabs {{ display: flex; border-bottom: 2px solid #e0e0e0; padding: 0 40px; background: #fafafa; }}
-        .tab {{ padding: 15px 25px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: 500; color: #666; transition: all 0.3s; }}
-        .tab:hover {{ color: #424242; }}
-        .tab.active {{ color: #424242; border-bottom: 3px solid #424242; margin-bottom: -2px; }}
-        .tab-content {{ padding: 40px; display: none; }}
-        .tab-content.active {{ display: block; }}
-        .tab-content pre {{ background: #f5f5f5; padding: 20px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; }}
-        .tab-content h3 {{ color: #424242; margin-top: 20px; margin-bottom: 10px; }}
-        a {{ color: #424242; text-decoration: none; }}
-        a:hover {{ text-decoration: underline; }}
-        .timeline {{ margin-top: 20px; }}
-        .timeline-item {{ padding: 15px; border-left: 3px solid #424242; margin-left: 10px; margin-bottom: 15px; background: #f9f9f9; border-radius: 4px; }}
+        .checklist-pill {{ 
+            display: inline-block; 
+            background: var(--bg-active); 
+            color: var(--text-secondary); 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: var(--font-xs); 
+            font-weight: var(--font-medium); 
+            margin-top: var(--space-sm); 
+        }}
+        .checklist-grid {{ 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: var(--space-sm); 
+            margin-top: var(--space-sm); 
+        }}
+        .checklist-item {{ 
+            display: flex; 
+            align-items: center; 
+            gap: var(--space-sm); 
+            padding: var(--space-sm); 
+            border-radius: var(--radius-sm); 
+            transition: background 0.2s; 
+        }}
+        .checklist-item:hover {{ 
+            background: var(--bg-hover); 
+        }}
+        .checklist-item label {{ 
+            cursor: pointer; 
+            user-select: none; 
+        }}
+        .checklist-item input[type="checkbox"] {{ 
+            width: 16px; 
+            height: 16px; 
+            cursor: pointer; 
+            accent-color: var(--accent-blue); 
+        }}
+        .checklist-item label {{ 
+            font-size: var(--font-xs); 
+            cursor: pointer; 
+            flex: 1; 
+            color: var(--text-primary);
+            line-height: 1.4; 
+        }}
+        .checklist-item input[type="checkbox"]:checked + label {{ 
+            font-weight: var(--font-medium); 
+        }}
+        .summary {{ 
+            padding: var(--space-xl); 
+            border-bottom: 1px solid var(--border-light); 
+            background: var(--bg-secondary); 
+        }}
+        .summary-grid {{ 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: var(--space-lg); 
+            margin-top: var(--space-lg); 
+        }}
+        .summary-item {{ 
+            background: var(--bg-primary); 
+            padding: var(--space-md); 
+            border-radius: var(--radius-md); 
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+        }}
+        .summary-item label {{ 
+            display: block; 
+            font-size: var(--font-xs); 
+            text-transform: uppercase; 
+            color: var(--text-secondary); 
+            margin-bottom: 5px; 
+            font-weight: var(--font-semibold); 
+        }}
+        .summary-item value {{ 
+            display: block; 
+            font-size: var(--font-base); 
+            color: var(--text-primary); 
+        }}
+        .match-score {{ 
+            font-size: var(--font-3xl); 
+            font-weight: var(--font-bold); 
+            color: {match_score_color}; 
+            text-align: center; 
+            padding: var(--space-lg); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+        }}
+        .status-badge {{ 
+            display: inline-block; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: var(--font-xs); 
+            font-weight: var(--font-medium); 
+            text-transform: capitalize; 
+        }}
+        .status-pending {{ background: #fef3c7; color: #92400e; }}
+        .status-applied {{ background: #dbeafe; color: #1e40af; }}
+        .status-contacted-someone {{ background: var(--bg-active); color: var(--text-secondary); }}
+        .status-company-response {{ background: var(--accent-blue-light); color: #1e40af; }}
+        .status-contacted-hiring-manager {{ background: var(--accent-blue-light); color: #1e40af; }}
+        .status-scheduled-interview {{ background: #fef3c7; color: #92400e; }}
+        .status-interviewed {{ background: #d1fae5; color: #065f46; }}
+        .status-interview-notes {{ background: #d1fae5; color: #065f46; }}
+        .status-interview-follow-up {{ background: #fce7f3; color: #9f1239; }}
+        .status-offered {{ background: #d1fae5; color: #065f46; }}
+        .status-rejected {{ background: #fee2e2; color: #991b1b; }}
+        .status-accepted {{ background: #d1fae5; color: #065f46; }}
+        .tabs {{ 
+            display: flex; 
+            border-bottom: 1px solid var(--border-primary); 
+            padding: 0 var(--space-xl); 
+            background: var(--bg-secondary); 
+            overflow-x: auto;
+        }}
+        .tab {{ 
+            padding: 14px var(--space-lg); 
+            cursor: pointer; 
+            border: none; 
+            background: none; 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-medium); 
+            color: var(--text-secondary); 
+            transition: all 0.2s; 
+            font-family: var(--font-family);
+            white-space: nowrap;
+        }}
+        .tab:hover {{ 
+            color: var(--text-primary); 
+            background: var(--bg-active);
+        }}
+        .tab.active {{ 
+            color: var(--accent-blue); 
+            border-bottom: 3px solid var(--accent-blue); 
+            margin-bottom: -1px; 
+            font-weight: var(--font-semibold);
+        }}
+        .tab-content {{ 
+            padding: var(--space-xl); 
+            display: none; 
+        }}
+        .tab-content.active {{ 
+            display: block; 
+        }}
+        .tab-content pre {{ 
+            background: var(--bg-secondary); 
+            padding: var(--space-lg); 
+            border-radius: var(--radius-md); 
+            overflow-x: auto; 
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            border: 1px solid var(--border-primary);
+        }}
+        .tab-content h3 {{ 
+            color: var(--text-primary); 
+            margin-top: var(--space-lg); 
+            margin-bottom: var(--space-sm); 
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+        }}
+        a {{ 
+            color: var(--accent-blue); 
+            text-decoration: none; 
+        }}
+        a:hover {{ 
+            text-decoration: underline; 
+        }}
+        .timeline {{ 
+            margin-top: var(--space-lg); 
+        }}
+        .timeline-item {{ 
+            padding: var(--space-md); 
+            border-left: 3px solid var(--accent-blue); 
+            margin-left: var(--space-sm); 
+            margin-bottom: var(--space-md); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-sm);
+        }}
         .timeline-item img {{ max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
         
         /* Job Description Specific Styles */
-        .job-meta {{ background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #424242; }}
-        .job-meta p {{ margin: 5px 0; color: #333; font-size: 14px; }}
-        .job-meta strong {{ color: #424242; font-weight: 600; }}
-        .job-section {{ margin-bottom: 30px; padding: 20px; background: #fafafa; border-radius: 8px; border: 1px solid #e9ecef; }}
-        .job-section-title {{ color: #424242; font-size: 20px; font-weight: 600; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; }}
-        .job-section-content {{ color: #333; font-size: 15px; line-height: 1.7; }}
-        .job-section-content p {{ margin: 10px 0; }}
-        .job-section-content ul {{ margin: 10px 0 10px 20px; }}
-        .job-section-content li {{ margin: 8px 0; padding-left: 5px; }}
-        .job-section-content strong {{ color: #555; font-weight: 600; }}
-        #job-desc h2 {{ color: #333; font-size: 28px; margin-bottom: 25px; }}
+        .job-meta {{ 
+            background: var(--bg-secondary); 
+            padding: var(--space-md) var(--space-lg); 
+            border-radius: var(--radius-md); 
+            margin-bottom: var(--space-lg); 
+            border-left: 3px solid var(--accent-blue);
+            border: 1px solid var(--border-primary);
+        }}
+        .job-meta p {{ 
+            margin: 5px 0; 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+        }}
+        .job-meta strong {{ 
+            color: var(--text-primary); 
+            font-weight: var(--font-semibold); 
+        }}
+        .job-section {{ 
+            margin-bottom: var(--space-xl); 
+            padding: var(--space-lg); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-primary);
+        }}
+        .job-section-title {{ 
+            color: var(--text-primary); 
+            font-size: var(--font-lg); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-md); 
+            padding-bottom: var(--space-sm); 
+            border-bottom: 1px solid var(--border-light); 
+        }}
+        .job-section-content {{ 
+            color: var(--text-primary); 
+            font-size: var(--font-base); 
+            line-height: 1.7; 
+        }}
+        .job-section-content p {{ 
+            margin: 10px 0; 
+        }}
+        .job-section-content ul {{ 
+            margin: 10px 0 10px 20px; 
+        }}
+        .job-section-content li {{ 
+            margin: 8px 0; 
+            padding-left: 5px; 
+        }}
+        .job-section-content strong {{ 
+            color: var(--text-primary); 
+            font-weight: var(--font-semibold); 
+        }}
+        #job-desc h2 {{ 
+            color: var(--text-primary); 
+            font-size: var(--font-2xl); 
+            margin-bottom: var(--space-lg); 
+            font-weight: var(--font-semibold);
+        }}
         
         /* Technology Pills Styles */
         .tech-pills-container {{ margin-top: 20px; }}
         .tech-pills-section {{ margin-bottom: 20px; }}
         .tech-pills-label {{ 
-            font-size: 14px; 
-            font-weight: 600; 
-            color: #424242; 
-            margin-bottom: 10px; 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            color: var(--text-primary); 
+            margin-bottom: var(--space-sm); 
             display: flex; 
             align-items: center; 
-            gap: 8px;
+            gap: var(--space-sm);
         }}
         .tech-pills {{ 
             display: flex; 
@@ -2555,30 +3258,31 @@ Format this as a professional research document that demonstrates thorough prepa
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }}
         .tech-pill-green {{ 
-            background: #d4edda; 
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #d1fae5; 
+            color: #065f46;
+            border: 1px solid var(--accent-green);
         }}
         .tech-pill-yellow {{ 
-            background: #fff3cd; 
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background: #fef3c7; 
+            color: #92400e;
+            border: 1px solid #f59e0b;
         }}
         .tech-pill-red {{ 
-            background: #f8d7da; 
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fee2e2; 
+            color: #991b1b;
+            border: 1px solid #ef4444;
         }}
         .tech-legend {{ 
-            margin-top: 15px; 
-            padding: 12px; 
-            background: #f8f9fa; 
-            border-radius: 6px; 
-            font-size: 12px; 
-            color: #666;
+            margin-top: var(--space-md); 
+            padding: var(--space-md); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-sm); 
+            font-size: var(--font-xs); 
+            color: var(--text-secondary);
             display: flex;
-            gap: 20px;
+            gap: var(--space-lg);
             flex-wrap: wrap;
+            border: 1px solid var(--border-primary);
         }}
         .tech-legend-item {{ 
             display: flex; 
@@ -2596,96 +3300,99 @@ Format this as a professional research document that demonstrates thorough prepa
             max-width: 100%;
         }}
         .research-section {{ 
-            margin-bottom: 30px; 
-            padding: 20px; 
-            background: #fafafa; 
-            border-radius: 8px; 
-            border: 1px solid #e9ecef;
+            margin-bottom: var(--space-xl); 
+            padding: var(--space-lg); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-primary);
         }}
         .research-section h3 {{ 
-            color: #424242; 
-            font-size: 18px; 
-            font-weight: 600; 
-            margin-bottom: 15px; 
-            padding-bottom: 10px; 
-            border-bottom: 2px solid #e9ecef;
+            color: var(--text-primary); 
+            font-size: var(--font-lg); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-md); 
+            padding-bottom: var(--space-sm); 
+            border-bottom: 1px solid var(--border-light);
         }}
         .research-item {{ 
-            margin-bottom: 15px; 
-            padding: 12px; 
-            background: white; 
-            border-radius: 6px; 
-            border-left: 4px solid #424242;
+            margin-bottom: var(--space-md); 
+            padding: var(--space-md); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-sm); 
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
         }}
         .research-item h4 {{ 
-            color: #424242; 
-            font-size: 14px; 
-            font-weight: 600; 
-            margin-bottom: 8px;
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-sm);
         }}
         .research-item p {{ 
-            color: #333; 
-            font-size: 14px; 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
             line-height: 1.6; 
             margin: 0;
         }}
         .research-item a {{ 
-            color: #1976d2; 
+            color: var(--accent-blue); 
             text-decoration: none; 
-            font-weight: 500;
+            font-weight: var(--font-medium);
         }}
         .research-item a:hover {{ 
             text-decoration: underline; 
         }}
         .news-item {{ 
-            margin-bottom: 15px; 
-            padding: 15px; 
-            background: white; 
-            border-radius: 6px; 
-            border: 1px solid #e9ecef;
+            margin-bottom: var(--space-md); 
+            padding: var(--space-md); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-sm); 
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }}
         .news-item h5 {{ 
-            color: #424242; 
-            font-size: 14px; 
-            font-weight: 600; 
-            margin-bottom: 8px;
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-sm);
         }}
         .news-item p {{ 
-            color: #666; 
-            font-size: 13px; 
+            color: var(--text-secondary); 
+            font-size: var(--font-xs); 
             line-height: 1.5; 
-            margin-bottom: 8px;
+            margin-bottom: var(--space-sm);
         }}
         .news-item .news-link {{ 
-            color: #1976d2; 
-            font-size: 12px; 
+            color: var(--accent-blue); 
+            font-size: var(--font-xs); 
             text-decoration: none;
         }}
         .news-item .news-link:hover {{ 
             text-decoration: underline;
         }}
         .person-item {{ 
-            margin-bottom: 12px; 
-            padding: 12px; 
-            background: white; 
-            border-radius: 6px; 
-            border-left: 3px solid #1976d2;
+            margin-bottom: var(--space-sm); 
+            padding: var(--space-md); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-sm); 
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
         }}
         .person-item h5 {{ 
-            color: #424242; 
-            font-size: 14px; 
-            font-weight: 600; 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
             margin-bottom: 5px;
         }}
         .person-item .title {{ 
-            color: #666; 
-            font-size: 13px; 
+            color: var(--text-secondary); 
+            font-size: var(--font-xs); 
             font-style: italic;
         }}
         .loading-research {{ 
             text-align: center; 
-            padding: 40px; 
-            color: #666;
+            padding: var(--space-xl); 
+            color: var(--text-secondary);
         }}
         .research-error {{ 
             color: #dc3545; 
@@ -2699,26 +3406,26 @@ Format this as a professional research document that demonstrates thorough prepa
         .ql-editor {{
             min-height: 120px;
             font-size: 11pt !important;
-            font-family: 'Montserrat', sans-serif !important;
+            font-family: var(--font-family) !important;
             font-weight: 400 !important;
             line-height: 1.5 !important;
-            color: black !important;
+            color: var(--text-primary) !important;
             text-align: justify !important;
         }}
         
         /* Override any pasted content font styles */
         .ql-editor * {{
-            font-family: 'Montserrat', sans-serif !important;
+            font-family: var(--font-family) !important;
             font-size: 11pt !important;
-            color: black !important;
+            color: var(--text-primary) !important;
         }}
         
         .ql-editor p,
         .ql-editor div,
         .ql-editor span {{
-            font-family: 'Montserrat', sans-serif !important;
+            font-family: var(--font-family) !important;
             font-size: 11pt !important;
-            color: black !important;
+            color: var(--text-primary) !important;
             text-align: justify !important;
             line-height: 1.5 !important;
         }}
@@ -2738,27 +3445,27 @@ Format this as a professional research document that demonstrates thorough prepa
         }}
         
         .ql-toolbar {{
-            border: 2px solid rgba(139, 157, 195, 0.3);
+            border: 1px solid var(--border-primary);
             border-bottom: none;
-            border-radius: 12px 12px 0 0;
-            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            background-color: var(--bg-primary);
         }}
         
         .ql-container {{
-            border: 2px solid rgba(139, 157, 195, 0.3);
+            border: 1px solid var(--border-primary);
             border-top: none;
-            border-radius: 0 0 12px 12px;
-            background-color: rgba(255, 255, 255, 0.9);
-            font-family: 'Montserrat', sans-serif;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            background-color: var(--bg-primary);
+            font-family: var(--font-family);
         }}
         
         .ql-container.ql-snow:focus-within {{
-            border-color: #8b9dc3;
-            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }}
         
         .ql-toolbar.ql-snow {{
-            border-color: rgba(139, 157, 195, 0.3);
+            border-color: var(--border-primary);
         }}
         
         .ql-toolbar.ql-snow .ql-picker-label {{
@@ -2766,87 +3473,130 @@ Format this as a professional research document that demonstrates thorough prepa
         }}
         
         .ql-toolbar.ql-snow .ql-picker-options {{
-            border-color: rgba(139, 157, 195, 0.3);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+            border-color: var(--border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            background: var(--bg-primary);
         }}
         
         .ql-toolbar.ql-snow button {{
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             margin: 2px;
         }}
         
         .ql-toolbar.ql-snow button:hover {{
-            background-color: rgba(139, 157, 195, 0.1);
+            background-color: var(--bg-hover);
         }}
         
         .ql-toolbar.ql-snow button.ql-active {{
-            background-color: rgba(139, 157, 195, 0.2);
+            background-color: var(--bg-active);
         }}
     </style>
 </head>
 <body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/new-application">New Application</a></li>
+            <li><a href="/reports">Reports</a></li>
+            <li><a href="/analytics">Analytics</a></li>
+            <li><a href="/templates">Templates</a></li>
+            <li><a href="/progress">Progress</a></li>
+            <li><a href="/daily-activities">Daily Activities</a></li>
+            <li><a href="/new-application?resume=true">Manage Resume</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Container -->
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <div class="header-left">
-                <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
-                <h1>{application.company}</h1>
-                <h2>{application.job_title}</h2>
-                <div style="margin-top: 15px;">
-                    <span class="status-badge status-{self._status_to_class(application.status)}" style="font-size: 16px; padding: 8px 20px;">{application.status}</span>
+            <div class="header-top">
+                <div style="flex: 1;">
+                    <a href="/dashboard" class="back-link" style="display: inline-block; margin-bottom: 8px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Back to Applications
+                    </a>
+                    <h1 style="margin: 0 0 4px 0;">{application.company} - {application.job_title}</h1>
+                    <div class="header-subtitle">Application ID: {application.id}</div>
                 </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+                    <div class="header-actions">
+                        <button class="btn" onclick="toggleFlag('{application.id}', {str(application.flagged).lower()})">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            Flag
+                        </button>
+                        <button class="btn btn-primary" onclick="const tabs = Array.from(document.querySelectorAll('.tab')); const updatesTab = tabs.find(t => t.textContent.includes('Updates') || t.textContent.includes('updates')); if (updatesTab) {{ showTab(updatesTab, 'updates'); }}">Update Status</button>
             </div>
-            <div class="header-right">
+                    
                 {self._generate_checklist_html(application)}
             </div>
         </div>
-        
-        <div class="summary">
-            <h2 style="margin-bottom: 20px; color: #333;">Summary</h2>
-            
-            <div class="match-score">
-                {qualifications.match_score:.0f}% Match
             </div>
             
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <label>Status</label>
-                    <value><span class="status-badge status-{self._status_to_class(application.status)}">{application.status}</span></value>
+        <!-- Content -->
+        <div class="content">
+            <!-- Application Header Card -->
+            <div class="app-header-card">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+{status_tags_html}                    <span class="match-pill">
+                        <span class="match-percentage" data-score="{qualifications.match_score:.0f}" style="color: {match_score_color};">{qualifications.match_score:.0f}%</span>
+                        <span class="match-score-label">Match Score</span>
+                    </span>
                 </div>
-                <div class="summary-item">
-                    <label>Salary Range</label>
-                    <value>{job_details.get('salary_range', '$0')}</value>
+                <div class="app-meta" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>{job_details.get('location', 'N/A')}</span>
                 </div>
-                <div class="summary-item">
-                    <label>Location</label>
-                    <value>{job_details.get('location', 'N/A')}</value>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>{job_details.get('salary_range', '$0')}</span>
                 </div>
-                <div class="summary-item">
-                    <label>Hiring Manager</label>
-                    <value>{job_details.get('hiring_manager', 'N/A')}</value>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Applied: {format_for_display(application.created_at).split(',')[0]}</span>
                 </div>
-                <div class="summary-item">
-                    <label>Posted Date</label>
-                    <value>{job_details.get('posted_date', 'N/A')}</value>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Posted: {job_details.get('posted_date', 'N/A')}</span>
                 </div>
-                <div class="summary-item">
-                    <label>Applied</label>
-                    <value>{format_for_display(application.created_at)}</value>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span>Updated: {format_for_display(application.status_updated_at).split(',')[0]}</span>
                 </div>
-                <div class="summary-item">
-                    <label>Last Updated</label>
-                    <value>{format_for_display(application.status_updated_at)}</value>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Contact #: {application.calculate_contact_count()}</span>
                 </div>
-                <div class="summary-item">
-                    <label>Contact #</label>
-                    <value>{application.calculate_contact_count()}</value>
+                    {f'<div class="meta-item"><svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg><a href="{application.job_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">View Job Posting</a></div>' if application.job_url else ''}
                 </div>
             </div>
             
-            {f'<div style="margin-top: 20px;"><label style="display: block; font-size: 12px; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 600;">Job URL</label><a href="{application.job_url}" target="_blank">{application.job_url}</a></div>' if application.job_url else ''}
-        </div>
-        
-        <div class="tabs">
+            <!-- Tabs Section -->
+            <div class="tabs-container">
+                <div class="tabs-header">
             <button type="button" class="tab active" onclick="showTab(this, 'job-desc')">Job Description</button>
             {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path).replace("showTab(event,", "showTab(this,")}
             {self._generate_tab_button('skills', 'Skills', application.qualifications_path).replace("showTab(event,", "showTab(this,")}
@@ -3064,6 +3814,27 @@ Format this as a professional research document that demonstrates thorough prepa
                     <strong>{format_for_display(application.created_at)}</strong> - Application Created
                 </div>
                 {self._generate_updates_timeline(application)}
+            </div>
+                </div>
+            </div>
+            
+            <!-- Two Column Layout - After Tabs -->
+            <div class="two-column">
+                <!-- Qualifications Summary -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Qualifications Summary</h2>
+                    </div>
+                    {self._generate_qualifications_summary_html(qualifications)}
+                </div>
+                
+                <!-- Application Timeline -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Application Timeline</h2>
+                    </div>
+                    {self._generate_timeline_html_for_summary(application)}
+                </div>
             </div>
         </div>
     </div>
@@ -3372,33 +4143,49 @@ Format this as a professional research document that demonstrates thorough prepa
             }}
         }}
         
-        function showTab(tabEl, tabId) {{
+        function showTab(button, tabId) {{
             // Hide all tab contents
-            var contents = document.getElementsByClassName('tab-content');
-            for (var i = 0; i < contents.length; i++) {{
-                contents[i].classList.remove('active');
-                contents[i].style.display = 'none';
-            }}
+            document.querySelectorAll('.tab-content').forEach(content => {{
+                content.classList.remove('active');
+            }});
             
             // Remove active class from all tabs
-            var tabs = document.getElementsByClassName('tab');
-            for (var i = 0; i < tabs.length; i++) {{
-                tabs[i].classList.remove('active');
+            document.querySelectorAll('.tab').forEach(tab => {{
+                tab.classList.remove('active');
+            }});
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabId);
+            if (selectedContent) {{
+                selectedContent.classList.add('active');
             }}
             
-            // Show selected tab
-            var target = document.getElementById(tabId);
-            if (target) {{
-                target.classList.add('active');
-                target.style.display = 'block';
-            }}
-            if (tabEl && tabEl.classList) {{ tabEl.classList.add('active'); }}
+            // Add active class to clicked tab
+            button.classList.add('active');
         }}
         
-        // Checklist functionality
+        function toggleChecklist() {{
+            const content = document.getElementById('checklist-content');
+            const toggleButton = document.querySelector('.checklist-toggle');
+            const toggleText = document.getElementById('checklist-toggle-text');
+            
+            if (content.classList.contains('checklist-collapsed')) {{
+                content.classList.remove('checklist-collapsed');
+                content.classList.add('checklist-expanded');
+                toggleText.textContent = 'Hide';
+                toggleButton.classList.add('expanded');
+            }} else {{
+                content.classList.remove('checklist-expanded');
+                content.classList.add('checklist-collapsed');
+                toggleText.textContent = 'Show';
+                toggleButton.classList.remove('expanded');
+            }}
+        }}
+        
+        // Checklist functionality (legacy support)
         let checklistExpanded = false;
         
-        function toggleChecklist() {{
+        function toggleChecklistLegacy() {{
             checklistExpanded = !checklistExpanded;
             const expanded = document.getElementById('checklistExpanded');
             const pill = document.getElementById('checklistPill');
@@ -3789,6 +4576,27 @@ Format this as a professional research document that demonstrates thorough prepa
                 if (btn) {{ btn.disabled = false; btn.textContent = 'Generate ' + messageType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) + ' Intro Messages'; btn.style.background = '#10b981'; }}
             }}
         }}
+        
+        // Function to determine match score color
+        function getMatchScoreColor(score) {{
+            if (score >= 80) return '#10b981'; // green
+            if (score >= 60) return '#f59e0b'; // yellow
+            return '#ef4444'; // red
+        }}
+        
+        // Apply color on page load and initialize checklist pill
+        document.addEventListener('DOMContentLoaded', function() {{
+            const matchPercentage = document.querySelector('.match-percentage');
+            if (matchPercentage) {{
+                const score = parseInt(matchPercentage.getAttribute('data-score') || matchPercentage.textContent);
+                matchPercentage.style.color = getMatchScoreColor(score);
+            }}
+            
+            // Initialize checklist pill display
+            if (typeof updateChecklistPill === 'function') {{
+                updateChecklistPill();
+            }}
+        }});
     </script>
 </body>
 </html>"""
@@ -3811,6 +4619,137 @@ Format this as a professional research document that demonstrates thorough prepa
             .replace(" - ", "-")
             .replace(" ", "-")
         )
+    
+    def _get_status_tags(self, application: Application) -> list:
+        """Get status tags from application checklist and status"""
+        tags = []
+        checklist_items = application.checklist_items or {}
+        status_lower = application.status.lower() if application.status else ""
+        
+        # Add tags based on checklist items
+        if checklist_items.get("interview_completed") or checklist_items.get("interview_scheduled") or "interview" in status_lower:
+            tags.append(("Interview Notes", "tag-green"))
+        if checklist_items.get("thank_you_sent") or "thank" in status_lower:
+            tags.append(("Thank You Sent", "tag-gray"))
+        if checklist_items.get("response_received") or "company response" in status_lower or "contacted" in status_lower:
+            tags.append(("Company Response", "tag-blue"))
+        if checklist_items.get("email_sent"):
+            tags.append(("Email Sent", "tag-gray"))
+        
+        return tags
+    
+    def _generate_qualifications_summary_html(self, qualifications: QualificationAnalysis) -> str:
+        """Generate Qualifications Summary HTML for two-column layout"""
+        strong_matches_html = ""
+        if qualifications.strong_matches and len(qualifications.strong_matches) > 0:
+            strong_matches_html = "<h3>Strong Matches</h3><ul>"
+            for match in qualifications.strong_matches[:5]:  # Limit to 5
+                strong_matches_html += f"<li>{match}</li>"
+            strong_matches_html += "</ul>"
+        
+        partial_matches_html = ""
+        if hasattr(qualifications, 'partial_matches') and qualifications.partial_matches and len(qualifications.partial_matches) > 0:
+            partial_matches_html = "<h3>Partial Matches</h3><ul>"
+            for match in qualifications.partial_matches[:3]:  # Limit to 3
+                partial_matches_html += f"<li>{match}</li>"
+            partial_matches_html += "</ul>"
+        
+        missing_skills_html = ""
+        if qualifications.missing_skills and len(qualifications.missing_skills) > 0:
+            missing_skills_html = "<h3>Missing Skills</h3><ul>"
+            for skill in qualifications.missing_skills[:5]:  # Limit to 5
+                missing_skills_html += f"<li>{skill}</li>"
+            missing_skills_html += "</ul>"
+        
+        # If no content, show a message
+        if not strong_matches_html and not partial_matches_html and not missing_skills_html:
+            return """
+                    <div class="section-content">
+                        <p style="color: #6b7280; font-size: 14px;">Qualifications analysis not available yet.</p>
+                    </div>
+        """
+        
+        return f"""
+                    <div class="section-content">
+                        {strong_matches_html}
+                        {partial_matches_html}
+                        {missing_skills_html}
+                    </div>
+        """
+    
+    def _generate_timeline_html_for_summary(self, application: Application) -> str:
+        """Generate Application Timeline HTML for two-column layout"""
+        from app.services.job_processor import JobProcessor
+        
+        job_processor = JobProcessor()
+        updates = job_processor.get_application_updates(application)
+        
+        # Add initial application creation
+        timeline_items = []
+        timeline_items.append({
+            'date': format_for_display(application.created_at),
+            'status': 'Applied',
+            'description': 'Application submitted'
+        })
+        
+        # Add status updates
+        if updates:
+            for update in reversed(updates[:9]):  # Limit to 9 more (10 total with initial)
+                timeline_items.append({
+                    'date': update['display_timestamp'],
+                    'status': update['status'],
+                    'description': update['status']
+                })
+        
+        if len(timeline_items) == 1 and not updates:
+            return '<div class="timeline"><p style="color: #6b7280; font-size: 14px;">No timeline entries yet.</p></div>'
+        
+        timeline_html = '<div class="timeline">'
+        for item in timeline_items:
+            tag_class = "tag-blue"
+            description = item['description']
+            if "interview" in item['status'].lower():
+                tag_class = "tag-green"
+                if "scheduled" in item['status'].lower():
+                    description = "Phone screen scheduled"
+                elif "notes" in item['status'].lower() or "completed" in item['status'].lower():
+                    description = "Phone screen completed"
+            elif "thank" in item['status'].lower():
+                tag_class = "tag-gray"
+                description = "Thank you email sent"
+            elif "rejected" in item['status'].lower():
+                tag_class = "tag-red"
+            elif "offered" in item['status'].lower():
+                tag_class = "tag-green"
+            elif "company" in item['status'].lower() or "response" in item['status'].lower():
+                tag_class = "tag-blue"
+                if "viewed" in item['status'].lower() or "profile" in item['status'].lower():
+                    description = "Company viewed profile"
+            
+            # Format status label for display
+            status_label = item['status']
+            if "interview" in status_label.lower() and "scheduled" in status_label.lower():
+                status_label = "Interview Scheduled"
+            elif "interview" in status_label.lower() and ("notes" in status_label.lower() or "completed" in status_label.lower()):
+                status_label = "Interview Notes"
+            elif "company" in status_label.lower() or "response" in status_label.lower():
+                status_label = "Company Response"
+            elif "thank" in status_label.lower():
+                status_label = "Thank You Sent"
+            elif status_label.lower() == "applied":
+                status_label = "Applied"
+            
+            timeline_html += f'''
+                        <div class="timeline-item">
+                            <div class="timeline-date">{item['date']}</div>
+                            <div class="timeline-content">
+                                <span class="timeline-description">{description}</span>
+                                <span class="timeline-status tag {tag_class}">{status_label}</span>
+                            </div>
+                        </div>
+            '''
+        timeline_html += '</div>'
+        return timeline_html
     
     def _generate_updates_timeline(self, application: Application) -> str:
         """Generate HTML for status updates timeline"""
@@ -4023,4 +4962,5 @@ Format this as a professional research document that demonstrates thorough prepa
         </div>'''
         except Exception:
             return ''
+
 

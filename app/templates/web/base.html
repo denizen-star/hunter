@@ -9,6 +9,11 @@
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="alternate icon" href="/static/favicon.svg">
     
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- CSS Files -->
     <link rel="stylesheet" href="/static/css/colors.css">
     <link rel="stylesheet" href="/static/css/layout.css">
@@ -33,6 +38,9 @@
         
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>Hunter</h3>
+            </div>
             <ul class="sidebar-nav">
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/new-application" class="nav-link">New Application</a></li>
@@ -73,6 +81,14 @@
     
     <!-- Global JavaScript -->
     <script>
+        // Collapsible Card Functionality
+        function toggleCollapse(header) {
+            const card = header.closest('.content-card');
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize navigation
@@ -85,6 +101,14 @@
             if (aiStatusBtn) {
                 aiStatusBtn.addEventListener('click', checkAIStatus);
             }
+            
+            // Collapse all content cards by default
+            const contentCards = document.querySelectorAll('.content-card');
+            contentCards.forEach(card => {
+                if (!card.classList.contains('expanded')) {
+                    card.classList.add('collapsed');
+                }
+            });
         });
         
         // AI Status Check Function

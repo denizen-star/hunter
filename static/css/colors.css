@@ -1,64 +1,43 @@
-/* Job Hunter Color System v2.2.0 - Soft Nordic Design */
-/* Warm gray backgrounds with soft shadows - Cozy and inviting while maintaining clean aesthetics */
+/* Hunter UI Redesign - LianLian Global Style Color System */
+/* Clean, minimal aesthetic with white space and clean typography */
 
 :root {
-  /* Primary Colors - Soft Nordic Palette */
-  --primary-dark: #6c7b95;      /* Dark blue-gray - Sidebar background */
-  --primary-medium: #8b9dc3;    /* Medium blue-gray - Navigation items */
-  --primary-light: #a8c8ec;     /* Light blue-gray - Hover states */
+  /* Backgrounds */
+  --bg-primary: #ffffff;           /* Main background */
+  --bg-secondary: #fafafa;          /* Page background */
+  --bg-hover: #f9fafb;              /* Hover states */
+  --bg-active: #f3f4f6;             /* Active states */
   
-  /* Neutral Colors - Warm Grays */
-  --neutral-dark: #2d3748;      /* Dark charcoal - Primary text */
-  --neutral-medium: #4a5568;    /* Medium gray - Secondary text */
-  --neutral-light: #718096;     /* Light gray - Tertiary text */
-  --neutral-white: #ffffff;     /* White - Background */
-  --neutral-bg: #f5f5f5;        /* Light background */
-  --neutral-bg-alt: #e8e8e8;    /* Alternate background */
+  /* Text Colors */
+  --text-primary: #1f2937;          /* Main text */
+  --text-secondary: #6b7280;        /* Secondary text */
+  --text-tertiary: #9ca3af;         /* Tertiary text */
   
-  /* Layout Proportions */
-  --sidebar-width: 250px;       /* Fixed sidebar width */
-  --content-width: calc(100% - 250px); /* Main content width */
+  /* Borders */
+  --border-primary: #e5e7eb;        /* Main borders */
+  --border-light: #f3f4f6;          /* Light borders */
   
-  /* Status Colors - Soft Nordic Variants */
-  --status-pending: #fef5e7;
-  --status-applied: #e6fffa;
-  --status-interviewed: #f0fff4;
-  --status-offered: #f0f9ff;
-  --status-rejected: #fef2f2;
-  --status-accepted: #f0fff4;
-  
-  /* Interactive Colors */
-  --hover-bg: rgba(139, 157, 195, 0.15);
-  --active-bg: rgba(139, 157, 195, 0.2);
-  --border-color: rgba(139, 157, 195, 0.3);
-  --border-light: rgba(139, 157, 195, 0.2);
-  
-  /* Shadow System */
-  --shadow-sm: 0 2px 4px rgba(108, 123, 149, 0.1);
-  --shadow-md: 0 4px 12px rgba(108, 123, 149, 0.15);
-  --shadow-lg: 0 8px 24px rgba(108, 123, 149, 0.2);
-  --shadow-xl: 0 12px 32px rgba(108, 123, 149, 0.25);
+  /* Accent Colors */
+  --accent-blue: #3b82f6;           /* Primary accent */
+  --accent-blue-hover: #2563eb;      /* Accent hover */
+  --accent-blue-light: #eff6ff;     /* Accent background */
+  --accent-green: #10b981;          /* Success/positive */
   
   /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-size-base: 16px;
-  --font-size-small: 14px;
-  --font-size-large: 18px;
-  --font-size-xl: 24px;
-  --font-size-2xl: 32px;
-  --font-size-3xl: 48px;
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-xs: 12px;      /* Small labels, badges */
+  --font-sm: 14px;      /* Body text, buttons */
+  --font-base: 16px;    /* Default body */
+  --font-lg: 18px;      /* Section titles */
+  --font-xl: 20px;      /* Card titles */
+  --font-2xl: 24px;     /* Page titles */
+  --font-3xl: 32px;     /* Large numbers */
   
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  /* Font Weights */
+  --font-normal: 400;    /* Body text */
+  --font-medium: 500;    /* Labels, buttons */
+  --font-semibold: 600; /* Headings, active states */
+  --font-bold: 700;     /* Large numbers, emphasis */
   
   /* Spacing */
   --space-xs: 4px;
@@ -67,22 +46,39 @@
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
-  --space-3xl: 64px;
+  
+  /* Layout Proportions */
+  --sidebar-width: 180px;       /* Reduced from 250px */
+  --content-width: calc(100% - 180px); /* Main content width */
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Shadows - Minimal */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.08);
+  
+  /* Status Colors - Subtle */
+  --status-pending: #fef3c7;
+  --status-applied: #dbeafe;
+  --status-interviewed: #d1fae5;
+  --status-offered: #d1fae5;
+  --status-rejected: #fee2e2;
+  --status-accepted: #d1fae5;
 }
 
 /* Color utility classes */
-.bg-primary-dark { background-color: var(--primary-dark); }
-.bg-primary-medium { background-color: var(--primary-medium); }
-.bg-primary-light { background-color: var(--primary-light); }
-.bg-neutral-white { background-color: var(--neutral-white); }
-.bg-neutral-light { background-color: var(--neutral-light); }
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-hover { background-color: var(--bg-hover); }
+.bg-active { background-color: var(--bg-active); }
 
-.text-primary-dark { color: var(--primary-dark); }
-.text-neutral-dark { color: var(--neutral-dark); }
-.text-neutral-medium { color: var(--neutral-medium); }
-.text-white { color: var(--neutral-white); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
 
-/* Border utilities */
-.border-primary { border-color: var(--primary-dark); }
-.border-neutral { border-color: var(--neutral-light); }
-
+.border-primary { border-color: var(--border-primary); }
+.border-light { border-color: var(--border-light); }

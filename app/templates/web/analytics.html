@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Analytics - Hunter</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
         * {
@@ -13,48 +17,269 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 0;
             margin: 0;
             position: relative;
             overflow-x: hidden;
-            color: #4a5568;
+            color: var(--text-primary);
         }
         
         .container {
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             margin: 0;
-            padding: 0 20px 20px 20px;
-            margin-left: 250px;
+            padding: var(--space-lg);
+            margin-left: 180px;
             box-sizing: border-box;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .container {
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .dashboard-grid {
+                gap: var(--space-sm);
+            }
+            
+            .metric-card {
+                min-width: 120px;
+                padding: var(--space-sm) 16px;
+            }
+            
+            .metric-value {
+                font-size: var(--font-xl);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .dashboard-grid {
+                justify-content: flex-start;
+            }
+            
+            .metric-card {
+                min-width: 110px;
+                padding: var(--space-sm) 12px;
+            }
+            
+            .metric-value {
+                font-size: var(--font-lg);
+            }
+            
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-primary);
+            }
+            
+            .container {
+                width: 100%;
+                margin-left: 0;
+                padding: var(--space-md);
+            }
+            
+            .dashboard-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .metric-card {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .period-selector {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .period-btn {
+                flex: 1;
+                min-width: 80px;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .tabs-header {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                min-width: 100px;
+                flex: 1;
+            }
         }
         
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 180px;
             height: 100vh;
-            background: #8b9dc3;
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 4px 0 20px rgba(139, 157, 195, 0.15);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
             z-index: 1000;
-            padding: 20px 0;
+            padding: var(--space-md) 0;
             overflow-y: auto;
         }
         
         .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
         }
         
         .sidebar-header h3 {
-            color: white;
+            color: var(--text-primary);
             font-size: 18px;
             font-weight: 600;
             margin: 0;
@@ -72,114 +297,177 @@
         
         .sidebar-menu a {
             display: block;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .sidebar-menu a:hover {
-            background: rgba(66, 66, 66, 0.2);
-            color: white;
-            border-left-color: #424242;
-            transform: translateX(5px);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .sidebar-menu a.active {
-            background: rgba(66, 66, 66, 0.3);
-            color: white;
-            border-left-color: #424242;
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
         }
         
         .header {
             text-align: center;
-            color: white;
-            margin: 0 -20px 20px -20px;
-            background: #8b9dc3;
-            padding: 30px 20px;
-            width: calc(100% + 40px);
-            box-shadow: 0 4px 20px rgba(139, 157, 195, 0.2);
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }
         
         .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            color: white;
+            font-size: 28px;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--space-lg);
         }
         
         .period-selector {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: var(--space-sm);
+            background: var(--bg-primary);
+            padding: 4px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            width: fit-content;
+            margin: 0 auto;
         }
         
         .period-btn {
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            cursor: pointer;
+            padding: 8px var(--space-md);
+            font-size: 14px;
             font-weight: 500;
-            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
         .period-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--bg-active);
+            color: var(--text-primary);
         }
         
         .period-btn.active {
-            background: white;
-            color: #8b9dc3;
-            border-color: white;
+            background: var(--accent-blue);
+            color: #ffffff;
         }
         
         .tabs-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
         }
         
         .tabs-header {
             display: flex;
-            background: #8b9dc3;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
             overflow-x: auto;
         }
         
         .tab {
             flex: 1;
             min-width: 150px;
-            padding: 18px 20px;
+            padding: 14px var(--space-lg);
             background: none;
             border: none;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
             white-space: nowrap;
-            border-bottom: 3px solid transparent;
+            border-bottom: 2px solid transparent;
         }
         
         .tab:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
         
         .tab.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-bottom: 3px solid #ffffff;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent-blue);
         }
         
         .tab-content {
-            padding: 30px;
+            padding: var(--space-xl);
             display: none;
         }
         
@@ -188,57 +476,126 @@
         }
         
         .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-grid {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
         }
         
         .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            min-width: 140px;
+            flex: 0 0 auto;
+            text-align: center;
+        }
+        
+        .metric-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
         
         .metric-card h4 {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 10px;
-            font-weight: 500;
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            margin-bottom: 6px;
         }
         
         .metric-value {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: 4px;
+            color: var(--text-primary);
         }
         
         .metric-label {
-            font-size: 12px;
-            opacity: 0.8;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+        
+        .content-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+            overflow: hidden;
+        }
+        
+        .content-card-header {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .content-card-header:hover {
+            background: var(--bg-hover);
+        }
+        
+        .content-card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .content-card-header .collapse-icon {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        .content-card.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .content-card-body {
+            padding: var(--space-lg);
+            transition: max-height 0.3s ease;
+        }
+        
+        .content-card.collapsed .content-card-body {
+            display: none;
         }
         
         .chart-container {
             position: relative;
             height: 450px;
             width: 100%;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: var(--space-lg);
+            background: var(--bg-primary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }
         
         .chart-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: #2d3748;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
         }
         
-        /* Scrollable wrapper for charts that need it */
         .chart-scroll-wrapper {
             position: relative;
             height: 380px;
@@ -257,82 +614,79 @@
             bottom: 5px;
             right: 10px;
             font-size: 6pt;
-            color: #666;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-tertiary);
+            font-family: var(--font-family);
             z-index: 10;
             pointer-events: none;
         }
         
         .analytics-section {
-            margin-bottom: 40px;
+            margin-bottom: var(--space-xl);
         }
         
         .section-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 20px;
-            color: #2d3748;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #8b9dc3;
+            margin-bottom: var(--space-lg);
+            color: var(--text-primary);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-primary);
         }
         
         .skills-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-primary);
         }
         
         .skills-table th,
         .skills-table td {
-            padding: 15px;
+            padding: 12px var(--space-md);
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-light);
         }
         
         .skills-table thead {
-            background: #8b9dc3;
+            background: var(--bg-secondary);
         }
         
         .skills-table th {
-            color: white;
+            color: var(--text-primary);
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            background: #8b9dc3;
-            color: white;
-            font-weight: 600;
         }
         
         .skills-table tr:hover {
-            background: #f7fafc;
+            background: var(--bg-hover);
         }
         
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #999;
+            padding: 60px var(--space-lg);
+            color: var(--text-secondary);
         }
         
         .empty-state-icon {
             font-size: 64px;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
         }
         
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #999;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h3>Job Hunter</h3>
+            <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -343,15 +697,24 @@
             <li><a href="/reports" class="nav-link">Reports</a></li>
             <li><a href="/analytics" class="nav-link active">Analytics</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
-    <div class="container">
-        <div class="header">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/dashboard" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
             <h1>Advanced Analytics & Reports</h1>
-            <p>Data-driven insights to optimize your job search strategy</p>
-            <div class="period-selector">
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="period-selector" style="margin-top: 24px; margin-bottom: 24px;">
                 <button class="period-btn" data-period="today" onclick="selectPeriod('today')">Today</button>
                 <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Days</button>
                 <button class="period-btn active" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
@@ -368,34 +731,60 @@
             
             <div id="tab-application" class="tab-content active">
                 <div class="analytics-section">
-                    <h2 class="section-title">Application Analytics</h2>
-                    
-                    <div class="metrics-grid" id="application-metrics">
+                    <div class="dashboard-grid" id="application-metrics">
                         <div class="loading">Loading metrics...</div>
                     </div>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Interview Conversion Funnel</div>
-                        <canvas id="funnelChart"></canvas>
-                        <div class="chart-timestamp" id="funnelChart-timestamp"></div>
+                    <div class="content-card collapsed">
+                        <div class="content-card-header" onclick="toggleCollapse(this)">
+                            <h3>Interview Conversion Funnel</h3>
+                            <span class="collapse-icon">▼</span>
+                        </div>
+                        <div class="content-card-body">
+                            <div class="chart-container">
+                                <canvas id="funnelChart"></canvas>
+                                <div class="chart-timestamp" id="funnelChart-timestamp"></div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Time to Response Distribution</div>
-                        <canvas id="timeToResponseChart"></canvas>
-                        <div class="chart-timestamp" id="timeToResponseChart-timestamp"></div>
+                    <div class="content-card collapsed">
+                        <div class="content-card-header" onclick="toggleCollapse(this)">
+                            <h3>Time to Response Distribution</h3>
+                            <span class="collapse-icon">▼</span>
+                        </div>
+                        <div class="content-card-body">
+                            <div class="chart-container">
+                                <canvas id="timeToResponseChart"></canvas>
+                                <div class="chart-timestamp" id="timeToResponseChart-timestamp"></div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Success by Match Score</div>
-                        <canvas id="matchScoreChart"></canvas>
-                        <div class="chart-timestamp" id="matchScoreChart-timestamp"></div>
+                    <div class="content-card collapsed">
+                        <div class="content-card-header" onclick="toggleCollapse(this)">
+                            <h3>Success by Match Score</h3>
+                            <span class="collapse-icon">▼</span>
+                        </div>
+                        <div class="content-card-body">
+                            <div class="chart-container">
+                                <canvas id="matchScoreChart"></canvas>
+                                <div class="chart-timestamp" id="matchScoreChart-timestamp"></div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Best Performing Day of Week</div>
-                        <canvas id="dayChart"></canvas>
-                        <div class="chart-timestamp" id="dayChart-timestamp"></div>
+                    <div class="content-card collapsed">
+                        <div class="content-card-header" onclick="toggleCollapse(this)">
+                            <h3>Best Performing Day of Week</h3>
+                            <span class="collapse-icon">▼</span>
+                        </div>
+                        <div class="content-card-body">
+                            <div class="chart-container">
+                                <canvas id="dayChart"></canvas>
+                                <div class="chart-timestamp" id="dayChart-timestamp"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -686,7 +1075,7 @@
                             conversion.interview || 0,
                             conversion.offer || 0
                         ],
-                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe']
+                        backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899']
                     }]
                 },
                 options: {
@@ -706,7 +1095,7 @@
                     datasets: [{
                         label: 'Applications',
                         data: Object.values(timeDist),
-                        backgroundColor: '#667eea'
+                        backgroundColor: '#3b82f6'
                     }]
                 },
                 options: {
@@ -727,12 +1116,12 @@
                         {
                             label: 'Response Rate',
                             data: Object.values(matchData).map(d => d.response_rate || 0),
-                            backgroundColor: '#667eea'
+                            backgroundColor: '#3b82f6'
                         },
                         {
                             label: 'Interview Rate',
                             data: Object.values(matchData).map(d => d.interview_rate || 0),
-                            backgroundColor: '#f5576c'
+                            backgroundColor: '#ef4444'
                         }
                     ]
                 },
@@ -761,11 +1150,11 @@
                     datasets: [{
                         label: 'Response Rate (%)',
                         data: dayLabels.map(day => bestDay[day]?.response_rate || 0),
-                        backgroundColor: '#667eea'
+                        backgroundColor: '#3b82f6'
                     }, {
                         label: 'Total Applications',
                         data: dayLabels.map(day => bestDay[day]?.total_applications || 0),
-                        backgroundColor: '#f5576c',
+                        backgroundColor: '#ef4444',
                         yAxisID: 'y1'
                     }]
                 },
@@ -805,8 +1194,8 @@
                     datasets: [{
                         label: 'Applications Per Day',
                         data: velocity.map(v => v.count),
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         fill: true
                     }]
                 },
@@ -827,8 +1216,8 @@
                     datasets: [{
                         label: 'Cumulative Applications',
                         data: velocityCumulative.map(v => v.cumulative),
-                        borderColor: '#764ba2',
-                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
                         fill: true
                     }]
                 },
@@ -848,7 +1237,7 @@
                     labels: Object.keys(statusDist),
                     datasets: [{
                         data: Object.values(statusDist),
-                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#43e97b']
+                        backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b']
                     }]
                 },
                 options: {
@@ -870,12 +1259,12 @@
                         {
                             label: 'Response Rate',
                             data: companyLabels.map(type => companyType[type]?.response_rate || 0),
-                            backgroundColor: '#667eea'
+                            backgroundColor: '#3b82f6'
                         },
                         {
                             label: 'Interview Rate',
                             data: companyLabels.map(type => companyType[type]?.interview_rate || 0),
-                            backgroundColor: '#f5576c'
+                            backgroundColor: '#ef4444'
                         }
                     ]
                 },
@@ -909,19 +1298,19 @@
                             {
                                 label: 'Total Applications',
                                 data: workTypeData,
-                                backgroundColor: '#667eea',
+                                backgroundColor: '#3b82f6',
                                 yAxisID: 'y'
                             },
                             {
                                 label: 'Response Rate (%)',
                                 data: workTypeResponseRates,
-                                backgroundColor: '#43e97b',
+                                backgroundColor: '#10b981',
                                 yAxisID: 'y1'
                             },
                             {
                                 label: 'Interview Rate (%)',
                                 data: workTypeInterviewRates,
-                                backgroundColor: '#f5576c',
+                                backgroundColor: '#ef4444',
                                 yAxisID: 'y1'
                             }
                         ]
@@ -995,7 +1384,7 @@
                         datasets: [{
                             label: 'No Data',
                             data: [0],
-                            backgroundColor: '#cccccc'
+                            backgroundColor: '#9ca3af'
                         }]
                     },
                     options: {
@@ -1026,12 +1415,12 @@
                             {
                                 label: 'Response Rate (%)',
                                 data: locationArray.map(l => l.response_rate || 0),
-                                backgroundColor: '#667eea'
+                                backgroundColor: '#3b82f6'
                             },
                             {
                                 label: 'Interview Rate (%)',
                                 data: locationArray.map(l => l.interview_rate || 0),
-                                backgroundColor: '#f5576c'
+                                backgroundColor: '#ef4444'
                             }
                         ]
                     },
@@ -1130,7 +1519,7 @@
                     datasets: [{
                         label: 'Number of Jobs',
                         data: orderedValues,
-                        backgroundColor: '#667eea'
+                        backgroundColor: '#3b82f6'
                     }]
                 },
                 options: {
@@ -1182,7 +1571,7 @@
                     datasets: [{
                         label: 'Number of Skills',
                         data: overlapValues,
-                        backgroundColor: '#667eea',
+                        backgroundColor: '#3b82f6',
                         borderRadius: 4
                     }]
                 },
@@ -1373,7 +1762,7 @@
                         datasets: [{
                             label: 'Number of Jobs',
                             data: commonUnmatchedValues,
-                            backgroundColor: '#f5576c',
+                            backgroundColor: '#ef4444',
                             borderRadius: 4
                         }]
                     },
@@ -1508,7 +1897,7 @@
                     datasets: [{
                         label: 'Frequency',
                         data: mostRequested.map(s => s.frequency),
-                        backgroundColor: '#667eea',
+                        backgroundColor: '#3b82f6',
                         borderRadius: 4
                     }]
                 },
@@ -1605,7 +1994,7 @@
                     datasets: [{
                         label: 'Frequency',
                         data: unmatched.map(s => s.frequency),
-                        backgroundColor: '#f5576c',
+                        backgroundColor: '#ef4444',
                         borderRadius: 4
                     }]
                 },
@@ -1839,7 +2228,8 @@
                                 stepSize: 10
                             },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                borderColor: 'rgba(229, 231, 235, 0.5)'
                             }
                         }
                     },
@@ -1923,7 +2313,23 @@
                 }
             });
         }
+        
+        // Collapsible Card Functionality
+        function toggleCollapse(header) {
+            const card = header.closest('.content-card');
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
     </script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
 </body>
 </html>
 

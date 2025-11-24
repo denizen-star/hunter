@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Application Reports - Hunter</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
         * {
@@ -13,48 +17,293 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 0;
             margin: 0;
             position: relative;
             overflow-x: hidden;
-            color: #4a5568;
+            color: var(--text-primary);
         }
         
         .container {
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             margin: 0;
-            padding: 0 20px 20px 20px;
-            margin-left: 250px;
+            padding: var(--space-lg);
+            margin-left: 180px;
             box-sizing: border-box;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .container {
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .stats-grid {
+                gap: var(--space-sm);
+            }
+            
+            .stat-item {
+                min-width: 110px;
+                padding: var(--space-sm) var(--space-md);
+            }
+            
+            .stat-number {
+                font-size: var(--font-xl);
+            }
+            
+            .stat-label {
+                font-size: var(--font-xs);
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .stats-grid {
+                justify-content: flex-start;
+            }
+            
+            .stat-item {
+                min-width: 100px;
+                padding: var(--space-sm) var(--space-md);
+            }
+            
+            .stat-number {
+                font-size: var(--font-lg);
+            }
+            
+            .stat-label {
+                font-size: 10px;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-primary);
+            }
+            
+            .container {
+                width: 100%;
+                margin-left: 0;
+                padding: var(--space-md);
+            }
+            
+            .stats-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stat-item {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .tabs-header {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                min-width: 100px;
+                flex: 1;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+            
+            .followup-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            
+            .followup-timestamp {
+                margin-left: 0;
+            }
         }
         
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 180px;
             height: 100vh;
-            background: #8b9dc3;
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 4px 0 20px rgba(139, 157, 195, 0.15);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
             z-index: 1000;
-            padding: 20px 0;
+            padding: var(--space-md) 0;
             overflow-y: auto;
         }
         
         .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
         }
         
         .sidebar-header h3 {
-            color: white;
+            color: var(--text-primary);
             font-size: 18px;
             font-weight: 600;
             margin: 0;
@@ -72,25 +321,25 @@
         
         .sidebar-menu a {
             display: block;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .sidebar-menu a:hover {
-            background: rgba(66, 66, 66, 0.2);
-            color: white;
-            border-left-color: #424242;
-            transform: translateX(5px);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .sidebar-menu a.active {
-            background: rgba(66, 66, 66, 0.3);
-            color: white;
-            border-left-color: #424242;
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .sidebar-menu a i {
@@ -101,27 +350,19 @@
         
         .header {
             text-align: center;
-            color: white;
-            margin: 0 -20px 0 -20px;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-            background: #8b9dc3;
-            padding: 0 20px;
-            width: calc(100% + 40px);
-            border-radius: 0;
-            height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(139, 157, 195, 0.2);
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }
         
         .header h1 {
             font-size: 28px;
-            margin-bottom: 5px;
-            color: #F7F7F7;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-weight: 600;
         }
         
         .nav-bar {
@@ -164,90 +405,114 @@
         }
         
         .tabs-container {
-            background: white;
-            backdrop-filter: blur(20px);
-            border-radius: 0;
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
-            margin: 0 -20px 20px -20px;
-            width: calc(100% + 40px);
-            position: relative;
-            z-index: 1;
+            margin-bottom: var(--space-lg);
         }
         
         .tabs-header {
             display: flex;
-            background: #8b9dc3;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
             overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
         }
         
         .tab {
             flex: 1;
             min-width: 120px;
-            padding: 18px 20px;
+            padding: 14px var(--space-lg);
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
             white-space: nowrap;
             position: relative;
-            border-bottom: 3px solid transparent;
         }
         
         .tab:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: var(--bg-active);
+            color: var(--text-primary);
         }
         
         .tab.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-bottom: 3px solid #ffffff;
+            background: var(--accent-blue);
+            color: #ffffff;
         }
         
         .reports-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
         }
         
         .report-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid rgba(139, 157, 195, 0.2);
-            box-shadow: 0 8px 32px rgba(108, 123, 149, 0.15);
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            color: #4a5568;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+            overflow: hidden;
+            color: var(--text-primary);
         }
         
-        .report-card h3 {
-            background: #8b9dc3;
-            color: white;
-            padding: 20px 25px;
-            margin: -40px -40px 30px -40px;
-            border-radius: 20px 20px 0 0;
-            font-size: 24px;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
+        .report-card-header {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .report-card-header:hover {
+            background: var(--bg-hover);
+        }
+        
+        .report-card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .report-card-header .collapse-icon {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        .report-card.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .report-card-body {
+            padding: var(--space-lg);
+            transition: max-height 0.3s ease;
+        }
+        
+        .report-card.collapsed .report-card-body {
+            display: none;
         }
         
         .chart-container {
             position: relative;
-            height: 300px;
+            height: 250px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-md);
+            background: var(--bg-primary);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }
         
         .chart-container canvas {
@@ -260,8 +525,8 @@
             bottom: 5px;
             right: 10px;
             font-size: 6pt;
-            color: #666;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-tertiary);
+            font-family: var(--font-family);
             z-index: 10;
             pointer-events: none;
         }
@@ -275,18 +540,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid rgba(139, 157, 195, 0.1);
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.5);
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+            background: var(--bg-primary);
         }
         
         .followup-item:hover {
-            background: rgba(139, 157, 195, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+            background: var(--bg-hover);
         }
         
         .followup-item:last-child {
@@ -298,77 +561,78 @@
         }
         
         .followup-company {
-            font-weight: 600;
-            color: #2d3748;
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
             margin-bottom: 5px;
-            font-size: 16px;
+            font-size: var(--font-base);
         }
         
         .followup-position {
-            color: #4a5568;
-            font-size: 14px;
+            color: var(--text-secondary);
+            font-size: var(--font-sm);
             margin-bottom: 5px;
         }
         
         .followup-match {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 14px;
+            color: var(--accent-blue);
+            font-weight: var(--font-semibold);
+            font-size: var(--font-sm);
         }
         
         .followup-timestamp {
-            color: #718096;
-            font-size: 12px;
-            margin-left: 15px;
+            color: var(--text-tertiary);
+            font-size: var(--font-xs);
+            margin-left: var(--space-md);
         }
         
         .followup-link {
-            color: #667eea;
+            color: var(--accent-blue);
             text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: rgba(102, 126, 234, 0.1);
-            transition: all 0.3s ease;
+            font-weight: var(--font-medium);
+            padding: 8px var(--space-md);
+            border-radius: var(--radius-sm);
+            background: var(--accent-blue-light);
+            transition: all 0.2s ease;
         }
         
         .followup-link:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateY(-1px);
+            background: var(--accent-blue);
+            color: #ffffff;
         }
         
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            color: #718096;
-            margin: 20px 0;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
         }
         
         .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            color: #8b9dc3;
+            font-size: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0 0 var(--space-sm) 0;
         }
         
         .loading {
             text-align: center;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            color: #718096;
-            margin: 20px 0;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 3px solid var(--border-primary);
+            border-top: 3px solid var(--accent-blue);
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto var(--space-md);
         }
         
         @keyframes spin {
@@ -377,39 +641,48 @@
         }
         
         .stats-summary {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(139, 157, 195, 0.2);
-            box-shadow: 0 8px 32px rgba(108, 123, 149, 0.15);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
             position: relative;
             z-index: 1;
-            color: #4a5568;
+            color: var(--text-primary);
         }
         
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            flex-wrap: nowrap;
+            align-items: center;
         }
         
         .stat-item {
             text-align: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm) var(--space-md);
+            box-shadow: var(--shadow-sm);
+            min-width: 120px;
+            flex: 0 0 auto;
         }
         
         .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 3px;
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.2;
         }
         
         .stat-label {
-            color: #718096;
-            font-size: 12px;
-            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: var(--font-medium);
             line-height: 1.2;
         }
     </style>
@@ -417,7 +690,7 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h3>Job Hunter</h3>
+            <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -429,14 +702,23 @@
             <li><a href="/analytics" class="nav-link">Analytics</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
-    <div class="container">
-        <div class="header">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/dashboard" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
             <h1>Application Reports</h1>
         </div>
+    </div>
+    
+    <div class="container">
         
         <div class="tabs-container">
             <div class="tabs-header">
@@ -457,42 +739,62 @@
         
         <div class="reports-grid">
             <div class="report-card">
-                <h3>Applications by Status</h3>
-                <div class="chart-container">
-                    <canvas id="applicationsByStatusChart"></canvas>
-                    <div class="chart-timestamp" id="applicationsByStatusChart-timestamp"></div>
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Applications by Status</h3>
+                    <span class="collapse-icon">▼</span>
                 </div>
-                <div id="applicationsByStatusData" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="applicationsByStatusChart"></canvas>
+                        <div class="chart-timestamp" id="applicationsByStatusChart-timestamp"></div>
+                    </div>
+                    <div id="applicationsByStatusData" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
+                </div>
             </div>
             
             <div class="report-card">
-                <h3>Applications by Status Change</h3>
-                <div class="chart-container">
-                    <canvas id="statusChangesChart"></canvas>
-                    <div class="chart-timestamp" id="statusChangesChart-timestamp"></div>
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Applications by Status Change</h3>
+                    <span class="collapse-icon">▼</span>
                 </div>
-                <div id="statusChangesData" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
-            </div>
-        </div>
-        
-        <div class="report-card">
-            <h3>Applications Requiring Follow-up</h3>
-            <p style="color: #718096; margin-bottom: 30px; font-size: 16px;">Applications with more than one week without updates</p>
-            <div id="followup-list" class="followup-list">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading follow-up applications...</p>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="statusChangesChart"></canvas>
+                        <div class="chart-timestamp" id="statusChangesChart-timestamp"></div>
+                    </div>
+                    <div id="statusChangesData" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
                 </div>
             </div>
-        </div>
-        
-        <div class="report-card">
-            <h3>Flagged Applications</h3>
-            <p style="color: #718096; margin-bottom: 30px; font-size: 16px;">Applications you've flagged for review</p>
-            <div id="flagged-list" class="followup-list">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading flagged applications...</p>
+            
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Applications Requiring Follow-up</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-md); font-size: var(--font-sm);">Applications with more than one week without updates</p>
+                    <div id="followup-list" class="followup-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading follow-up applications...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Flagged Applications</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-md); font-size: var(--font-sm);">Applications you've flagged for review</p>
+                    <div id="flagged-list" class="followup-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading flagged applications...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -747,8 +1049,8 @@
             const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
             const values = Object.values(data);
             const colors = [
-                '#667eea', '#f093fb', '#f5576c', '#4facfe', 
-                '#43e97b', '#fa709a', '#ffecd2', '#a8edea'
+                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
             ];
             
             console.log('Applications by Status Chart Data:', { labels, values, data });
@@ -835,8 +1137,8 @@
             const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
             const values = Object.values(data);
             const colors = [
-                '#667eea', '#f093fb', '#f5576c', '#4facfe', 
-                '#43e97b', '#fa709a', '#ffecd2', '#a8edea'
+                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
             ];
             
             console.log('Status Changes Chart Data:', { labels, values, data });
@@ -1062,6 +1364,22 @@
                 console.error('AI Status Error:', error);
             }
         }
+        
+        // Collapsible Card Functionality
+        function toggleCollapse(header) {
+            const card = header.closest('.report-card');
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
     </script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
 </body>
 </html>

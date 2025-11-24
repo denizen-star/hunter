@@ -101,8 +101,8 @@ class DashboardGenerator:
         
         total = len(applications)
 
-        # Generate tabbed content for each status
-        tabs_html = self._create_tabs_html(applications, status_counts)
+        # Generate stat cards and filter interface
+        dashboard_html = self._create_dashboard_with_stats(applications, status_counts)
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -111,47 +111,163 @@ class DashboardGenerator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Application Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {{
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f5f5f5;
+            font-family: var(--font-family); 
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 0;
             margin: 0;
             position: relative;
             overflow-x: hidden;
+            color: var(--text-primary);
         }}
         .container {{ 
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             margin: 0;
-            padding: 0 20px 20px 20px;
-            margin-left: 250px;
+            padding: var(--space-lg);
+            margin-left: 180px;
             box-sizing: border-box;
+        }}
+        
+        /* Hero Header - Full Width */
+        .hero-header {{
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+        }}
+        
+        .hero-header-top {{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }}
+        
+        .hero-header h1 {{
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }}
+        
+        .hero-header-subtitle {{
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }}
+        
+        /* Footer */
+        .page-footer {{
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }}
+        
+        .footer-buttons {{
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }}
+        
+        .footer-btn {{
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .footer-btn:hover {{
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }}
+        
+        .footer-btn-primary {{
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }}
+        
+        .footer-btn-primary:hover {{
+            background: #2563eb;
+            border-color: #2563eb;
+        }}
+        
+        .container {{
+            padding-bottom: 100px; /* Space for fixed footer */
         }}
         
         .sidebar {{
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 180px;
             height: 100vh;
-            background: #8b9dc3;
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
             z-index: 1000;
-            padding: 20px 0;
+            padding: var(--space-md) 0;
             overflow-y: auto;
         }}
         
         .sidebar-header {{
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
         }}
         
         .sidebar-header h3 {{
-            color: white;
+            color: var(--text-primary);
             font-size: 18px;
             font-weight: 600;
             margin: 0;
@@ -169,25 +285,25 @@ class DashboardGenerator:
         
         .sidebar-menu a {{
             display: block;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            font-size: 14px;
         }}
         
         .sidebar-menu a:hover {{
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: #ffffff;
-            transform: translateX(5px);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }}
         
         .sidebar-menu a.active {{
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-left-color: #ffffff;
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }}
         
         .sidebar-menu a i {{
@@ -197,121 +313,103 @@ class DashboardGenerator:
         }}
         .header {{
             text-align: center;
-            color: white;
-            margin: 0 -20px 0 -20px;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-            background: #8b9dc3;
-            padding: 0 20px;
-            width: calc(100% + 40px);
-            border-radius: 0;
-            height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }}
         .header h1 {{
             font-size: 28px;
-            margin-bottom: 5px;
-            color: white;
-            font-weight: 300;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-weight: 600;
         }}
         .actions {{
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--space-lg);
         }}
         .nav-bar {{
-            background: rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(20px);
-            padding: 15px 0;
-            margin-bottom: 30px;
-            border-radius: 10px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: var(--bg-primary);
+            padding: var(--space-md) 0;
+            margin-bottom: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }}
         .nav-links {{
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: var(--space-md);
             flex-wrap: wrap;
         }}
         .nav-link {{
-            color: white;
+            color: var(--text-primary);
             text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            padding: 10px var(--space-md);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
         }}
         .nav-link:hover {{
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
+            background: var(--bg-hover);
         }}
         .btn {{
-            background: white;
-            color: #667eea;
+            background: var(--accent-blue);
+            color: #ffffff;
             border: none;
-            padding: 15px 40px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
+            padding: 12px var(--space-xl);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
         }}
         .btn:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            background: var(--accent-blue-hover);
         }}
         .tabs-container {{
-            background: white;
-            backdrop-filter: blur(20px);
-            border-radius: 0;
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
-            margin: 0 -20px 20px -20px;
-            width: calc(100% + 40px);
-            position: relative;
-            z-index: 1;
+            margin-bottom: var(--space-lg);
         }}
         .tabs-header {{
             display: flex;
-            background: #8b9dc3;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
             overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
+            flex-wrap: wrap;
         }}
         .tab {{
             flex: 1;
-            min-width: 120px;
-            padding: 18px 20px;
+            min-width: 100px;
+            padding: 14px var(--space-lg);
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
             white-space: nowrap;
             position: relative;
-            border-bottom: 3px solid transparent;
+            font-family: var(--font-family);
         }}
         .tab:hover {{
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: var(--bg-active);
+            color: var(--text-primary);
         }}
         .tab.active {{
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-bottom: 3px solid #ffffff;
+            background: var(--accent-blue);
+            color: #ffffff;
         }}
         .tab-count {{
             font-size: 12px;
@@ -319,40 +417,54 @@ class DashboardGenerator:
             margin-left: 5px;
         }}
         .tab-content {{
-            padding: 30px;
+            padding: var(--space-lg);
             min-height: 400px;
         }}
         .sort-controls {{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+        }}
+        .sort-controls h3 {{
+            margin: 0;
+            color: var(--text-primary);
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
         }}
         .sort-select {{
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
+            padding: 10px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            cursor: pointer;
+        }}
+        .sort-select:focus {{
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }}
         .applications-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: var(--space-lg);
         }}
         .card {{
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(74, 85, 104, 0.1);
-            border: 1px solid rgba(74, 85, 104, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-primary);
+            transition: all 0.2s ease;
         }}
         .card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(74, 85, 104, 0.15);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }}
         .card-header {{
             display: flex;
@@ -361,18 +473,18 @@ class DashboardGenerator:
             margin-bottom: 8px;
         }}
         .card-company {{
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
             flex: 1;
         }}
         .flag-btn {{
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            padding: 5px;
-            margin-left: 10px;
+            padding: var(--space-xs);
+            margin-left: var(--space-sm);
             transition: transform 0.2s;
             opacity: 0.6;
         }}
@@ -384,9 +496,10 @@ class DashboardGenerator:
             opacity: 1;
         }}
         .card-title {{
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: var(--font-sm);
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            font-weight: var(--font-medium);
         }}
         .card-status-container {{
             display: flex;
@@ -409,73 +522,187 @@ class DashboardGenerator:
             border-radius: 16px;
             font-size: 12px;
             font-weight: 500;
-            background: rgba(139, 157, 195, 0.2);
-            color: #6c7b95;
-            border: 1px solid rgba(139, 157, 195, 0.3);
+            background: var(--bg-active);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-primary);
         }}
-        .status-pending {{ background: #fff3cd; color: #856404; }}
-        .status-applied {{ background: #d1ecf1; color: #0c5460; }}
-        .status-contacted-someone {{ background: #e2e3e5; color: #383d41; }}
-        .status-contacted-hiring-manager {{ background: #f8d7da; color: #721c24; }}
-        .status-company-response {{ background: #cce5ff; color: #004085; }}
-        .status-scheduled-interview {{ background: #ffeeba; color: #856404; }}
-        .status-interviewed {{ background: #d4edda; color: #155724; }}
-        .status-interview-notes {{ background: #d4edda; color: #155724; }}
-        .status-interview-follow-up {{ background: #ffeef8; color: #b21f66; }}
-        .status-offered {{ background: #c3e6cb; color: #155724; }}
-        .status-rejected {{ background: #f8d7da; color: #721c24; }}
-        .status-accepted {{ background: #d4edda; color: #155724; }}
+        .status-pending {{ background: #fef3c7; color: #92400e; }}
+        .status-applied {{ background: #dbeafe; color: #1e40af; }}
+        .status-contacted-someone {{ background: var(--bg-active); color: var(--text-secondary); }}
+        .status-contacted-hiring-manager {{ background: #fee2e2; color: #991b1b; }}
+        .status-company-response {{ background: var(--accent-blue-light); color: #1e40af; }}
+        .status-scheduled-interview {{ background: #fef3c7; color: #92400e; }}
+        .status-interviewed {{ background: #d1fae5; color: #065f46; }}
+        .status-interview-notes {{ background: #d1fae5; color: #065f46; }}
+        .status-interview-follow-up {{ background: #fce7f3; color: #9f1239; }}
+        .status-offered {{ background: #d1fae5; color: #065f46; }}
+        .status-rejected {{ background: #fee2e2; color: #991b1b; }}
+        .status-accepted {{ background: #d1fae5; color: #065f46; }}
         .card-meta {{
-            font-size: 13px;
-            color: #999;
-            margin-bottom: 8px;
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
         }}
         .card-actions {{
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+            margin-top: var(--space-lg);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-light);
         }}
         .card-btn {{
             display: inline-block;
-            background: #8b9dc3;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
+            background: var(--accent-blue);
+            color: #ffffff;
+            padding: 10px var(--space-md);
+            border-radius: var(--radius-sm);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.2s;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+            width: 100%;
+            text-align: center;
         }}
         .card-btn:hover {{
-            background: #7a8bb0;
+            background: var(--accent-blue-hover);
         }}
         .empty-state {{
             text-align: center;
-            padding: 60px 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            color: #999;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
         }}
         .empty-state-icon {{
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
         }}
         .empty-state-text {{
-            font-size: 20px;
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
         }}
         .match-score {{
             float: right;
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--accent-blue);
         }}
         .hidden {{ display: none; }}
+        
+        /* Status Toggle Box */
+        .status-toggle-box {{
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }}
+        
+        .status-toggle-header {{
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }}
+        
+        .status-toggle-buttons {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }}
+        
+        .status-toggle-btn {{
+            padding: 6px 12px;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+        }}
+        
+        .status-toggle-btn:hover {{
+            background: var(--bg-hover);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }}
+        
+        .status-toggle-btn.active {{
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }}
+        
+        /* Dashboard Stats Container */
+        .dashboard-stats-container {{
+            padding: var(--space-lg);
+        }}
+        
+        /* Stat Cards Grid - Two rows, centered */
+        .stat-cards-grid {{
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }}
+        
+        .stat-card {{
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: calc(var(--space-lg) * 0.75);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }}
+        
+        .stat-card:hover {{
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }}
+        
+        .stat-card.active {{
+            border: 2px solid var(--accent-blue);
+        }}
+        
+        .stat-number {{
+            font-size: var(--font-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }}
+        
+        .stat-label {{
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }}
+        
+        @media (max-width: 1200px) {{
+            .stat-cards-grid {{
+                grid-template-columns: repeat(4, 1fr);
+            }}
+        }}
+        
+        @media (max-width: 768px) {{
+            .stat-cards-grid {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
+        }}
     </style>
 </head>
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h3>Job Hunter</h3>
+            <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -486,17 +713,18 @@ class DashboardGenerator:
             <li><a href="/reports" class="nav-link">Reports</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
-    <div class="container">
-        <div class="header">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
             <h1>Job Application Dashboard - {total}</h1>
         </div>
+        </div>
         
-        
-        {tabs_html}
+    <div class="container">
+        {dashboard_html}
     </div>
     
     <script>
@@ -564,53 +792,70 @@ class DashboardGenerator:
             window.location.href = '/new-application';
         }}
         
-        // Tab switching functionality
-        function switchTab(status) {{
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => {{
-                content.style.display = 'none';
+        // Filter applications by status
+        function filterApplications(filterStatus) {{
+            // Update active stat card
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {{
+                card.classList.remove('active');
+                card.style.border = '1px solid var(--border-primary)';
             }});
-            
-            // Remove active class from all tabs
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab content
-            const selectedContent = document.getElementById('tab-' + status);
-            if (selectedContent) {{
-                selectedContent.style.display = 'block';
+            const activeCard = document.querySelector(`.stat-card[data-status="${{filterStatus}}"]`);
+            if (activeCard) {{
+                activeCard.classList.add('active');
             }}
             
-            // Add active class to clicked tab
-            const selectedTab = document.querySelector(`[data-status="${{status}}"]`);
-            if (selectedTab) {{
-                selectedTab.classList.add('active');
-            }}
-            
-            // Update sort dropdown for this tab
-            updateSortOptions(status);
-        }}
-        
-        // Update sort options based on current tab
-        function updateSortOptions(status) {{
-            const sortSelect = document.getElementById('sort-select-' + status);
-            if (sortSelect) {{
-                // Reset to default sorting
-                sortSelect.value = 'updated_desc';
-                sortApplications(status, 'updated_desc');
-            }}
-        }}
-        
-        // Sort applications in the current tab
-        function sortApplications(status, sortBy) {{
-            const tabContent = document.getElementById('tab-' + status);
-            if (!tabContent) return;
-            
-            const grid = tabContent.querySelector('.applications-grid');
+            // Get all application cards
+            const grid = document.getElementById('applications-grid');
             if (!grid) return;
             
             const cards = Array.from(grid.querySelectorAll('.card'));
+            
+            // Filter cards based on status
+            cards.forEach(card => {{
+                let show = false;
+                const statusElement = card.querySelector('.card-status');
+                const statusText = statusElement?.textContent.toLowerCase() || '';
+                const statusClass = statusElement?.className || '';
+                const isFlagged = card.dataset.flagged === 'true';
+                
+                if (filterStatus === 'all') {{
+                    show = true;
+                }} else if (filterStatus === 'active') {{
+                    // Show all non-rejected and non-accepted
+                    show = !statusText.includes('rejected') && !statusText.includes('accepted');
+                }} else if (filterStatus === 'flagged') {{
+                    show = isFlagged;
+                }} else if (filterStatus === 'pending') {{
+                    show = statusText.includes('pending');
+                }} else if (filterStatus === 'applied') {{
+                    show = statusText.includes('applied') && !statusText.includes('company') && !statusClass.includes('company');
+                }} else if (filterStatus === 'contacted') {{
+                    show = statusText.includes('contacted') || statusClass.includes('contacted');
+                }} else if (filterStatus === 'company') {{
+                    show = statusText.includes('company') || statusClass.includes('company-response');
+                }} else if (filterStatus === 'scheduled') {{
+                    show = statusText.includes('scheduled') || statusClass.includes('scheduled');
+                }} else if (filterStatus === 'follow-up') {{
+                    show = statusText.includes('follow') || statusClass.includes('follow');
+                }} else if (filterStatus === 'offered') {{
+                    show = statusText.includes('offered') || statusClass.includes('offered');
+                }} else if (filterStatus === 'rejected') {{
+                    show = statusText.includes('rejected') || statusClass.includes('rejected');
+                }} else if (filterStatus === 'accepted') {{
+                    show = statusText.includes('accepted') || statusClass.includes('accepted');
+                }}
+                
+                card.style.display = show ? '' : 'none';
+            }});
+        }}
+        
+        // Sort applications
+        function sortApplications(sortBy) {{
+            const grid = document.getElementById('applications-grid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.card:not([style*="display: none"])'));
             
             cards.sort((a, b) => {{
                 switch(sortBy) {{
@@ -641,16 +886,26 @@ class DashboardGenerator:
         
         // Handle sort dropdown change
         function handleSortChange() {{
-            const activeTab = document.querySelector('.tab.active');
-            
-            if (activeTab) {{
-                const status = activeTab.dataset.status;
-                const sortSelect = document.getElementById('sort-select-' + status);
+            const sortSelect = document.getElementById('sort-select');
                 if (sortSelect) {{
-                    sortApplications(status, sortSelect.value);
-                }}
+                sortApplications(sortSelect.value);
             }}
         }}
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {{
+            // Make stat cards clickable
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {{
+                card.addEventListener('click', function() {{
+                    const status = this.dataset.status;
+                    filterApplications(status);
+                }});
+            }});
+            
+            // Initialize with "active" filter active
+            filterApplications('active');
+        }});
         
         // Toggle flag for an application
         async function toggleFlag(appId, currentFlagged) {{
@@ -698,19 +953,102 @@ class DashboardGenerator:
             }}
         }}
         
-        // Initialize with active tab as default
-        document.addEventListener('DOMContentLoaded', function() {{
-            // Activate 'active' tab by default (landing page)
-            const activeTab = document.querySelector('[data-status="active"]');
-            if (activeTab) {{
-                const status = activeTab.dataset.status;
-                switchTab(status);
-            }}
-        }});
     </script>
 </body>
 </html>"""
         return html
+    
+    def _create_dashboard_with_stats(self, applications: List[Application], status_counts: dict) -> str:
+        """Create dashboard with stat cards and filter buttons"""
+        # Calculate counts for each status
+        def count_status(*labels):
+            return len([a for a in applications if self._status_matches(a.status, *labels)])
+        
+        def count_flagged():
+            return len([a for a in applications if a.flagged])
+        
+        def count_active():
+            return len([a for a in applications if a.status.lower() != 'rejected' and a.status.lower() != 'accepted'])
+        
+        # Calculate stats
+        stats = {
+            'active': count_active(),
+            'all': len(applications),
+            'flagged': count_flagged(),
+            'pending': count_status('pending'),
+            'applied': count_status('applied'),
+            'contacted': count_status('contacted someone'),
+            'company': count_status('company response', 'contacted hiring manager'),
+            'scheduled': count_status('scheduled interview'),
+            'follow-up': count_status('interview - follow up'),
+            'offered': count_status('offered'),
+            'rejected': count_status('rejected'),
+            'accepted': count_status('accepted')
+        }
+        
+        # Create stat cards (two rows, 6 cards per row)
+        stat_cards_html = ""
+        status_order = ['active', 'all', 'flagged', 'pending', 'applied', 'contacted', 'company', 'scheduled', 'follow-up', 'offered', 'rejected', 'accepted']
+        status_labels = {
+            'active': 'Active',
+            'all': 'All',
+            'flagged': 'Flagged',
+            'pending': 'Pending',
+            'applied': 'Applied',
+            'contacted': 'Contacted',
+            'company': 'Company',
+            'scheduled': 'Scheduled',
+            'follow-up': 'Follow Up',
+            'offered': 'Offered',
+            'rejected': 'Rejected',
+            'accepted': 'Accepted'
+        }
+        
+        for i, status in enumerate(status_order):
+            count = stats[status]
+            label = status_labels[status]
+            stat_cards_html += f'''
+                <div class="stat-card" data-status="{status}">
+                    <div class="stat-number">{count}</div>
+                    <div class="stat-label">{label}</div>
+                </div>
+            '''
+        
+        # Create all application cards
+        cards_html = ""
+        # Sort applications by updated timestamp (newest first)
+        def safe_datetime_sort_key(app):
+            if app.status_updated_at:
+                return str(app.status_updated_at)
+            return str(app.created_at)
+        
+        sorted_apps = sorted(applications, key=safe_datetime_sort_key, reverse=True)
+        for app in sorted_apps:
+            cards_html += self._create_application_card(app)
+        
+        return f'''
+        <div class="dashboard-stats-container">
+            <div class="stat-cards-grid">
+                {stat_cards_html}
+            </div>
+            <div class="sort-controls">
+                <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">Applications</h3>
+                <select id="sort-select" class="sort-select" onchange="handleSortChange()">
+                    <option value="updated_desc">Updated (Newest First)</option>
+                    <option value="updated_asc">Updated (Oldest First)</option>
+                    <option value="applied_desc">Applied (Newest First)</option>
+                    <option value="applied_asc">Applied (Oldest First)</option>
+                    <option value="job_posted_desc">Job Posted (Newest First)</option>
+                    <option value="job_posted_asc">Job Posted (Oldest First)</option>
+                    <option value="match_desc">Match % (Highest First)</option>
+                    <option value="match_asc">Match % (Lowest First)</option>
+                </select>
+            </div>
+            <div class="applications-grid" id="applications-grid">
+                {cards_html if cards_html else self._create_empty_state('all')}
+            </div>
+        </div>
+        '''
     
     def _create_tabs_html(self, applications: List[Application], status_counts: dict) -> str:
         """Create the tabbed interface HTML"""
@@ -724,7 +1062,6 @@ class DashboardGenerator:
             'contacted someone',
             'company response',
             'scheduled interview',
-            'interview notes',
             'interview - follow up',
             'offered',
             'rejected',
@@ -753,8 +1090,6 @@ class DashboardGenerator:
                     status_display = "Company"
                 elif status == 'scheduled interview':
                     status_display = "Scheduled"
-                elif status == 'interview notes':
-                    status_display = "Interview Notes"
                 elif status == 'interview - follow up':
                     status_display = "Follow Up"
                 else:
@@ -762,7 +1097,6 @@ class DashboardGenerator:
             tab_headers += f'''
                 <button class="tab" data-status="{status}" onclick="switchTab('{status}')">
                     {status_display}
-                    <span class="tab-count">({count})</span>
                 </button>
             '''
         
@@ -770,33 +1104,36 @@ class DashboardGenerator:
         tab_contents = ""
         for status in status_order:
             if status == 'active':
+                # Count all applications except rejected ones
+                count = len([app for app in applications if app.status.lower() != 'rejected'])
                 # All applications except rejected ones
                 status_apps = [app for app in applications if app.status.lower() != 'rejected']
-                status_title = "Active Applications"
+                status_title = f"Active Applications ({count})"
                 default_display = 'block'  # Show 'active' tab by default (landing page)
             elif status == 'all':
+                count = len(applications)  # Total count for all applications
                 status_apps = applications  # All applications
-                status_title = "All Applications"
+                status_title = f"All Applications ({count})"
                 default_display = 'none'  # No longer the default
             elif status == 'flagged':
+                count = len([app for app in applications if app.flagged])
                 status_apps = [app for app in applications if app.flagged]
-                status_title = "Flagged Applications"
+                status_title = f"Flagged Applications ({count})"
                 default_display = 'none'
             else:
+                count = status_counts.get(status, 0)
                 status_apps = [app for app in applications if self._status_matches(app.status, status)]
                 # Use full names in content area for clarity
                 if status == 'contacted someone':
-                    status_title = "Contacted Someone Applications"
+                    status_title = f"Contacted Someone Applications ({count})"
                 elif status == 'company response':
-                    status_title = "Company Response Applications"
+                    status_title = f"Company Response Applications ({count})"
                 elif status == 'scheduled interview':
-                    status_title = "Scheduled Interview Applications"
-                elif status == 'interview notes':
-                    status_title = "Interview Notes Applications"
+                    status_title = f"Scheduled Interview Applications ({count})"
                 elif status == 'interview - follow up':
-                    status_title = "Interview - Follow Up Applications"
+                    status_title = f"Interview - Follow Up Applications ({count})"
                 else:
-                    status_title = f"{status.replace('_', ' ').title()} Applications"
+                    status_title = f"{status.replace('_', ' ').title()} Applications ({count})"
                 default_display = 'none'
             
             # Sort applications by updated timestamp (newest first) by default
@@ -812,10 +1149,32 @@ class DashboardGenerator:
             for app in status_apps:
                 cards_html += self._create_application_card(app)
             
+            # Add status toggle box for Active Applications tab
+            status_toggle_html = ""
+            if status == 'active':
+                status_toggle_html = f'''
+                    <div class="status-toggle-box">
+                        <div class="status-toggle-header">Filter by Status:</div>
+                        <div class="status-toggle-buttons">
+                            <button class="status-toggle-btn active" onclick="filterByStatus('active', 'active')">Active</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'flagged')">Flagged</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'pending')">Pending</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'applied')">Applied</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'contacted')">Contacted</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'company')">Company</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'scheduled')">Scheduled</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'follow-up')">Follow Up</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'offered')">Offered</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'rejected')">Rejected</button>
+                            <button class="status-toggle-btn" onclick="filterByStatus('active', 'all')">All</button>
+                        </div>
+                    </div>
+                '''
+            
             tab_contents += f'''
                 <div class="tab-content" id="tab-{status}" style="display: {default_display}">
                     <div class="sort-controls">
-                        <h3 style="margin: 0; color: #333;">{status_title}</h3>
+                        <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">{status_title}</h3>
                         <select id="sort-select-{status}" class="sort-select" onchange="handleSortChange()">
                             <option value="updated_desc">Updated (Newest First)</option>
                             <option value="updated_asc">Updated (Oldest First)</option>
@@ -827,7 +1186,8 @@ class DashboardGenerator:
                             <option value="match_asc">Match % (Lowest First)</option>
                         </select>
                     </div>
-                    {f'<div class="applications-grid">{cards_html}</div>' if cards_html else self._create_empty_state(status)}
+                    {status_toggle_html}
+                    {f'<div class="applications-grid" id="applications-grid-{status}">{cards_html}</div>' if cards_html else self._create_empty_state(status)}
                 </div>
             '''
         
@@ -977,47 +1337,173 @@ class DashboardGenerator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Dashboard - Job Applications</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {{
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-xs: 12px;
+            --font-sm: 14px;
+            --font-base: 16px;
+            --font-lg: 18px;
+            --font-xl: 20px;
+            --font-2xl: 24px;
+            --font-3xl: 32px;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }}
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f5f5f5;
+            font-family: var(--font-family); 
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 0;
             margin: 0;
             position: relative;
             overflow-x: hidden;
+            color: var(--text-primary);
         }}
         .container {{ 
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             margin: 0;
-            padding: 0 20px 20px 20px;
-            margin-left: 250px;
+            padding: var(--space-lg);
+            margin-left: 180px;
             box-sizing: border-box;
+        }}
+        
+        /* Hero Header - Full Width */
+        .hero-header {{
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+        }}
+        
+        .hero-header-top {{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }}
+        
+        .hero-header h1 {{
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }}
+        
+        .hero-header-subtitle {{
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }}
+        
+        /* Footer */
+        .page-footer {{
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }}
+        
+        .footer-buttons {{
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }}
+        
+        .footer-btn {{
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .footer-btn:hover {{
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }}
+        
+        .footer-btn-primary {{
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }}
+        
+        .footer-btn-primary:hover {{
+            background: #2563eb;
+            border-color: #2563eb;
+        }}
+        
+        .container {{
+            padding-bottom: 100px; /* Space for fixed footer */
         }}
         
         .sidebar {{
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 180px;
             height: 100vh;
-            background: #8b9dc3;
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
             z-index: 1000;
-            padding: 20px 0;
+            padding: var(--space-md) 0;
             overflow-y: auto;
         }}
         
         .sidebar-header {{
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
         }}
         
         .sidebar-header h3 {{
-            color: white;
+            color: var(--text-primary);
             font-size: 18px;
             font-weight: 600;
             margin: 0;
@@ -1035,82 +1521,89 @@ class DashboardGenerator:
         
         .sidebar-menu a {{
             display: block;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            font-size: 14px;
         }}
         
         .sidebar-menu a:hover {{
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: white;
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }}
         
         .sidebar-menu a.active {{
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border-left-color: white;
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }}
         
         .header {{
-            background: linear-gradient(135deg, #8b9dc3 0%, #6c7b95 100%);
-            color: white;
-            padding: 40px;
-            border-radius: 12px;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(108, 123, 149, 0.2);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }}
         
         .header h1 {{
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: var(--font-2xl);
+            margin-bottom: var(--space-sm);
+            font-weight: 600;
         }}
         
         .header p {{
-            font-size: 16px;
-            opacity: 0.9;
+            font-size: var(--font-base);
+            color: var(--text-secondary);
         }}
         
         .tabs-container {{
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
+            margin-bottom: var(--space-lg);
         }}
         
         .tabs-header {{
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
             overflow-x: auto;
             padding: 0;
+            flex-wrap: wrap;
         }}
         
         .tab {{
-            padding: 15px 25px;
+            padding: 14px var(--space-lg);
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
             white-space: nowrap;
-            border-bottom: 3px solid transparent;
+            font-family: var(--font-family);
+            min-width: 100px;
+            flex: 1;
         }}
         
         .tab:hover {{
-            background: rgba(139, 157, 195, 0.1);
-            color: #8b9dc3;
+            background: var(--bg-active);
+            color: var(--text-primary);
         }}
         
         .tab.active {{
-            background: white;
-            color: #8b9dc3;
-            border-bottom: 3px solid #8b9dc3;
+            background: var(--accent-blue);
+            color: #ffffff;
         }}
         
         .tab-count {{
@@ -1120,7 +1613,7 @@ class DashboardGenerator:
         }}
         
         .tab-content {{
-            padding: 30px;
+            padding: var(--space-lg);
             min-height: 400px;
         }}
         
@@ -1128,50 +1621,66 @@ class DashboardGenerator:
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+        }}
+        
+        .sort-controls h3 {{
+            margin: 0;
+            color: var(--text-primary);
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
         }}
         
         .sort-select {{
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
+            padding: 10px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            cursor: pointer;
+        }}
+        
+        .sort-select:focus {{
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }}
         
         .applications-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: var(--space-lg);
         }}
         
         .card {{
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(74, 85, 104, 0.1);
-            border: 1px solid rgba(74, 85, 104, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-primary);
+            transition: all 0.2s ease;
         }}
         
         .card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(74, 85, 104, 0.15);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }}
         
         .card-header {{
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-sm);
         }}
         
         .card-company {{
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
             flex: 1;
         }}
         
@@ -1194,100 +1703,105 @@ class DashboardGenerator:
         }}
         
         .card-title {{
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: var(--font-sm);
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            font-weight: var(--font-medium);
         }}
         
         .card-status-container {{
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
             flex-wrap: wrap;
         }}
         
         .card-status {{
             display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
             text-transform: capitalize;
         }}
         
         .card-progress-pill {{
             display: inline-block;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 500;
-            background: rgba(139, 157, 195, 0.2);
-            color: #6c7b95;
-            border: 1px solid rgba(139, 157, 195, 0.3);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
+            background: var(--bg-active);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-primary);
         }}
         
-        .status-pending {{ background: #fff3cd; color: #856404; }}
-        .status-applied {{ background: #d1ecf1; color: #0c5460; }}
-        .status-contacted-someone {{ background: #e2e3e5; color: #383d41; }}
-        .status-company-response {{ background: #cce5ff; color: #004085; }}
-        .status-scheduled-interview {{ background: #ffeeba; color: #856404; }}
-        .status-interview-notes {{ background: #d4edda; color: #155724; }}
-        .status-interview-follow-up {{ background: #ffeef8; color: #b21f66; }}
-        .status-offered {{ background: #c3e6cb; color: #155724; }}
-        .status-rejected {{ background: #f8d7da; color: #721c24; }}
-        .status-accepted {{ background: #d4edda; color: #155724; }}
+        .status-pending {{ background: #fef3c7; color: #92400e; }}
+        .status-applied {{ background: #dbeafe; color: #1e40af; }}
+        .status-contacted-someone {{ background: var(--bg-active); color: var(--text-secondary); }}
+        .status-company-response {{ background: var(--accent-blue-light); color: #1e40af; }}
+        .status-scheduled-interview {{ background: #fef3c7; color: #92400e; }}
+        .status-interview-notes {{ background: #d1fae5; color: #065f46; }}
+        .status-interview-follow-up {{ background: #fce7f3; color: #9f1239; }}
+        .status-offered {{ background: #d1fae5; color: #065f46; }}
+        .status-rejected {{ background: #fee2e2; color: #991b1b; }}
+        .status-accepted {{ background: #d1fae5; color: #065f46; }}
         
         .card-meta {{
-            font-size: 13px;
-            color: #999;
-            margin-bottom: 8px;
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
         }}
         
         .card-actions {{
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+            margin-top: var(--space-lg);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-light);
         }}
         
         .card-btn {{
             display: inline-block;
-            background: #8b9dc3;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
+            background: var(--accent-blue);
+            color: #ffffff;
+            padding: 10px var(--space-md);
+            border-radius: var(--radius-sm);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.2s;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+            width: 100%;
+            text-align: center;
         }}
         
         .card-btn:hover {{
-            background: #7a8bb0;
+            background: var(--accent-blue-hover);
         }}
         
         .empty-state {{
             text-align: center;
-            padding: 60px 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            color: #999;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
         }}
         
         .empty-state-icon {{
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
         }}
         
         .empty-state-text {{
-            font-size: 20px;
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
         }}
         
         .match-score {{
             float: right;
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--accent-blue);
         }}
         .hidden {{ display: none; }}
     </style>
@@ -1295,7 +1809,7 @@ class DashboardGenerator:
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h3>Job Hunter</h3>
+            <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -1310,11 +1824,14 @@ class DashboardGenerator:
         </ul>
     </div>
     
-    <div class="container">
-        <div class="header">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
             <h1>Progress Dashboard - {total} Applications</h1>
-            <p>Track your application progress by latest completed checklist item</p>
         </div>
+        </div>
+    
+    <div class="container">
         
         {tabs_html}
     </div>
@@ -1396,6 +1913,14 @@ class DashboardGenerator:
             }}
         }});
     </script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
 </body>
 </html>"""
         return html
@@ -1409,7 +1934,6 @@ class DashboardGenerator:
         tab_headers += f'''
             <button class="tab active" data-progress="all" onclick="switchTab('all')">
                 All
-                <span class="tab-count">({progress_counts['all']})</span>
             </button>
         '''
         
@@ -1418,7 +1942,6 @@ class DashboardGenerator:
             tab_headers += f'''
                 <button class="tab" data-progress="no_progress" onclick="switchTab('no_progress')">
                     No Progress
-                    <span class="tab-count">({progress_counts['no_progress']})</span>
                 </button>
             '''
         
@@ -1435,7 +1958,6 @@ class DashboardGenerator:
                 tab_headers += f'''
                     <button class="tab" data-progress="{progress_key}" onclick="switchTab('{progress_key}')">
                         {short_name}
-                        <span class="tab-count">({progress_counts[progress_key]})</span>
                     </button>
                 '''
         
@@ -1447,7 +1969,7 @@ class DashboardGenerator:
         tab_contents += f'''
             <div id="progress-all" class="tab-content" style="display: block;">
                 <div class="sort-controls">
-                    <label>Sort by:</label>
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">All Applications ({progress_counts['all']})</h3>
                     <select class="sort-select" onchange="sortCards(this, 'all')">
                         <option value="date-updated">Date Updated</option>
                         <option value="date-applied">Date Applied</option>
@@ -1465,7 +1987,7 @@ class DashboardGenerator:
             tab_contents += f'''
                 <div id="progress-no_progress" class="tab-content" style="display: none;">
                     <div class="sort-controls">
-                        <label>Sort by:</label>
+                        <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">No Progress Applications ({progress_counts['no_progress']})</h3>
                         <select class="sort-select" onchange="sortCards(this, 'no_progress')">
                             <option value="date-updated">Date Updated</option>
                             <option value="date-applied">Date Applied</option>
@@ -1479,6 +2001,9 @@ class DashboardGenerator:
         else:
             tab_contents += f'''
                 <div id="progress-no_progress" class="tab-content" style="display: none;">
+                    <div class="sort-controls">
+                        <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">No Progress Applications ({progress_counts['no_progress']})</h3>
+                    </div>
                     {self._create_empty_state('no progress')}
                 </div>
             '''
@@ -1489,10 +2014,11 @@ class DashboardGenerator:
             if apps:
                 cards_html = ''.join([self._create_application_card(app) for app in apps])
                 display_name = checklist_definitions[progress_key]
+                count = progress_counts.get(progress_key, 0)
                 tab_contents += f'''
                     <div id="progress-{progress_key}" class="tab-content" style="display: none;">
                         <div class="sort-controls">
-                            <label>Sort by:</label>
+                            <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">{display_name} Applications ({count})</h3>
                             <select class="sort-select" onchange="sortCards(this, '{progress_key}')">
                                 <option value="date-updated">Date Updated</option>
                                 <option value="date-applied">Date Applied</option>

@@ -6,10 +6,10 @@
     <title>Job Hunter - AI-Powered Application Manager</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     
-    <!-- Google Fonts - Montserrat -->
+    <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
@@ -22,51 +22,76 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 0;
             margin: 0;
             position: relative;
             overflow-x: hidden;
+            color: var(--text-primary);
         }
         
         .container {
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             margin: 0;
-            padding: 0 20px 20px 20px;
-            margin-left: 250px;
+            padding: var(--space-lg);
+            margin-left: 180px;
             box-sizing: border-box;
+            padding-bottom: 100px; /* Space for fixed footer */
         }
         
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 180px;
             height: 100vh;
-            background: #8b9dc3;
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 4px 0 20px rgba(139, 157, 195, 0.15);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
             z-index: 1000;
-            padding: 20px 0;
+            padding: var(--space-md) 0;
             overflow-y: auto;
         }
         
         .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
         }
         
         .sidebar-header h3 {
-            color: #ffffff;
+            color: var(--text-primary);
             font-size: 18px;
             font-weight: 600;
             margin: 0;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .sidebar-menu {
@@ -81,29 +106,25 @@
         
         .sidebar-menu a {
             display: block;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.85);
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
-            border-radius: 0 12px 12px 0;
-            margin-right: 10px;
+            font-size: 14px;
         }
         
         .sidebar-menu a:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border-left-color: #ffffff;
-            transform: translateX(5px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .sidebar-menu a.active {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-left-color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .sidebar-menu a i {
@@ -112,88 +133,163 @@
             text-align: center;
         }
         
-        .header {
-            text-align: center;
-            color: white;
-            margin: 0 -20px 0 -20px;
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
             position: sticky;
             top: 0;
-            z-index: 99;
-            background: #8b9dc3;
-            padding: 0 20px;
-            width: calc(100% + 40px);
-            border-radius: 0;
-            height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(139, 157, 195, 0.2);
+            z-index: 100;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
         }
         
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-            color: #F7F7F7;
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
         }
         
         
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid rgba(139, 157, 195, 0.2);
-            box-shadow: 0 8px 32px rgba(108, 123, 149, 0.15);
-            margin-bottom: 20px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
             position: relative;
             z-index: 1;
-            color: #4a5568;
+            color: var(--text-primary);
         }
         
         .card h2 {
-            background: #8b9dc3;
-            color: white;
-            padding: 20px 25px;
-            margin: -40px -40px 30px -40px;
-            border-radius: 20px 20px 0 0;
-            font-size: 24px;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
+            font-size: var(--font-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-primary);
         }
         
         .status-banner {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-lg);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--space-sm);
+            border: 1px solid var(--border-primary);
         }
         
         .status-banner.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #d1fae5;
+            color: #065f46;
+            border-color: var(--accent-green);
         }
         
         .status-banner.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
         }
         
         .status-banner.warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
         }
         
         .status-banner.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+            background: var(--accent-blue-light);
+            color: #1e40af;
+            border-color: var(--accent-blue);
+        }
+        
+        .status-banner.hidden {
+            display: none;
         }
         
         .form-group {
@@ -202,32 +298,30 @@
         
         .form-group label {
             display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #4a5568;
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-size: var(--font-sm);
         }
         
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid rgba(139, 157, 195, 0.3);
-            border-radius: 12px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            color: #4a5568;
-            box-shadow: 0 2px 4px rgba(108, 123, 149, 0.1);
+            padding: 10px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
         
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #8b9dc3;
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
-            transform: translateY(-1px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }
         
         .form-group textarea {
@@ -237,64 +331,60 @@
         
         .form-group small {
             display: block;
-            margin-top: 5px;
-            color: rgba(74, 85, 104, 0.7);
-            font-size: 14px;
+            margin-top: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
         }
         
         .btn {
-            background: linear-gradient(135deg, #8b9dc3 0%, #6c7b95 100%);
-            color: white;
+            background: var(--accent-blue);
+            color: #ffffff;
             border: none;
-            padding: 15px 40px;
-            font-size: 16px;
-            font-weight: 500;
-            border-radius: 12px;
+            padding: 12px var(--space-xl);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(108, 123, 149, 0.3);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            font-family: var(--font-family);
         }
         
         .btn:hover {
-            background: linear-gradient(135deg, #6c7b95 0%, #5a6b7d 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108, 123, 149, 0.4);
+            background: var(--accent-blue-hover);
         }
         
         .btn:disabled {
-            background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+            background: var(--text-tertiary);
             cursor: not-allowed;
-            transform: none;
-            box-shadow: 0 2px 4px rgba(108, 123, 149, 0.2);
+            opacity: 0.6;
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
         }
         
         .btn-secondary:hover {
-            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+            background: var(--bg-hover);
         }
         
         .loading {
             display: none;
             text-align: center;
-            padding: 40px 20px;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 12px;
-            margin-top: 20px;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #808080;
+            border: 3px solid var(--border-primary);
+            border-top: 3px solid var(--accent-blue);
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto var(--space-md);
         }
 
         /* Full-page loading overlay to guarantee visibility */
@@ -311,10 +401,11 @@
             z-index: 2000; /* Above sidebar/header/cards */
         }
         .loading-overlay .panel {
-            background: #ffffff;
-            padding: 24px 28px;
-            border-radius: 12px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-primary);
             text-align: center;
             min-width: 260px;
         }
@@ -329,14 +420,12 @@
         
         
         .quick-links {
-            background: white;
-            backdrop-filter: blur(20px);
-            border-radius: 0;
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.1);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
-            margin: 0 -20px 20px -20px;
-            width: calc(100% + 40px);
+            margin-bottom: var(--space-lg);
             position: relative;
             z-index: 1;
         }
@@ -590,7 +679,7 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h3>Job Hunter</h3>
+            <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -602,21 +691,23 @@
             <li><a href="/analytics" class="nav-link">Analytics</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="checkOllama(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/dashboard" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <h1>New Application</h1>
+        </div>
+    </div>
+    
     <div class="container">
-        <div class="header">
-            <h1 class="page-title">Job Hunter</h1>
-        </div>
-        
-        <div class="quick-links">
-            <div class="quick-links-header">
-                <a href="#" onclick="showNewApplication(); return false;">New Application</a>
-                <a href="#" onclick="showResumeManager(); return false;">Manage Resume</a>
-            </div>
-        </div>
         
         <div id="status-banner" class="status-banner hidden"></div>
         
@@ -1615,6 +1706,14 @@
             }
         });
     </script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
 </body>
 </html>
 

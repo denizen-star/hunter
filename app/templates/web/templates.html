@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Templates - Job Hunter</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
@@ -17,48 +20,175 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 0;
             margin: 0;
             position: relative;
             overflow-x: hidden;
-            color: #4a5568;
+            color: var(--text-primary);
         }
         
         .container {
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             margin: 0;
-            padding: 0 20px 20px 20px;
-            margin-left: 250px;
+            padding: var(--space-lg);
+            margin-left: 180px;
             box-sizing: border-box;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .container {
+            padding-bottom: 100px; /* Space for fixed footer */
         }
         
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 250px;
+            width: 180px;
             height: 100vh;
-            background: #8b9dc3;
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 4px 0 20px rgba(139, 157, 195, 0.15);
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
             z-index: 1000;
-            padding: 20px 0;
+            padding: var(--space-md) 0;
             overflow-y: auto;
         }
         
         .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
         }
         
         .sidebar-header h3 {
-            color: white;
+            color: var(--text-primary);
             font-size: 18px;
             font-weight: 600;
             margin: 0;
@@ -76,85 +206,84 @@
         
         .sidebar-menu a {
             display: block;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .sidebar-menu a:hover {
-            background: rgba(66, 66, 66, 0.2);
-            color: white;
-            border-left-color: #424242;
-            transform: translateX(5px);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .sidebar-menu a.active {
-            background: rgba(66, 66, 66, 0.3);
-            color: white;
-            border-left-color: #424242;
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
         }
         
         .header {
             text-align: center;
-            color: white;
-            margin: 0 -20px 20px -20px;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-            background: #8b9dc3;
-            padding: 20px;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 20px rgba(139, 157, 195, 0.2);
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
         }
         
         .header h1 {
             font-size: 28px;
             margin: 0;
+            color: var(--text-primary);
+            font-weight: 600;
         }
         
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid rgba(139, 157, 195, 0.2);
-            box-shadow: 0 8px 32px rgba(108, 123, 149, 0.15);
-            margin-bottom: 20px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
         }
         
         .card h2 {
-            background: #8b9dc3;
-            color: white;
-            padding: 20px 25px;
-            margin: -40px -40px 30px -40px;
-            border-radius: 20px 20px 0 0;
-            font-size: 24px;
-            font-weight: 500;
+            font-size: var(--font-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-xl)) var(--space-lg) calc(-1 * var(--space-xl));
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
             cursor: pointer;
             user-select: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .card h2:hover {
-            background: #7a8bb0;
+            background: var(--bg-hover);
         }
         
         .card h2::after {
             content: '▼';
-            position: absolute;
-            right: 25px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            transition: transform 0.3s ease;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
         }
         
         .card h2.collapsed::after {
-            transform: translateY(-50%) rotate(-90deg);
+            transform: rotate(-90deg);
         }
         
         .card-content {
@@ -177,74 +306,77 @@
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #4a5568;
+            margin-bottom: var(--space-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            font-size: var(--font-sm);
         }
         
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid rgba(139, 157, 195, 0.3);
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: white;
+            padding: 10px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family);
         }
         
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #8b9dc3;
-            box-shadow: 0 0 0 3px rgba(139, 157, 195, 0.1);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }
         
         .form-group small {
             display: block;
-            margin-top: 6px;
-            color: #6c757d;
-            font-size: 12px;
+            margin-top: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
         }
         
         .quill-editor {
-            background: white;
-            border: 1px solid rgba(139, 157, 195, 0.3);
-            border-radius: 8px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
             min-height: 300px;
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 12px var(--space-lg);
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-sm);
+            font-family: var(--font-family);
         }
         
         .btn-primary {
-            background: #8b9dc3;
-            color: white;
+            background: var(--accent-blue);
+            color: #ffffff;
         }
         
         .btn-primary:hover {
-            background: #6b7fa3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.3);
+            background: var(--accent-blue-hover);
         }
         
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
         }
         
         .btn-secondary:hover {
-            background: #5a6268;
+            background: var(--bg-hover);
         }
         
         .btn-sm {
@@ -278,16 +410,17 @@
         }
         
         .template-item {
-            background: #f8f9fa;
-            border: 1px solid rgba(139, 157, 195, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
         
         .template-item:hover {
-            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+            box-shadow: var(--shadow-md);
             transform: translateY(-2px);
         }
         
@@ -392,14 +525,21 @@
         
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
         }
         
         .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: var(--space-md);
             opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0 0 var(--space-sm) 0;
         }
         
         .empty-state-text {
@@ -410,7 +550,7 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h3>Job Hunter</h3>
+            <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -422,14 +562,23 @@
             <li><a href="/analytics" class="nav-link">Analytics</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="checkAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
-    <div class="container">
-        <div class="header">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/dashboard" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
             <h1>Templates</h1>
         </div>
+    </div>
+    
+    <div class="container">
         
         <div id="status-banner" class="status-banner"></div>
         
@@ -725,6 +874,14 @@
             content.classList.toggle('collapsed');
         }
     </script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
 </body>
 </html>
 
