@@ -540,7 +540,7 @@ class DashboardGenerator:
         .status-rejected {{ background: #fee2e2; color: #991b1b; }}
         .status-accepted {{ background: #d1fae5; color: #065f46; }}
         .card-meta {{
-            font-size: var(--font-xs);
+            font-size: 10px;
             color: var(--text-secondary);
             margin-bottom: var(--space-sm);
         }}
@@ -1751,7 +1751,7 @@ class DashboardGenerator:
         .status-accepted {{ background: #d1fae5; color: #065f46; }}
         
         .card-meta {{
-            font-size: var(--font-xs);
+            font-size: 10px;
             color: var(--text-secondary);
             margin-bottom: var(--space-sm);
         }}
