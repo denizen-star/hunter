@@ -185,6 +185,7 @@ class DashboardGenerator:
             font-weight: 700;
             color: #1f2937;
             margin: 0;
+            text-align: left;
         }}
         
         .hero-header-subtitle {{
@@ -1421,6 +1422,7 @@ class DashboardGenerator:
             font-weight: 700;
             color: #1f2937;
             margin: 0;
+            text-align: left;
         }}
         
         .hero-header-subtitle {{

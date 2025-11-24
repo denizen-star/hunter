@@ -4793,8 +4793,7 @@ Format this as a professional research document that demonstrates thorough prepa
             # Build content sections
             content_parts = []
             
-            if app_id:
-                content_parts.append(f'<div style="margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #666;"><strong>Application ID:</strong> {app_id}</div>')
+            # Application ID removed from timeline as per design requirements
             
             if notes_text and notes_text not in ["No additional notes", ""]:
                 # Handle HTML content (including images) - don't process URLs if content is already HTML
