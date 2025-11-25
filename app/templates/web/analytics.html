@@ -60,6 +60,8 @@
             padding: var(--space-lg);
             margin-left: 180px;
             box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
         
         /* Hero Header - Full Width */
@@ -327,9 +329,9 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            width: 100%;
-            margin-left: 0;
-            margin-right: 0;
+            width: calc(100% - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
         }
         
         .hero-header-top {
@@ -433,6 +435,7 @@
             box-shadow: var(--shadow-sm);
             overflow: hidden;
             margin-bottom: var(--space-lg);
+            margin-left: 180px;
         }
         
         .tabs-header {
