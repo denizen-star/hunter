@@ -3598,11 +3598,11 @@ Format this as a professional research document that demonstrates thorough prepa
             <div class="tabs-container">
                 <div class="tabs-header">
             <button type="button" class="tab active" onclick="showTab(this, 'job-desc')">Job Description</button>
-            {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path).replace("showTab(event,", "showTab(this,")}
-            {self._generate_tab_button('skills', 'Skills', application.qualifications_path).replace("showTab(event,", "showTab(this,")}
-            {self._generate_tab_button('research', 'Research', application.research_path or application.hiring_manager_intros_path).replace("showTab(event,", "showTab(this,")}
-            {self._generate_tab_button('qualifications', 'Qualifications Analysis', application.qualifications_path).replace("showTab(event,", "showTab(this,")}
-            {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path).replace("showTab(event,", "showTab(this,")}
+            {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path)}
+            {self._generate_tab_button('skills', 'Skills', application.qualifications_path)}
+            {self._generate_tab_button('research', 'Research', application.research_path or application.hiring_manager_intros_path)}
+            {self._generate_tab_button('qualifications', 'Qualifications Analysis', application.qualifications_path)}
+            {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path)}
             <button type="button" class="tab" onclick="showTab(this, 'resume')">Customized Resume</button>
             <button type="button" class="tab" onclick="showTab(this, 'updates')">Updates & Notes</button>
         </div>
@@ -4934,7 +4934,7 @@ Format this as a professional research document that demonstrates thorough prepa
     def _generate_tab_button(self, tab_id: str, tab_name: str, file_path) -> str:
         """Generate tab button HTML if file exists"""
         if file_path and Path(file_path).exists():
-            return f'<button type="button" class="tab" onclick="showTab(event, \'{tab_id}\')">{tab_name}</button>'
+            return f'<button type="button" class="tab" onclick="showTab(this, \'{tab_id}\')">{tab_name}</button>'
         return ''
 
     def _generate_tab_content(self, tab_id: str, tab_name: str, content: str, file_path) -> str:

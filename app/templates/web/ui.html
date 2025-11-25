@@ -187,7 +187,7 @@
         .page-footer {
             background: #ffffff;
             border-top: 1px solid #e5e7eb;
-            padding: 20px 32px;
+            padding: 10px 32px;
             width: calc(100% - 180px);
             margin-left: 180px;
             box-sizing: border-box;
@@ -198,13 +198,13 @@
         
         .footer-buttons {
             display: flex;
-            justify-content: center;
-            gap: 16px;
+            justify-content: flex-start;
+            gap: 12px;
         }
         
         .footer-btn {
-            padding: 12px 24px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 12px;
             font-weight: 500;
             border-radius: 6px;
             border: 1px solid #e5e7eb;
@@ -214,7 +214,7 @@
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .footer-btn:hover {
@@ -302,7 +302,7 @@
             font-weight: var(--font-semibold);
             margin-bottom: var(--space-sm);
             color: var(--text-primary);
-            font-size: var(--font-sm);
+            font-size: 12px;
         }
         
         .form-group input,
@@ -326,7 +326,7 @@
         }
         
         .form-group textarea {
-            min-height: 200px;
+            min-height: 170px;
             resize: vertical;
         }
         
@@ -712,11 +712,9 @@
         
         <div id="status-banner" class="status-banner hidden"></div>
         
-        <div class="card" id="application-form">
-            <h2 class="card-title"></h2>
-            
+        <div class="card" id="application-form" style="padding-top: 16px;">
             <form id="jobForm" onsubmit="submitApplication(event)">
-                <div class="form-group">
+                <div class="form-group" style="margin-top: 0;">
                     <label for="company">Company Name *</label>
                     <input type="text" id="company" name="company" required placeholder="e.g., Google, Microsoft, Apple">
                 </div>
@@ -762,45 +760,13 @@
                 <h2>Application Created Successfully!</h2>
                 <div class="match-score" id="match-score">--</div>
                 <p style="color: #666; margin-bottom: 10px;">Match Score</p>
-                <p style="color: #999; font-size: 14px;" id="success-details">All documents generated and saved</p>
+                <h1 id="success-title" style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 20px 0 15px 0; text-align: center;">--</h1>
+                <div id="success-job-info" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+                    <!-- Job information will be populated by JavaScript -->
             </div>
+                <div id="success-job-link" style="margin-top: 20px; text-align: center;">
+                    <!-- Job link will be populated by JavaScript -->
         </div>
-        
-        <!-- Analysis Details Section - Outside the success card -->
-        <div id="analysis-details" class="card hidden" style="border: 1px solid #0099FF; padding: 15px; margin-top: 20px; box-shadow: none;">
-            <h3 style="color: #666; margin-bottom: 10px; font-size: 16px;" id="analysis-title">Analysis Summary</h3>
-            
-            <!-- Methodology -->
-            <div style="margin-bottom: 10px;">
-                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Methodology</h4>
-                <p style="color: #666; font-size: 11px; line-height: 1.4;">
-                    Our AI analyzes your resume against the job description using weighted scoring: 
-                    Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
-                </p>
-            </div>
-            
-            <!-- Features Compared -->
-            <div style="margin-bottom: 10px;">
-                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Features Compared</h4>
-                <p style="color: #666; font-size: 11px;">
-                    <span id="features-compared-count">--</span> individual skills, technologies, and requirements analyzed
-                </p>
-            </div>
-            
-            <!-- Strong Matches -->
-            <div style="margin-bottom: 10px;">
-                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Strong Matches</h4>
-                <div id="strong-matches-list" style="color: #666; font-size: 11px;">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Missing Skills -->
-            <div style="margin-bottom: 10px;">
-                <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Missing Skills</h4>
-                <div id="missing-skills-list" style="color: #666; font-size: 11px;">
-                    <!-- Will be populated by JavaScript -->
-                </div>
             </div>
         </div>
         
@@ -999,19 +965,90 @@
                     // Show success card
                     const successCard = document.getElementById('success-card');
                     const matchScore = document.getElementById('match-score');
-                    const successDetails = document.getElementById('success-details');
+                    const successTitle = document.getElementById('success-title');
+                    const successJobInfo = document.getElementById('success-job-info');
                     
                     if (successCard) successCard.classList.remove('hidden');
                     if (matchScore) matchScore.textContent = `${Math.round(result.match_score || 0)}%`;
-                    if (successDetails) successDetails.textContent = `Application for ${data.company} - ${data.job_title}`;
+                    if (successTitle) successTitle.textContent = `${data.company} - ${data.job_title}`;
+                    
+                    // Populate job information
+                    if (successJobInfo) {
+                        let jobInfoHtml = '';
+                        
+                        // Location
+                        if (result.location && result.location !== 'N/A') {
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span>${result.location}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        // Salary
+                        if (result.salary_range && result.salary_range !== 'N/A' && result.salary_range !== '$0') {
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>${result.salary_range}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        // Applied Date
+                        if (result.created_at) {
+                            const appliedDate = result.created_at.split(',')[0]; // Get date part only
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Applied: ${appliedDate}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        // Posted Date
+                        if (result.posted_date && result.posted_date !== 'N/A') {
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Posted: ${result.posted_date}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        successJobInfo.innerHTML = jobInfoHtml || '<div style="color: #9ca3af; font-size: 14px; text-align: center;">No additional information available</div>';
+                    }
+                    
+                    // Populate job link
+                    const successJobLink = document.getElementById('success-job-link');
+                    if (successJobLink) {
+                        const jobUrl = result.job_url || data.job_url;
+                        if (jobUrl) {
+                            successJobLink.innerHTML = `
+                                <a href="${jobUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    View Job Posting
+                                </a>
+                            `;
+                        } else {
+                            successJobLink.innerHTML = '';
+                        }
+                    }
+                    
                     const overlay = document.getElementById('loading-overlay');
                     if (overlay) overlay.style.display = 'none';
-                    
-                    // Show analysis details if available
-                    if (result.qualifications) {
-                        document.getElementById('analysis-details').classList.remove('hidden');
-                        populateAnalysisDetails(result.qualifications, data.company, data.job_title, result.match_score);
-                    }
                     
                     // Show success actions
                     document.getElementById('success-actions').style.display = 'flex';
@@ -1019,7 +1056,6 @@
                     // Set summary link - use the summary_url from backend
                     if (result.summary_url) {
                         document.getElementById('view-summary-btn').href = result.summary_url;
-                        document.getElementById('view-summary-btn').target = '_blank';
                     }
                     
                     showStatus('Application created successfully!', 'success');
@@ -1058,7 +1094,6 @@
             
             // Hide success card and related elements
             document.getElementById('success-card').classList.add('hidden');
-            document.getElementById('analysis-details').classList.add('hidden');
             document.getElementById('success-actions').style.display = 'none';
             
             // Show form
@@ -1085,38 +1120,6 @@
                 setTimeout(() => {
                     banner.classList.add('hidden');
                 }, 5000);
-            }
-        }
-        
-        function populateAnalysisDetails(qualifications, company, jobTitle, matchScore) {
-            // Set the analysis title
-            const analysisTitle = document.getElementById('analysis-title');
-            analysisTitle.textContent = `Match Score: ${Math.round(matchScore || 0)}% - Application for ${company} - ${jobTitle}`;
-            
-            // Populate features compared count
-            const featuresCount = document.getElementById('features-compared-count');
-            featuresCount.textContent = qualifications.features_compared || '--';
-            
-            // Populate strong matches
-            const strongMatchesList = document.getElementById('strong-matches-list');
-            if (qualifications.strong_matches && qualifications.strong_matches.length > 0) {
-                const matchesHtml = qualifications.strong_matches.map(match => 
-                    `<span style="display: inline-block; background: #d4edda; color: #666; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin: 1px; border: 1px solid #c3e6cb; box-shadow: none;">${match.trim()}</span>`
-                ).join('');
-                strongMatchesList.innerHTML = matchesHtml;
-            } else {
-                strongMatchesList.innerHTML = '<span style="color: #999; font-style: italic;">No strong matches identified</span>';
-            }
-            
-            // Populate missing skills
-            const missingSkillsList = document.getElementById('missing-skills-list');
-            if (qualifications.missing_skills && qualifications.missing_skills.length > 0) {
-                const skillsHtml = qualifications.missing_skills.map(skill => 
-                    `<span style="display: inline-block; background: #f8d7da; color: #666; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin: 1px; border: 1px solid #f5c6cb; box-shadow: none;">${skill.trim()}</span>`
-                ).join('');
-                missingSkillsList.innerHTML = skillsHtml;
-            } else {
-                missingSkillsList.innerHTML = '<span style="color: #28a745; font-weight: 600;">No missing skills identified!</span>';
             }
         }
         

@@ -404,7 +404,12 @@ def create_application():
             'summary_path': str(application.summary_path),
             'summary_url': summary_url,
             'match_score': application.match_score,
-            'qualifications': qualifications_data
+            'qualifications': qualifications_data,
+            'location': application.location,
+            'salary_range': application.salary_range,
+            'posted_date': application.posted_date,
+            'created_at': format_for_display(application.created_at) if application.created_at else None,
+            'job_url': application.job_url
         })
     except Exception as e:
         import traceback
