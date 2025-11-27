@@ -725,14 +725,15 @@ class DashboardGenerator:
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
             <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="/analytics" class="nav-link">Analytics</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
@@ -1867,12 +1868,12 @@ class DashboardGenerator:
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
             <li><a href="/progress" class="nav-link active">Progress</a></li>
-            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="/analytics" class="nav-link">Analytics</a></li>
             <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
             <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
             <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
