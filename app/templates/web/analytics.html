@@ -75,6 +75,9 @@
             width: calc(100% - 180px);
             margin-left: 180px;
             box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .hero-header-top {
@@ -82,6 +85,12 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
+            flex: 1;
+        }
+        
+        .hero-header-period {
+            display: flex;
+            align-items: center;
         }
         
         .back-link {
@@ -165,7 +174,7 @@
         }
         
         .container {
-            padding-bottom: 100px; /* Space for fixed footer */
+            padding-bottom: 10px; /* Space for fixed footer */
         }
         
         /* Responsive Design */
@@ -321,56 +330,6 @@
             border-left-color: var(--accent-blue);
         }
         
-        /* Hero Header - Full Width */
-        .hero-header {
-            background: #ffffff;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 20px 32px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            width: calc(100% - 180px);
-            margin-left: 180px;
-            box-sizing: border-box;
-        }
-        
-        .hero-header-top {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        
-        .back-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #3b82f6;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s ease;
-            margin-bottom: 4px;
-        }
-        
-        .back-link:hover {
-            color: #2563eb;
-        }
-        
-        .hero-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-            margin: 0;
-            text-align: left;
-        }
-        
-        .hero-header-subtitle {
-            font-size: 14px;
-            color: #6b7280;
-            margin: 0;
-        }
-        
         .header {
             text-align: center;
             margin-bottom: var(--space-xl);
@@ -403,7 +362,10 @@
             border: 1px solid var(--border-primary);
             border-radius: var(--radius-md);
             width: fit-content;
-            margin: 0 auto;
+        }
+        
+        .hero-header-period .period-selector {
+            margin: 0;
         }
         
         .period-btn {
@@ -435,7 +397,11 @@
             box-shadow: var(--shadow-sm);
             overflow: hidden;
             margin-bottom: var(--space-lg);
-            margin-left: 180px;
+            margin-left: 0px;
+            margin-right: var(--space-lg);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .tabs-header {
@@ -474,6 +440,10 @@
         .tab-content {
             padding: var(--space-xl);
             display: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
         
         .tab-content.active {
@@ -586,12 +556,20 @@
             position: relative;
             height: 450px;
             width: 100%;
+            max-width: 100%;
             margin-bottom: var(--space-lg);
             background: var(--bg-primary);
             padding: var(--space-lg);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-primary);
             box-shadow: var(--shadow-sm);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto;
         }
         
         .chart-title {
@@ -614,19 +592,33 @@
             min-width: 100%;
         }
         
-        .chart-timestamp {
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            font-size: 6pt;
-            color: var(--text-tertiary);
-            font-family: var(--font-family);
-            z-index: 10;
-            pointer-events: none;
-        }
-        
         .analytics-section {
             margin-bottom: var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Two-column grid layout for all tabs */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .analytics-grid .chart-container {
+            margin-bottom: 0;
+            min-width: 0; /* Allows grid items to shrink below content size */
+        }
+        
+        @media (max-width: 1200px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .section-title {
@@ -716,128 +708,53 @@
             </a>
             <h1>Advanced Analytics & Reports</h1>
         </div>
-    </div>
-    
-    <div class="container">
-        <div class="period-selector" style="margin-top: 24px; margin-bottom: 24px;">
+        <div class="hero-header-period">
+            <div class="period-selector">
                 <button class="period-btn" data-period="today" onclick="selectPeriod('today')">Today</button>
                 <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Days</button>
                 <button class="period-btn active" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
                 <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
             </div>
         </div>
-        
+    </div>
+    
+    <div class="container">
         <div class="tabs-container">
             <div class="tabs-header">
-                <button class="tab active" data-tab="application" onclick="switchTab('application')">Application Analytics</button>
-                <button class="tab" data-tab="trend" onclick="switchTab('trend')">Trend Analysis</button>
+                <button class="tab active" data-tab="trend" onclick="switchTab('trend')">Trend Analysis</button>
                 <button class="tab" data-tab="skills" onclick="switchTab('skills')">Skills Gap Analysis</button>
+                <button class="tab" data-tab="application" onclick="switchTab('application')">Application Analytics</button>
             </div>
             
-            <div id="tab-application" class="tab-content active">
-                <div class="analytics-section">
-                    <div class="dashboard-grid" id="application-metrics">
-                        <div class="loading">Loading metrics...</div>
-                    </div>
-                    
-                    <div class="content-card collapsed">
-                        <div class="content-card-header" onclick="toggleCollapse(this)">
-                            <h3>Interview Conversion Funnel</h3>
-                            <span class="collapse-icon">▼</span>
-                        </div>
-                        <div class="content-card-body">
-                            <div class="chart-container">
-                                <canvas id="funnelChart"></canvas>
-                                <div class="chart-timestamp" id="funnelChart-timestamp"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="content-card collapsed">
-                        <div class="content-card-header" onclick="toggleCollapse(this)">
-                            <h3>Time to Response Distribution</h3>
-                            <span class="collapse-icon">▼</span>
-                        </div>
-                        <div class="content-card-body">
-                            <div class="chart-container">
-                                <canvas id="timeToResponseChart"></canvas>
-                                <div class="chart-timestamp" id="timeToResponseChart-timestamp"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="content-card collapsed">
-                        <div class="content-card-header" onclick="toggleCollapse(this)">
-                            <h3>Success by Match Score</h3>
-                            <span class="collapse-icon">▼</span>
-                        </div>
-                        <div class="content-card-body">
-                            <div class="chart-container">
-                                <canvas id="matchScoreChart"></canvas>
-                                <div class="chart-timestamp" id="matchScoreChart-timestamp"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="content-card collapsed">
-                        <div class="content-card-header" onclick="toggleCollapse(this)">
-                            <h3>Best Performing Day of Week</h3>
-                            <span class="collapse-icon">▼</span>
-                        </div>
-                        <div class="content-card-body">
-                            <div class="chart-container">
-                                <canvas id="dayChart"></canvas>
-                                <div class="chart-timestamp" id="dayChart-timestamp"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="tab-trend" class="tab-content">
+            <div id="tab-trend" class="tab-content active">
                 <div class="analytics-section">
                     <h2 class="section-title">Trend Analysis</h2>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Application Velocity (Daily)</div>
-                        <canvas id="velocityChart"></canvas>
-                        <div class="chart-timestamp" id="velocityChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-title">Application Velocity (Cumulative)</div>
-                        <canvas id="velocityCumulativeChart"></canvas>
-                        <div class="chart-timestamp" id="velocityCumulativeChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-title">Status Distribution</div>
-                        <canvas id="statusDistributionChart"></canvas>
-                        <div class="chart-timestamp" id="statusDistributionChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-title">Company Type Analysis</div>
-                        <canvas id="companyTypeChart"></canvas>
-                        <div class="chart-timestamp" id="companyTypeChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-title">Work Type Distribution</div>
-                        <canvas id="workTypeChart"></canvas>
-                        <div class="chart-timestamp" id="workTypeChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-title">Location Insights</div>
-                        <canvas id="locationChart"></canvas>
-                        <div class="chart-timestamp" id="locationChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <div class="chart-title">Salary Range Distribution</div>
-                        <canvas id="salaryChart"></canvas>
-                        <div class="chart-timestamp" id="salaryChart-timestamp"></div>
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">Application Velocity (Daily)</div>
+                            <canvas id="velocityChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Application Velocity (Cumulative)</div>
+                            <canvas id="velocityCumulativeChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Status Distribution</div>
+                            <canvas id="statusDistributionChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Work Type Distribution</div>
+                            <canvas id="workTypeChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Salary Range Distribution</div>
+                            <canvas id="salaryChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -846,38 +763,30 @@
                 <div class="analytics-section">
                     <h2 class="section-title">Skills Gap Analysis</h2>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Most Requested Skills (Top 20)</div>
-                        <canvas id="mostRequestedChart"></canvas>
-                        <div class="chart-timestamp" id="mostRequestedChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container" style="margin-top: 30px;">
-                        <div class="chart-title">Skills Overlap: How Many Skills Are Common Between Jobs</div>
-                        <canvas id="skillsOverlapChart"></canvas>
-                        <div class="chart-timestamp" id="skillsOverlapChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container" style="margin-top: 30px;">
-                        <div class="chart-title">Common Requested Skills Between Jobs: Skills with Names and Job Count</div>
-                        <canvas id="commonRequestedSkillsChart"></canvas>
-                        <div class="chart-timestamp" id="commonRequestedSkillsChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container" style="margin-top: 30px;">
-                        <div class="chart-title">Common Unmatched Skills Between Jobs: Skills with Names and Job Count</div>
-                        <canvas id="commonUnmatchedSkillsChart"></canvas>
-                        <div class="chart-timestamp" id="commonUnmatchedSkillsChart-timestamp"></div>
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">Most Requested Skills (Top 20)</div>
+                            <canvas id="mostRequestedChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Unmatched Skills Between Resume and Jobs: Names and Job Count</div>
+                            <canvas id="commonUnmatchedSkillsChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Unmatched Technical Skills Between Resume and Jobs: Names and Job Count</div>
+                            <canvas id="commonUnmatchedTechnicalSkillsChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Most Unmatched Skills (Top 20)</div>
+                            <canvas id="mostUnmatchedChart"></canvas>
+                        </div>
                     </div>
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 10px;">
                         <h3 style="font-size: 16px; font-weight: 600; color: #2d3748; margin: 0;">Skills You're Frequently Missing</h3>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="period-btn" data-gap-period="daily" onclick="selectGapPeriod('daily')">Daily</button>
-                            <button class="period-btn" data-gap-period="weekly" onclick="selectGapPeriod('weekly')">Weekly</button>
-                            <button class="period-btn" data-gap-period="monthly" onclick="selectGapPeriod('monthly')">Monthly</button>
-                            <button class="period-btn active" data-gap-period="all" onclick="selectGapPeriod('all')">All Time</button>
-                        </div>
                     </div>
                     <table class="skills-table" id="skill-gaps-table">
                         <thead>
@@ -909,25 +818,50 @@
                         </tbody>
                     </table>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Most Unmatched Skills (Top 20)</div>
-                        <canvas id="mostUnmatchedChart"></canvas>
-                        <div class="chart-timestamp" id="mostUnmatchedChart-timestamp"></div>
+                </div>
+            </div>
+            
+            <div id="tab-application" class="tab-content">
+                <div class="analytics-section">
+                    <div class="dashboard-grid" id="application-metrics">
+                        <div class="loading">Loading metrics...</div>
                     </div>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">Skill Match Trends: Track Improvement as You Learn New Skills</div>
-                        <p style="color: #718096; font-size: 14px; margin-bottom: 15px; margin-top: 5px;">Monitor how your match scores improve over time for the most frequently requested skills. Grouped by week (Top 10 Skills).</p>
-                        <div class="chart-scroll-wrapper">
-                            <canvas id="skillTrendsChart"></canvas>
+                    <div class="analytics-grid">
+                        <div class="content-card">
+                            <div class="content-card-header" onclick="toggleCollapse(this)">
+                                <h3>Interview Conversion Funnel</h3>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="chart-container">
+                                    <canvas id="funnelChart"></canvas>
+                                </div>
+                            </div>
                         </div>
-                        <div class="chart-timestamp" id="skillTrendsChart-timestamp"></div>
-                    </div>
-                    
-                    <div class="chart-container" style="margin-top: 30px;">
-                        <div class="chart-title">Unique Skills: Skills That Appear in Only One Job</div>
-                        <div id="uniqueSkillsList" style="max-height: 400px; overflow-y: auto; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <div class="loading">Loading...</div>
+                        
+                        <div class="content-card">
+                            <div class="content-card-header" onclick="toggleCollapse(this)">
+                                <h3>Success by Match Score</h3>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="chart-container">
+                                    <canvas id="matchScoreChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-card">
+                            <div class="content-card-header" onclick="toggleCollapse(this)">
+                                <h3>Best Performing Day of Week</h3>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="chart-container">
+                                    <canvas id="dayChart"></canvas>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -941,36 +875,6 @@
         let analyticsData = null;
         let charts = {};
         
-        // Format current time in EST timezone
-        function formatTimestampEST() {
-            const now = new Date();
-            const formatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/New_York',
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-            const parts = formatter.formatToParts(now);
-            const month = parts.find(p => p.type === 'month').value;
-            const day = parts.find(p => p.type === 'day').value;
-            const year = parts.find(p => p.type === 'year').value;
-            const hour = parts.find(p => p.type === 'hour').value;
-            const minute = parts.find(p => p.type === 'minute').value;
-            const ampm = parts.find(p => p.type === 'dayPeriod').value.toUpperCase();
-            return `Last updated: ${month}/${day}/${year} ${hour}:${minute} ${ampm} EST`;
-        }
-        
-        // Update all chart timestamps
-        function updateAllTimestamps() {
-            const timestamp = formatTimestampEST();
-            document.querySelectorAll('.chart-timestamp').forEach(el => {
-                el.textContent = timestamp;
-            });
-        }
-        
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadAnalyticsData();
@@ -978,13 +882,19 @@
         
         // Period selection
         function selectPeriod(period) {
+            console.log('Selecting period:', period);
             currentPeriod = period;
             
             // Update button states
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+            const activeButton = document.querySelector(`[data-period="${period}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            } else {
+                console.error('Could not find button for period:', period);
+            }
             
             // Reload data
             loadAnalyticsData();
@@ -1006,29 +916,66 @@
         // Load analytics data
         async function loadAnalyticsData() {
             try {
-                const response = await fetch(`/api/analytics?period=${currentPeriod}&gap_period=${currentGapPeriod}`);
+                const url = `/api/analytics?period=${currentPeriod}&gap_period=${currentGapPeriod}`;
+                console.log('Loading analytics data from:', url);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.error('HTTP error:', response.status, response.statusText);
+                    return;
+                }
+                
                 const data = await response.json();
+                console.log('Analytics API response:', {
+                    success: data.success,
+                    period: data.period,
+                    total_applications: data.total_applications
+                });
                 
                 if (data.success) {
-                    analyticsData = data.data || data;
+                    // API returns {success: true, period: ..., trend_analysis: ..., skills_gap_analysis: ...}
+                    // So we use data directly, not data.data
+                    analyticsData = data;
+                    console.log('Analytics data loaded:', {
+                        period: analyticsData.period,
+                        hasTrendAnalysis: !!analyticsData.trend_analysis,
+                        hasSkillsGapAnalysis: !!analyticsData.skills_gap_analysis,
+                        workTypeDist: !!analyticsData.trend_analysis?.work_type_distribution,
+                        salaryTracking: !!analyticsData.trend_analysis?.salary_tracking,
+                        mostRequested: !!analyticsData.skills_gap_analysis?.most_requested_skills
+                    });
                     updateAllCharts();
                 } else {
                     console.error('Failed to load analytics:', data.error);
+                    alert('Failed to load analytics: ' + (data.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error loading analytics:', error);
+                alert('Error loading analytics: ' + error.message);
             }
         }
         
         // Update all charts and metrics
         function updateAllCharts() {
-            if (!analyticsData) return;
+            if (!analyticsData) {
+                console.error('No analytics data available for updateAllCharts');
+                return;
+            }
             
-            updateApplicationMetrics();
-            updateApplicationCharts();
-            updateTrendCharts();
-            updateSkillsCharts();
-            updateAllTimestamps();
+            console.log('Updating all charts with data structure:', {
+                hasTrendAnalysis: !!analyticsData.trend_analysis,
+                hasSkillsGapAnalysis: !!analyticsData.skills_gap_analysis,
+                keys: Object.keys(analyticsData)
+            });
+            
+            try {
+                updateApplicationMetrics();
+                updateApplicationCharts();
+                updateTrendCharts();
+                updateSkillsCharts();
+            } catch (error) {
+                console.error('Error updating charts:', error);
+            }
         }
         
         // Update application metrics
@@ -1081,26 +1028,6 @@
                             conversion.offer || 0
                         ],
                         backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-            
-            // Time to Response Chart
-            if (charts.timeToResponse) charts.timeToResponse.destroy();
-            const timeCtx = document.getElementById('timeToResponseChart').getContext('2d');
-            const timeDist = appAnalytics.time_to_response?.distribution || {};
-            charts.timeToResponse = new Chart(timeCtx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(timeDist),
-                    datasets: [{
-                        label: 'Applications',
-                        data: Object.values(timeDist),
-                        backgroundColor: '#3b82f6'
                     }]
                 },
                 options: {
@@ -1186,13 +1113,28 @@
         
         // Update trend charts
         function updateTrendCharts() {
+            if (!analyticsData) {
+                console.error('No analytics data available');
+                return;
+            }
+            
             const trends = analyticsData.trend_analysis || {};
+            console.log('Updating trend charts, trends data:', {
+                hasWorkType: !!trends.work_type_distribution,
+                hasSalary: !!trends.salary_tracking,
+                workTypeKeys: trends.work_type_distribution ? Object.keys(trends.work_type_distribution) : [],
+                salaryDist: trends.salary_tracking?.distribution ? Object.keys(trends.salary_tracking.distribution) : []
+            });
             
             // Velocity Chart (Daily)
             if (charts.velocity) charts.velocity.destroy();
-            const velCtx = document.getElementById('velocityChart').getContext('2d');
-            const velocity = trends.application_velocity?.daily || [];
-            charts.velocity = new Chart(velCtx, {
+            const velocityCanvas = document.getElementById('velocityChart');
+            if (!velocityCanvas) {
+                console.error('Velocity chart canvas not found');
+            } else {
+                const velCtx = velocityCanvas.getContext('2d');
+                const velocity = trends.application_velocity?.daily || [];
+                charts.velocity = new Chart(velCtx, {
                 type: 'line',
                 data: {
                     labels: velocity.map(v => v.date),
@@ -1208,13 +1150,18 @@
                     responsive: true,
                     maintainAspectRatio: false
                 }
-            });
+                });
+            }
             
             // Velocity Chart (Cumulative)
             if (charts.velocityCumulative) charts.velocityCumulative.destroy();
-            const velCumCtx = document.getElementById('velocityCumulativeChart').getContext('2d');
-            const velocityCumulative = trends.application_velocity?.daily_cumulative || [];
-            charts.velocityCumulative = new Chart(velCumCtx, {
+            const velocityCumulativeCanvas = document.getElementById('velocityCumulativeChart');
+            if (!velocityCumulativeCanvas) {
+                console.error('Velocity Cumulative chart canvas not found');
+            } else {
+                const velCumCtx = velocityCumulativeCanvas.getContext('2d');
+                const velocityCumulative = trends.application_velocity?.daily_cumulative || [];
+                charts.velocityCumulative = new Chart(velCumCtx, {
                 type: 'line',
                 data: {
                     labels: velocityCumulative.map(v => v.date),
@@ -1230,33 +1177,43 @@
                     responsive: true,
                     maintainAspectRatio: false
                 }
-            });
+                });
+            }
             
             // Status Distribution Chart
             if (charts.statusDist) charts.statusDist.destroy();
-            const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
-            const statusDist = trends.status_distribution || {};
-            charts.statusDist = new Chart(statusCtx, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(statusDist),
-                    datasets: [{
-                        data: Object.values(statusDist),
-                        backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
+            const statusCanvas = document.getElementById('statusDistributionChart');
+            if (!statusCanvas) {
+                console.error('Status Distribution chart canvas not found');
+            } else {
+                const statusCtx = statusCanvas.getContext('2d');
+                const statusDist = trends.status_distribution || {};
+                charts.statusDist = new Chart(statusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(statusDist),
+                        datasets: [{
+                            data: Object.values(statusDist),
+                            backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
             
             // Company Type Analysis Chart (top 20)
             if (charts.companyType) charts.companyType.destroy();
-            const companyTypeCtx = document.getElementById('companyTypeChart').getContext('2d');
-            const companyType = trends.company_type_analysis || {};
-            const companyLabels = Object.keys(companyType).slice(0, 20);
-            charts.companyType = new Chart(companyTypeCtx, {
+            const companyTypeCanvas = document.getElementById('companyTypeChart');
+            if (!companyTypeCanvas) {
+                console.warn('Company Type chart canvas not found, skipping');
+            } else {
+                const companyTypeCtx = companyTypeCanvas.getContext('2d');
+                const companyType = trends.company_type_analysis || {};
+                const companyLabels = Object.keys(companyType).slice(0, 20);
+                charts.companyType = new Chart(companyTypeCtx, {
                 type: 'bar',
                 data: {
                     labels: companyLabels,
@@ -1283,19 +1240,52 @@
                         }
                     }
                 }
-            });
+                });
+            }
             
             // Work Type Distribution Chart (Remote, Hybrid, On-site)
             if (charts.workType) charts.workType.destroy();
-            const workTypeCtx = document.getElementById('workTypeChart').getContext('2d');
-            const workTypes = trends.work_type_distribution || {};
-            const workTypeLabels = Object.keys(workTypes);
-            const workTypeData = workTypeLabels.map(wt => workTypes[wt].total || 0);
-            const workTypeResponseRates = workTypeLabels.map(wt => workTypes[wt].response_rate || 0);
-            const workTypeInterviewRates = workTypeLabels.map(wt => workTypes[wt].interview_rate || 0);
-            
-            if (workTypeLabels.length > 0) {
-                charts.workType = new Chart(workTypeCtx, {
+            const workTypeCtx = document.getElementById('workTypeChart');
+            if (!workTypeCtx) {
+                console.error('Work Type chart canvas not found');
+            } else {
+                let workTypes = trends.work_type_distribution || {};
+                console.log('Work Type Distribution data:', workTypes);
+                
+                // Ensure workTypes is an object and has valid entries
+                if (!workTypes || typeof workTypes !== 'object' || Array.isArray(workTypes)) {
+                    console.warn('Work type distribution is not a valid object:', workTypes);
+                    workTypes = {};
+                }
+                
+                const workTypeLabels = Object.keys(workTypes).filter(wt => {
+                    const wtData = workTypes[wt];
+                    return wtData && typeof wtData === 'object' && typeof wtData.total === 'number' && wtData.total >= 0;
+                });
+                const workTypeData = workTypeLabels.map(wt => {
+                    const wtData = workTypes[wt];
+                    return (wtData && typeof wtData === 'object' && wtData.total) ? wtData.total : 0;
+                });
+                const workTypeResponseRates = workTypeLabels.map(wt => {
+                    const wtData = workTypes[wt];
+                    return (wtData && typeof wtData === 'object' && typeof wtData.response_rate === 'number') ? wtData.response_rate : 0;
+                });
+                const workTypeInterviewRates = workTypeLabels.map(wt => {
+                    const wtData = workTypes[wt];
+                    return (wtData && typeof wtData === 'object' && typeof wtData.interview_rate === 'number') ? wtData.interview_rate : 0;
+                });
+                
+                console.log('Work Type chart data:', {
+                    labels: workTypeLabels,
+                    data: workTypeData,
+                    responseRates: workTypeResponseRates,
+                    interviewRates: workTypeInterviewRates,
+                    hasData: workTypeData.some(d => d > 0)
+                });
+                
+                // Always create chart, even if empty
+                if (workTypeLabels.length > 0 && workTypeData.some(d => d > 0)) {
+                    charts.workType = new Chart(workTypeCtx.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: workTypeLabels,
@@ -1381,15 +1371,80 @@
                         }
                     }
                 });
+                } else {
+                    console.warn('No work type data available, showing empty state');
+                    charts.workType = new Chart(workTypeCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['No work type data available'],
+                            datasets: [{
+                                label: 'No Data',
+                                data: [0],
+                                backgroundColor: '#9ca3af'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Salary Distribution Chart (ordered ascending)
+            if (charts.salary) charts.salary.destroy();
+            const salaryCanvas = document.getElementById('salaryChart');
+            if (!salaryCanvas) {
+                console.error('Salary chart canvas not found');
             } else {
-                charts.workType = new Chart(workTypeCtx, {
+                const salaryCtx = salaryCanvas.getContext('2d');
+                const salaryTracking = trends.salary_tracking || {};
+                let salaryDist = salaryTracking.distribution || {};
+                console.log('Salary tracking data:', {
+                    hasTracking: !!trends.salary_tracking,
+                    hasDistribution: !!salaryTracking.distribution,
+                    distribution: salaryDist
+                });
+                
+                // Ensure salaryDist is an object
+                if (!salaryDist || typeof salaryDist !== 'object' || Array.isArray(salaryDist)) {
+                    console.warn('Salary distribution is not a valid object:', salaryDist);
+                    salaryDist = {};
+                }
+                
+                // Order keys ascending (already ordered from backend, but ensure it)
+                const salaryOrder = [
+                    '$0-50k', '$50k-75k', '$75k-100k', '$100k-125k', '$125k-150k',
+                    '$150k-200k', '$200k-220k', '$220k-230k', '$230k-250k',
+                    '$250k-270k', '$270k-300k', '$300k+'
+                ];
+                const orderedLabels = salaryOrder.filter(key => salaryDist[key] !== undefined && salaryDist[key] !== null);
+                const orderedValues = orderedLabels.map(key => {
+                    const val = salaryDist[key];
+                    return (typeof val === 'number' && val >= 0) ? val : 0;
+                });
+                
+                console.log('Salary chart data:', {
+                    labels: orderedLabels,
+                    values: orderedValues,
+                    hasData: orderedValues.some(v => v > 0)
+                });
+                
+                // Always create chart, even if empty
+                if (orderedLabels.length > 0) {
+                    charts.salary = new Chart(salaryCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['No work type data available'],
+                        labels: orderedLabels,
                         datasets: [{
-                            label: 'No Data',
-                            data: [0],
-                            backgroundColor: '#9ca3af'
+                            label: 'Number of Jobs',
+                            data: orderedValues,
+                            backgroundColor: '#3b82f6'
                         }]
                     },
                     options: {
@@ -1397,467 +1452,186 @@
                         maintainAspectRatio: false
                     }
                 });
-            }
-            
-            // Location Insights Chart (sorted by response rate descending, top 20)
-            if (charts.location) charts.location.destroy();
-            const locationCtx = document.getElementById('locationChart').getContext('2d');
-            const locations = trends.location_insights || {};
-            
-            // Convert to array, sort by response_rate descending, take top 20
-            const locationArray = Object.keys(locations).map(loc => ({
-                location: loc,
-                ...locations[loc]
-            })).sort((a, b) => b.response_rate - a.response_rate).slice(0, 20);
-            
-            if (locationArray.length > 0) {
-                const locationLabels = locationArray.map(l => l.location);
-                charts.location = new Chart(locationCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: locationLabels,
-                        datasets: [
-                            {
-                                label: 'Response Rate (%)',
-                                data: locationArray.map(l => l.response_rate || 0),
-                                backgroundColor: '#3b82f6'
-                            },
-                            {
-                                label: 'Interview Rate (%)',
-                                data: locationArray.map(l => l.interview_rate || 0),
-                                backgroundColor: '#ef4444'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const index = context.dataIndex;
-                                        const location = locationArray[index];
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        label += context.parsed.x.toFixed(1) + '%';
-                                        label += ' (' + location.total + ' application' + (location.total !== 1 ? 's' : '') + ')';
-                                        return label;
-                                    }
-                                }
-                            }
+                } else {
+                    console.warn('No salary data available, showing empty state');
+                    charts.salary = new Chart(salaryCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['No salary data available'],
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: [0],
+                                backgroundColor: '#cccccc'
+                            }]
                         },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                max: 100,
-                                title: {
-                                    display: true,
-                                    text: 'Rate (%)',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                }
-                            },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Location',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    font: {
-                                        size: 11
-                                    }
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
                                 }
                             }
                         }
-                    }
-                });
-            } else {
-                // No location data - create empty chart
-                charts.location = new Chart(locationCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['No location data available'],
-                        datasets: [{
-                            label: 'No Data',
-                            data: [0],
-                            backgroundColor: '#cccccc'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y'
-                    }
-                });
-            }
-            
-            // Salary Distribution Chart (ordered ascending)
-            if (charts.salary) charts.salary.destroy();
-            const salaryCtx = document.getElementById('salaryChart').getContext('2d');
-            const salaryDist = trends.salary_tracking?.distribution || {};
-            // Order keys ascending (already ordered from backend, but ensure it)
-            const salaryOrder = [
-                '$0-50k', '$50k-75k', '$75k-100k', '$100k-125k', '$125k-150k',
-                '$150k-200k', '$200k-220k', '$220k-230k', '$230k-250k',
-                '$250k-270k', '$270k-300k', '$300k+'
-            ];
-            const orderedLabels = salaryOrder.filter(key => salaryDist[key] !== undefined);
-            const orderedValues = orderedLabels.map(key => salaryDist[key]);
-            charts.salary = new Chart(salaryCtx, {
-                type: 'bar',
-                data: {
-                    labels: orderedLabels,
-                    datasets: [{
-                        label: 'Number of Jobs',
-                        data: orderedValues,
-                        backgroundColor: '#3b82f6'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+                    });
                 }
-            });
+            }
         }
         
         // Update skills charts
         function updateSkillsCharts() {
+            if (!analyticsData) {
+                console.error('No analytics data available');
+                return;
+            }
+            
             const skills = analyticsData.skills_gap_analysis || {};
-            
-            // Skills Overlap Chart - Distribution of common skills
-            if (charts.skillsOverlap) charts.skillsOverlap.destroy();
-            const overlapCtx = document.getElementById('skillsOverlapChart').getContext('2d');
-            const overlapData = skills.skills_overlap || {};
-            const distribution = overlapData.distribution || {};
-            
-            // Prepare data: group by ranges for readability
-            const overlapRanges = {
-                '1 job (Unique)': distribution[1] || 0,
-                '2 jobs': distribution[2] || 0,
-                '3-5 jobs': Object.keys(distribution).filter(k => {
-                    const count = parseInt(k);
-                    return count >= 3 && count <= 5;
-                }).reduce((sum, k) => sum + (distribution[k] || 0), 0),
-                '6-10 jobs': Object.keys(distribution).filter(k => {
-                    const count = parseInt(k);
-                    return count >= 6 && count <= 10;
-                }).reduce((sum, k) => sum + (distribution[k] || 0), 0),
-                '11-20 jobs': Object.keys(distribution).filter(k => {
-                    const count = parseInt(k);
-                    return count >= 11 && count <= 20;
-                }).reduce((sum, k) => sum + (distribution[k] || 0), 0),
-                '20+ jobs': Object.keys(distribution).filter(k => {
-                    const count = parseInt(k);
-                    return count > 20;
-                }).reduce((sum, k) => sum + (distribution[k] || 0), 0)
-            };
-            
-            const overlapLabels = Object.keys(overlapRanges).filter(label => overlapRanges[label] > 0);
-            const overlapValues = overlapLabels.map(label => overlapRanges[label]);
-            
-            charts.skillsOverlap = new Chart(overlapCtx, {
-                type: 'bar',
-                data: {
-                    labels: overlapLabels,
-                    datasets: [{
-                        label: 'Number of Skills',
-                        data: overlapValues,
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            },
-                            title: {
-                                display: true,
-                                text: 'Number of Skills',
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Number of Jobs Skill Appears In',
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.parsed.y} skill${context.parsed.y !== 1 ? 's' : ''}`;
-                                }
-                            }
-                        }
-                    }
-                }
+            console.log('Updating skills charts, skills data:', {
+                hasMostRequested: !!skills.most_requested_skills,
+                hasSkillGaps: !!skills.skill_gaps,
+                hasLearningPriorities: !!skills.learning_priorities,
+                hasSkillsOverlap: !!skills.skills_overlap,
+                hasCommonUnmatched: !!skills.skills_overlap?.common_unmatched_skills,
+                hasCommonUnmatchedTechnical: !!skills.skills_overlap?.common_unmatched_technical_skills,
+                mostRequestedCount: skills.most_requested_skills?.length || 0,
+                skillGapsCount: skills.skill_gaps?.length || 0,
+                commonUnmatchedCount: skills.skills_overlap?.common_unmatched_skills?.length || 0,
+                commonUnmatchedTechnicalCount: skills.skills_overlap?.common_unmatched_technical_skills?.length || 0
             });
             
-            // Common Requested Skills Chart - Showing skill names and how many jobs they appear in
-            if (charts.commonRequestedSkills) charts.commonRequestedSkills.destroy();
-            const commonRequestedCtx = document.getElementById('commonRequestedSkillsChart').getContext('2d');
-            const commonRequestedSkills = overlapData.common_requested_skills || [];
+            // Unmatched Skills Chart (Non-Technical) - Showing unmatched skill names and how many jobs they appear in
+            const overlapData = skills.skills_overlap || {};
             
-            // Sort by job count (most common first) and take top 20
-            const topCommonRequestedSkills = commonRequestedSkills.slice(0, 20);
-            
-            if (topCommonRequestedSkills.length > 0) {
-                const commonRequestedLabels = topCommonRequestedSkills.map(s => s.skill);
-                const commonRequestedValues = topCommonRequestedSkills.map(s => s.job_count);
-                
-                charts.commonRequestedSkills = new Chart(commonRequestedCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: commonRequestedLabels,
-                        datasets: [{
-                            label: 'Number of Jobs',
-                            data: commonRequestedValues,
-                            backgroundColor: '#764ba2',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Number of Jobs',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                }
-                            },
-                            y: {
-                                ticks: {
-                                    font: {
-                                        size: 11
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Skill Name',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: function(context) {
-                                        const skill = topCommonRequestedSkills[context[0].dataIndex];
-                                        return skill.skill;
-                                    },
-                                    label: function(context) {
-                                        const skill = topCommonRequestedSkills[context[0].dataIndex];
-                                        let label = `Appears in ${skill.job_count} job${skill.job_count !== 1 ? 's' : ''}`;
-                                        label += ` (${skill.percentage.toFixed(1)}% of jobs)`;
-                                        if (skill.average_match_score) {
-                                            label += `\nAvg match score: ${skill.average_match_score}%`;
-                                        }
-                                        if (skill.applications && skill.applications.length > 0) {
-                                            label += '\n\nJobs:';
-                                            skill.applications.slice(0, 5).forEach(app => {
-                                                label += `\n• ${app.company} - ${app.job_title}`;
-                                            });
-                                            if (skill.applications.length > 5) {
-                                                label += `\n... and ${skill.applications.length - 5} more`;
-                                            }
-                                        }
-                                        return label;
-                                    },
-                                    afterBody: function(context) {
-                                        const skill = topCommonRequestedSkills[context[0].dataIndex];
-                                        if (skill.applications && skill.applications.length > 0) {
-                                            let jobsText = '\n\nJobs:';
-                                            skill.applications.forEach(app => {
-                                                jobsText += `\n• ${app.company} - ${app.job_title}`;
-                                            });
-                                            return jobsText;
-                                        }
-                                        return null;
-                                    }
-                                },
-                                usePointStyle: true,
-                                padding: 12
-                            }
-                        },
-                    }
-                });
-            } else {
-                // No common requested skills - create empty chart
-                charts.commonRequestedSkills = new Chart(commonRequestedCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['No common requested skills found'],
-                        datasets: [{
-                            label: 'Number of Jobs',
-                            data: [0],
-                            backgroundColor: '#cccccc'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y'
-                    }
-                });
-            }
-            
-            // Common Unmatched Skills Chart - Showing unmatched skill names and how many jobs they appear in
+            // Chart 1: Non-Technical Unmatched Skills
             if (charts.commonUnmatchedSkills) charts.commonUnmatchedSkills.destroy();
-            const commonUnmatchedCtx = document.getElementById('commonUnmatchedSkillsChart').getContext('2d');
-            const commonUnmatchedSkills = overlapData.common_unmatched_skills || [];
-            
-            // Sort by job count (most common first) and take top 20
-            const topCommonUnmatchedSkills = commonUnmatchedSkills.slice(0, 20);
-            
-            if (topCommonUnmatchedSkills.length > 0) {
-                const commonUnmatchedLabels = topCommonUnmatchedSkills.map(s => s.skill);
-                const commonUnmatchedValues = topCommonUnmatchedSkills.map(s => s.job_count);
-                
-                charts.commonUnmatchedSkills = new Chart(commonUnmatchedCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: commonUnmatchedLabels,
-                        datasets: [{
-                            label: 'Number of Jobs',
-                            data: commonUnmatchedValues,
-                            backgroundColor: '#ef4444',
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Number of Jobs',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                }
-                            },
-                            y: {
-                                ticks: {
-                                    font: {
-                                        size: 11
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Skill Name',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: function(context) {
-                                        const skill = topCommonUnmatchedSkills[context[0].dataIndex];
-                                        return skill.skill;
-                                    },
-                                    label: function(context) {
-                                        const skill = topCommonUnmatchedSkills[context[0].dataIndex];
-                                        let label = `Appears in ${skill.job_count} job${skill.job_count !== 1 ? 's' : ''}`;
-                                        label += ` (${skill.percentage.toFixed(1)}% of jobs)`;
-                                        if (skill.average_match_score_impact) {
-                                            label += `\nAvg match score impact: ${skill.average_match_score_impact}%`;
-                                        }
-                                        if (skill.applications && skill.applications.length > 0) {
-                                            label += '\n\nJobs:';
-                                            skill.applications.slice(0, 5).forEach(app => {
-                                                label += `\n• ${app.company} - ${app.job_title}`;
-                                            });
-                                            if (skill.applications.length > 5) {
-                                                label += `\n... and ${skill.applications.length - 5} more`;
-                                            }
-                                        }
-                                        return label;
-                                    },
-                                    afterBody: function(context) {
-                                        const skill = topCommonUnmatchedSkills[context[0].dataIndex];
-                                        if (skill.applications && skill.applications.length > 0) {
-                                            let jobsText = '\n\nJobs:';
-                                            skill.applications.forEach(app => {
-                                                jobsText += `\n• ${app.company} - ${app.job_title}`;
-                                            });
-                                            return jobsText;
-                                        }
-                                        return null;
-                                    }
-                                },
-                                usePointStyle: true,
-                                padding: 12
-                            }
-                        },
-                    }
-                });
+            const commonUnmatchedCanvas = document.getElementById('commonUnmatchedSkillsChart');
+            if (!commonUnmatchedCanvas) {
+                console.error('Common Unmatched Skills chart canvas not found');
             } else {
-                // No common unmatched skills - create empty chart
-                charts.commonUnmatchedSkills = new Chart(commonUnmatchedCtx, {
+                const commonUnmatchedCtx = commonUnmatchedCanvas.getContext('2d');
+                let commonUnmatchedSkills = overlapData.common_unmatched_skills || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(commonUnmatchedSkills)) {
+                    console.warn('Common unmatched skills is not an array:', commonUnmatchedSkills);
+                    commonUnmatchedSkills = [];
+                }
+                
+                // Sort by job count (most common first) and take top 20
+                const topCommonUnmatchedSkills = commonUnmatchedSkills
+                    .filter(s => s && s.skill && typeof s.job_count === 'number')
+                    .slice(0, 20);
+                
+                console.log('Common Unmatched Skills (Non-Technical) data:', {
+                    total: commonUnmatchedSkills.length,
+                    top20: topCommonUnmatchedSkills.length,
+                    skills: topCommonUnmatchedSkills.map(s => ({skill: s.skill, job_count: s.job_count}))
+                });
+                
+                if (topCommonUnmatchedSkills.length > 0) {
+                    const commonUnmatchedLabels = topCommonUnmatchedSkills.map(s => s.skill);
+                    const commonUnmatchedValues = topCommonUnmatchedSkills.map(s => s.job_count);
+                    
+                    charts.commonUnmatchedSkills = new Chart(commonUnmatchedCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: commonUnmatchedLabels,
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: commonUnmatchedValues,
+                                backgroundColor: '#ef4444',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Jobs',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Skill Name',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            const skill = topCommonUnmatchedSkills[context[0].dataIndex];
+                                            return skill.skill;
+                                        },
+                                        label: function(context) {
+                                            const skill = topCommonUnmatchedSkills[context[0].dataIndex];
+                                            let label = `Appears in ${skill.job_count} job${skill.job_count !== 1 ? 's' : ''}`;
+                                            const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                            label += ` (${percentage.toFixed(1)}% of jobs)`;
+                                            if (skill.average_match_score_impact !== undefined && skill.average_match_score_impact !== null) {
+                                                label += `\nAvg match score impact: ${skill.average_match_score_impact.toFixed(1)}%`;
+                                            }
+                                            if (skill.applications && skill.applications.length > 0) {
+                                                label += '\n\nJobs:';
+                                                skill.applications.slice(0, 5).forEach(app => {
+                                                    label += `\n• ${app.company} - ${app.job_title}`;
+                                                });
+                                                if (skill.applications.length > 5) {
+                                                    label += `\n... and ${skill.applications.length - 5} more`;
+                                                }
+                                            }
+                                            return label;
+                                        },
+                                        afterBody: function(context) {
+                                            const skill = topCommonUnmatchedSkills[context[0].dataIndex];
+                                            if (skill.applications && skill.applications.length > 0) {
+                                                let jobsText = '\n\nJobs:';
+                                                skill.applications.forEach(app => {
+                                                    jobsText += `\n• ${app.company} - ${app.job_title}`;
+                                                });
+                                                return jobsText;
+                                            }
+                                            return null;
+                                        }
+                                    },
+                                    usePointStyle: true,
+                                    padding: 12
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // No common unmatched skills - create empty chart with message
+                    console.warn('No common unmatched skills data available, showing empty state');
+                    charts.commonUnmatchedSkills = new Chart(commonUnmatchedCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['No common unmatched skills found'],
+                        labels: ['No data available'],
                         datasets: [{
                             label: 'Number of Jobs',
                             data: [0],
@@ -1867,45 +1641,189 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        indexAxis: 'y'
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
                     }
                 });
+                }
             }
             
-            // Unique Skills List
-            const uniqueSkills = overlapData.unique_skills || [];
-            const uniqueSkillsHtml = uniqueSkills.length > 0 
-                ? uniqueSkills.map(us => {
-                    const app = us.application;
-                    const appLink = app ? `<a href="${app.url}" target="_blank" style="color: #667eea; text-decoration: underline;">${app.company} - ${app.job_title}</a>` : 'Unknown job';
-                    return `<div style="padding: 8px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 500; color: #2d3748;">${us.skill}</span>
-                        <span style="font-size: 12px; color: #718096;">${appLink}</span>
-                    </div>`;
-                }).join('')
-                : '<div style="text-align: center; padding: 20px; color: #718096;">No unique skills found</div>';
-            
-            document.getElementById('uniqueSkillsList').innerHTML = 
-                `<div style="margin-bottom: 10px; font-weight: 600; color: #2d3748; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0;">
-                    Total Unique Skills: ${overlapData.unique_skills_count || 0}
-                </div>
-                ${uniqueSkillsHtml}`;
+            // Chart 2: Technical Unmatched Skills
+            if (charts.commonUnmatchedTechnicalSkills) charts.commonUnmatchedTechnicalSkills.destroy();
+            const commonUnmatchedTechnicalCanvas = document.getElementById('commonUnmatchedTechnicalSkillsChart');
+            if (!commonUnmatchedTechnicalCanvas) {
+                console.error('Common Unmatched Technical Skills chart canvas not found');
+            } else {
+                const commonUnmatchedTechnicalCtx = commonUnmatchedTechnicalCanvas.getContext('2d');
+                let commonUnmatchedTechnicalSkills = overlapData.common_unmatched_technical_skills || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(commonUnmatchedTechnicalSkills)) {
+                    console.warn('Common unmatched technical skills is not an array:', commonUnmatchedTechnicalSkills);
+                    commonUnmatchedTechnicalSkills = [];
+                }
+                
+                // Sort by job count (most common first) and take top 20
+                const topCommonUnmatchedTechnicalSkills = commonUnmatchedTechnicalSkills
+                    .filter(s => s && s.skill && typeof s.job_count === 'number')
+                    .slice(0, 20);
+                
+                console.log('Common Unmatched Technical Skills data:', {
+                    total: commonUnmatchedTechnicalSkills.length,
+                    top20: topCommonUnmatchedTechnicalSkills.length,
+                    skills: topCommonUnmatchedTechnicalSkills.map(s => ({skill: s.skill, job_count: s.job_count}))
+                });
+                
+                if (topCommonUnmatchedTechnicalSkills.length > 0) {
+                    const commonUnmatchedTechnicalLabels = topCommonUnmatchedTechnicalSkills.map(s => s.skill);
+                    const commonUnmatchedTechnicalValues = topCommonUnmatchedTechnicalSkills.map(s => s.job_count);
+                    
+                    charts.commonUnmatchedTechnicalSkills = new Chart(commonUnmatchedTechnicalCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: commonUnmatchedTechnicalLabels,
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: commonUnmatchedTechnicalValues,
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Jobs',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Skill Name',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            const skill = topCommonUnmatchedTechnicalSkills[context[0].dataIndex];
+                                            return skill.skill;
+                                        },
+                                        label: function(context) {
+                                            const skill = topCommonUnmatchedTechnicalSkills[context[0].dataIndex];
+                                            let label = `Appears in ${skill.job_count} job${skill.job_count !== 1 ? 's' : ''}`;
+                                            const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                            label += ` (${percentage.toFixed(1)}% of jobs)`;
+                                            if (skill.average_match_score_impact !== undefined && skill.average_match_score_impact !== null) {
+                                                label += `\nAvg match score impact: ${skill.average_match_score_impact.toFixed(1)}%`;
+                                            }
+                                            if (skill.applications && skill.applications.length > 0) {
+                                                label += '\n\nJobs:';
+                                                skill.applications.slice(0, 5).forEach(app => {
+                                                    label += `\n• ${app.company} - ${app.job_title}`;
+                                                });
+                                                if (skill.applications.length > 5) {
+                                                    label += `\n... and ${skill.applications.length - 5} more`;
+                                                }
+                                            }
+                                            return label;
+                                        }
+                                    },
+                                    usePointStyle: true,
+                                    padding: 12
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // No common unmatched technical skills - create empty chart with message
+                    console.warn('No common unmatched technical skills data available, showing empty state');
+                    charts.commonUnmatchedTechnicalSkills = new Chart(commonUnmatchedTechnicalCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['No data available'],
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: [0],
+                                backgroundColor: '#cccccc'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
             
             // Most Requested Skills Chart (Top 20 - readable visualization)
             if (charts.mostRequested) charts.mostRequested.destroy();
-            const mostCtx = document.getElementById('mostRequestedChart').getContext('2d');
-            const mostRequested = (skills.most_requested_skills || []).slice(0, 20);
-            charts.mostRequested = new Chart(mostCtx, {
-                type: 'bar',
-                data: {
-                    labels: mostRequested.map(s => s.skill),
-                    datasets: [{
-                        label: 'Frequency',
-                        data: mostRequested.map(s => s.frequency),
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 4
-                    }]
-                },
+            const mostCanvas = document.getElementById('mostRequestedChart');
+            if (!mostCanvas) {
+                console.error('Most Requested chart canvas not found');
+            } else {
+                const mostCtx = mostCanvas.getContext('2d');
+                let mostRequested = skills.most_requested_skills || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(mostRequested)) {
+                    console.warn('Most requested skills is not an array:', mostRequested);
+                    mostRequested = [];
+                }
+                
+                mostRequested = mostRequested.slice(0, 20);
+                console.log('Most Requested Skills data:', {
+                    count: mostRequested.length,
+                    skills: mostRequested.map(s => s?.skill || 'invalid')
+                });
+            
+                if (mostRequested.length > 0 && mostRequested.every(s => s && s.skill && typeof s.frequency === 'number')) {
+                charts.mostRequested = new Chart(mostCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: mostRequested.map(s => s.skill),
+                        datasets: [{
+                            label: 'Frequency',
+                            data: mostRequested.map(s => s.frequency),
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        }]
+                    },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1937,7 +1855,8 @@
                                 },
                                 label: function(context) {
                                     const skill = mostRequested[context.dataIndex];
-                                    let label = `Frequency: ${skill.frequency} (${skill.percentage.toFixed(1)}%)`;
+                                    const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                    let label = `Frequency: ${skill.frequency} (${percentage.toFixed(1)}%)`;
                                     if (skill.applications && skill.applications.length > 0) {
                                         label += '\n\nApplications:';
                                         skill.applications.slice(0, 5).forEach(app => {
@@ -1981,28 +1900,73 @@
                     }
                 }
             });
+            } else {
+                console.warn('No most requested skills data available, showing empty state');
+                charts.mostRequested = new Chart(mostCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['No data available'],
+                        datasets: [{
+                            label: 'Frequency',
+                            data: [0],
+                            backgroundColor: '#cccccc'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            }
             
             // Most Unmatched Skills Chart (Top 20) - Show skills and average count
             if (charts.mostUnmatched) charts.mostUnmatched.destroy();
-            const unmatchedCtx = document.getElementById('mostUnmatchedChart').getContext('2d');
-            const unmatched = (skills.skill_gaps || []).slice(0, 20);
-            
-            // Calculate average count
-            const avgCount = unmatched.length > 0 
-                ? (unmatched.reduce((sum, s) => sum + s.frequency, 0) / unmatched.length).toFixed(1)
-                : 0;
-            
-            charts.mostUnmatched = new Chart(unmatchedCtx, {
-                type: 'bar',
-                data: {
-                    labels: unmatched.map(s => s.skill),
-                    datasets: [{
-                        label: 'Frequency',
-                        data: unmatched.map(s => s.frequency),
-                        backgroundColor: '#ef4444',
-                        borderRadius: 4
-                    }]
-                },
+            const unmatchedCanvas = document.getElementById('mostUnmatchedChart');
+            if (!unmatchedCanvas) {
+                console.error('Most Unmatched chart canvas not found');
+            } else {
+                const unmatchedCtx = unmatchedCanvas.getContext('2d');
+                let unmatched = skills.skill_gaps || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(unmatched)) {
+                    console.warn('Skill gaps is not an array:', unmatched);
+                    unmatched = [];
+                }
+                
+                unmatched = unmatched
+                    .filter(s => s && s.skill && typeof s.frequency === 'number')
+                    .slice(0, 20);
+                
+                console.log('Most Unmatched Skills data:', {
+                    count: unmatched.length,
+                    skills: unmatched.map(s => ({skill: s.skill, frequency: s.frequency}))
+                });
+                
+                // Calculate average count
+                const avgCount = unmatched.length > 0 
+                    ? (unmatched.reduce((sum, s) => sum + (s.frequency || 0), 0) / unmatched.length).toFixed(1)
+                    : 0;
+                
+                if (unmatched.length > 0) {
+                    charts.mostUnmatched = new Chart(unmatchedCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: unmatched.map(s => s.skill),
+                        datasets: [{
+                            label: 'Frequency',
+                            data: unmatched.map(s => s.frequency),
+                            backgroundColor: '#ef4444',
+                            borderRadius: 4
+                        }]
+                    },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -2050,8 +2014,10 @@
                                 },
                                 label: function(context) {
                                     const skill = unmatched[context.dataIndex];
-                                    let label = `Frequency: ${skill.frequency} (${skill.percentage.toFixed(1)}%)`;
-                                    label += `\nAverage match score impact: ${skill.average_match_score_impact.toFixed(1)}%`;
+                                    const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                    const impact = (skill.average_match_score_impact !== undefined && skill.average_match_score_impact !== null) ? skill.average_match_score_impact : 0;
+                                    let label = `Frequency: ${skill.frequency} (${percentage.toFixed(1)}%)`;
+                                    label += `\nAverage match score impact: ${impact.toFixed(1)}%`;
                                     if (skill.applications && skill.applications.length > 0) {
                                         label += '\n\nApplications:';
                                         skill.applications.slice(0, 5).forEach(app => {
@@ -2071,20 +2037,73 @@
                     }
                 }
             });
+                } else {
+                    console.warn('No most unmatched skills data available, showing empty state');
+                    charts.mostUnmatched = new Chart(unmatchedCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['No data available'],
+                            datasets: [{
+                                label: 'Frequency',
+                                data: [0],
+                                backgroundColor: '#cccccc'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
             
             // Skill Gaps Table (with headers, top 20) - Open links in same window
-            const gaps = (skills.skill_gaps || []).slice(0, 20);
-            const gapsHtml = gaps.map(gap => {
-                // Build application links (same window, no target="_blank")
-                const appLinks = gap.applications && gap.applications.length > 0 
-                    ? gap.applications.map(app => `<a href="${app.url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${app.company} - ${app.job_title}</a>`).join('')
-                    : 'No applications';
-                return `
+            let gaps = skills.skill_gaps || [];
+            
+            // Ensure it's an array
+            if (!Array.isArray(gaps)) {
+                console.warn('Skill gaps is not an array:', gaps);
+                gaps = [];
+            }
+            
+            gaps = gaps
+                .filter(gap => gap && gap.skill && typeof gap.frequency === 'number')
+                .slice(0, 20);
+            
+            console.log('Skill Gaps table data:', {
+                count: gaps.length,
+                skills: gaps.map(g => g.skill)
+            });
+            
+            let gapsHtml = '';
+            if (gaps.length > 0) {
+                gapsHtml = gaps.map(gap => {
+                    // Build application links (same window, no target="_blank")
+                    const appLinks = gap.applications && Array.isArray(gap.applications) && gap.applications.length > 0 
+                        ? gap.applications.map(app => {
+                            const url = app?.url || '#';
+                            const company = app?.company || 'Unknown';
+                            const jobTitle = app?.job_title || 'Unknown';
+                            return `<a href="${url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${company} - ${jobTitle}</a>`;
+                        }).join('')
+                        : 'No applications';
+                    const skill = gap.skill || 'Unknown';
+                    const frequency = gap.frequency || 0;
+                    const impact = (gap.average_match_score_impact !== undefined && gap.average_match_score_impact !== null) 
+                        ? gap.average_match_score_impact.toFixed(1) 
+                        : '0.0';
+                    return `
                 <tr>
-                    <td>${gap.skill}</td>
-                    <td>Appears in ${gap.frequency} job${gap.frequency > 1 ? 's' : ''}</td>
+                    <td>${skill}</td>
+                    <td>Appears in ${frequency} job${frequency > 1 ? 's' : ''}</td>
                     <td>Not demonstrated</td>
-                    <td>${gap.average_match_score_impact.toFixed(1)}% impact</td>
+                    <td>${impact}% impact</td>
                 </tr>
                 <tr style="background: #f8f9fa; border-top: 2px solid #e2e8f0;">
                     <td colspan="4" style="padding: 10px 15px; font-size: 12px;">
@@ -2092,23 +2111,57 @@
                         ${appLinks}
                     </td>
                 </tr>`;
-            }).join('');
-            document.querySelector('#skill-gaps-table tbody').innerHTML = 
-                gapsHtml || '<tr><td colspan="4" class="empty-state">No skill gaps identified</td></tr>';
+                }).join('');
+            }
+            
+            const gapsTableBody = document.querySelector('#skill-gaps-table tbody');
+            if (gapsTableBody) {
+                gapsTableBody.innerHTML = gapsHtml || '<tr><td colspan="4" class="empty-state">No skill gaps identified</td></tr>';
+            } else {
+                console.error('Skill gaps table tbody not found');
+            }
             
             // Learning Priorities Table (with headers, top 20) - Open links in same window
-            const priorities = (skills.learning_priorities || []).slice(0, 20);
-            const prioritiesHtml = priorities.map((p, i) => {
-                // Build application links (same window, no target="_blank")
-                const appLinks = p.applications && p.applications.length > 0 
-                    ? p.applications.map(app => `<a href="${app.url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${app.company} - ${app.job_title}</a>`).join('')
-                    : 'No applications';
-                return `
+            let priorities = skills.learning_priorities || [];
+            
+            // Ensure it's an array
+            if (!Array.isArray(priorities)) {
+                console.warn('Learning priorities is not an array:', priorities);
+                priorities = [];
+            }
+            
+            priorities = priorities
+                .filter(p => p && p.skill && typeof p.priority_score === 'number')
+                .slice(0, 20);
+            
+            console.log('Learning Priorities table data:', {
+                count: priorities.length,
+                skills: priorities.map(p => p.skill)
+            });
+            
+            let prioritiesHtml = '';
+            if (priorities.length > 0) {
+                prioritiesHtml = priorities.map((p, i) => {
+                    // Build application links (same window, no target="_blank")
+                    const appLinks = p.applications && Array.isArray(p.applications) && p.applications.length > 0 
+                        ? p.applications.map(app => {
+                            const url = app?.url || '#';
+                            const company = app?.company || 'Unknown';
+                            const jobTitle = app?.job_title || 'Unknown';
+                            return `<a href="${url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${company} - ${jobTitle}</a>`;
+                        }).join('')
+                        : 'No applications';
+                    const skill = p.skill || 'Unknown';
+                    const priorityScore = (p.priority_score !== undefined && p.priority_score !== null) 
+                        ? p.priority_score.toFixed(2) 
+                        : '0.00';
+                    const reason = p.reason || 'No reason provided';
+                    return `
                 <tr>
                     <td>#${i + 1}</td>
-                    <td>${p.skill}</td>
-                    <td>${p.priority_score.toFixed(2)}</td>
-                    <td>${p.reason}</td>
+                    <td>${skill}</td>
+                    <td>${priorityScore}</td>
+                    <td>${reason}</td>
                 </tr>
                 <tr style="background: #f8f9fa; border-top: 2px solid #e2e8f0;">
                     <td colspan="4" style="padding: 10px 15px; font-size: 12px;">
@@ -2116,207 +2169,15 @@
                         ${appLinks}
                     </td>
                 </tr>`;
-            }).join('');
-            document.querySelector('#learning-priorities-table tbody').innerHTML = 
-                prioritiesHtml || '<tr><td colspan="4" class="empty-state">No learning priorities identified</td></tr>';
-            
-            // Skill Trends Chart (Weekly Bar Chart - Top 10 Skills for readability)
-            if (charts.skillTrends) charts.skillTrends.destroy();
-            const trendsCtx = document.getElementById('skillTrendsChart').getContext('2d');
-            const trendsData = skills.skill_match_trends || {};
-            
-            // Filter null weeks (only include weeks with actual data)
-            const allWeeks = Object.keys(trendsData.overall || {})
-                .filter(week => {
-                    const data = trendsData.overall[week];
-                    return data && data.average_score != null && data.count > 0;
-                })
-                .sort();
-            
-            // Format week for display (e.g., "2025-W03" -> "Week 3, 2025")
-            const formatWeek = (week) => {
-                const match = week.match(/(\d{4})-W(\d{2})/);
-                if (match) {
-                    return `W${match[2]} ${match[1]}`;
-                }
-                return week;
-            };
-            
-            // Top 10 skills color palette (distinct, readable colors)
-            const skillColors = [
-                '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe',
-                '#43e97b', '#fa709a', '#ffecd2', '#a8edea', '#ffeaa7'
-            ];
-            
-            // Get top 10 skills from most requested (already limited in backend)
-            const topSkills = skills.most_requested_skills?.slice(0, 10) || [];
-            
-            // Build grouped bar chart datasets (one per skill)
-            const datasets = topSkills.map((skill, index) => ({
-                label: skill.skill,
-                data: allWeeks.map(week => {
-                    const weekData = trendsData.by_skill?.[skill.skill]?.[week];
-                    return (weekData && weekData.average_score != null) ? weekData.average_score : null;
-                }),
-                backgroundColor: skillColors[index % skillColors.length],
-                borderColor: skillColors[index % skillColors.length],
-                borderWidth: 1,
-                borderRadius: 2
-            }));
-            
-            // Add "other" dataset if it has data
-            const otherTrends = trendsData.other || {};
-            const otherWeeksWithData = allWeeks.filter(week => {
-                const weekData = otherTrends[week];
-                return weekData && weekData.average_score != null && weekData.count > 0;
-            });
-            
-            if (otherWeeksWithData.length > 0) {
-                datasets.push({
-                    label: 'Other Skills',
-                    data: allWeeks.map(week => {
-                        const weekData = otherTrends[week];
-                        return (weekData && weekData.average_score != null) ? weekData.average_score : null;
-                    }),
-                    backgroundColor: '#cccccc',
-                    borderColor: '#cccccc',
-                    borderWidth: 1,
-                    borderRadius: 2
-                });
+                }).join('');
             }
             
-            // Chart configuration for grouped bar chart (proper visualization principles)
-            charts.skillTrends = new Chart(trendsCtx, {
-                type: 'bar',
-                data: {
-                    labels: allWeeks.map(formatWeek), // Weeks on x-axis
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    scales: {
-                        x: {
-                            stacked: false, // Grouped bars (readable for up to ~10 categories)
-                            ticks: {
-                                maxRotation: 60,
-                                minRotation: 45,
-                                font: {
-                                    size: 11
-                                },
-                                autoSkip: true,
-                                maxTicksLimit: 15 // Limit date labels for readability
-                            },
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            title: {
-                                display: true,
-                                text: 'Match Score (%)',
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11
-                                },
-                                stepSize: 10
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)',
-                                borderColor: 'rgba(229, 231, 235, 0.5)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'right',
-                            labels: {
-                                font: {
-                                    size: 11
-                                },
-                                boxWidth: 15,
-                                padding: 8,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            titleFont: {
-                                size: 13,
-                                weight: 'bold'
-                            },
-                            bodyFont: {
-                                size: 12
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed.y;
-                                    if (value === null) return null;
-                                    return `${context.dataset.label}: ${value.toFixed(1)}%`;
-                                },
-                                afterBody: function(context) {
-                                    // Get applications for this skill/week combination
-                                    const weekIndex = context[0].dataIndex;
-                                    const week = allWeeks[weekIndex];
-                                    
-                                    // Find all skills in this tooltip that have applications
-                                    let appsText = '';
-                                    context.forEach(ctx => {
-                                        const skillName = ctx.dataset.label.replace(' (avg: N/A%)', '').replace(/ \(avg: \d+\.\d+%\)$/, '').replace('Other Skills', '').trim();
-                                        if (skillName) {
-                                            const weekData = trendsData.by_skill?.[skillName]?.[week];
-                                            if (weekData && weekData.applications && weekData.applications.length > 0) {
-                                                appsText += `\n\n${skillName}:`;
-                                                weekData.applications.slice(0, 3).forEach(app => {
-                                                    appsText += `\n• ${app.company} - ${app.job_title}`;
-                                                    appsText += `\n  ${app.url}`;
-                                                });
-                                                if (weekData.applications.length > 3) {
-                                                    appsText += `\n... and ${weekData.applications.length - 3} more`;
-                                                }
-                                            }
-                                        }
-                                    });
-                                    
-                                    return appsText || null;
-                                }
-                            }
-                        }
-                    },
-                    onClick: function(event, elements) {
-                        if (elements.length > 0) {
-                            // Get clicked week and skill
-                            const element = elements[0];
-                            const weekIndex = element.index;
-                            const week = allWeeks[weekIndex];
-                            const datasetIndex = element.datasetIndex;
-                            const skill = topSkills[datasetIndex];
-                            
-                            if (skill && trendsData.by_skill?.[skill.skill]?.[week]?.applications) {
-                                const apps = trendsData.by_skill[skill.skill][week].applications;
-                                if (apps && apps.length > 0) {
-                                    window.open(apps[0].url, '_blank');
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            const prioritiesTableBody = document.querySelector('#learning-priorities-table tbody');
+            if (prioritiesTableBody) {
+                prioritiesTableBody.innerHTML = prioritiesHtml || '<tr><td colspan="4" class="empty-state">No learning priorities identified</td></tr>';
+            } else {
+                console.error('Learning priorities table tbody not found');
+            }
         }
         
         // Collapsible Card Functionality

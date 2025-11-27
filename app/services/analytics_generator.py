@@ -8,6 +8,7 @@ from app.models.application import Application
 from app.services.job_processor import JobProcessor
 from app.utils.file_utils import get_data_path, read_text_file
 from app.utils.location_normalizer import LocationNormalizer
+from app.utils.simple_tech_extractor import SimpleTechExtractor
 
 
 class AnalyticsGenerator:
@@ -16,6 +17,7 @@ class AnalyticsGenerator:
     def __init__(self):
         self.job_processor = JobProcessor()
         self.location_normalizer = LocationNormalizer()
+        self.tech_extractor = SimpleTechExtractor()
     
     def get_applications_for_period(
         self,
@@ -165,6 +167,14 @@ class AnalyticsGenerator:
                 
                 # Calculate days difference
                 if isinstance(response_at, datetime) and isinstance(applied_date, datetime):
+                    # Normalize timezones - ensure both are timezone-aware or both are naive
+                    if response_at.tzinfo is None and applied_date.tzinfo is not None:
+                        # response_at is naive, applied_date is aware - make response_at aware
+                        response_at = response_at.replace(tzinfo=timezone(timedelta(hours=-5)))
+                    elif response_at.tzinfo is not None and applied_date.tzinfo is None:
+                        # response_at is aware, applied_date is naive - make applied_date aware
+                        applied_date = applied_date.replace(tzinfo=timezone(timedelta(hours=-5)))
+                    
                     time_diff = response_at - applied_date
                     days = time_diff.total_seconds() / (24 * 3600)
                     if days >= 0:  # Only positive values
@@ -897,7 +907,8 @@ class AnalyticsGenerator:
         overlap_distribution = Counter()  # Key: number of jobs, Value: count of skills
         unique_skills = []  # Skills appearing in only 1 job
         common_requested_skills_data = []  # Requested skills appearing in 2+ jobs
-        common_unmatched_skills_data = []  # Unmatched skills appearing in 2+ jobs
+        common_unmatched_skills_data = []  # Unmatched skills appearing in 2+ jobs (non-technical)
+        common_unmatched_technical_skills_data = []  # Unmatched technical skills appearing in 2+ jobs
         
         # Create a map from app_id to app_info for quick lookup
         app_id_to_info = {}
@@ -963,13 +974,30 @@ class AnalyticsGenerator:
                 
                 # Calculate average match score impact for unmatched skills
                 avg_score_with = sum(skill_to_match_scores.get(skill, [])) / len(skill_to_match_scores.get(skill, [1])) if skill_to_match_scores.get(skill) else 0.0
-                common_unmatched_skills_data.append({
+                
+                # Check if this is a technical skill (technology)
+                skill_lower = skill.lower()
+                is_technical = False
+                known_technologies_lower = {tech.lower() for tech in self.tech_extractor.TECHNOLOGIES.keys()}
+                # Check if skill matches any known technology name or variation
+                for tech_name, variations in self.tech_extractor.TECHNOLOGIES.items():
+                    if skill_lower == tech_name.lower() or any(skill_lower == var.lower() for var in variations):
+                        is_technical = True
+                        break
+                
+                skill_data = {
                     'skill': skill,
                     'job_count': job_count,
                     'percentage': (job_count / len(applications) * 100) if applications else 0.0,
                     'average_match_score_impact': round(avg_score_with, 1),
                     'applications': [a for a in app_infos_for_unmatched if a]  # Filter out None values
-                })
+                }
+                
+                # Split into technical vs non-technical
+                if is_technical:
+                    common_unmatched_technical_skills_data.append(skill_data)
+                else:
+                    common_unmatched_skills_data.append(skill_data)
         
         # Sort unique skills alphabetically
         unique_skills.sort(key=lambda x: x['skill'].lower())
@@ -979,6 +1007,7 @@ class AnalyticsGenerator:
         
         # Sort common unmatched skills by job count
         common_unmatched_skills_data.sort(key=lambda x: (x['job_count'], x['average_match_score_impact']), reverse=True)
+        common_unmatched_technical_skills_data.sort(key=lambda x: (x['job_count'], x['average_match_score_impact']), reverse=True)
         
         # 3. Learning Priorities: Top 20 gaps sorted by frequency * match score impact
         learning_priorities = []
@@ -1099,7 +1128,8 @@ class AnalyticsGenerator:
                 'unique_skills_count': len(unique_skills),
                 'unique_skills': unique_skills[:50],  # Top 50 unique skills
                 'common_requested_skills': common_requested_skills_data[:50],  # Top 50 common requested skills
-                'common_unmatched_skills': common_unmatched_skills_data[:50]  # Top 50 common unmatched skills
+                'common_unmatched_skills': common_unmatched_skills_data[:50],  # Top 50 common unmatched skills (non-technical)
+                'common_unmatched_technical_skills': common_unmatched_technical_skills_data[:50]  # Top 50 common unmatched technical skills
             },
             'learning_priorities': learning_priorities[:20],  # Top 20 priorities
             'skill_match_trends': skill_match_trends
