@@ -556,3 +556,5 @@ To manually refresh chart data:
 - [Chart.js Documentation](https://www.chartjs.org/docs/latest/) - Chart.js library reference
 - Backend Code: `app/services/analytics_generator.py` - Implementation details
 
+
+

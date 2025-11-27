@@ -701,25 +701,31 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Stats Summary - Full Width, Aligned with Hero and Sidebar, No Gap */
         .stats-summary {
             background: transparent;
             border-radius: 0;
             padding: 0;
-            margin-bottom: var(--space-sm);
-            margin-top: var(--space-sm);
+            margin: 0;
+            margin-top: 0;
             border: none;
             box-shadow: none;
             position: relative;
             z-index: 1;
             color: var(--text-primary);
+            width: calc(100vw - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 6px;
-            margin-bottom: var(--space-sm);
+            margin: 0;
+            padding: 6px;
             width: 100%;
+            box-sizing: border-box;
         }
         
         .stat-item {
@@ -756,13 +762,19 @@
         
         @media (max-width: 1400px) {
             .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }
         }
         
         @media (max-width: 900px) {
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             }
         }
     </style>
@@ -798,23 +810,23 @@
         </div>
         <div class="hero-header-period">
             <div class="period-selector">
-                <button class="period-btn" data-period="today" onclick="selectPeriod('today')">Today</button>
+                <button class="period-btn active" data-period="today" onclick="selectPeriod('today')">Today</button>
                 <button class="period-btn" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
                 <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Days</button>
-                <button class="period-btn active" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
+                <button class="period-btn" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
                 <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
             </div>
         </div>
     </div>
     
-    <div class="container">
-        
-        <div class="stats-summary" id="stats-summary">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading statistics...</p>
-            </div>
+    <div class="stats-summary" id="stats-summary">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading statistics...</p>
         </div>
+    </div>
+    
+    <div class="container">
         
         <div class="reports-grid">
             <div class="report-card">

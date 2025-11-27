@@ -1428,6 +1428,8 @@ def get_analytics():
 def view_dashboard():
     """View the generated dashboard"""
     from app.utils.file_utils import get_data_path
+    # Always regenerate dashboard to ensure it's up to date
+    dashboard_generator.generate_index_page()
     dashboard_path = get_data_path('output') / 'index.html'
     
     if dashboard_path.exists():
@@ -1435,21 +1437,14 @@ def view_dashboard():
             dashboard_path.parent,
             dashboard_path.name
         )
-    else:
-        # Generate dashboard if it doesn't exist
-        dashboard_generator.generate_index_page()
-        if dashboard_path.exists():
-            return send_from_directory(
-                dashboard_path.parent,
-                dashboard_path.name
-            )
-        else:
-            return "Dashboard not found", 404
+    return "Dashboard not found", 404
 
 @app.route('/progress')
 def view_progress_dashboard():
     """View the generated progress dashboard"""
     from app.utils.file_utils import get_data_path
+    # Always regenerate progress dashboard to ensure it's up to date
+    dashboard_generator.generate_progress_dashboard()
     progress_path = get_data_path('output') / 'progress.html'
     
     if progress_path.exists():
@@ -1457,15 +1452,7 @@ def view_progress_dashboard():
             progress_path.parent,
             progress_path.name
         )
-    else:
-        # Generate progress dashboard if it doesn't exist
-        dashboard_generator.generate_progress_dashboard()
-        if progress_path.exists():
-            return send_from_directory(
-                progress_path.parent,
-                progress_path.name
-            )
-        return "Dashboard not generated yet.", 404
+    return "Dashboard not generated yet.", 404
 
 
 @app.route('/applications/<path:filepath>')

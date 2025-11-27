@@ -180,6 +180,11 @@ class DashboardGenerator:
             gap: 4px;
         }}
         
+        .back-link-spacer {{
+            height: 22px;
+            visibility: hidden;
+        }}
+        
         .hero-header h1 {{
             font-size: 24px;
             font-weight: 700;
@@ -637,20 +642,25 @@ class DashboardGenerator:
             border-color: var(--accent-blue);
         }}
         
-        /* Dashboard Stats Container */
+        /* Dashboard Stats Container - Full Width, Aligned with Hero and Sidebar, No Gap */
         .dashboard-stats-container {{
-            padding: var(--space-lg);
+            padding: 0;
+            margin: 0;
+            margin-top: 0;
+            width: calc(100vw - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
         }}
         
-        /* Stat Cards Grid - Single row, ultra-compact */
+        /* Stat Cards Grid - Full width, evenly distributed, single row */
         .stat-cards-grid {{
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 6px;
-            margin-bottom: var(--space-sm);
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0;
+            padding: 6px;
+            width: 100%;
+            box-sizing: border-box;
         }}
         
         .stat-card {{
@@ -692,19 +702,19 @@ class DashboardGenerator:
         
         @media (max-width: 1400px) {{
             .stat-cards-grid {{
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }}
         }}
         
         @media (max-width: 900px) {{
             .stat-cards-grid {{
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }}
         }}
         
         @media (max-width: 600px) {{
             .stat-cards-grid {{
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             }}
         }}
     </style>
@@ -729,13 +739,12 @@ class DashboardGenerator:
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
+            <div class="back-link-spacer"></div>
             <h1>Job Application Dashboard - {total}</h1>
         </div>
         </div>
         
-    <div class="container">
-        {dashboard_html}
-    </div>
+    {dashboard_html}
     
     <script>
         // AI Status Check Function - Show message on screen
@@ -1041,6 +1050,8 @@ class DashboardGenerator:
             <div class="stat-cards-grid">
                 {stat_cards_html}
             </div>
+        </div>
+        <div class="container">
             <div class="sort-controls">
                 <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">Applications</h3>
                 <select id="sort-select" class="sort-select" onchange="handleSortChange()">
@@ -1426,6 +1437,11 @@ class DashboardGenerator:
             gap: 4px;
         }}
         
+        .back-link-spacer {{
+            height: 22px;
+            visibility: hidden;
+        }}
+        
         .hero-header h1 {{
             font-size: 24px;
             font-weight: 700;
@@ -1574,24 +1590,25 @@ class DashboardGenerator:
             color: var(--text-secondary);
         }}
         
+        /* Progress Stats Container - Full Width, Aligned with Hero and Sidebar, No Gap */
         .tabs-container {{
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            overflow: visible;
-            margin-bottom: var(--space-md);
+            padding: 0;
+            margin: 0;
+            margin-top: 0;
+            width: calc(100vw - 180px);
+            margin-left: 180px;
+            box-sizing: border-box;
         }}
         
+        /* Stat Cards Grid - Full width, evenly distributed, single row */
         .tabs-header {{
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 6px;
-            background: transparent;
-            border: none;
-            overflow-x: auto;
-            padding: 0;
-            flex-wrap: nowrap;
-            margin-bottom: var(--space-sm);
+            margin: 0;
+            padding: 6px;
+            width: 100%;
+            box-sizing: border-box;
         }}
         
         .tab {{
@@ -1603,18 +1620,7 @@ class DashboardGenerator:
             box-shadow: none;
             transition: all 0.2s ease;
             cursor: pointer;
-            font-size: 10px;
-            font-weight: var(--font-medium);
-            color: var(--text-secondary);
-            white-space: nowrap;
             font-family: var(--font-family);
-            min-width: auto;
-            flex: 0 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
         }}
         
         .tab:hover {{
@@ -1626,13 +1632,13 @@ class DashboardGenerator:
         .tab.active {{
             border: 1px solid var(--accent-blue);
             background: var(--accent-blue-light);
-            color: var(--text-primary);
         }}
         
         .tab-count {{
             font-size: 17px;
             font-weight: var(--font-bold);
             color: var(--text-primary);
+            margin-bottom: 1px;
             line-height: 1.2;
         }}
         
@@ -1645,26 +1651,20 @@ class DashboardGenerator:
         
         @media (max-width: 1400px) {{
             .tabs-header {{
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }}
         }}
         
         @media (max-width: 900px) {{
             .tabs-header {{
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }}
         }}
         
         @media (max-width: 600px) {{
             .tabs-header {{
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             }}
-        }}
-        
-        .tab-count {{
-            font-size: 12px;
-            opacity: 0.7;
-            margin-left: 5px;
         }}
         
         .tab-content {{
@@ -1882,14 +1882,12 @@ class DashboardGenerator:
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
+            <div class="back-link-spacer"></div>
             <h1>Progress Dashboard - {total} Applications</h1>
         </div>
         </div>
     
-    <div class="container">
-        
-        {tabs_html}
-    </div>
+    {tabs_html}
     
     <script>
         function switchTab(progressKey) {{
@@ -1899,20 +1897,21 @@ class DashboardGenerator:
                 content.style.display = 'none';
             }});
             
-            // Remove active class from all tabs
+            // Update active stat card (matching dashboard behavior)
             const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
+            tabs.forEach(tab => {{
+                tab.classList.remove('active');
+                tab.style.border = '1px solid var(--border-primary)';
+            }});
+            const activeTab = document.querySelector(`.tab[data-progress="${{progressKey}}"]`);
+            if (activeTab) {{
+                activeTab.classList.add('active');
+            }}
             
             // Show selected tab
             const target = document.getElementById('progress-' + progressKey);
             if (target) {{
                 target.style.display = 'block';
-            }}
-            
-            // Activate clicked tab
-            const clickedTab = document.querySelector(`[data-progress="${{progressKey}}"]`);
-            if (clickedTab) {{
-                clickedTab.classList.add('active');
             }}
         }}
         
@@ -1960,12 +1959,19 @@ class DashboardGenerator:
             }}
         }}
         
-        // Initialize with 'all' tab as default
+        // Initialize on page load - matching dashboard pattern
         document.addEventListener('DOMContentLoaded', function() {{
-            const allTab = document.querySelector('[data-progress="all"]');
-            if (allTab) {{
-                switchTab('all');
-            }}
+            // Make stat cards clickable (matching dashboard behavior)
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {{
+                tab.addEventListener('click', function() {{
+                    const progressKey = this.dataset.progress;
+                    switchTab(progressKey);
+                }});
+            }});
+            
+            // Initialize with 'all' tab as default
+            switchTab('all');
         }});
     </script>
     
@@ -1988,7 +1994,7 @@ class DashboardGenerator:
         # Add 'all' tab first
         count = progress_counts.get('all', 0)
         tab_headers += f'''
-            <button class="tab active" data-progress="all" onclick="switchTab('all')">
+            <button class="tab active" data-progress="all">
                 <div class="tab-count">{count}</div>
                 <div class="tab-label">All</div>
             </button>
@@ -1998,7 +2004,7 @@ class DashboardGenerator:
         if progress_counts.get('no_progress', 0) > 0:
             count = progress_counts['no_progress']
             tab_headers += f'''
-                <button class="tab" data-progress="no_progress" onclick="switchTab('no_progress')">
+                <button class="tab" data-progress="no_progress">
                     <div class="tab-count">{count}</div>
                     <div class="tab-label">No Progress</div>
                 </button>
@@ -2016,7 +2022,7 @@ class DashboardGenerator:
                     short_name = display_name
                 
                 tab_headers += f'''
-                    <button class="tab" data-progress="{progress_key}" onclick="switchTab('{progress_key}')">
+                    <button class="tab" data-progress="{progress_key}">
                         <div class="tab-count">{count}</div>
                         <div class="tab-label">{short_name}</div>
                     </button>
@@ -2096,6 +2102,8 @@ class DashboardGenerator:
             <div class="tabs-header">
                 {tab_headers}
             </div>
+        </div>
+        <div class="container">
             {tab_contents}
         </div>
         '''

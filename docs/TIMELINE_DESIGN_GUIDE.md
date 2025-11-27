@@ -433,3 +433,5 @@ This timeline design provides a clean, professional way to display chronological
 
 For questions or customization needs, refer to the implementation in `app/services/document_generator.py` in the Hunter application codebase.
 
+
+

@@ -65,3 +65,9 @@ templates:
   delivery_method: LinkedIn Connection
   id: '20251121094459'
   title: LI Recruiter 296
+- content_file: 20251125151203.html
+  created_at: '2025-11-25T15:12:03.163765-05:00'
+  created_at_display: Nov 25, 2025 03:12 PM EST
+  delivery_method: LinkedIn Message
+  id: '20251125151203'
+  title: Reply - Accepted Invitation LInkedIn

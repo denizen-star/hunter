@@ -145,3 +145,5 @@ Priority Score = Frequency × (Average Match Score Impact / 100)
 - Each line shows average match score over time for applications containing that skill
 - Color-coded for easy identification
 
+
+
