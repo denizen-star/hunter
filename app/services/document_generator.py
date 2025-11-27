@@ -2738,6 +2738,11 @@ Format this as a professional research document that demonstrates thorough prepa
             color: #4b5563;
         }}
         
+        .tag-red {{
+            background: #fee2e2;
+            color: #991b1b;
+        }}
+        
         .status-pill {{
             display: inline-flex;
             align-items: center;
@@ -2885,6 +2890,20 @@ Format this as a professional research document that demonstrates thorough prepa
             display: flex;
             align-items: center;
             gap: 12px;
+        }}
+        
+        .timeline-notes-content {{
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }}
+        
+        .timeline-notes-content p,
+        .timeline-notes-content div,
+        .timeline-notes-content ul,
+        .timeline-notes-content ol,
+        .timeline-notes-content li {{
+            margin-left: 0 !important;
+            padding-left: 0 !important;
         }}
         
         .timeline-description {{
@@ -3810,9 +3829,6 @@ Format this as a professional research document that demonstrates thorough prepa
             </div>
             
             <div class="timeline">
-                <div class="timeline-item">
-                    <strong>{format_for_display(application.created_at)}</strong> - Application Created
-                </div>
                 {self._generate_updates_timeline(application)}
             </div>
                 </div>
@@ -4680,71 +4696,76 @@ Format this as a professional research document that demonstrates thorough prepa
     def _generate_timeline_html_for_summary(self, application: Application) -> str:
         """Generate Application Timeline HTML for two-column layout"""
         from app.services.job_processor import JobProcessor
+        from datetime import datetime
+        import re
         
         job_processor = JobProcessor()
         updates = job_processor.get_application_updates(application)
         
-        # Add initial application creation
+        # Collect all timeline items with datetime objects for sorting
         timeline_items = []
+        
+        # Add initial application creation
         timeline_items.append({
-            'date': format_for_display(application.created_at),
-            'status': 'Applied',
-            'description': 'Application submitted'
+            'datetime': application.created_at,
+            'display_date': format_for_display(application.created_at),
+            'status': 'Application Created',
+            'notes': None,
+            'update_file': None
         })
         
-        # Add status updates
-        if updates:
-            for update in reversed(updates[:9]):  # Limit to 9 more (10 total with initial)
+        # Add status updates with datetime objects
+        import pytz
+        est = pytz.timezone('America/Toronto')
+        for update in updates:
+            try:
+                # Convert timestamp string to datetime object for sorting
+                timestamp_str = update['timestamp']
+                dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                # Make timezone-aware to match application.created_at
+                if dt.tzinfo is None:
+                    dt = est.localize(dt)
                 timeline_items.append({
-                    'date': update['display_timestamp'],
+                    'datetime': dt,
+                    'display_date': update['display_timestamp'],
                     'status': update['status'],
-                    'description': update['status']
+                    'notes': None,  # Will extract if needed
+                    'update_file': update['file']
                 })
+            except Exception as e:
+                print(f"Warning: Could not parse timestamp for update {update.get('file', 'unknown')}: {e}")
+        
+        # Sort by datetime descending (newest first)
+        timeline_items.sort(key=lambda x: x['datetime'], reverse=True)
+        
+        # Limit to 10 items total
+        timeline_items = timeline_items[:10]
         
         if len(timeline_items) == 1 and not updates:
             return '<div class="timeline"><p style="color: #6b7280; font-size: 14px;">No timeline entries yet.</p></div>'
         
         timeline_html = '<div class="timeline">'
         for item in timeline_items:
-            tag_class = "tag-blue"
-            description = item['description']
-            if "interview" in item['status'].lower():
+            # Determine tag class for status pill
+            status_lower = item['status'].lower()
+            if "interview" in status_lower:
                 tag_class = "tag-green"
-                if "scheduled" in item['status'].lower():
-                    description = "Phone screen scheduled"
-                elif "notes" in item['status'].lower() or "completed" in item['status'].lower():
-                    description = "Phone screen completed"
-            elif "thank" in item['status'].lower():
-                tag_class = "tag-gray"
-                description = "Thank you email sent"
-            elif "rejected" in item['status'].lower():
+            elif "rejected" in status_lower:
                 tag_class = "tag-red"
-            elif "offered" in item['status'].lower():
+            elif "offered" in status_lower or "accepted" in status_lower:
                 tag_class = "tag-green"
-            elif "company" in item['status'].lower() or "response" in item['status'].lower():
+            elif "thank" in status_lower:
+                tag_class = "tag-gray"
+            else:
                 tag_class = "tag-blue"
-                if "viewed" in item['status'].lower() or "profile" in item['status'].lower():
-                    description = "Company viewed profile"
             
-            # Format status label for display
-            status_label = item['status']
-            if "interview" in status_label.lower() and "scheduled" in status_label.lower():
-                status_label = "Interview Scheduled"
-            elif "interview" in status_label.lower() and ("notes" in status_label.lower() or "completed" in status_label.lower()):
-                status_label = "Interview Notes"
-            elif "company" in status_label.lower() or "response" in status_label.lower():
-                status_label = "Company Response"
-            elif "thank" in status_label.lower():
-                status_label = "Thank You Sent"
-            elif status_label.lower() == "applied":
-                status_label = "Applied"
+            # Build status pill
+            status_pill = f'<span class="tag {tag_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{item["status"]}</span>'
             
             timeline_html += f'''
                         <div class="timeline-item">
-                            <div class="timeline-date">{item['date']}</div>
-                            <div class="timeline-content">
-                                <span class="timeline-description">{description}</span>
-                                <span class="timeline-status tag {tag_class}">{status_label}</span>
+                            <div style="margin-bottom: 8px;">
+                                {status_pill} - <span style="color: #666; font-size: 14px;">{item['display_date']}</span>
                             </div>
                         </div>
             '''
@@ -4754,70 +4775,108 @@ Format this as a professional research document that demonstrates thorough prepa
     def _generate_updates_timeline(self, application: Application) -> str:
         """Generate HTML for status updates timeline"""
         from app.services.job_processor import JobProcessor
+        from datetime import datetime
         import re
         
         job_processor = JobProcessor()
         updates = job_processor.get_application_updates(application)
         
-        if not updates:
+        # Collect all timeline items with datetime objects for sorting
+        timeline_items = []
+        
+        # Add initial application creation
+        timeline_items.append({
+            'datetime': application.created_at,
+            'display_date': format_for_display(application.created_at),
+            'status': 'Application Created',
+            'update_file': None
+        })
+        
+        # Add status updates with datetime objects
+        import pytz
+        est = pytz.timezone('America/Toronto')
+        for update in updates:
+            try:
+                # Convert timestamp string to datetime object for sorting
+                timestamp_str = update['timestamp']
+                dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                # Make timezone-aware to match application.created_at
+                if dt.tzinfo is None:
+                    dt = est.localize(dt)
+                timeline_items.append({
+                    'datetime': dt,
+                    'display_date': update['display_timestamp'],
+                    'status': update['status'],
+                    'update_file': update['file']
+                })
+            except Exception as e:
+                print(f"Warning: Could not parse timestamp for update {update.get('file', 'unknown')}: {e}")
+        
+        # Sort by datetime descending (newest first)
+        timeline_items.sort(key=lambda x: x['datetime'], reverse=True)
+        
+        if not timeline_items:
             return ""
         
         timeline_html = ""
-        for update in reversed(updates):  # Show newest first
-            # Extract content from the HTML file
-            app_id = ""
+        for item in timeline_items:
+            # Extract notes if this is an update item
             notes_text = ""
+            if item['update_file']:
+                try:
+                    if Path(item['update_file']).exists():
+                        html_content = read_text_file(Path(item['update_file']))
+                        notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
+                        if notes_match:
+                            notes_text = notes_match.group(1).strip()
+                            # Don't clean up HTML content - preserve images and formatting
+                except Exception as e:
+                    print(f"Warning: Could not extract content from {item['update_file']}: {e}")
             
-            try:
-                if Path(update['file']).exists():
-                    html_content = read_text_file(Path(update['file']))
-                    
-                    # Extract Application ID
-                    app_id_match = re.search(r'<strong>Application ID:</strong>\s*([^<]+)', html_content)
-                    if app_id_match:
-                        app_id = app_id_match.group(1).strip()
-                    
-                    # Extract notes text (including HTML content like images)
-                    notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
-                    if notes_match:
-                        notes_text = notes_match.group(1).strip()
-                        # Don't clean up HTML content - preserve images and formatting
-                        
-            except Exception as e:
-                print(f"Warning: Could not extract content from {update['file']}: {e}")
+            # Determine tag class for status pill
+            status_lower = item['status'].lower()
+            if "interview" in status_lower:
+                tag_class = "tag-green"
+            elif "rejected" in status_lower:
+                tag_class = "tag-red"
+            elif "offered" in status_lower or "accepted" in status_lower:
+                tag_class = "tag-green"
+            elif "thank" in status_lower:
+                tag_class = "tag-gray"
+            else:
+                tag_class = "tag-blue"
             
-            # Build status badge HTML
-            status_class = self._status_to_class(update['status'])
-            status_badge = f'<span class="status-badge status-{status_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #d1ecf1; color: #0c5460; margin-left: 10px;">{update["status"]}</span>'
+            # Build status pill HTML (rendered once)
+            status_pill = f'<span class="tag {tag_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{item["status"]}</span>'
             
-            # Build content sections
-            content_parts = []
-            
-            # Application ID removed from timeline as per design requirements
-            
+            # Build notes section
+            notes_html = ""
             if notes_text and notes_text not in ["No additional notes", ""]:
+                # Remove emoji from notes content if present
+                notes_text = notes_text.replace('📝', '').strip()
+                
+                # Remove any inline styles that might add yellow background or borders
+                notes_text = re.sub(r'style="[^"]*background[^"]*fff3e0[^"]*"', '', notes_text)
+                notes_text = re.sub(r'style="[^"]*border[^"]*ff9800[^"]*"', '', notes_text)
+                notes_text = re.sub(r'style="[^"]*background[^"]*#fff3e0[^"]*"', '', notes_text)
+                notes_text = re.sub(r'style="[^"]*border[^"]*#ff9800[^"]*"', '', notes_text)
+                
                 # Handle HTML content (including images) - don't process URLs if content is already HTML
                 if '<' in notes_text and '>' in notes_text:
-                    # Content is already HTML, use as-is
+                    # Content is already HTML, use as-is but clean up any remaining background styles
                     notes_display = notes_text
                 else:
                     # Plain text, make URLs clickable
                     notes_display = re.sub(r'(https?://[^\s]+)', r'<a href="\1" target="_blank" style="color: #667eea; text-decoration: underline;">\1</a>', notes_text)
                 
-                content_parts.append(f'<div style="margin-top: 8px; padding: 12px; background: #fff3e0; border-left: 3px solid #ff9800; border-radius: 4px; font-size: 14px; color: #000;"><strong>📝 Notes:</strong><br>{notes_display}</div>')
-            
-            content_html = "".join(content_parts)
+                notes_html = f'<div style="margin-top: 8px; font-size: 14px; color: #000; margin-left: 0; padding-left: 0;"><div style="margin-bottom: 4px; margin-left: 0; padding-left: 0;"><strong>Notes:</strong></div><div class="timeline-notes-content" style="margin-left: 0; padding-left: 0;">{notes_display}</div></div>'
             
             timeline_html += f"""
                 <div class="timeline-item">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <div>
-                            <strong style="color: #667eea;">{update['status']}</strong>
-                            {status_badge}
-                        </div>
-                        <span style="color: #666; font-size: 14px;">{update['display_timestamp']}</span>
+                    <div style="margin-bottom: 8px; white-space: nowrap;">
+                        {status_pill} - <span style="color: #666; font-size: 14px;">{item['display_date']}</span>
                     </div>
-                    {content_html}
+                    {notes_html}
                 </div>"""
         
         return timeline_html
