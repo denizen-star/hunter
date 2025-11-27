@@ -164,7 +164,7 @@ class DashboardGenerator:
         .hero-header {{
             background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
-            padding: 20px 32px;
+            padding: 8px 16px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -177,7 +177,7 @@ class DashboardGenerator:
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 8px;
+            gap: 4px;
         }}
         
         .hero-header h1 {{
@@ -642,12 +642,12 @@ class DashboardGenerator:
             padding: var(--space-lg);
         }}
         
-        /* Stat Cards Grid - Two rows, centered */
+        /* Stat Cards Grid - Single row, ultra-compact */
         .stat-cards-grid {{
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: var(--space-md);
-            margin-bottom: var(--space-xl);
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
+            margin-bottom: var(--space-sm);
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
@@ -656,44 +656,53 @@ class DashboardGenerator:
         .stat-card {{
             background: var(--bg-primary);
             border: 1px solid var(--border-primary);
-            border-radius: var(--radius-md);
-            padding: calc(var(--space-lg) * 0.75);
+            border-radius: var(--radius-sm);
+            padding: 6px;
             text-align: center;
-            box-shadow: var(--shadow-sm);
+            box-shadow: none;
             transition: all 0.2s ease;
             cursor: pointer;
         }}
         
         .stat-card:hover {{
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
             border-color: var(--accent-blue);
         }}
         
         .stat-card.active {{
-            border: 2px solid var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+            background: var(--accent-blue-light);
         }}
         
         .stat-number {{
-            font-size: var(--font-3xl);
+            font-size: 17px;
             font-weight: var(--font-bold);
             color: var(--text-primary);
-            margin-bottom: var(--space-xs);
+            margin-bottom: 1px;
+            line-height: 1.2;
         }}
         
         .stat-label {{
-            font-size: var(--font-sm);
+            font-size: 10px;
             color: var(--text-secondary);
             font-weight: var(--font-medium);
+            line-height: 1.2;
         }}
         
-        @media (max-width: 1200px) {{
+        @media (max-width: 1400px) {{
+            .stat-cards-grid {{
+                grid-template-columns: repeat(6, 1fr);
+            }}
+        }}
+        
+        @media (max-width: 900px) {{
             .stat-cards-grid {{
                 grid-template-columns: repeat(4, 1fr);
             }}
         }}
         
-        @media (max-width: 768px) {{
+        @media (max-width: 600px) {{
             .stat-cards-grid {{
                 grid-template-columns: repeat(2, 1fr);
             }}
@@ -1401,7 +1410,7 @@ class DashboardGenerator:
         .hero-header {{
             background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
-            padding: 20px 32px;
+            padding: 8px 16px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -1414,7 +1423,7 @@ class DashboardGenerator:
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 8px;
+            gap: 4px;
         }}
         
         .hero-header h1 {{
@@ -1566,46 +1575,90 @@ class DashboardGenerator:
         }}
         
         .tabs-container {{
-            background: var(--bg-primary);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-primary);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            margin-bottom: var(--space-lg);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            overflow: visible;
+            margin-bottom: var(--space-md);
         }}
         
         .tabs-header {{
-            display: flex;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-primary);
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
+            background: transparent;
+            border: none;
             overflow-x: auto;
             padding: 0;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            margin-bottom: var(--space-sm);
         }}
         
         .tab {{
-            padding: 14px var(--space-lg);
-            background: transparent;
-            border: none;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            text-align: center;
+            box-shadow: none;
+            transition: all 0.2s ease;
             cursor: pointer;
-            font-size: var(--font-sm);
+            font-size: 10px;
             font-weight: var(--font-medium);
             color: var(--text-secondary);
-            transition: all 0.2s ease;
             white-space: nowrap;
             font-family: var(--font-family);
-            min-width: 100px;
-            flex: 1;
+            min-width: auto;
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
         }}
         
         .tab:hover {{
-            background: var(--bg-active);
-            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+            border-color: var(--accent-blue);
         }}
         
         .tab.active {{
-            background: var(--accent-blue);
-            color: #ffffff;
+            border: 1px solid var(--accent-blue);
+            background: var(--accent-blue-light);
+            color: var(--text-primary);
+        }}
+        
+        .tab-count {{
+            font-size: 17px;
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            line-height: 1.2;
+        }}
+        
+        .tab-label {{
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            line-height: 1.2;
+        }}
+        
+        @media (max-width: 1400px) {{
+            .tabs-header {{
+                grid-template-columns: repeat(6, 1fr);
+            }}
+        }}
+        
+        @media (max-width: 900px) {{
+            .tabs-header {{
+                grid-template-columns: repeat(4, 1fr);
+            }}
+        }}
+        
+        @media (max-width: 600px) {{
+            .tabs-header {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
         }}
         
         .tab-count {{
@@ -1933,23 +1986,28 @@ class DashboardGenerator:
         tab_headers = ""
         
         # Add 'all' tab first
+        count = progress_counts.get('all', 0)
         tab_headers += f'''
             <button class="tab active" data-progress="all" onclick="switchTab('all')">
-                All
+                <div class="tab-count">{count}</div>
+                <div class="tab-label">All</div>
             </button>
         '''
         
         # Add 'no_progress' tab
-        if progress_counts['no_progress'] > 0:
+        if progress_counts.get('no_progress', 0) > 0:
+            count = progress_counts['no_progress']
             tab_headers += f'''
                 <button class="tab" data-progress="no_progress" onclick="switchTab('no_progress')">
-                    No Progress
+                    <div class="tab-count">{count}</div>
+                    <div class="tab-label">No Progress</div>
                 </button>
             '''
         
         # Add tabs for each progress stage
         for progress_key in progress_order:
-            if progress_counts.get(progress_key, 0) > 0:
+            count = progress_counts.get(progress_key, 0)
+            if count > 0:
                 display_name = checklist_definitions[progress_key]
                 # Shorten long names for tabs
                 if len(display_name) > 20:
@@ -1959,7 +2017,8 @@ class DashboardGenerator:
                 
                 tab_headers += f'''
                     <button class="tab" data-progress="{progress_key}" onclick="switchTab('{progress_key}')">
-                        {short_name}
+                        <div class="tab-count">{count}</div>
+                        <div class="tab-label">{short_name}</div>
                     </button>
                 '''
         

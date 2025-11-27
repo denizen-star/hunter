@@ -57,7 +57,7 @@
         .container {
             width: calc(100vw - 180px);
             margin: 0;
-            padding: var(--space-lg);
+            padding: var(--space-md);
             margin-left: 180px;
             box-sizing: border-box;
         }
@@ -66,20 +66,66 @@
         .hero-header {
             background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
-            padding: 20px 32px;
+            padding: 8px 16px;
             position: sticky;
             top: 0;
             z-index: 100;
             width: calc(100% - 180px);
             margin-left: 180px;
             box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .hero-header-top {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 8px;
+            gap: 4px;
+            flex: 1;
+        }
+        
+        .hero-header-period {
+            display: flex;
+            align-items: center;
+        }
+        
+        .period-selector {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            background: var(--bg-primary);
+            padding: 4px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+        
+        .hero-header-period .period-selector {
+            margin: 0;
+        }
+        
+        .period-btn {
+            padding: 8px var(--space-md);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .period-btn:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
+        }
+        
+        .period-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
         }
         
         .back-link {
@@ -519,7 +565,7 @@
         
         .chart-container {
             position: relative;
-            height: 250px;
+            height: 350px;
             width: 100%;
             margin-bottom: var(--space-md);
             background: var(--bg-primary);
@@ -527,11 +573,12 @@
             border-radius: var(--radius-md);
             border: 1px solid var(--border-primary);
             box-shadow: var(--shadow-sm);
+            box-sizing: border-box;
         }
         
         .chart-container canvas {
-            width: 100% !important;
-            height: 300px !important;
+            max-width: 100%;
+            height: 100% !important;
         }
         
         .chart-timestamp {
@@ -655,23 +702,24 @@
         }
         
         .stats-summary {
-            background: var(--bg-primary);
-            border-radius: var(--radius-md);
-            padding: var(--space-xl);
-            margin-bottom: var(--space-lg);
-            border: 1px solid var(--border-primary);
-            box-shadow: var(--shadow-sm);
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: var(--space-sm);
+            margin-top: var(--space-sm);
+            border: none;
+            box-shadow: none;
             position: relative;
             z-index: 1;
             color: var(--text-primary);
         }
         
         .stats-grid {
-            display: flex;
-            justify-content: center;
-            gap: var(--space-sm);
-            flex-wrap: nowrap;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            margin-bottom: var(--space-sm);
+            width: 100%;
         }
         
         .stat-item {
@@ -679,17 +727,23 @@
             background: var(--bg-primary);
             border: 1px solid var(--border-primary);
             border-radius: var(--radius-sm);
-            padding: var(--space-sm) var(--space-md);
-            box-shadow: var(--shadow-sm);
-            min-width: 120px;
+            padding: 6px;
+            box-shadow: none;
+            min-width: auto;
             flex: 0 0 auto;
         }
         
+        .stat-item:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+            border-color: var(--accent-blue);
+        }
+        
         .stat-number {
-            font-size: var(--font-2xl);
+            font-size: 17px;
             font-weight: var(--font-bold);
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 1px;
             line-height: 1.2;
         }
         
@@ -698,6 +752,18 @@
             font-size: 10px;
             font-weight: var(--font-medium);
             line-height: 1.2;
+        }
+        
+        @media (max-width: 1400px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -730,19 +796,18 @@
             </a>
             <h1>Application Reports</h1>
         </div>
+        <div class="hero-header-period">
+            <div class="period-selector">
+                <button class="period-btn" data-period="today" onclick="selectPeriod('today')">Today</button>
+                <button class="period-btn" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
+                <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Days</button>
+                <button class="period-btn active" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
+                <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
+            </div>
+        </div>
     </div>
     
     <div class="container">
-        
-        <div class="tabs-container">
-            <div class="tabs-header">
-                <button class="tab active" data-period="today" onclick="selectPeriod('today')">Today</button>
-                <button class="tab" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
-                <button class="tab" data-period="7days" onclick="selectPeriod('7days')">7 Rolling Days</button>
-                <button class="tab" data-period="30days" onclick="selectPeriod('30days')">30 Rolling Days</button>
-                <button class="tab" data-period="all" onclick="selectPeriod('all')">All Time</button>
-            </div>
-        </div>
         
         <div class="stats-summary" id="stats-summary">
             <div class="loading">
@@ -902,13 +967,36 @@
         
         // Period selection
         function selectPeriod(period) {
-            currentPeriod = period;
+            const clickedButton = document.querySelector(`[data-period="${period}"]`);
+            const isCurrentlyActive = clickedButton.classList.contains('active');
             
-            // Update button states
-            document.querySelectorAll('.tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+            // If clicking the same period that's already active, toggle it off
+            if (isCurrentlyActive) {
+                clickedButton.classList.remove('active');
+                // If deselecting 'all', switch to a default period (30days)
+                if (period === 'all') {
+                    currentPeriod = '30days';
+                    const defaultButton = document.querySelector(`[data-period="30days"]`);
+                    if (defaultButton) {
+                        defaultButton.classList.add('active');
+                    }
+                } else {
+                    // If deselecting any other period, switch to 'all'
+                    currentPeriod = 'all';
+                    const allButton = document.querySelector(`[data-period="all"]`);
+                    if (allButton) {
+                        allButton.classList.add('active');
+                    }
+                }
+            } else {
+                // Remove active from all buttons
+                document.querySelectorAll('.period-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Activate the clicked button
+                clickedButton.classList.add('active');
+                currentPeriod = period;
+            }
             
             // Reload data
             loadReportsData();
@@ -1034,12 +1122,11 @@
             }
             
             const canvas = document.getElementById('applicationsByStatusChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
             const ctx = canvas.getContext('2d');
-            
-            // Ensure canvas has proper dimensions
-            const container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
             
             // Destroy existing chart if it exists
             if (window.applicationsByStatusChart && typeof window.applicationsByStatusChart.destroy === 'function') {
@@ -1122,12 +1209,11 @@
             }
             
             const canvas = document.getElementById('statusChangesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
             const ctx = canvas.getContext('2d');
-            
-            // Ensure canvas has proper dimensions
-            const container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
             
             // Destroy existing chart if it exists
             if (window.statusChangesChart && typeof window.statusChangesChart.destroy === 'function') {
