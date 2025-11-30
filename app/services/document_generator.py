@@ -2419,16 +2419,15 @@ Format this as a professional research document that demonstrates thorough prepa
                     <div class="header-checklist">
         <div class="checklist-container">
             <div class="checklist-header" onclick="toggleChecklist()">
-                                <div class="checklist-title">APPLICATION CHECKLIST</div>
+                                <div class="checklist-title">Checklist</div>
                                 <button type="button" class="checklist-toggle" onclick="event.stopPropagation(); toggleChecklist()">
-                                    <span id="checklist-toggle-text">Show</span>
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
             </div>
-                            <div class="checklist-pill" id="checklistPill" style="display: {'block' if latest_display else 'none'}; margin-top: 8px; padding: 4px 10px; background: #f3f4f6; color: #6b7280; border-radius: 12px; font-size: 11px; font-weight: 500;">{latest_display or ''}</div>
-                            <div id="checklist-content" class="checklist-collapsed">
+                            <div class="checklist-pill" id="checklistPill" style="display: {'block' if latest_display else 'none'}; margin-top: var(--space-sm); padding: 4px 10px; background: #f3f4f6; color: #6b7280; border-radius: 12px; font-size: 11px; font-weight: 500;">{latest_display or ''}</div>
+                            <div id="checklist-content" class="checklist-collapsed" style="margin-top: var(--space-sm);">
                 <div class="checklist-grid">
                     {checklist_grid}
                                 </div>
@@ -2967,8 +2966,7 @@ Format this as a professional research document that demonstrates thorough prepa
         .checklist-container {{ 
             background: var(--bg-primary); 
             border-radius: var(--radius-md); 
-            padding: var(--space-md); 
-            border: 1px solid var(--border-primary);
+            padding: 4px; 
         }}
         .checklist-header {{ 
             display: flex; 
@@ -2976,33 +2974,40 @@ Format this as a professional research document that demonstrates thorough prepa
             align-items: center; 
             margin-bottom: var(--space-sm); 
             cursor: pointer; 
-            padding: var(--space-sm);
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
+            padding: 4px;
+            border-bottom: 1px solid var(--border-primary);
         }}
         .checklist-header:hover {{
-            background: var(--bg-hover);
+            color: var(--text-primary);
         }}
         .checklist-title {{ 
-            font-size: var(--font-xs); 
+            font-size: var(--font-sm); 
             font-weight: var(--font-semibold); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
-            color: var(--text-primary);
+            letter-spacing: 0.3px; 
+            color: var(--text-secondary);
         }}
         .checklist-toggle {{ 
             background: transparent; 
             border: none; 
             color: var(--text-secondary); 
-            padding: 4px 8px; 
-            border-radius: var(--radius-sm); 
+            padding: 0;
             cursor: pointer; 
             font-size: var(--font-xs); 
-            transition: all 0.2s; 
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s ease;
         }}
         .checklist-toggle:hover {{ 
-            background: var(--bg-active); 
             color: var(--text-primary);
+        }}
+        .checklist-toggle svg {{
+            width: 14px;
+            height: 14px;
+            transition: transform 0.2s ease;
+        }}
+        .checklist-toggle.expanded svg {{
+            transform: rotate(180deg);
         }}
         .checklist-collapsed {{ display: none !important; }}
         .checklist-expanded {{ display: block; }}
@@ -3754,26 +3759,11 @@ Format this as a professional research document that demonstrates thorough prepa
         
         <div id="updates" class="tab-content">
             <h2>Updates & Notes</h2>
-            <div style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-left: 4px solid #667eea; border-radius: 4px;">
-                <strong style="color: #667eea;">Current Status:</strong> 
-                <span class="status-badge status-{self._status_to_class(application.status)}" style="margin-left: 10px;">{application.status}</span>
-                <div style="margin-top: 8px; font-size: 14px; color: #666;">
-                    Last Updated: {format_for_display(application.status_updated_at)}
-                </div>
-            </div>
             
             <!-- Update Status Form -->
             <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
-                <h3 style="color: #667eea; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                    <span style="width: 20px; height: 20px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                        <span style="color: white; font-size: 10px; font-weight: bold;">📊</span>
-                    </span>
-                    Update Status
-                </h3>
-                
                 <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
                     <div style="margin-bottom: 15px;">
-                        <label for="new_status" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">New Status</label>
                         <select id="new_status" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
                             <option value="">-- Select Status --</option>
                             <option value="Pending">⏳ Pending</option>
@@ -3790,19 +3780,7 @@ Format this as a professional research document that demonstrates thorough prepa
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                            <label for="status_notes" style="display: block; font-weight: 600; color: #333;">Notes (Optional)</label>
-                            <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                                📋 Copy Content
-                            </button>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                            <div id="status_notes" placeholder="Add notes about this status update..."></div>
-                            <div style="display: flex; justify-content: flex-end;">
-                                <small id="status_notes_character_count" style="color: #6c757d;">0 characters</small>
-                            </div>
-                        </div>
-                        <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
+                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
                     </div>
                     
                     <!-- Template Inserter -->
@@ -3814,14 +3792,17 @@ Format this as a professional research document that demonstrates thorough prepa
                             <select id="template_selector" style="flex: 1; padding: 10px; border: 1px solid #d0d7de; border-radius: 8px; font-size: 14px; background: #f8fafc;">
                                 <option value="">-- Select Template --</option>
                             </select>
+                            <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Copy</button>
                             <button type="button" id="clearTemplateBtn" style="background: #e9ecef; color: #333; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
                         </div>
-                        <small style="color: #6c757d; margin-top: 8px; display: block;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <small style="color: #6c757d;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
+                            <small id="status_notes_character_count" style="color: #6c757d; margin-left: 10px;">0 characters</small>
+                        </div>
                     </div>
                     
-                    <button type="submit" id="updateStatusBtn" style="background: #fd7e14; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; justify-content: center; transition: all 0.3s;">
-                        <span id="btnIcon" style="color: white; font-size: 12px;">📊</span>
-                        <span id="btnText">Update Status</span>
+                    <button type="submit" id="updateStatusBtn" style="background: #d97706; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        <span id="btnText">Update</span>
                     </button>
                 </form>
                 
@@ -4183,17 +4164,14 @@ Format this as a professional research document that demonstrates thorough prepa
         function toggleChecklist() {{
             const content = document.getElementById('checklist-content');
             const toggleButton = document.querySelector('.checklist-toggle');
-            const toggleText = document.getElementById('checklist-toggle-text');
             
             if (content.classList.contains('checklist-collapsed')) {{
                 content.classList.remove('checklist-collapsed');
                 content.classList.add('checklist-expanded');
-                toggleText.textContent = 'Hide';
                 toggleButton.classList.add('expanded');
             }} else {{
                 content.classList.remove('checklist-expanded');
                 content.classList.add('checklist-collapsed');
-                toggleText.textContent = 'Show';
                 toggleButton.classList.remove('expanded');
             }}
         }}
@@ -4301,7 +4279,6 @@ Format this as a professional research document that demonstrates thorough prepa
             const notes = quillEditor ? quillEditor.root.innerHTML : '';
             const messageDiv = document.getElementById('status-message');
             const submitBtn = document.getElementById('updateStatusBtn');
-            const btnIcon = document.getElementById('btnIcon');
             const btnText = document.getElementById('btnText');
             
             if (!status) {{
@@ -4318,9 +4295,8 @@ Format this as a professional research document that demonstrates thorough prepa
             
             // Show processing state
             submitBtn.disabled = true;
-            submitBtn.style.background = '#6c757d';
+            submitBtn.style.background = '#d97706';
             submitBtn.style.cursor = 'not-allowed';
-            btnIcon.textContent = '⏳';
             btnText.textContent = 'Processing...';
             
             // Show processing message
@@ -4342,7 +4318,6 @@ Format this as a professional research document that demonstrates thorough prepa
                 
                 if (result.success) {{
                     // Show success state
-                    btnIcon.textContent = '✅';
                     btnText.textContent = 'Updated!';
                     showMessage(`✅ Status updated to ${{status}} successfully!`, 'success');
                     
@@ -4364,14 +4339,12 @@ Format this as a professional research document that demonstrates thorough prepa
         
         function resetButtonState() {{
             const submitBtn = document.getElementById('updateStatusBtn');
-            const btnIcon = document.getElementById('btnIcon');
             const btnText = document.getElementById('btnText');
             
             submitBtn.disabled = false;
-            submitBtn.style.background = '#fd7e14';
+            submitBtn.style.background = '#d97706';
             submitBtn.style.cursor = 'pointer';
-            btnIcon.textContent = '📊';
-            btnText.textContent = 'Update Status';
+            btnText.textContent = 'Update';
         }}
         
         function showMessage(message, type) {{
@@ -4651,6 +4624,45 @@ Format this as a professional research document that demonstrates thorough prepa
             tags.append(("Company Response", "tag-blue"))
         if checklist_items.get("email_sent"):
             tags.append(("Email Sent", "tag-gray"))
+        
+        # Add application status as a pill if it's not already covered by checklist items
+        if application.status:
+            status_display = application.status.replace('_', ' ').title()
+            
+            # Determine tag class based on status
+            if "rejected" in status_lower:
+                tag_class = "tag-red"
+            elif "offered" in status_lower or "accepted" in status_lower:
+                tag_class = "tag-green"
+            elif "interview" in status_lower:
+                tag_class = "tag-green"
+            elif "applied" in status_lower:
+                tag_class = "tag-blue"
+            elif "pending" in status_lower:
+                tag_class = "tag-gray"
+            else:
+                tag_class = "tag-blue"
+            
+            # Only add status tag if it's not already covered by checklist items
+            # Check if status is already represented by existing tags
+            # We only skip if the status is clearly represented by a more specific checklist tag
+            status_already_represented = False
+            for tag_name, _ in tags:
+                tag_lower = tag_name.lower()
+                # Only consider it represented if:
+                # 1. Status contains "interview" and we have "Interview Notes" tag
+                # 2. Status contains "company response" or "contacted" and we have "Company Response" tag  
+                # 3. Status contains "thank" and we have "Thank You Sent" tag
+                if (("interview" in status_lower and "interview" in tag_lower) or
+                    (("company response" in status_lower or "contacted" in status_lower) and "company response" in tag_lower) or
+                    ("thank" in status_lower and "thank" in tag_lower)):
+                    status_already_represented = True
+                    break
+            
+            # Always show the status pill unless it's clearly represented by a checklist tag
+            # This ensures common statuses like "Pending", "Applied", "Rejected", "Offered" always show
+            if not status_already_represented:
+                tags.append((status_display, tag_class))
         
         return tags
     

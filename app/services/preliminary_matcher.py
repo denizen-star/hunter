@@ -231,9 +231,13 @@ class PreliminaryMatcher:
             
             # Check for CRITICAL missing requirements (education, domain expertise)
             # These should severely penalize the score regardless of other matches
+            # CRITICAL: Only apply severe penalties for truly critical requirements
+            # Mathematics/Statistics are common in data roles and shouldn't trigger severe penalties
             critical_requirements = []
             education_keywords = ['phd', 'doctorate', 'master', 'bachelor', 'degree', 'abd']
-            domain_keywords = ['biology', 'chemistry', 'physics', 'mathematics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics']
+            # Only scientific domain expertise that's truly required (not common data science skills)
+            # Mathematics/Statistics are standard for analytics roles - treat as regular skills
+            domain_keywords = ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics', 'molecular biology']
             
             for unmatched_skill in matches['unmatched_job_skills']:
                 skill_lower = unmatched_skill.lower()
@@ -281,15 +285,23 @@ class PreliminaryMatcher:
                 
                 # Apply overqualification bonus if base score is decent (lowered threshold)
                 # Overqualified candidates should be rewarded, not penalized
+                # BUT: Never give 100% if there are unmatched skills - cap at 95%
                 if base_score >= 50:  # Lowered from 70% - being overqualified is valuable
                     if overqualification_ratio >= 4.0:  # 4x+ overqualified
-                        overqualification_bonus = 15
+                        overqualification_bonus = 10  # Reduced from 15
                     elif overqualification_ratio >= 3.0:  # 3x+ overqualified
-                        overqualification_bonus = 10
+                        overqualification_bonus = 7  # Reduced from 10
                     else:  # 2x+ overqualified
                         overqualification_bonus = 5
                     
-                    base_score = min(100, base_score + overqualification_bonus)
+                    base_score = base_score + overqualification_bonus
+                    
+                    # CRITICAL: Cap at 95% if there are any unmatched job skills
+                    # This prevents 100% scores when skills are actually missing
+                    if critical_skills_missing > 0:
+                        base_score = min(95, base_score)
+                    else:
+                        base_score = min(100, base_score)
             else:
                 # Not overqualified - apply standard penalties for missing skills
                 if critical_skills_missing > 0:
@@ -670,6 +682,10 @@ class PreliminaryMatcher:
         # Extract requirements
         requirements = self.extract_job_requirements(job_description)
         
+        # Extract technologies from JD once (to avoid duplicate extraction later)
+        # This is cached in preliminary_analysis so enhanced_analyzer can reuse it
+        extracted_technologies = self.tech_extractor.extract_technologies(job_description)
+        
         # Generate summary
         analysis = {
             'preliminary_match_score': matches['match_score'],
@@ -678,6 +694,7 @@ class PreliminaryMatcher:
             'missing_skills': matches['missing_skills'],
             'unmatched_job_skills': matches['unmatched_job_skills'],  # Include unmatched job skills
             'job_requirements': requirements,
+            'extracted_job_technologies': extracted_technologies,  # Cache for reuse - avoid duplicate extraction
             'match_summary': {
                 'total_candidate_skills': matches['total_required'],
                 'matched_skills': matches['matched_count'],

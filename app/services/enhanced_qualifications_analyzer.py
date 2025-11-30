@@ -16,6 +16,16 @@ class EnhancedQualificationsAnalyzer:
         self.model = "llama3"
         self.base_url = "http://localhost:11434"
         self.timeout = 600
+        
+        # PERFORMANCE: Pre-compute these sets once at initialization instead of on every match
+        # This avoids expensive nested set comprehensions during validation
+        self._candidate_skills_lower_cache = {skill.lower() for skill in self.preliminary_matcher.candidate_skills.keys()}
+        self._known_technologies_lower_cache = {tech.lower() for tech in self.preliminary_matcher.tech_extractor.TECHNOLOGIES.keys()}
+        # Pre-compute which candidate skills are technologies (avoids O(n*m) check on every match)
+        self._candidate_technologies_lower_cache = {
+            skill.lower() for skill in self._candidate_skills_lower_cache
+            if skill.lower() in self._known_technologies_lower_cache
+        }
     
     def _call_ollama(self, prompt: str) -> str:
         """Make a call to Ollama API"""
@@ -60,7 +70,7 @@ class EnhancedQualificationsAnalyzer:
         
         # Step 4: Combine preliminary and AI results
         print("📊 Combining preliminary and AI analysis results...")
-        combined_analysis = self._combine_analyses(preliminary_analysis, ai_analysis, job_description)
+        combined_analysis = self._combine_analyses(preliminary_analysis, ai_analysis, job_description, resume_content)
         
         return combined_analysis
     
@@ -236,7 +246,67 @@ Provide an overall assessment considering both the preliminary matching results 
         
         return items
     
-    def _combine_analyses(self, preliminary_analysis: Dict, ai_analysis: Dict, job_description: str) -> QualificationAnalysis:
+    def _validate_technology_match(
+        self, 
+        tech_name: str, 
+        job_technologies_lower: set, 
+        candidate_skills_lower: set,
+        candidate_technologies_lower: set,
+        known_technologies_lower: set
+    ) -> bool:
+        """
+        Validate that a technology should be marked as a strong match.
+        
+        Rules:
+        1. Technology must be mentioned in job description
+        2. Technology must exist in candidate's skills (from cached skills.yaml)
+        
+        This prevents false positives like Power BI appearing as a match
+        when it's only in the JD, not the candidate's resume.
+        
+        Args:
+            tech_name: Technology name to validate (lowercase)
+            job_technologies_lower: Set of technologies found in JD (lowercase)
+            candidate_skills_lower: Set of all candidate skills (lowercase)
+            candidate_technologies_lower: Set of candidate technologies (lowercase)
+            known_technologies_lower: Set of all known technology names (lowercase)
+            
+        Returns:
+            True if technology should be marked as strong match, False otherwise
+        """
+        # Must be a recognized technology
+        if tech_name not in known_technologies_lower:
+            return False
+        
+        # Must be mentioned in job description
+        if tech_name not in job_technologies_lower:
+            return False
+        
+        # Must exist in candidate skills (from cached skills.yaml)
+        # Check direct match first (fast set lookup)
+        if tech_name in candidate_skills_lower or tech_name in candidate_technologies_lower:
+            return True
+        
+        # PERFORMANCE: Only do substring matching if direct match fails
+        # Check if any candidate skill contains the technology (for variations)
+        # e.g., "Power BI" might match "Microsoft Power BI" in skills
+        # Use words instead of full string to speed up matching
+        tech_words = set(tech_name.split())
+        if len(tech_words) > 1:  # Multi-word technologies
+            # Check if most words appear in any candidate skill
+            for candidate_skill in candidate_skills_lower:
+                candidate_words = set(candidate_skill.split())
+                # If 50%+ words match, consider it a match
+                if len(tech_words & candidate_words) >= (len(tech_words) * 0.5):
+                    return True
+        else:  # Single word - use substring check only
+            if any(tech_name in candidate_skill or candidate_skill in tech_name 
+                   for candidate_skill in candidate_skills_lower):
+                return True
+        
+        return False
+    
+    def _combine_analyses(self, preliminary_analysis: Dict, ai_analysis: Dict, job_description: str, resume_content: str = "") -> QualificationAnalysis:
         """Combine preliminary and AI analysis results"""
         
         # TRUST PRELIMINARY MATCHER SCORE as source of truth
@@ -277,31 +347,59 @@ Provide an overall assessment considering both the preliminary matching results 
         
         # Combine strong matches
         # CRITICAL: Only include technologies that were actually extracted from the job description
-        # Extract technologies from JD to validate against
-        job_technologies = set(self.preliminary_matcher.tech_extractor.extract_technologies(job_description))
+        # AND verify they actually exist in the candidate's resume/skills
+        # PERFORMANCE FIX: Reuse technologies already extracted in preliminary_matcher (avoid duplicate extraction)
+        job_technologies = set(preliminary_analysis.get('extracted_job_technologies', []))
+        if not job_technologies:
+            # Fallback: extract if not in preliminary_analysis (backwards compatibility)
+            job_technologies = set(self.preliminary_matcher.tech_extractor.extract_technologies(job_description))
         job_technologies_lower = {tech.lower() for tech in job_technologies}
         
-        # Get all known technology names for validation
-        known_technologies_lower = {tech.lower() for tech in self.preliminary_matcher.tech_extractor.TECHNOLOGIES.keys()}
+        # PERFORMANCE FIX: Use pre-computed cached sets instead of creating them on every match
+        # These are computed once in __init__ to avoid expensive nested comprehensions
+        candidate_skills_lower = self._candidate_skills_lower_cache
+        candidate_technologies_lower = self._candidate_technologies_lower_cache
+        known_technologies_lower = self._known_technologies_lower_cache
         
         strong_matches = []
         for match in preliminary_analysis.get('exact_matches', []):
             skill = match['skill']
             skill_lower = skill.lower()
+            job_skill = match.get('job_skill', '').lower()
             
             # Check if this is a known technology
-            is_technology = skill_lower in known_technologies_lower
+            is_technology = skill_lower in known_technologies_lower or job_skill in known_technologies_lower
             
             if is_technology:
-                # It's a technology - only include if it was extracted from the JD
-                if skill_lower in job_technologies_lower:
+                # It's a technology - verify it exists in candidate skills AND was in JD
+                # Determine which technology name to check (job_skill takes precedence if it's a known tech)
+                tech_to_check = None
+                if job_skill and job_skill in known_technologies_lower:
+                    tech_to_check = job_skill
+                elif skill_lower in known_technologies_lower:
+                    tech_to_check = skill_lower
+                else:
+                    # Try to find matching tech from known technologies
+                    for known_tech in known_technologies_lower:
+                        if known_tech in skill_lower or known_tech in job_skill:
+                            tech_to_check = known_tech
+                            break
+                
+                # Use consolidated validation method
+                if tech_to_check and self._validate_technology_match(
+                    tech_to_check,
+                    job_technologies_lower,
+                    candidate_skills_lower,
+                    candidate_technologies_lower,
+                    known_technologies_lower
+                ):
                     strong_matches.append(skill)
-                # Otherwise, skip it (technology not mentioned in JD)
+                # Otherwise, skip it (technology not mentioned in JD or not verified in candidate skills)
             else:
                 # Not a technology (e.g., "Leadership", "Strategy") - allow it
                 strong_matches.append(skill)
         
-        # Filter AI strong matches to only include technologies found in JD
+        # Filter AI strong matches to only include technologies found in JD AND candidate skills
         for ai_match in ai_analysis.get('strong_matches', []):
             ai_match_lower = ai_match.lower()
             
@@ -309,11 +407,17 @@ Provide an overall assessment considering both the preliminary matching results 
             is_technology = ai_match_lower in known_technologies_lower
             
             if is_technology:
-                # It's a technology - only include if it was extracted from the JD
-                if ai_match_lower in job_technologies_lower:
+                # It's a technology - use consolidated validation method
+                if self._validate_technology_match(
+                    ai_match_lower,
+                    job_technologies_lower,
+                    candidate_skills_lower,
+                    candidate_technologies_lower,
+                    known_technologies_lower
+                ):
                     if ai_match not in strong_matches:
                         strong_matches.append(ai_match)
-                # Otherwise, skip it (technology not mentioned in JD)
+                # Otherwise, skip it (technology not mentioned in JD or not in candidate skills)
             else:
                 # Not a technology (e.g., "Leadership", "Strategy") - allow it
                 if ai_match not in strong_matches:
