@@ -19,6 +19,7 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 - **[TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md)** - Complete technical specification and architecture
 - **[TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md)** - API reference and technical details
 - **[API_REFERENCE.md](API_REFERENCE.md)** - Complete REST API documentation
+- **[APPLICATION_PROCESSING_PIPELINE.md](APPLICATION_PROCESSING_PIPELINE.md)** - Complete 10-step processing pipeline with timing and descriptions
 - **[ENHANCED_MATCHING_SYSTEM.md](ENHANCED_MATCHING_SYSTEM.md)** - Two-phase matching system documentation
 - **[FEATURE_EXTRACTION.md](FEATURE_EXTRACTION.md)** - Feature extraction and matching capabilities
 
