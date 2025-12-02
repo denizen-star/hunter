@@ -71,3 +71,15 @@ templates:
   delivery_method: LinkedIn Message
   id: '20251125151203'
   title: Reply - Accepted Invitation LInkedIn
+- content_file: 20251201090420.html
+  created_at: '2025-12-01T09:04:20.072115-05:00'
+  created_at_display: Dec 01, 2025 09:04 AM EST
+  delivery_method: Other
+  id: '20251201090420'
+  title: For Branding as a consultant
+- content_file: 20251201142618.html
+  created_at: '2025-12-01T14:26:18.908943-05:00'
+  created_at_display: Dec 01, 2025 02:26 PM EST
+  delivery_method: LinkedIn Message
+  id: '20251201142618'
+  title: Thank Recruiter for Moving you Forward in the Process
