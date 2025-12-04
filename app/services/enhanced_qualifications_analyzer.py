@@ -57,7 +57,7 @@ class EnhancedQualificationsAnalyzer:
         
         # Step 2: Create focused AI prompt based on preliminary results
         print("🤖 Creating focused AI analysis prompt...")
-        ai_context = self.preliminary_matcher.create_ai_prompt_context(job_description)
+        ai_context = self.preliminary_matcher.create_ai_prompt_context(job_description, preliminary_analysis)
         
         # Step 3: Run AI analysis with focused prompt
         print("🧠 Running AI analysis with preliminary context...")
@@ -345,84 +345,6 @@ Provide an overall assessment considering both the preliminary matching results 
         if abs(final_prelim_score - ai_score) > 5 and final_prelim_score > 0:
             print(f"⚠️  WARNING: Score mismatch detected! Preliminary={final_prelim_score}%, AI={ai_score}%, USING PRELIMINARY={match_score_final}%")
         
-        # Combine strong matches
-        # CRITICAL: Only include technologies that were actually extracted from the job description
-        # AND verify they actually exist in the candidate's resume/skills
-        # PERFORMANCE FIX: Reuse technologies already extracted in preliminary_matcher (avoid duplicate extraction)
-        job_technologies = set(preliminary_analysis.get('extracted_job_technologies', []))
-        if not job_technologies:
-            # Fallback: extract if not in preliminary_analysis (backwards compatibility)
-            job_technologies = set(self.preliminary_matcher.tech_extractor.extract_technologies(job_description))
-        job_technologies_lower = {tech.lower() for tech in job_technologies}
-        
-        # PERFORMANCE FIX: Use pre-computed cached sets instead of creating them on every match
-        # These are computed once in __init__ to avoid expensive nested comprehensions
-        candidate_skills_lower = self._candidate_skills_lower_cache
-        candidate_technologies_lower = self._candidate_technologies_lower_cache
-        known_technologies_lower = self._known_technologies_lower_cache
-        
-        strong_matches = []
-        for match in preliminary_analysis.get('exact_matches', []):
-            skill = match['skill']
-            skill_lower = skill.lower()
-            job_skill = match.get('job_skill', '').lower()
-            
-            # Check if this is a known technology
-            is_technology = skill_lower in known_technologies_lower or job_skill in known_technologies_lower
-            
-            if is_technology:
-                # It's a technology - verify it exists in candidate skills AND was in JD
-                # Determine which technology name to check (job_skill takes precedence if it's a known tech)
-                tech_to_check = None
-                if job_skill and job_skill in known_technologies_lower:
-                    tech_to_check = job_skill
-                elif skill_lower in known_technologies_lower:
-                    tech_to_check = skill_lower
-                else:
-                    # Try to find matching tech from known technologies
-                    for known_tech in known_technologies_lower:
-                        if known_tech in skill_lower or known_tech in job_skill:
-                            tech_to_check = known_tech
-                            break
-                
-                # Use consolidated validation method
-                if tech_to_check and self._validate_technology_match(
-                    tech_to_check,
-                    job_technologies_lower,
-                    candidate_skills_lower,
-                    candidate_technologies_lower,
-                    known_technologies_lower
-                ):
-                    strong_matches.append(skill)
-                # Otherwise, skip it (technology not mentioned in JD or not verified in candidate skills)
-            else:
-                # Not a technology (e.g., "Leadership", "Strategy") - allow it
-                strong_matches.append(skill)
-        
-        # Filter AI strong matches to only include technologies found in JD AND candidate skills
-        for ai_match in ai_analysis.get('strong_matches', []):
-            ai_match_lower = ai_match.lower()
-            
-            # Check if it's a known technology
-            is_technology = ai_match_lower in known_technologies_lower
-            
-            if is_technology:
-                # It's a technology - use consolidated validation method
-                if self._validate_technology_match(
-                    ai_match_lower,
-                    job_technologies_lower,
-                    candidate_skills_lower,
-                    candidate_technologies_lower,
-                    known_technologies_lower
-                ):
-                    if ai_match not in strong_matches:
-                        strong_matches.append(ai_match)
-                # Otherwise, skip it (technology not mentioned in JD or not in candidate skills)
-            else:
-                # Not a technology (e.g., "Leadership", "Strategy") - allow it
-                if ai_match not in strong_matches:
-                    strong_matches.append(ai_match)
-        
         # Combine missing skills from both preliminary analysis and AI analysis
         ai_missing_skills = ai_analysis.get('missing_skills', [])
         preliminary_unmatched = preliminary_analysis.get('unmatched_job_skills', [])
@@ -444,27 +366,24 @@ Provide an overall assessment considering both the preliminary matching results 
                 if any(ai_skill_lower == pre_skill.lower().strip() for pre_skill in preliminary_unmatched):
                     missing_skills.append(ai_skill)
         
-        # Combine partial matches
-        partial_matches = []
-        for match in preliminary_analysis.get('partial_matches', []):
-            partial_matches.append(match['skill'])
+        # For backward compatibility, extract simple lists from preliminary_analysis
+        # These will be deprecated in favor of using preliminary_analysis directly
+        strong_matches = [match.get('skill', '') for match in preliminary_analysis.get('exact_matches', [])]
+        partial_matches = [match.get('skill', '') for match in preliminary_analysis.get('partial_matches', [])]
         partial_matches.extend(ai_analysis.get('partial_matches', []))
         
-        # Create soft skills list
+        # Soft skills are a subset of exact matches by category
         soft_skills = []
         for match in preliminary_analysis.get('exact_matches', []):
-            if match['category'] in ['Leadership', 'Communication', 'Strategic Thinking', 'Problem Solving']:
+            if match.get('category', '') in ['Leadership', 'Communication', 'Strategic Thinking', 'Problem Solving']:
                 soft_skills.append({
-                    'skill': match['skill'],
-                    'category': match['category'],
+                    'skill': match.get('skill', ''),
+                    'category': match.get('category', ''),
                     'match_level': 'Strong Match'
                 })
         
         # Combine recommendations
         recommendations = ai_analysis.get('recommendations', [])
-        
-        # Generate skill mapping
-        skill_mapping = self._generate_skill_mapping(preliminary_analysis)
         
         # Sanitize AI's detailed_analysis to replace any Match Score mentions with the correct preliminary score
         # This prevents confusion from conflicting scores in the text
@@ -478,15 +397,24 @@ Provide an overall assessment considering both the preliminary matching results 
             flags=re.IGNORECASE
         )
         
-        # Create detailed analysis
+        # Remove unwanted sections from AI detailed analysis
+        # Remove: SKILL MAPPING, Skills Match Summary, Skills Analysis by Category, Unmatched Skills Analysis
+        sections_to_remove = [
+            r'##?\s*SKILL MAPPING.*?(?=##|\*\*|$)',
+            r'##?\s*Skills Match Summary.*?(?=##|\*\*|$)',
+            r'##?\s*Skills Analysis by Category.*?(?=##|\*\*|$)',
+            r'##?\s*Unmatched Skills Analysis.*?(?=##|\*\*|$)',
+        ]
+        for pattern in sections_to_remove:
+            ai_detailed = re.sub(pattern, '', ai_detailed, flags=re.DOTALL | re.IGNORECASE)
+        
+        # Create detailed analysis - keep only Recommendations and Overall Assessment
         detailed_analysis = f"""
 PRELIMINARY MATCHING RESULTS:
 - Match Score: {match_score:.0f}% (Source: Preliminary Matcher - validated skill matching)
 - Exact Matches: {len(preliminary_analysis.get('exact_matches', []))}
 - Partial Matches: {len(preliminary_analysis.get('partial_matches', []))}
 - AI Focus Areas: {', '.join(preliminary_analysis.get('ai_focus_areas', []))}
-
-{skill_mapping}
 
 {ai_detailed}
 """
@@ -499,59 +427,10 @@ PRELIMINARY MATCHING RESULTS:
             partial_matches=partial_matches,
             soft_skills=soft_skills,
             recommendations=recommendations,
-            detailed_analysis=detailed_analysis
+            detailed_analysis=detailed_analysis,
+            preliminary_analysis=preliminary_analysis  # Store as single source of truth
         )
     
-    def _generate_skill_mapping(self, preliminary_analysis: Dict) -> str:
-        """Generate skill mapping showing extracted job skills and their matches"""
-        mapping_lines = ["SKILL MAPPING (Job Skills → Matched Skills):"]
-        mapping_lines.append("=" * 60)
-        
-        # Get all extracted job skills
-        all_job_skills = set()
-        
-        # Add exact matches
-        for match in preliminary_analysis.get('exact_matches', []):
-            all_job_skills.add(match['job_skill'])
-        
-        # Add partial matches  
-        for match in preliminary_analysis.get('partial_matches', []):
-            all_job_skills.add(match['job_skill'])
-        
-        # Add unmatched skills
-        for skill in preliminary_analysis.get('unmatched_job_skills', []):
-            all_job_skills.add(skill)
-        
-        # Sort skills alphabetically
-        sorted_skills = sorted(all_job_skills)
-        
-        for job_skill in sorted_skills:
-            # Find if this skill has a match
-            matched_skill = None
-            match_type = None
-            
-            # Check exact matches
-            for match in preliminary_analysis.get('exact_matches', []):
-                if match['job_skill'] == job_skill:
-                    matched_skill = match['skill']
-                    match_type = "EXACT"
-                    break
-            
-            # Check partial matches
-            if not matched_skill:
-                for match in preliminary_analysis.get('partial_matches', []):
-                    if match['job_skill'] == job_skill:
-                        matched_skill = match['skill']
-                        match_type = "PARTIAL"
-                        break
-            
-            # Format the mapping line
-            if matched_skill:
-                mapping_lines.append(f"{job_skill} --> {matched_skill} ({match_type})")
-            else:
-                mapping_lines.append(f"{job_skill} ---------------------")
-        
-        return "\n".join(mapping_lines)
 
 if __name__ == "__main__":
     # Test the enhanced analyzer

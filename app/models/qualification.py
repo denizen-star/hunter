@@ -15,6 +15,7 @@ class QualificationAnalysis:
     soft_skills: List[Dict[str, str]]
     recommendations: List[str]
     detailed_analysis: str
+    preliminary_analysis: Optional[Dict] = None  # Single source of truth for matching data
     
     @classmethod
     def from_dict(cls, data: dict) -> 'QualificationAnalysis':
@@ -27,7 +28,8 @@ class QualificationAnalysis:
             partial_matches=data.get('partial_matches', []),
             soft_skills=data.get('soft_skills', []),
             recommendations=data.get('recommendations', []),
-            detailed_analysis=data.get('detailed_analysis', '')
+            detailed_analysis=data.get('detailed_analysis', ''),
+            preliminary_analysis=data.get('preliminary_analysis', None)
         )
     
     def to_dict(self) -> dict:
@@ -40,6 +42,48 @@ class QualificationAnalysis:
             'partial_matches': self.partial_matches,
             'soft_skills': self.soft_skills,
             'recommendations': self.recommendations,
-            'detailed_analysis': self.detailed_analysis
+            'detailed_analysis': self.detailed_analysis,
+            'preliminary_analysis': self.preliminary_analysis
         }
+    
+    def get_strong_matches(self) -> List[str]:
+        """Extract strong matches from preliminary_analysis (backward compatibility)"""
+        if not self.preliminary_analysis:
+            return self.strong_matches  # Fallback to stored list
+        
+        strong_matches = []
+        for match in self.preliminary_analysis.get('exact_matches', []):
+            skill = match.get('skill', '')
+            if skill and skill not in strong_matches:
+                strong_matches.append(skill)
+        return strong_matches
+    
+    def get_partial_matches(self) -> List[str]:
+        """Extract partial matches from preliminary_analysis (backward compatibility)"""
+        if not self.preliminary_analysis:
+            return self.partial_matches  # Fallback to stored list
+        
+        partial_matches = []
+        for match in self.preliminary_analysis.get('partial_matches', []):
+            skill = match.get('skill', '')
+            if skill and skill not in partial_matches:
+                partial_matches.append(skill)
+        return partial_matches
+    
+    def get_soft_skills(self) -> List[Dict[str, str]]:
+        """Extract soft skills from preliminary_analysis (backward compatibility)"""
+        if not self.preliminary_analysis:
+            return self.soft_skills  # Fallback to stored list
+        
+        soft_skills = []
+        soft_categories = ['Leadership', 'Communication', 'Strategic Thinking', 'Problem Solving']
+        for match in self.preliminary_analysis.get('exact_matches', []):
+            category = match.get('category', '')
+            if category in soft_categories:
+                soft_skills.append({
+                    'skill': match.get('skill', ''),
+                    'category': category,
+                    'match_level': 'Strong Match'
+                })
+        return soft_skills
 

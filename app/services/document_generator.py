@@ -1149,6 +1149,298 @@ Format this as a professional research document that demonstrates thorough prepa
         
         return skills_data
     
+    def _parse_skill_requirement_status(self, job_description: str, skill: str) -> str:
+        """Parse whether a skill is Required or Preferred from job description context"""
+        import re
+        
+        job_desc_lower = job_description.lower()
+        skill_lower = skill.lower()
+        
+        # Find all occurrences of the skill in the job description
+        # Use word boundaries to avoid partial matches
+        skill_pattern = r'\b' + re.escape(skill_lower) + r'\b'
+        matches = list(re.finditer(skill_pattern, job_desc_lower))
+        
+        if not matches:
+            return "Required"  # Default to Required if skill not found
+        
+        # Check context around each occurrence (50 characters before and after)
+        for match in matches:
+            start = max(0, match.start() - 50)
+            end = min(len(job_desc_lower), match.end() + 50)
+            context = job_desc_lower[start:end]
+            
+            # Check for preferred indicators
+            preferred_patterns = [
+                r'preferred',
+                r'nice to have',
+                r'nice-to-have',
+                r'bonus',
+                r'plus',
+                r'optional',
+                r'would be nice'
+            ]
+            for pattern in preferred_patterns:
+                if re.search(pattern, context, re.IGNORECASE):
+                    return "Preferred"
+            
+            # Check for required indicators
+            required_patterns = [
+                r'required',
+                r'must have',
+                r'must-have',
+                r'must',
+                r'essential',
+                r'necessary',
+                r'need',
+                r'required:'
+            ]
+            for pattern in required_patterns:
+                if re.search(pattern, context, re.IGNORECASE):
+                    return "Required"
+        
+        # Default to Required if no indicator found
+        return "Required"
+    
+    def _generate_qualifications_tables_html(self, qualifications: QualificationAnalysis, application: Application) -> str:
+        """Generate HTML tables for Qualifications Analysis section"""
+        if not qualifications.preliminary_analysis:
+            # Fallback to old format if preliminary_analysis not available
+            return f'<pre>{qualifications.detailed_analysis}</pre>'
+        
+        prelim = qualifications.preliminary_analysis
+        
+        # Get job description for requirement parsing
+        job_description = ""
+        if application.job_description_path and application.job_description_path.exists():
+            job_description = read_text_file(application.job_description_path)
+        
+        # Cache requirement status parsing to avoid repeated regex searches
+        requirement_status_cache = {}
+        
+        # Build Table 1: Detailed skills table
+        # Group matches by job_skill to avoid duplicates
+        job_skills_map = {}  # job_skill -> list of matches
+        
+        # Process exact matches
+        for match in prelim.get('exact_matches', []):
+            job_skill = match.get('job_skill', match.get('skill', ''))
+            if not job_skill:
+                continue
+            
+            matched_skill = match.get('skill', '')
+            category = match.get('category', 'Unknown')
+            
+            if job_skill not in job_skills_map:
+                # Cache requirement status to avoid repeated parsing
+                if job_skill not in requirement_status_cache:
+                    requirement_status_cache[job_skill] = self._parse_skill_requirement_status(job_description, job_skill)
+                
+                job_skills_map[job_skill] = {
+                    'requirement_status': requirement_status_cache[job_skill],
+                    'matches': [],
+                    'skill_category': category
+                }
+            
+            # Add this match
+            job_skills_map[job_skill]['matches'].append({
+                'matched_with': matched_skill,
+                'match_type': 'Strong',
+                'category': category
+            })
+            # Update category if we have a better one
+            if category != 'Unknown' and job_skills_map[job_skill]['skill_category'] == 'Unknown':
+                job_skills_map[job_skill]['skill_category'] = category
+        
+        # Process partial matches
+        for match in prelim.get('partial_matches', []):
+            job_skill = match.get('job_skill', match.get('skill', ''))
+            if not job_skill:
+                continue
+            
+            matched_skill = match.get('skill', '')
+            category = match.get('category', 'Unknown')
+            
+            if job_skill not in job_skills_map:
+                # Cache requirement status to avoid repeated parsing
+                if job_skill not in requirement_status_cache:
+                    requirement_status_cache[job_skill] = self._parse_skill_requirement_status(job_description, job_skill)
+                
+                job_skills_map[job_skill] = {
+                    'requirement_status': requirement_status_cache[job_skill],
+                    'matches': [],
+                    'skill_category': category
+                }
+            
+            # Add this match
+            job_skills_map[job_skill]['matches'].append({
+                'matched_with': matched_skill,
+                'match_type': 'Partial',
+                'category': category
+            })
+            # Update category if we have a better one
+            if category != 'Unknown' and job_skills_map[job_skill]['skill_category'] == 'Unknown':
+                job_skills_map[job_skill]['skill_category'] = category
+        
+        # Process unmatched skills
+        for job_skill in prelim.get('unmatched_job_skills', []):
+            if not job_skill or job_skill in job_skills_map:
+                continue  # Skip if already matched
+            
+            # Cache requirement status to avoid repeated parsing
+            if job_skill not in requirement_status_cache:
+                requirement_status_cache[job_skill] = self._parse_skill_requirement_status(job_description, job_skill)
+            
+            job_skills_map[job_skill] = {
+                'requirement_status': requirement_status_cache[job_skill],
+                'matches': [{
+                    'matched_with': '----',
+                    'match_type': 'No Match',
+                    'category': 'Unknown'
+                }],
+                'skill_category': 'Unknown'
+            }
+        
+        # Convert to table rows - one row per job skill, showing all matches
+        table1_rows = []
+        for job_skill, skill_data in sorted(job_skills_map.items()):
+            matches = skill_data['matches']
+            # If multiple matches, show the best match type first
+            matches.sort(key=lambda x: {'Strong': 0, 'Partial': 1, 'No Match': 2}.get(x['match_type'], 3))
+            
+            # Count matches by type
+            match_count = len([m for m in matches if m['match_type'] in ['Strong', 'Partial']])
+            total_matches = len(matches)
+            
+            # Create one row per match (but grouped by job_skill)
+            for i, match in enumerate(matches):
+                table1_rows.append({
+                    'job_skill': job_skill if i == 0 else '',  # Only show job skill in first row
+                    'requirement_status': skill_data['requirement_status'] if i == 0 else '',
+                    'match_count': match_count if i == 0 else '',  # Show count only in first row
+                    'matched_with': match['matched_with'],
+                    'match_type': match['match_type'],
+                    'skill_category': match.get('category', skill_data['skill_category'])
+                })
+        
+        # Build Table 2: Category summary
+        category_stats = {}
+        
+        # Count unique job skills by category (not matches)
+        unique_job_skills_by_category = {}
+        for job_skill, skill_data in job_skills_map.items():
+            category = skill_data['skill_category']
+            if category not in unique_job_skills_by_category:
+                unique_job_skills_by_category[category] = set()
+            unique_job_skills_by_category[category].add(job_skill)
+        
+        # Count matched vs unmatched by category
+        for job_skill, skill_data in job_skills_map.items():
+            category = skill_data['skill_category']
+            if category not in category_stats:
+                category_stats[category] = {'total': 0, 'matched': 0}
+            
+            category_stats[category]['total'] += 1
+            # Check if this job skill has any match (Strong or Partial)
+            has_match = any(m['match_type'] in ['Strong', 'Partial'] for m in skill_data['matches'])
+            if has_match:
+                category_stats[category]['matched'] += 1
+        
+        # Generate HTML for Table 1
+        table1_html = """
+        <div style="margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px; color: #333; font-size: 18px;">Skills Matching Details</h3>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Job Skill</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Skill Category</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 600; color: #374151;"># Matches</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Matched with</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Match Type</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        for row in table1_rows:
+            match_type_color = {
+                'Strong': '#10b981',
+                'Partial': '#f59e0b',
+                'No Match': '#ef4444'
+            }.get(row['match_type'], '#6b7280')
+            
+            requirement_color = {
+                'Required': '#ef4444',
+                'Preferred': '#3b82f6'
+            }.get(row['requirement_status'], '#6b7280')
+            
+            # Use rowspan styling for grouped rows (show job_skill only in first row)
+            job_skill_cell = f"<td style=\"padding: 12px; color: #1f2937; font-weight: 500;\">{row['job_skill']}</td>" if row['job_skill'] else "<td style=\"padding: 12px;\"></td>"
+            requirement_cell = f"<td style=\"padding: 12px;\"><span style=\"color: {requirement_color}; font-weight: 500;\">{row['requirement_status']}</span></td>" if row['requirement_status'] else "<td style=\"padding: 12px;\"></td>"
+            match_count_cell = f"<td style=\"padding: 12px; text-align: center; color: #6b7280; font-weight: 500;\">{row['match_count']}</td>" if row['match_count'] != '' else "<td style=\"padding: 12px;\"></td>"
+            
+            table1_html += f"""
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        {job_skill_cell}
+                        {requirement_cell}
+                        {match_count_cell}
+                        <td style="padding: 12px; color: #6b7280;">{row['matched_with']}</td>
+                        <td style="padding: 12px;">
+                            <span style="color: {match_type_color}; font-weight: 500;">{row['match_type']}</span>
+                        </td>
+                        <td style="padding: 12px; color: #6b7280;">{row['skill_category']}</td>
+                    </tr>
+            """
+        
+        table1_html += """
+                </tbody>
+            </table>
+        </div>
+        """
+        
+        # Generate HTML for Table 2
+        table2_html = """
+        <div>
+            <h3 style="margin-bottom: 15px; color: #333; font-size: 18px;">Category Summary</h3>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; font-size: 14px;">
+                <thead>
+                    <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                        <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Category</th>
+                        <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;"># Job Skills</th>
+                        <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;"># Matched Skills</th>
+                        <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">Match Ratio</th>
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        for category, stats in sorted(category_stats.items()):
+            total = stats['total']
+            matched = stats['matched']
+            ratio = (matched / total * 100) if total > 0 else 0
+            ratio_color = '#10b981' if ratio >= 75 else '#f59e0b' if ratio >= 50 else '#ef4444'
+            
+            table2_html += f"""
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px; color: #1f2937; font-weight: 500;">{category}</td>
+                        <td style="padding: 12px; text-align: right; color: #6b7280;">{total}</td>
+                        <td style="padding: 12px; text-align: right; color: #6b7280;">{matched}</td>
+                        <td style="padding: 12px; text-align: right;">
+                            <span style="color: {ratio_color}; font-weight: 500;">{ratio:.1f}%</span>
+                        </td>
+                    </tr>
+            """
+        
+        table2_html += """
+                </tbody>
+            </table>
+        </div>
+        """
+        
+        return table1_html + table2_html
+    
     def _generate_company_research_html(self, company_name: str, application: Application = None) -> str:
         """Generate HTML for company research section"""
         try:
@@ -3662,7 +3954,7 @@ Format this as a professional research document that demonstrates thorough prepa
         
         {self._generate_tab_content('qualifications', 'Qualifications Analysis', f'''
             <h2>Qualifications Analysis</h2>
-            <pre>{qual_analysis}</pre>
+            {self._generate_qualifications_tables_html(qualifications, application)}
         ''', application.qualifications_path)}
         
         {self._generate_tab_content('cover-letter', 'Cover Letter', f'''

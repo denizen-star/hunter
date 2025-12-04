@@ -491,6 +491,199 @@ class PreliminaryMatcher:
             'Data Visualization' not in job_skills):
             job_skills.append('Data Visualization')
         
+        # Extract data governance and management skills
+        if re.search(r'\bdata\s+governance\b', job_desc_lower, re.IGNORECASE) and 'Data Governance' not in job_skills:
+            job_skills.append('Data Governance')
+        
+        # Extract governance when mentioned in data context
+        if (re.search(r'\bgovernance\b', job_desc_lower, re.IGNORECASE) and 
+            re.search(r'\bdata\b', job_desc_lower, re.IGNORECASE) and
+            'Data Governance' not in job_skills):
+            # Check if governance appears near data (within 100 characters)
+            governance_matches = list(re.finditer(r'\bgovernance\b', job_desc_lower, re.IGNORECASE))
+            data_matches = list(re.finditer(r'\bdata\b', job_desc_lower, re.IGNORECASE))
+            for gov_match in governance_matches:
+                for data_match in data_matches:
+                    if abs(gov_match.start() - data_match.start()) < 100:
+                        job_skills.append('Data Governance')
+                        break
+                if 'Data Governance' in job_skills:
+                    break
+        
+        if re.search(r'\bdata\s+management\b', job_desc_lower, re.IGNORECASE) and 'Data Management' not in job_skills:
+            job_skills.append('Data Management')
+        
+        if re.search(r'\bdata\s+quality\b', job_desc_lower, re.IGNORECASE) and 'Data Quality' not in job_skills:
+            job_skills.append('Data Quality')
+        
+        if re.search(r'\bdata\s+privacy\b', job_desc_lower, re.IGNORECASE) and 'Data Privacy' not in job_skills:
+            job_skills.append('Data Privacy')
+        
+        if re.search(r'\bdata\s+security\b', job_desc_lower, re.IGNORECASE) and 'Data Security' not in job_skills:
+            job_skills.append('Data Security')
+        
+        if re.search(r'\bdata\s+stewardship\b', job_desc_lower, re.IGNORECASE) and 'Data Stewardship' not in job_skills:
+            job_skills.append('Data Stewardship')
+        
+        if re.search(r'\bdata\s+partnerships?\b', job_desc_lower, re.IGNORECASE) and 'Data Partnerships' not in job_skills:
+            job_skills.append('Data Partnerships')
+        
+        if re.search(r'\bdata\s+standards\b', job_desc_lower, re.IGNORECASE) and 'Data Standards' not in job_skills:
+            job_skills.append('Data Standards')
+        
+        # Extract compliance and regulatory skills
+        if re.search(r'\bcompliance\b', job_desc_lower, re.IGNORECASE) and 'Compliance' not in job_skills:
+            job_skills.append('Compliance')
+        
+        if re.search(r'\bregulatory\s+requirements?\b', job_desc_lower, re.IGNORECASE) and 'Regulatory Requirements' not in job_skills:
+            job_skills.append('Regulatory Requirements')
+        
+        if re.search(r'\bregulatory\s+compliance\b', job_desc_lower, re.IGNORECASE) and 'Regulatory Compliance' not in job_skills:
+            job_skills.append('Regulatory Compliance')
+        
+        # Extract risk management
+        if re.search(r'\brisk\s+management\b', job_desc_lower, re.IGNORECASE) and 'Risk Management' not in job_skills:
+            job_skills.append('Risk Management')
+        
+        # Extract stakeholder management
+        if re.search(r'\bstakeholder\s+management\b', job_desc_lower, re.IGNORECASE) and 'Stakeholder Management' not in job_skills:
+            job_skills.append('Stakeholder Management')
+        
+        if re.search(r'\bstakeholder\s+engagement\b', job_desc_lower, re.IGNORECASE) and 'Stakeholder Engagement' not in job_skills:
+            job_skills.append('Stakeholder Engagement')
+        
+        # Extract leadership and management skills
+        if re.search(r'\bengineering\s+management\b', job_desc_lower, re.IGNORECASE) and 'Engineering Management' not in job_skills:
+            job_skills.append('Engineering Management')
+        
+        if re.search(r'\bcoaching\b', job_desc_lower, re.IGNORECASE) and 'Coaching' not in job_skills:
+            job_skills.append('Coaching')
+        
+        if re.search(r'\bperformance\s+management\b', job_desc_lower, re.IGNORECASE) and 'Performance Management' not in job_skills:
+            job_skills.append('Performance Management')
+        
+        if re.search(r'\bhiring\b', job_desc_lower, re.IGNORECASE) and 'Hiring' not in job_skills:
+            job_skills.append('Hiring')
+        
+        if re.search(r'\btalent\s+acquisition\b', job_desc_lower, re.IGNORECASE) and 'Talent Acquisition' not in job_skills:
+            job_skills.append('Talent Acquisition')
+        
+        # Extract strategy and decision-making
+        if re.search(r'\barchitectural\s+decisions?\b', job_desc_lower, re.IGNORECASE) and 'Architectural Decision Making' not in job_skills:
+            job_skills.append('Architectural Decision Making')
+        
+        if re.search(r'\bprioritization\b', job_desc_lower, re.IGNORECASE) and 'Prioritization' not in job_skills:
+            job_skills.append('Prioritization')
+        
+        # Extract financial management
+        if re.search(r'\bcost\s+management\b', job_desc_lower, re.IGNORECASE) and 'Cost Management' not in job_skills:
+            job_skills.append('Cost Management')
+        
+        if re.search(r'\bfinops\b', job_desc_lower, re.IGNORECASE) and 'FinOps' not in job_skills:
+            job_skills.append('FinOps')
+        
+        # Extract communication and collaboration
+        if re.search(r'\bexecutive\s+communication\b', job_desc_lower, re.IGNORECASE) and 'Executive Communication' not in job_skills:
+            job_skills.append('Executive Communication')
+        
+        if re.search(r'\bincident\s+management\b', job_desc_lower, re.IGNORECASE) and 'Incident Management' not in job_skills:
+            job_skills.append('Incident Management')
+        
+        if re.search(r'\broot\s+cause\s+analysis\b', job_desc_lower, re.IGNORECASE) and 'Root Cause Analysis' not in job_skills:
+            job_skills.append('Root Cause Analysis')
+        
+        if re.search(r'\bgo-to-market\b', job_desc_lower, re.IGNORECASE) and 'Go-To-Market' not in job_skills:
+            job_skills.append('Go-To-Market')
+        
+        if re.search(r'\bgtm\b', job_desc_lower, re.IGNORECASE) and 'GTM' not in job_skills and 'Go-To-Market' not in job_skills:
+            job_skills.append('GTM')
+        
+        # Extract risk management
+        if re.search(r'\brisk\s+mitigation\b', job_desc_lower, re.IGNORECASE) and 'Risk Mitigation' not in job_skills:
+            job_skills.append('Risk Mitigation')
+        
+        # Extract metadata management
+        if re.search(r'\bmetadata\s+management\b', job_desc_lower, re.IGNORECASE) and 'Metadata Management' not in job_skills:
+            job_skills.append('Metadata Management')
+        
+        # Extract data product
+        if re.search(r'\bdata\s+product\b', job_desc_lower, re.IGNORECASE) and 'Data Product' not in job_skills:
+            job_skills.append('Data Product')
+        
+        # Extract data infrastructure and platform
+        if re.search(r'\bdata\s+infrastructure\b', job_desc_lower, re.IGNORECASE) and 'Data Infrastructure' not in job_skills:
+            job_skills.append('Data Infrastructure')
+        
+        if re.search(r'\bdata\s+platform\b', job_desc_lower, re.IGNORECASE) and 'Data Platform' not in job_skills:
+            job_skills.append('Data Platform')
+        
+        # Extract observability
+        if re.search(r'\bobservability\b', job_desc_lower, re.IGNORECASE) and 'Observability' not in job_skills:
+            job_skills.append('Observability')
+        
+        # Extract distributed systems
+        if re.search(r'\bdistributed\s+systems?\b', job_desc_lower, re.IGNORECASE) and 'Distributed Systems' not in job_skills:
+            job_skills.append('Distributed Systems')
+        
+        # Extract schema design
+        if re.search(r'\bschema\s+design\b', job_desc_lower, re.IGNORECASE) and 'Schema Design' not in job_skills:
+            job_skills.append('Schema Design')
+        
+        # Extract data modeling (more specific than just "modeling")
+        if re.search(r'\bdata\s+modeling\b', job_desc_lower, re.IGNORECASE) and 'Data Modeling' not in job_skills:
+            job_skills.append('Data Modeling')
+        
+        # Extract data engineering processes
+        if re.search(r'\bingestion\b', job_desc_lower, re.IGNORECASE) and 'Data Ingestion' not in job_skills:
+            job_skills.append('Data Ingestion')
+        
+        if re.search(r'\btransformation\b', job_desc_lower, re.IGNORECASE) and 'Data Transformation' not in job_skills:
+            job_skills.append('Data Transformation')
+        
+        if re.search(r'\benrichment\b', job_desc_lower, re.IGNORECASE) and 'Data Enrichment' not in job_skills:
+            job_skills.append('Data Enrichment')
+        
+        if re.search(r'\betl\b', job_desc_lower, re.IGNORECASE) and 'ETL' not in job_skills:
+            job_skills.append('ETL')
+        
+        if re.search(r'\belt\b', job_desc_lower, re.IGNORECASE) and 'ELT' not in job_skills:
+            job_skills.append('ELT')
+        
+        if re.search(r'\bdata\s+pipelines?\b', job_desc_lower, re.IGNORECASE) and 'Data Pipeline' not in job_skills:
+            job_skills.append('Data Pipeline')
+        
+        if re.search(r'\bpipelines?\b', job_desc_lower, re.IGNORECASE) and 'Pipeline' not in job_skills and 'Data Pipeline' not in job_skills:
+            job_skills.append('Pipeline')
+        
+        # Extract database types
+        # Check for "relational database" or "relational" in context of databases/systems
+        if (re.search(r'\brelational\s+(database|databases|systems?)\b', job_desc_lower, re.IGNORECASE) or
+            (re.search(r'\brelational\b', job_desc_lower, re.IGNORECASE) and 
+             re.search(r'\b(database|databases|systems?|mpp|nosql)\b', job_desc_lower, re.IGNORECASE))) and 'Relational Database' not in job_skills:
+            job_skills.append('Relational Database')
+        
+        # Extract automation
+        if re.search(r'\bautomation\b', job_desc_lower, re.IGNORECASE) and 'Automation' not in job_skills:
+            job_skills.append('Automation')
+        
+        # Extract certifications mentioned
+        if re.search(r'\bdm-bok\b', job_desc_lower, re.IGNORECASE) and 'DM-BOK' not in job_skills:
+            job_skills.append('DM-BOK')
+        
+        if re.search(r'\bcdmp\b', job_desc_lower, re.IGNORECASE) and 'CDMP' not in job_skills:
+            job_skills.append('CDMP')
+        
+        # Extract MBA if mentioned
+        if re.search(r'\bmba\b', job_desc_lower, re.IGNORECASE) and 'MBA' not in job_skills:
+            job_skills.append('MBA')
+        
+        # Extract database/system types
+        if re.search(r'\bnosql\b', job_desc_lower, re.IGNORECASE) and 'NoSQL' not in job_skills:
+            job_skills.append('NoSQL')
+        
+        if re.search(r'\bmpp\b', job_desc_lower, re.IGNORECASE) and 'MPP' not in job_skills:
+            job_skills.append('MPP')
+        
         # Extract technologies using SimpleTechExtractor (comprehensive 157+ technologies)
         # This replaces the hardcoded list and ensures consistency across the codebase
         extracted_technologies = self.tech_extractor.extract_technologies(job_description)
@@ -504,6 +697,15 @@ class PreliminaryMatcher:
             tech_lower = tech_to_add.lower()
             if tech_to_add not in job_skills and tech_lower not in [s.lower() for s in job_skills]:
                 job_skills.append(tech_to_add)
+            
+            # For compound technology names like "Apache Airflow", also add the core technology
+            # This ensures "airflow" is extracted even if "Apache Airflow" gets filtered
+            if 'apache' in tech_lower:
+                core_tech = tech_lower.replace('apache', '').strip()
+                if core_tech and core_tech not in [s.lower() for s in job_skills]:
+                    # Capitalize first letter for consistency
+                    core_tech_capitalized = core_tech.capitalize()
+                    job_skills.append(core_tech_capitalized)
         
         # Filter out invalid skills and clean up the list
         filtered_skills = []
@@ -540,19 +742,33 @@ class PreliminaryMatcher:
             
             # Additional validation - must have meaningful content and be reasonable length
             # AND verify the skill (or core part) actually appears in the job description
-            # BUT: Don't filter out education/domain skills that we explicitly extracted
-            is_education_skill = any(edu in skill_clean.lower() for edu in ['phd', 'doctorate', 'master', 'bachelor', 'abd'])
+            # BUT: Don't filter out education/domain/research/data skills that we explicitly extracted
+            is_education_skill = any(edu in skill_clean.lower() for edu in ['phd', 'doctorate', 'master', 'bachelor', 'abd', 'mba'])
             is_domain_skill = any(domain in skill_clean.lower() for domain in ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics'])
             is_research_skill = any(research in skill_clean.lower() for research in ['research', 'experimental'])
+            is_data_skill = any(data_term in skill_clean.lower() for data_term in [
+                'data governance', 'data management', 'data quality', 'data privacy', 'data security',
+                'data stewardship', 'data partnerships', 'data standards', 'data engineering', 'data strategy',
+                'data visualization', 'data product', 'data infrastructure', 'data platform', 'data modeling',
+                'data ingestion', 'data transformation', 'data enrichment', 'data pipeline', 'pipeline',
+                'metadata management', 'observability', 'distributed systems', 'schema design',
+                'etl', 'elt', 'relational database', 'automation',
+                'compliance', 'regulatory',
+                'risk management', 'risk mitigation', 'stakeholder management', 'stakeholder engagement',
+                'engineering management', 'coaching', 'performance management', 'hiring', 'talent acquisition',
+                'architectural decision making', 'prioritization', 'cost management', 'finops',
+                'executive communication', 'incident management', 'root cause analysis', 'go-to-market', 'gtm',
+                'dm-bok', 'cdmp'
+            ])
             
-            # Allow shorter skills if they're education/domain/research (PhD is 3 chars, so >= 3)
-            min_length = 2 if (is_education_skill or is_domain_skill or is_research_skill) else 3
+            # Allow shorter skills if they're education/domain/research/data (PhD is 3 chars, so >= 3)
+            min_length = 2 if (is_education_skill or is_domain_skill or is_research_skill or is_data_skill) else 3
             
             if (is_valid and 
                 len(skill_clean) >= min_length and 
                 len(skill_clean) < 50 and 
                 skill_clean not in filtered_skills and
-                (is_education_skill or is_domain_skill or is_research_skill or 
+                (is_education_skill or is_domain_skill or is_research_skill or is_data_skill or 
                  not any(word in skill_clean.lower() for word in ['experience', 'years', 'minimum', 'preferred']))):
                 
                 # Final validation: Verify the skill actually appears in JD (not just similar words)
@@ -563,7 +779,11 @@ class PreliminaryMatcher:
                 core_skill_for_validation = core_skill_for_validation.strip()
                 
                 # Check if core skill appears in JD with word boundaries (more strict)
-                if len(core_skill_for_validation) >= 3:
+                # BUT: Skip validation for data/education/domain/research skills we explicitly extracted
+                if is_data_skill or is_education_skill or is_domain_skill or is_research_skill:
+                    # Trust these skills - we extracted them because they appeared in JD
+                    filtered_skills.append(skill_clean)
+                elif len(core_skill_for_validation) >= 3:
                     # For multi-word skills, require all words to appear
                     words = core_skill_for_validation.split()
                     if len(words) > 1:
@@ -773,10 +993,14 @@ class PreliminaryMatcher:
         
         return focus_areas
     
-    def create_ai_prompt_context(self, job_description: str) -> str:
+    def create_ai_prompt_context(self, job_description: str, preliminary_analysis: Optional[Dict] = None) -> str:
         """Create context for AI analysis based on preliminary matching"""
         
-        analysis = self.generate_preliminary_analysis(job_description)
+        # Use provided analysis or generate if not provided (backward compatibility)
+        if preliminary_analysis is None:
+            analysis = self.generate_preliminary_analysis(job_description)
+        else:
+            analysis = preliminary_analysis
         
         context = f"""
 PRELIMINARY MATCHING ANALYSIS:
@@ -859,14 +1083,18 @@ Please focus your analysis on the areas above and provide detailed insights on:
             'data science': ['data science'],
             'machine learning': ['machine learning', 'ml'],
             
-            # Data Engineering
+            # Data Engineering - keep data pipeline separate as it's more specific
+            'data pipeline': ['data pipeline', 'data pipelines'],
             'data engineering': ['data engineering', 'data engineering pipelines', 'data pipeline engineering'],
-            'pipelines': ['pipelines', 'data pipelines', 'data pipeline', 'pipeline'],
-            'data pipelines': ['data pipelines', 'pipelines', 'data pipeline'],
+            'pipelines': ['pipelines', 'pipeline'],
             
-            # Modeling
-            'modeling': ['modeling', 'data modeling', 'data models', 'modeling techniques'],
-            'data modeling': ['data modeling', 'modeling', 'data models'],
+            # Data Management (keep separate from metadata management)
+            'data management': ['data management'],
+            'metadata management': ['metadata management'],
+            
+            # Modeling - check data modeling first (more specific) before generic modeling
+            'data modeling': ['data modeling'],
+            'modeling': ['modeling', 'data models', 'modeling techniques'],
             
             # Communication
             'communication': ['communication', 'communication skills', 'excellent communication', 'strong communication', 'excellent communication skills', 'strong communication skills'],
@@ -874,7 +1102,12 @@ Please focus your analysis on the areas above and provide detailed insights on:
             
             # Leadership and management
             'leadership': ['leadership', 'team leadership'],
-            'management': ['management', 'team management', 'project management'],
+            # Don't consolidate "Data Management", "Stakeholder Management", "Risk Management" into generic "management"
+            # Only consolidate generic management terms
+            'management': ['team management', 'project management'],
+            'data management': ['data management'],
+            'stakeholder management': ['stakeholder management'],
+            'risk management': ['risk management'],
             'strategy': ['strategy', 'strategic', 'strategic planning', 'product strategy', 'data strategy', 'business strategy'],
             'problem solving': ['problem solving', 'problem-solving', 'problem-solving skills', 'problem solving skills'],
             
@@ -907,9 +1140,16 @@ Please focus your analysis on the areas above and provide detailed insights on:
                     member_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', member_normalized).strip()
                     
                     # Check if normalized versions match
-                    if (member_normalized in skill_normalized or 
-                        skill_normalized in member_normalized or
-                        member_normalized == skill_normalized):
+                    # Use exact match or word boundary matching to avoid false positives
+                    # e.g., "metadata management" should NOT match "data management"
+                    exact_match = (member_normalized == skill_normalized)
+                    # For substring matching, require word boundaries to avoid partial matches
+                    word_boundary_match = (
+                        re.search(r'\b' + re.escape(member_normalized) + r'\b', skill_normalized) or
+                        re.search(r'\b' + re.escape(skill_normalized) + r'\b', member_normalized)
+                    )
+                    
+                    if exact_match or word_boundary_match:
                         # Use the canonical name
                         if group_name not in [s.lower() for s in consolidated]:
                             consolidated.append(group_name)
