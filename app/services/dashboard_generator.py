@@ -1,9 +1,10 @@
 """Dashboard generation service"""
 from pathlib import Path
-from typing import List
+from typing import List, Optional
+import re
 from app.models.application import Application
 from app.services.job_processor import JobProcessor
-from app.utils.file_utils import get_data_path, ensure_dir_exists, write_text_file
+from app.utils.file_utils import get_data_path, ensure_dir_exists, write_text_file, read_text_file
 from app.utils.datetime_utils import format_for_display
 
 STATUS_NORMALIZATION_MAP = {
@@ -548,6 +549,26 @@ class DashboardGenerator:
             font-size: 10px;
             color: var(--text-secondary);
             margin-bottom: var(--space-sm);
+        }}
+        .card-notes {{
+            margin-top: var(--space-md);
+            margin-bottom: var(--space-md);
+            padding: var(--space-md);
+            background: #fee2e2;
+            border-left: 3px solid #991b1b;
+            border-radius: var(--radius-sm);
+        }}
+        .card-notes-label {{
+            font-size: 11px;
+            font-weight: var(--font-semibold);
+            color: #991b1b;
+            margin-bottom: var(--space-xs);
+        }}
+        .card-notes-text {{
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.5;
+            word-wrap: break-word;
         }}
         .card-actions {{
             margin-top: var(--space-lg);
@@ -1244,6 +1265,20 @@ class DashboardGenerator:
         flag_class = 'flagged' if app.flagged else 'unflagged'
         flag_title = 'Unflag this job' if app.flagged else 'Flag this job'
         
+        # Get rejected notes if status is rejected
+        notes_html = ""
+        if app.status.lower() == 'rejected':
+            notes = self._get_latest_status_notes(app)
+            if notes:
+                # Truncate long notes for card display
+                display_notes = notes[:200] + "..." if len(notes) > 200 else notes
+                notes_html = f"""
+            <div class="card-notes">
+                <div class="card-notes-label">Rejection Notes:</div>
+                <div class="card-notes-text" title="{notes}">{display_notes}</div>
+            </div>
+                """
+        
         return f"""
         <div class="card" 
              data-updated-at="{updated_at.isoformat()}" 
@@ -1275,6 +1310,7 @@ class DashboardGenerator:
             <div class="card-meta">
                 🔄 Updated: {format_for_display(app.status_updated_at)}
             </div>
+            {notes_html}
             <div class="card-actions">
                 <a href="{summary_link}" class="card-btn">View Summary →</a>
             </div>
@@ -1305,6 +1341,53 @@ class DashboardGenerator:
         
         display_name = checklist_definitions.get(latest_item, latest_item)
         return f'<span class="card-progress-pill">{display_name}</span>'
+    
+    def _get_latest_status_notes(self, app: Application) -> Optional[str]:
+        """Get the latest status update notes for an application"""
+        try:
+            updates = self.job_processor.get_application_updates(app)
+            
+            if not updates:
+                return None
+            
+            # Filter for updates matching the current status (especially "rejected")
+            status_updates = [u for u in updates if u['status'].lower() == app.status.lower()]
+            
+            # If no exact match, get the most recent update
+            if not status_updates:
+                status_updates = updates
+            
+            # Get the most recent update (updates are sorted, so take the last one)
+            latest_update = status_updates[-1] if status_updates else None
+            
+            if not latest_update or not Path(latest_update['file']).exists():
+                return None
+            
+            # Extract notes from the HTML file
+            html_content = read_text_file(Path(latest_update['file']))
+            
+            # Extract notes text using regex - match everything between notes-text div tags
+            # Use a more robust pattern that handles nested HTML
+            notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
+            if notes_match:
+                notes_html = notes_match.group(1).strip()
+                # Remove HTML tags but preserve text content
+                # First, replace common block elements with newlines for better formatting
+                notes_html = re.sub(r'</(p|div|br|li)>', '\n', notes_html, flags=re.IGNORECASE)
+                notes_html = re.sub(r'<(p|div|br|li)[^>]*>', '\n', notes_html, flags=re.IGNORECASE)
+                # Remove all remaining HTML tags
+                notes_text = re.sub(r'<[^>]+>', ' ', notes_html)
+                # Clean up whitespace - replace multiple spaces/newlines with single space
+                notes_text = re.sub(r'\s+', ' ', notes_text)
+                # Strip leading/trailing whitespace
+                notes_text = notes_text.strip()
+                # Return None if empty after cleaning
+                return notes_text if notes_text else None
+            
+            return None
+        except Exception as e:
+            # Silently fail - don't break dashboard if notes can't be extracted
+            return None
     
     def _create_progress_dashboard_html(self, applications: List[Application]) -> str:
         """Create the progress dashboard HTML"""
@@ -1808,6 +1891,26 @@ class DashboardGenerator:
             font-size: 10px;
             color: var(--text-secondary);
             margin-bottom: var(--space-sm);
+        }}
+        .card-notes {{
+            margin-top: var(--space-md);
+            margin-bottom: var(--space-md);
+            padding: var(--space-md);
+            background: #fee2e2;
+            border-left: 3px solid #991b1b;
+            border-radius: var(--radius-sm);
+        }}
+        .card-notes-label {{
+            font-size: 11px;
+            font-weight: var(--font-semibold);
+            color: #991b1b;
+            margin-bottom: var(--space-xs);
+        }}
+        .card-notes-text {{
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.5;
+            word-wrap: break-word;
         }}
         
         .card-actions {{
