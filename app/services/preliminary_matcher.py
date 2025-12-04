@@ -254,7 +254,32 @@ class PreliminaryMatcher:
                 base_score = max(0, base_score - critical_penalty)
             
             # Check if candidate is overqualified (has significantly more skills than required)
-            critical_skills_missing = len(matches['unmatched_job_skills'])
+            # FIX: Only count truly critical missing skills, not all unmatched skills
+            # Critical skills are: education requirements (PhD, degree, etc.) and domain expertise (biology, chemistry, etc.)
+            critical_skills_missing_list = []
+            education_keywords = ['phd', 'doctorate', 'master', 'bachelor', 'degree', 'abd']
+            domain_keywords = ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics', 'molecular biology']
+            
+            for unmatched_skill in matches['unmatched_job_skills']:
+                skill_lower = unmatched_skill.lower()
+                is_education = any(edu in skill_lower for edu in education_keywords)
+                is_domain = any(domain in skill_lower for domain in domain_keywords)
+                if is_education or is_domain:
+                    critical_skills_missing_list.append(unmatched_skill)
+            
+            critical_skills_missing = len(critical_skills_missing_list)
+            total_unmatched_skills = len(matches['unmatched_job_skills'])
+            non_critical_unmatched = total_unmatched_skills - critical_skills_missing
+            
+            # Debug logging to investigate the issue
+            if total_unmatched_skills > 0:
+                print(f"🔍 Match Score Debug: total_unmatched={total_unmatched_skills}, critical_missing={critical_skills_missing}, non_critical={non_critical_unmatched}")
+                if critical_skills_missing > 0:
+                    print(f"   Critical missing: {critical_skills_missing_list}")
+                if non_critical_unmatched > 0:
+                    non_critical_skills = [s for s in matches['unmatched_job_skills'] if s not in critical_skills_missing_list]
+                    print(f"   Non-critical missing: {non_critical_skills[:5]}...")  # Show first 5
+            
             total_candidate_skills = len(self.candidate_skills)
             overqualification_ratio = total_candidate_skills / total_job_skills if total_job_skills > 0 else 1
             
@@ -267,8 +292,9 @@ class PreliminaryMatcher:
                 # Missing skills are less impactful when you have many more skills than required
                 
                 # Calculate missing skill penalty (reduced for overqualified candidates)
-                if critical_skills_missing > 0:
-                    # Distinguish between critical and nice-to-have skills
+                # Note: This uses different "critical" skills (technical) than education/domain critical skills
+                if total_unmatched_skills > 0:
+                    # Distinguish between critical technical skills and nice-to-have skills
                     critical_penalty_skills = ['snowflake', 'bigquery', 'cloud', 'data engineering']
                     nice_to_have_skills = ['paid advertising', 'google ads', 'meta', 'advertising platforms', 'mentorship skills', 'problem-solving']
                     
@@ -296,15 +322,21 @@ class PreliminaryMatcher:
                     
                     base_score = base_score + overqualification_bonus
                     
-                    # CRITICAL: Cap at 95% if there are any unmatched job skills
-                    # This prevents 100% scores when skills are actually missing
+                    # FIX: Only cap at 95% if CRITICAL skills are missing (education, domain expertise)
+                    # Allow up to 100% if only non-critical skills are missing
+                    # This prevents 100% scores when critical requirements are missing, but allows
+                    # perfect scores when only minor/nice-to-have skills are missing
                     if critical_skills_missing > 0:
                         base_score = min(95, base_score)
+                        print(f"   ⚠️  Capping at 95% due to {critical_skills_missing} critical missing skill(s)")
                     else:
                         base_score = min(100, base_score)
+                        if non_critical_unmatched > 0:
+                            print(f"   ✅ Allowing up to 100% despite {non_critical_unmatched} non-critical missing skill(s)")
             else:
                 # Not overqualified - apply standard penalties for missing skills
-                if critical_skills_missing > 0:
+                # Only apply penalties if there are unmatched skills (critical or non-critical)
+                if total_unmatched_skills > 0:
                     critical_penalty_skills = ['snowflake', 'bigquery', 'cloud', 'data engineering']
                     nice_to_have_skills = ['paid advertising', 'google ads', 'meta', 'advertising platforms', 'mentorship skills', 'problem-solving']
                     
@@ -314,9 +346,19 @@ class PreliminaryMatcher:
                                              if any(nice in skill.lower() for nice in nice_to_have_skills))
                     
                     # Standard penalties for non-overqualified candidates
-                penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
-                penalty = min(20, penalty)  # Cap penalty at 20%
-                base_score = max(0, base_score - penalty)
+                    penalty = (critical_missing * 3) + (nice_to_have_missing * 1)
+                    penalty = min(20, penalty)  # Cap penalty at 20%
+                    base_score = max(0, base_score - penalty)
+                
+                # FIX: Only cap at 95% if CRITICAL skills are missing (education, domain expertise)
+                # Allow up to 100% if only non-critical skills are missing
+                if critical_skills_missing > 0:
+                    base_score = min(95, base_score)
+                    print(f"   ⚠️  Capping at 95% due to {critical_skills_missing} critical missing skill(s)")
+                else:
+                    base_score = min(100, base_score)
+                    if non_critical_unmatched > 0:
+                        print(f"   ✅ Allowing up to 100% despite {non_critical_unmatched} non-critical missing skill(s)")
             
             matches['match_score'] = round(base_score, 2)
         else:
