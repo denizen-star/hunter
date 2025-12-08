@@ -4578,6 +4578,9 @@ Format this as a professional research document that demonstrates thorough prepa
                 return;
             }}
             
+            // Check if this is a rejection BEFORE making the API call
+            const isRejectedStatus = status.toLowerCase().trim() === 'rejected';
+            
             // Clear form immediately
             document.getElementById('statusUpdateForm').reset();
             if (quillEditor) {{
@@ -4609,6 +4612,18 @@ Format this as a professional research document that demonstrates thorough prepa
                 const result = await response.json();
                 
                 if (result.success) {{
+                    // Check if this was a rejection - redirect to dashboard instead of reloading
+                    // Check redirect field, result status, or original status
+                    const isRejected = isRejectedStatus || 
+                                      result.redirect === 'dashboard' || 
+                                      (result.status && result.status.toLowerCase().trim() === 'rejected');
+                    
+                    if (isRejected) {{
+                        // IMMEDIATELY redirect to dashboard - no delay, no reload, no other code execution
+                        window.location.replace('/dashboard');
+                        return; // Exit immediately - prevent any other code from running
+                    }}
+                    
                     // Show success state
                     btnText.textContent = 'Updated!';
                     showMessage(`✅ Status updated to ${{status}} successfully!`, 'success');

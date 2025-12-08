@@ -1575,6 +1575,43 @@
                 console.log('Message:', result.message);
                 
                 if (result.success) {
+                    // Navigate to dashboard FIRST if this was a rejection (before any other code runs)
+                    if (result.redirect === 'dashboard') {
+                        // Immediately prevent any other navigation
+                        event.preventDefault();
+                        
+                        // Use window.location.replace to prevent back button from going to error page
+                        // Check if we're on the main UI page or a summary page
+                        if (window.location.pathname.includes('/applications/')) {
+                            // We're on a summary page - do full redirect
+                            window.location.replace('/dashboard');
+                        } else {
+                            // We're on the main UI - use NavigationManager
+                            if (window.navManager) {
+                                window.navManager.navigateToPage('dashboard');
+                                
+                                // After navigation, ensure the "all" tab is active
+                                setTimeout(() => {
+                                    if (window.dashboardManager && window.dashboardManager.switchTab) {
+                                        window.dashboardManager.switchTab('all');
+                                    } else {
+                                        const allTab = document.querySelector('[data-status="all"]');
+                                        if (allTab) {
+                                            allTab.click();
+                                        }
+                                    }
+                                }, 300);
+                            } else {
+                                window.location.replace('/dashboard');
+                            }
+                        }
+                        
+                        // Show success message
+                        showStatus(` ${result.message}`, 'success');
+                        hideStatusUpdate();
+                        return; // Exit early to prevent any other code from running
+                    }
+                    
                     showStatus(` ${result.message}`, 'success');
                     hideStatusUpdate();
                     
@@ -1584,28 +1621,6 @@
                         quillEditor.setContents([]);
                     }
                     selectedApplicationId = null;
-                    
-                    // Debug logging
-                    console.log('Status update result:', result);
-                    
-                    // Redirect to dashboard if this was a rejection
-                    if (result.redirect) {
-                        console.log('=== REDIRECT ATTEMPT ===');
-                        console.log('Redirecting to:', result.redirect);
-                        console.log('Executing immediate redirect...');
-                        
-                        // Try multiple redirect methods
-                        try {
-                            console.log('Trying window.location.replace...');
-                            window.location.replace(result.redirect);
-                            console.log('window.location.replace executed');
-                        } catch (e) {
-                            console.log('Replace failed, trying assign:', e);
-                            window.location.assign(result.redirect);
-                        }
-                    } else {
-                        console.log('No redirect specified');
-                    }
                 } else {
                     showStatus(` Error: ${result.error}`, 'error');
                 }

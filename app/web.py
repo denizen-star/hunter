@@ -661,16 +661,9 @@ def update_status(app_id):
         
         # For rejected applications, include redirect information
         normalized_status = normalize_status_label(status)
-        print(f"DEBUG: Status received: '{status}' (normalized: '{normalized_status}')")
-        print(f"DEBUG: Checking if normalized status == 'rejected': {normalized_status == 'rejected'}")
         if normalized_status == 'rejected':
-            response_data['redirect'] = 'http://localhost:51003/dashboard'  # Use absolute URL
+            response_data['redirect'] = 'dashboard'  # Navigate to dashboard page
             response_data['message'] = f'Status updated to {status}. Application cleaned up and redirected to dashboard.'
-            print(f"DEBUG: Rejected application - adding redirect to dashboard")
-        else:
-            print(f"DEBUG: Not a rejected application, no redirect added")
-        
-        print(f"DEBUG: Response data: {response_data}")
         return jsonify(response_data)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1467,6 +1460,7 @@ def serve_application_file(filepath):
             file_path.parent,
             file_path.name
         )
+    # File not found - return 404
     return "File not found", 404
 
 
