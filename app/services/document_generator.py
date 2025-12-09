@@ -4055,8 +4055,8 @@ Format this as a professional research document that demonstrates thorough prepa
             <!-- Update Status Form -->
             <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
                 <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
-                    <div style="margin-bottom: 15px;">
-                        <select id="new_status" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                        <select id="new_status" required style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
                             <option value="">-- Select Status --</option>
                             <option value="Pending">⏳ Pending</option>
                             <option value="Applied">✉️ Applied</option>
@@ -4069,6 +4069,8 @@ Format this as a professional research document that demonstrates thorough prepa
                             <option value="Rejected">❌ Rejected</option>
                             <option value="Accepted">✅ Accepted</option>
                         </select>
+                        <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Copy</button>
+                        <button type="button" id="clearTemplateBtn" style="background: #e9ecef; color: #333; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
@@ -4084,8 +4086,6 @@ Format this as a professional research document that demonstrates thorough prepa
                             <select id="template_selector" style="flex: 1; padding: 10px; border: 1px solid #d0d7de; border-radius: 8px; font-size: 14px; background: #f8fafc;">
                                 <option value="">-- Select Template --</option>
                             </select>
-                            <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Copy</button>
-                            <button type="button" id="clearTemplateBtn" style="background: #e9ecef; color: #333; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                             <small style="color: #6c757d;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
