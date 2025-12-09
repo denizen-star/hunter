@@ -69,11 +69,69 @@ class DocumentGenerator:
         qual_filename = f"{job_title_clean}-Qualifications.md"
         qual_path = application.folder_path / qual_filename
         
+        # Save text file (for backward compatibility)
         write_text_file(qualifications.detailed_analysis, qual_path)
+        
+        # Save JSON file with full QualificationAnalysis data (including preliminary_analysis)
+        import json
+        qual_json_path = application.folder_path / f"{job_title_clean}-Qualifications.json"
+        with open(qual_json_path, 'w', encoding='utf-8') as f:
+            json.dump(qualifications.to_dict(), f, indent=2, ensure_ascii=False)
+        
         application.qualifications_path = qual_path
         application.match_score = qualifications.match_score
         
         return qualifications
+    
+    def _load_qualifications(self, application: Application) -> QualificationAnalysis:
+        """Load qualifications from JSON file if available, otherwise parse from text file"""
+        if not application.qualifications_path or not application.qualifications_path.exists():
+            # Return empty qualifications if file doesn't exist
+            return QualificationAnalysis(
+                match_score=0.0,
+                features_compared=0,
+                strong_matches=[],
+                missing_skills=[],
+                partial_matches=[],
+                soft_skills=[],
+                recommendations=[],
+                detailed_analysis="",
+                preliminary_analysis=None
+            )
+        
+        # Try to load from JSON file first (new format with preliminary_analysis)
+        import json
+        # Construct JSON path: replace .md extension with .json
+        qual_json_path = application.qualifications_path.parent / (application.qualifications_path.stem + '.json')
+        if qual_json_path.exists():
+            try:
+                with open(qual_json_path, 'r', encoding='utf-8') as f:
+                    qual_data = json.load(f)
+                    return QualificationAnalysis.from_dict(qual_data)
+            except Exception as e:
+                print(f"Warning: Could not load qualifications from JSON: {e}")
+        
+        # Fallback to text file parsing (old format)
+        qual_content = read_text_file(application.qualifications_path)
+        
+        # Extract match score from text
+        match_score = application.match_score if application.match_score else 0.0
+        score_match = re.search(r'Match Score:?\s*(\d+)', qual_content, re.IGNORECASE)
+        if score_match:
+            match_score = float(score_match.group(1))
+        
+        # Create QualificationAnalysis object without preliminary_analysis (old format)
+        return QualificationAnalysis(
+            match_score=match_score,
+            features_compared=0,
+            strong_matches=[],
+            missing_skills=[],
+            partial_matches=[],
+            soft_skills=[],
+            recommendations=[],
+            detailed_analysis=qual_content,
+            preliminary_analysis=None  # Old format doesn't have this
+        )
     
     def _load_research_content(self, application: Application) -> str:
         """Load research content from application if available"""
@@ -345,14 +403,23 @@ Format this as a professional research document that demonstrates thorough prepa
             
             # Load all documents
             job_desc_content = read_text_file(application.job_description_path)
-            qual_content = read_text_file(application.qualifications_path) if application.qualifications_path else ""
+            # Load qualifications (will use JSON if available, otherwise text)
+            loaded_qualifications = self._load_qualifications(application)
+            # Use provided qualifications if available (has preliminary_analysis), otherwise use loaded
+            if qualifications.preliminary_analysis:
+                # Use the provided qualifications (newly generated with preliminary_analysis)
+                final_qualifications = qualifications
+            else:
+                # Use loaded qualifications (may have preliminary_analysis from JSON)
+                final_qualifications = loaded_qualifications
+            qual_content = final_qualifications.detailed_analysis
             cover_letter_content = read_text_file(application.cover_letter_path) if application.cover_letter_path else ""
             resume_content = read_text_file(application.custom_resume_path) if application.custom_resume_path else ""
             
             # Generate summary
             summary_html = self._create_summary_html(
                 application,
-                qualifications,
+                final_qualifications,
                 job_details,
                 job_desc_content,
                 qual_content,
@@ -1222,13 +1289,14 @@ Format this as a professional research document that demonstrates thorough prepa
         # Group matches by job_skill to avoid duplicates
         job_skills_map = {}  # job_skill -> list of matches
         
-        # Process exact matches
+        # Process exact matches - SHOW ALL MATCHES, NO FILTERING
         for match in prelim.get('exact_matches', []):
-            job_skill = match.get('job_skill', match.get('skill', ''))
-            if not job_skill:
+            job_skill = match.get('job_skill', '')
+            matched_skill = match.get('skill', '')  # This is the candidate skill
+            
+            if not job_skill or not matched_skill:
                 continue
             
-            matched_skill = match.get('skill', '')
             category = match.get('category', 'Unknown')
             
             if job_skill not in job_skills_map:
@@ -1252,13 +1320,14 @@ Format this as a professional research document that demonstrates thorough prepa
             if category != 'Unknown' and job_skills_map[job_skill]['skill_category'] == 'Unknown':
                 job_skills_map[job_skill]['skill_category'] = category
         
-        # Process partial matches
+        # Process partial matches - SHOW ALL MATCHES, NO FILTERING
         for match in prelim.get('partial_matches', []):
-            job_skill = match.get('job_skill', match.get('skill', ''))
-            if not job_skill:
+            job_skill = match.get('job_skill', '')
+            matched_skill = match.get('skill', '')
+            
+            if not job_skill or not matched_skill:
                 continue
             
-            matched_skill = match.get('skill', '')
             category = match.get('category', 'Unknown')
             
             if job_skill not in job_skills_map:
@@ -3844,11 +3913,11 @@ Format this as a professional research document that demonstrates thorough prepa
         }}
         
         .percentage-progress-fill.green {{
-            background: #019999;
+            background: #3491B2;
         }}
         
         .percentage-progress-fill.orange {{
-            background: #019999;
+            background: #3491B2;
         }}
     </style>
 </head>
@@ -4150,7 +4219,7 @@ Format this as a professional research document that demonstrates thorough prepa
                             <div id="percentage-bar-container" style="position: relative; flex: 1; height: 32px; display: flex; align-items: center; gap: 10px;">
                                 <div class="percentage-progress-wrapper" style="position: relative; width: 100%; height: 32px; flex: 1;">
                                     <div class="percentage-progress-track" style="width: 100%; height: 100%; background: #f3f4f6; border-radius: 16px; position: relative; overflow: hidden;">
-                                        <div class="percentage-progress-fill" id="percentage-progress-bar" style="height: 100%; border-radius: 16px; position: relative; transition: width 0.5s ease; width: 75%; background: #019999;"></div>
+                                        <div class="percentage-progress-fill" id="percentage-progress-bar" style="height: 100%; border-radius: 16px; position: relative; transition: width 0.5s ease; width: 75%; background: #3491B2;"></div>
                                     </div>
                                 </div>
                                 <div class="percentage-text-display" id="percentage-text-display" style="font-size: 16px; font-weight: 600; color: #1f2937; min-width: 40px; text-align: right; flex-shrink: 0;">75%</div>
@@ -5150,19 +5219,53 @@ Format this as a professional research document that demonstrates thorough prepa
     
     def _generate_qualifications_summary_html(self, qualifications: QualificationAnalysis) -> str:
         """Generate Qualifications Summary HTML for two-column layout"""
+        # Use preliminary_analysis as single source of truth (same as Skills Matching Details table)
         strong_matches_html = ""
-        if qualifications.strong_matches and len(qualifications.strong_matches) > 0:
-            strong_matches_html = "<h3>Strong Matches</h3><ul>"
-            for match in qualifications.strong_matches[:5]:  # Limit to 5
-                strong_matches_html += f"<li>{match}</li>"
-            strong_matches_html += "</ul>"
-        
         partial_matches_html = ""
-        if hasattr(qualifications, 'partial_matches') and qualifications.partial_matches and len(qualifications.partial_matches) > 0:
-            partial_matches_html = "<h3>Partial Matches</h3><ul>"
-            for match in qualifications.partial_matches[:3]:  # Limit to 3
-                partial_matches_html += f"<li>{match}</li>"
-            partial_matches_html += "</ul>"
+        
+        if qualifications.preliminary_analysis:
+            # Extract from preliminary_analysis - NO FILTERING, show all matches
+            exact_matches = qualifications.preliminary_analysis.get('exact_matches', [])
+            partial_matches = qualifications.preliminary_analysis.get('partial_matches', [])
+            
+            # Get unique matched skills - show ALL, no filtering
+            strong_skills = set()
+            for match in exact_matches:
+                matched_skill = match.get('skill', '')
+                if matched_skill:
+                    strong_skills.add(matched_skill)
+            
+            if strong_skills:
+                strong_matches_html = "<h3>Strong Matches</h3><ul>"
+                for skill in sorted(list(strong_skills))[:5]:  # Limit to 5
+                    strong_matches_html += f"<li>{skill}</li>"
+                strong_matches_html += "</ul>"
+            
+            # Get unique partial match skills - show ALL, no filtering
+            partial_skills = set()
+            for match in partial_matches:
+                matched_skill = match.get('skill', '')
+                if matched_skill:
+                    partial_skills.add(matched_skill)
+            
+            if partial_skills:
+                partial_matches_html = "<h3>Partial Matches</h3><ul>"
+                for skill in sorted(list(partial_skills))[:3]:  # Limit to 3
+                    partial_matches_html += f"<li>{skill}</li>"
+                partial_matches_html += "</ul>"
+        else:
+            # Fallback to old lists if preliminary_analysis not available
+            if qualifications.strong_matches and len(qualifications.strong_matches) > 0:
+                strong_matches_html = "<h3>Strong Matches</h3><ul>"
+                for match in qualifications.strong_matches[:5]:
+                    strong_matches_html += f"<li>{match}</li>"
+                strong_matches_html += "</ul>"
+            
+            if hasattr(qualifications, 'partial_matches') and qualifications.partial_matches and len(qualifications.partial_matches) > 0:
+                partial_matches_html = "<h3>Partial Matches</h3><ul>"
+                for match in qualifications.partial_matches[:3]:
+                    partial_matches_html += f"<li>{match}</li>"
+                partial_matches_html += "</ul>"
         
         missing_skills_html = ""
         if qualifications.missing_skills and len(qualifications.missing_skills) > 0:
