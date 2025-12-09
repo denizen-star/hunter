@@ -3807,6 +3807,49 @@ Format this as a professional research document that demonstrates thorough prepa
         .ql-toolbar.ql-snow button.ql-active {{
             background-color: var(--bg-active);
         }}
+        
+        /* Percentage Widget Styles */
+        .percentage-widget-container {{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        
+        .percentage-input-group {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        
+        .percentage-input-group label {{
+            font-weight: 500;
+            color: #4b5563;
+            font-size: 13px;
+        }}
+        
+        #percentage-input {{
+            width: 60px;
+            padding: 6px 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: border-color 0.3s;
+        }}
+        
+        #percentage-input:focus {{
+            outline: none;
+            border-color: #3b82f6;
+        }}
+        
+        .percentage-progress-fill.green {{
+            background: #019999;
+        }}
+        
+        .percentage-progress-fill.orange {{
+            background: #019999;
+        }}
     </style>
 </head>
 <body>
@@ -4093,9 +4136,27 @@ Format this as a professional research document that demonstrates thorough prepa
                         </div>
                     </div>
                     
-                    <button type="submit" id="updateStatusBtn" style="background: #d97706; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                        <span id="btnText">Update</span>
-                    </button>
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" id="updateStatusBtn" style="background: #d97706; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                            <span id="btnText">Update</span>
+                        </button>
+                        
+                        <!-- Percentage Bar Widget -->
+                        <div class="percentage-widget-container" id="percentage-widget-container" style="display: none; align-items: center; gap: 10px; width: 500px; background: white; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <div class="percentage-input-group" style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                                <label for="percentage-input" style="font-weight: 500; color: #4b5563; font-size: 13px;">%:</label>
+                                <input type="number" id="percentage-input" min="0" max="100" value="75" step="1" style="width: 60px; padding: 6px 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center; transition: border-color 0.3s;">
+                            </div>
+                            <div id="percentage-bar-container" style="position: relative; flex: 1; height: 32px; display: flex; align-items: center; gap: 10px;">
+                                <div class="percentage-progress-wrapper" style="position: relative; width: 100%; height: 32px; flex: 1;">
+                                    <div class="percentage-progress-track" style="width: 100%; height: 100%; background: #f3f4f6; border-radius: 16px; position: relative; overflow: hidden;">
+                                        <div class="percentage-progress-fill" id="percentage-progress-bar" style="height: 100%; border-radius: 16px; position: relative; transition: width 0.5s ease; width: 75%; background: #019999;"></div>
+                                    </div>
+                                </div>
+                                <div class="percentage-text-display" id="percentage-text-display" style="font-size: 16px; font-weight: 600; color: #1f2937; min-width: 40px; text-align: right; flex-shrink: 0;">75%</div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 
                 <div id="status-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
@@ -4289,6 +4350,12 @@ Format this as a professional research document that demonstrates thorough prepa
                         }}
                         const sel = document.getElementById('template_selector');
                         if (sel) {{ sel.value = ''; }}
+                        
+                        // Hide percentage widget when template is cleared
+                        const widgetContainer = document.getElementById('percentage-widget-container');
+                        if (widgetContainer) {{
+                            widgetContainer.style.display = 'none';
+                        }}
                     }});
                 }}
             }} else {{
@@ -4432,6 +4499,25 @@ Format this as a professional research document that demonstrates thorough prepa
         
         function onTemplateSelected(event) {{
             const value = event.target.value;
+            
+            // Show/hide percentage widget based on template selection
+            const widgetContainer = document.getElementById('percentage-widget-container');
+            if (widgetContainer) {{
+                if (!value) {{
+                    // No template selected, hide widget
+                    widgetContainer.style.display = 'none';
+                }} else {{
+                    const match = templatesCache.find(t => (t.id && t.id === value) || (((t.title || '') + '|' + (t.delivery_method || '')) === value));
+                    if (match && (match.delivery_method === 'Cover Letter' || match.id === 'cover-letter')) {{
+                        // Cover letter template selected, show widget
+                        widgetContainer.style.display = 'flex';
+                    }} else {{
+                        // Other template selected, hide widget
+                        widgetContainer.style.display = 'none';
+                    }}
+                }}
+            }}
+            
             if (!value) return;
             const match = templatesCache.find(t => (t.id && t.id === value) || (((t.title || '') + '|' + (t.delivery_method || '')) === value));
             if (!match) return;
@@ -4633,6 +4719,11 @@ Format this as a professional research document that demonstrates thorough prepa
             // Check if this is a rejection BEFORE making the API call
             const isRejectedStatus = status.toLowerCase().trim() === 'rejected';
             
+            // If rejecting, set a flag to prevent any reload attempts
+            if (isRejectedStatus) {{
+                window.__preventReload = true;
+            }}
+            
             // Clear form immediately
             document.getElementById('statusUpdateForm').reset();
             if (quillEditor) {{
@@ -4671,7 +4762,11 @@ Format this as a professional research document that demonstrates thorough prepa
                                       (result.status && result.status.toLowerCase().trim() === 'rejected');
                     
                     if (isRejected) {{
+                        // Set flag to prevent any reload
+                        window.__preventReload = true;
+                        
                         // IMMEDIATELY redirect to dashboard - no delay, no reload, no other code execution
+                        // Use replace to prevent back button from going to deleted page
                         window.location.replace('/dashboard');
                         return; // Exit immediately - prevent any other code from running
                     }}
@@ -4681,9 +4776,12 @@ Format this as a professional research document that demonstrates thorough prepa
                     showMessage(`✅ Status updated to ${{status}} successfully!`, 'success');
                     
                     // Reload the page to show updated status and timeline
-                    setTimeout(() => {{
-                        window.location.reload();
-                    }}, 2000);
+                    // Only reload if we're not preventing it
+                    if (!window.__preventReload) {{
+                        setTimeout(() => {{
+                            window.location.reload();
+                        }}, 2000);
+                    }}
                 }} else {{
                     // Reset button state on error
                     resetButtonState();
@@ -4943,6 +5041,31 @@ Format this as a professional research document that demonstrates thorough prepa
             // Initialize checklist pill display
             if (typeof updateChecklistPill === 'function') {{
                 updateChecklistPill();
+            }}
+            
+            // Initialize percentage bar widget
+            const percentageInput = document.getElementById('percentage-input');
+            const progressBar = document.getElementById('percentage-progress-bar');
+            const percentageText = document.getElementById('percentage-text-display');
+            
+            if (percentageInput && progressBar && percentageText) {{
+                function updatePercentageBar() {{
+                    const percentage = parseInt(percentageInput.value) || 0;
+                    const clampedPercentage = Math.max(0, Math.min(100, percentage));
+                    
+                    progressBar.style.width = clampedPercentage + '%';
+                    percentageText.textContent = clampedPercentage + '%';
+                    
+                    // Update color based on percentage
+                    if (clampedPercentage > 70) {{
+                        progressBar.className = 'percentage-progress-fill green';
+                    }} else {{
+                        progressBar.className = 'percentage-progress-fill orange';
+                    }}
+                }}
+                
+                percentageInput.addEventListener('input', updatePercentageBar);
+                updatePercentageBar();
             }}
         }});
     </script>
