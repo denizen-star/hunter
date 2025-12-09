@@ -1408,14 +1408,51 @@
                     templatesCache = data.templates;
                     const selector = document.getElementById('template_selector');
                     if (selector) {
+                        // Define delivery method order
+                        const deliveryMethodOrder = [
+                            'Cover Letter',
+                            'LinkedIn Connection',
+                            'Email',
+                            'Other',
+                            'Intro',
+                            'LinkedIn Inmail',
+                            'LinkedIn Message',
+                            'Text',
+                            'Phone'
+                        ];
+                        
+                        // Sort templates by delivery method order, then by title
+                        templatesCache.sort((a, b) => {
+                            const aMethod = a.delivery_method || '';
+                            const bMethod = b.delivery_method || '';
+                            const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                            const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                            
+                            // If both have delivery methods, sort by order
+                            if (aIndex !== -1 && bIndex !== -1) {
+                                if (aIndex !== bIndex) {
+                                    return aIndex - bIndex;
+                                }
+                            } else if (aIndex !== -1) {
+                                return -1; // a comes first
+                            } else if (bIndex !== -1) {
+                                return 1; // b comes first
+                            }
+                            
+                            // Within same delivery method, sort by title
+                            return (a.title || '').localeCompare(b.title || '');
+                        });
+                        
                         // Clear existing options except the first one
                         selector.innerHTML = '<option value="">-- Select Template --</option>';
                         
-                        // Add template options
-                        data.templates.forEach(template => {
+                        // Add template options with delivery method first
+                        templatesCache.forEach(template => {
                             const option = document.createElement('option');
                             option.value = template.id;
-                            option.textContent = `${template.title} (${template.delivery_method})`;
+                            const method = template.delivery_method || '';
+                            const title = template.title || 'Template';
+                            option.textContent = method ? `${method} - ${title}` : title;
                             selector.appendChild(option);
                         });
                     }

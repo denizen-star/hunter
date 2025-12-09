@@ -4307,22 +4307,74 @@ Format this as a professional research document that demonstrates thorough prepa
                 templatesCache = data.templates || [];
                 const selector = document.getElementById('template_selector');
                 if (!selector) return;
-                // Sort by title for UX
-                templatesCache.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                
+                // Define delivery method order
+                const deliveryMethodOrder = [
+                    'Cover Letter',
+                    'LinkedIn Connection',
+                    'Email',
+                    'Other',
+                    'Intro',
+                    'LinkedIn Inmail',
+                    'LinkedIn Message',
+                    'Text',
+                    'Phone'
+                ];
+                
+                // Sort templates by delivery method order, then by title
+                templatesCache.sort((a, b) => {{
+                    const aMethod = a.delivery_method || '';
+                    const bMethod = b.delivery_method || '';
+                    const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                    const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                    
+                    // If both have delivery methods, sort by order
+                    if (aIndex !== -1 && bIndex !== -1) {{
+                        if (aIndex !== bIndex) {{
+                            return aIndex - bIndex;
+                        }}
+                    }} else if (aIndex !== -1) {{
+                        return -1; // a comes first
+                    }} else if (bIndex !== -1) {{
+                        return 1; // b comes first
+                    }}
+                    
+                    // Within same delivery method, sort by title
+                    return (a.title || '').localeCompare(b.title || '');
+                }});
                 
                 // Augment with intro message boxes from this page
                 const introTemplates = collectIntroTemplates();
                 for (const t of introTemplates) {{
                     templatesCache.push(t);
                 }}
-                // Re-sort after augmentation
-                templatesCache.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-                // Populate options (include Delivery Method in label when available)
+                
+                // Re-sort after augmentation (same logic)
+                templatesCache.sort((a, b) => {{
+                    const aMethod = a.delivery_method || '';
+                    const bMethod = b.delivery_method || '';
+                    const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                    const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                    
+                    if (aIndex !== -1 && bIndex !== -1) {{
+                        if (aIndex !== bIndex) {{
+                            return aIndex - bIndex;
+                        }}
+                    }} else if (aIndex !== -1) {{
+                        return -1;
+                    }} else if (bIndex !== -1) {{
+                        return 1;
+                    }}
+                    
+                    return (a.title || '').localeCompare(b.title || '');
+                }});
+                
+                // Populate options with delivery method first
                 selector.innerHTML = '<option value="">-- Select Template --</option>';
                 for (const t of templatesCache) {{
                     const baseTitle = t.title || 'Template';
-                    const method = t.delivery_method ? (' - ' + t.delivery_method) : '';
-                    const label = baseTitle + method;
+                    const method = t.delivery_method || '';
+                    const label = method ? (method + ' - ' + baseTitle) : baseTitle;
                     const opt = document.createElement('option');
                     opt.value = t.id || ((t.title || '') + '|' + (t.delivery_method || ''));
                     opt.textContent = label;
