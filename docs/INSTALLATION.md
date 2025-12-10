@@ -2,6 +2,8 @@
 
 Complete guide to installing and setting up Job Hunter.
 
+> **Windows Users**: For a detailed, Windows-specific installation guide with screenshots and troubleshooting, see **[INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)**
+
 ## Prerequisites
 
 Before you begin, ensure you have:
@@ -34,9 +36,13 @@ curl https://ollama.ai/install.sh | sh
 
 ### Windows
 
-1. Download installer from https://ollama.ai/download
-2. Run the installer
+**For detailed Windows installation instructions, see [INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)**
+
+Quick steps:
+1. Download installer from https://ollama.com/download/windows
+2. Run the installer (`OllamaSetup.exe`)
 3. Follow installation prompts
+4. Ollama will start automatically
 
 ### Verify Installation
 

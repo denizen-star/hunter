@@ -23,7 +23,9 @@ curl https://ollama.ai/install.sh | sh
 ```
 
 ### Windows
-Download from https://ollama.ai/download and run installer
+Download from https://ollama.com/download/windows and run installer
+
+**Need detailed Windows instructions?** See [INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)
 
 ## Step 2: Download AI Model (3 minutes)
 

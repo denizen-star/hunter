@@ -21,6 +21,8 @@ An intelligent job application management system that uses local AI (Ollama) to 
 
 ## 🚀 Quick Start
 
+### macOS/Linux
+
 ```bash
 # 1. Install Ollama
 brew install ollama
@@ -33,6 +35,18 @@ pip install -r requirements.txt
 # 3. Start the app
 python -m app.web
 ```
+
+### Windows
+
+**See [Windows Installation Guide](docs/INSTALLATION_WINDOWS.md)** for detailed step-by-step instructions.
+
+Quick Windows steps:
+1. Install Git, Python 3.11+, and Ollama
+2. Clone repository: `git clone [repository-url]`
+3. Create virtual environment: `python -m venv venv`
+4. Activate: `venv\Scripts\activate`
+5. Install dependencies: `pip install -r requirements.txt`
+6. Run: `python -m app.web`
 
 Open **http://localhost:51003** in your browser.
 

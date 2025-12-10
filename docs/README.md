@@ -4,11 +4,17 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 
 ## 🗂️ Documentation Structure
 
+### 💻 **Windows Users** 
+- **[WINDOWS_RESOURCES_INDEX.md](WINDOWS_RESOURCES_INDEX.md)** - Complete guide to all Windows documentation
+
 ### 📖 **Getting Started**
 - **[README.md](README.md)** - Main project overview and quick start guide
 - **[WHAT_IS_HUNTER.md](WHAT_IS_HUNTER.md)** - Friendly explanation of what Hunter does and why it's useful
 - **[QUICKSTART.md](QUICKSTART.md)** - Get up and running in 5 minutes
 - **[INSTALLATION.md](INSTALLATION.md)** - Detailed installation instructions
+- **[INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)** - Windows-specific installation guide
+- **[WINDOWS_QUICK_REFERENCE.md](WINDOWS_QUICK_REFERENCE.md)** - Quick reference card for Windows users
+- **[WINDOWS_INSTALLATION_CHECKLIST.md](WINDOWS_INSTALLATION_CHECKLIST.md)** - Printable installation checklist
 
 ### 👤 **User Guides**
 - **[USER_GUIDE.md](USER_GUIDE.md)** - Complete guide to using Job Hunter
@@ -25,6 +31,7 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 
 ### 🐛 **Support & Troubleshooting**
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[WINDOWS_TROUBLESHOOTING_FLOWCHART.md](WINDOWS_TROUBLESHOOTING_FLOWCHART.md)** - Windows troubleshooting decision tree
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
 - **[RELEASE_NOTES_v2.0.0.md](RELEASE_NOTES_v2.0.0.md)** - Latest release notes
 
@@ -42,9 +49,11 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 3. Use **[USER_GUIDE.md](USER_GUIDE.md)** for detailed usage instructions
 
 ### **For Installation Issues** 🔧
-1. Check **[INSTALLATION.md](INSTALLATION.md)** for detailed setup
-2. Review **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** for common problems
-3. Ensure Ollama is properly installed and running
+1. **Windows Users**: Follow **[INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)** for step-by-step Windows setup
+2. Check **[INSTALLATION.md](INSTALLATION.md)** for detailed setup (macOS/Linux)
+3. Review **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** for common problems
+4. Use **[WINDOWS_QUICK_REFERENCE.md](WINDOWS_QUICK_REFERENCE.md)** for daily commands (Windows)
+5. Ensure Ollama is properly installed and running
 
 ### **For Developers** 👨‍💻
 1. Read **[TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md)** for architecture
