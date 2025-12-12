@@ -44,6 +44,8 @@ data/resumes/*.yaml
 !data/resumes/.gitkeep
 data/applications/*/
 !data/applications/.gitkeep
+data/networking/*/
+!data/networking/.gitkeep
 data/output/*.html
 !data/output/.gitkeep
 
