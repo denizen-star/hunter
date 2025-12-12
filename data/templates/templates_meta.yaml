@@ -83,3 +83,15 @@ templates:
   delivery_method: LinkedIn Message
   id: '20251201142618'
   title: Thank Recruiter for Moving you Forward in the Process
+- content_file: 20251209105940.html
+  created_at: '2025-12-09T10:59:40.367416-05:00'
+  created_at_display: Dec 09, 2025 10:59 AM EST
+  delivery_method: Email
+  id: '20251209105940'
+  title: Finance Cold Email
+- content_file: 20251211130705.html
+  created_at: '2025-12-11T13:07:05.234130-05:00'
+  created_at_display: Dec 11, 2025 01:07 PM EST
+  delivery_method: LinkedIn Connection
+  id: '20251211130705'
+  title: Practical 250

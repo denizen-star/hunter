@@ -520,6 +520,68 @@
             margin: 10px 0;
         }
         
+        /* Delivery Method Groups */
+        .delivery-method-group {
+            margin-bottom: var(--space-md);
+        }
+        
+        .delivery-method-header {
+            padding: 8px 0;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .delivery-method-header:hover {
+            opacity: 0.7;
+        }
+        
+        .delivery-method-header::before {
+            content: '▼';
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-right: 12px;
+            transition: transform 0.2s ease;
+        }
+        
+        .delivery-method-header.collapsed::before {
+            transform: rotate(-90deg);
+        }
+        
+        .delivery-method-name {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-primary);
+        }
+        
+        .template-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .delivery-method-content {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+            max-height: 10000px;
+            opacity: 1;
+        }
+        
+        .delivery-method-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+        
+        .delivery-method-content .template-item {
+            margin-left: 0;
+        }
+        
         .hidden {
             display: none !important;
         }
@@ -685,30 +747,108 @@
                 return;
             }
             
-            container.innerHTML = templates.map(template => `
-                <div class="template-item">
-                    <div class="template-header collapsed" onclick="toggleTemplateItem(this)">
-                        <div class="template-header-info">
-                            <div class="template-title">${escapeHtml(template.title)}</div>
-                            <div class="template-meta">
-                                ${template.created_at_display || 'Date not available'}
-                                <span class="template-delivery-method">${escapeHtml(template.delivery_method)}</span>
+            // Group templates by delivery method
+            const groupedTemplates = {};
+            templates.forEach(template => {
+                const method = template.delivery_method || 'Other';
+                if (!groupedTemplates[method]) {
+                    groupedTemplates[method] = [];
+                }
+                groupedTemplates[method].push(template);
+            });
+            
+            // Sort templates within each group alphabetically by title
+            Object.keys(groupedTemplates).forEach(method => {
+                groupedTemplates[method].sort((a, b) => {
+                    const titleA = (a.title || '').toLowerCase();
+                    const titleB = (b.title || '').toLowerCase();
+                    return titleA.localeCompare(titleB);
+                });
+            });
+            
+            // Define delivery method order
+            const deliveryMethodOrder = [
+                'LinkedIn Connection',
+                'Email',
+                'Other',
+                'LinkedIn Inmail',
+                'LinkedIn Message',
+                'Text',
+                'Phone'
+            ];
+            
+            // Get sorted delivery methods
+            const sortedMethods = [];
+            deliveryMethodOrder.forEach(method => {
+                if (groupedTemplates[method]) {
+                    sortedMethods.push(method);
+                }
+            });
+            
+            // Add any unlisted methods alphabetically at the end
+            Object.keys(groupedTemplates).forEach(method => {
+                if (!deliveryMethodOrder.includes(method)) {
+                    sortedMethods.push(method);
+                }
+            });
+            sortedMethods.sort((a, b) => {
+                const aIndex = deliveryMethodOrder.indexOf(a);
+                const bIndex = deliveryMethodOrder.indexOf(b);
+                if (aIndex === -1 && bIndex === -1) {
+                    return a.localeCompare(b);
+                }
+                return 0;
+            });
+            
+            // Build HTML with grouped templates
+            let html = '';
+            sortedMethods.forEach(method => {
+                const methodTemplates = groupedTemplates[method];
+                const templateCount = methodTemplates.length;
+                
+                html += `
+                    <div class="delivery-method-group">
+                        <div class="delivery-method-header collapsed" onclick="toggleDeliveryMethodGroup(this)">
+                            <span class="delivery-method-name">${escapeHtml(method)}</span>
+                            <span class="template-count">(${templateCount} template${templateCount !== 1 ? 's' : ''})</span>
+                        </div>
+                        <div class="delivery-method-content collapsed">
+                `;
+                
+                methodTemplates.forEach(template => {
+                    html += `
+                        <div class="template-item">
+                            <div class="template-header collapsed" onclick="toggleTemplateItem(this)">
+                                <div class="template-header-info">
+                                    <div class="template-title">${escapeHtml(template.title)}</div>
+                                    <div class="template-meta">
+                                        ${template.created_at_display || 'Date not available'}
+                                        <span class="template-delivery-method">${escapeHtml(template.delivery_method)}</span>
+                                    </div>
+                                </div>
+                                <div class="template-actions" onclick="event.stopPropagation();">
+                                    <button class="btn btn-primary btn-sm" onclick="copyTemplate('${template.id}')">
+                                        📋 Copy
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm" onclick="deleteTemplate('${template.id}')">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="template-content collapsed">
+                                ${template.content || ''}
                             </div>
                         </div>
-                        <div class="template-actions" onclick="event.stopPropagation();">
-                            <button class="btn btn-primary btn-sm" onclick="copyTemplate('${template.id}')">
-                                📋 Copy
-                            </button>
-                            <button class="btn btn-secondary btn-sm" onclick="deleteTemplate('${template.id}')">
-                                🗑️ Delete
-                            </button>
+                    `;
+                });
+                
+                html += `
                         </div>
                     </div>
-                    <div class="template-content collapsed">
-                        ${template.content || ''}
-                    </div>
-                </div>
-            `).join('');
+                `;
+            });
+            
+            container.innerHTML = html;
         }
         
         async function submitTemplate(event) {
@@ -867,6 +1007,18 @@
         function toggleTemplateItem(headerElement) {
             const templateItem = headerElement.parentElement;
             const content = templateItem.querySelector('.template-content');
+            
+            // Toggle collapsed class on header
+            headerElement.classList.toggle('collapsed');
+            
+            // Toggle collapsed class on content
+            content.classList.toggle('collapsed');
+        }
+        
+        // Toggle delivery method group collapse/expand
+        function toggleDeliveryMethodGroup(headerElement) {
+            const group = headerElement.parentElement;
+            const content = group.querySelector('.delivery-method-content');
             
             // Toggle collapsed class on header
             headerElement.classList.toggle('collapsed');

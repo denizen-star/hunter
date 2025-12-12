@@ -203,6 +203,19 @@ class AIAnalyzer:
                     if rec:
                         recommendations.append(rec)
         
+        # Try to generate preliminary_analysis even when using original method
+        # This ensures the new table format is always available
+        preliminary_analysis = None
+        try:
+            # Try to use preliminary matcher directly if available
+            if ENHANCED_ANALYZER_AVAILABLE:
+                from app.services.preliminary_matcher import PreliminaryMatcher
+                matcher = PreliminaryMatcher()
+                preliminary_analysis = matcher.generate_preliminary_analysis(job_description)
+        except Exception as e:
+            print(f"Warning: Could not generate preliminary_analysis: {e}")
+            preliminary_analysis = None
+        
         return QualificationAnalysis(
             match_score=match_score,
             features_compared=features_compared,
@@ -211,7 +224,8 @@ class AIAnalyzer:
             partial_matches=[],
             soft_skills=soft_skills,
             recommendations=recommendations[:5] if recommendations else [],
-            detailed_analysis=response
+            detailed_analysis=response,
+            preliminary_analysis=preliminary_analysis
         )
     def generate_cover_letter(
         self, 

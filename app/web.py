@@ -610,34 +610,11 @@ def update_status(app_id):
         
         # Regenerate summary page to include new update in timeline
         try:
-            # Load qualifications to regenerate summary
-            if application.qualifications_path and Path(application.qualifications_path).exists():
-                from app.utils.file_utils import read_text_file
-                qual_content = read_text_file(application.qualifications_path)
-                
-                # Extract match score from qualifications
-                import re
-                match_score = 0.0
-                score_match = re.search(r'Match Score:?\s*(\d+)', qual_content, re.IGNORECASE)
-                if score_match:
-                    match_score = float(score_match.group(1))
-                
-                # Create QualificationAnalysis object
-                from app.models.qualification import QualificationAnalysis
-                qualifications = QualificationAnalysis(
-                    match_score=match_score,
-                    features_compared=24,  # Default value
-                    strong_matches=[],
-                    missing_skills=[],
-                    partial_matches=[],
-                    soft_skills=[],
-                    recommendations=[],
-                    detailed_analysis=qual_content
-                )
-                
+            # Load qualifications to regenerate summary (uses JSON if available)
+            qualifications = doc_generator._load_qualifications(application)
+            if qualifications.match_score > 0:
                 # Update application metadata with qualifications info
-                application.match_score = match_score
-                application.qualifications_path = str(application.folder_path / "Headofdata-Qualifications.md")
+                application.match_score = qualifications.match_score
                 
                 # Regenerate summary page
                 doc_generator.generate_summary_page(application, qualifications)
@@ -779,30 +756,9 @@ def update_checklist(app_id):
         
         # Regenerate summary page to reflect checklist changes
         try:
-            if application.qualifications_path and Path(application.qualifications_path).exists():
-                from app.utils.file_utils import read_text_file
-                qual_content = read_text_file(application.qualifications_path)
-                
-                # Extract match score from qualifications
-                import re
-                match_score = 0.0
-                score_match = re.search(r'Match Score:?\s*(\d+)', qual_content, re.IGNORECASE)
-                if score_match:
-                    match_score = float(score_match.group(1))
-                
-                # Create QualificationAnalysis object
-                from app.models.qualification import QualificationAnalysis
-                qualifications = QualificationAnalysis(
-                    match_score=match_score,
-                    features_compared=24,
-                    strong_matches=[],
-                    missing_skills=[],
-                    partial_matches=[],
-                    soft_skills=[],
-                    recommendations=[],
-                    detailed_analysis=qual_content
-                )
-                
+            # Load qualifications (uses JSON if available)
+            qualifications = doc_generator._load_qualifications(application)
+            if qualifications.match_score > 0 or qualifications.detailed_analysis:
                 # Regenerate summary page with updated checklist
                 doc_generator.generate_summary_page(application, qualifications)
         except Exception as e:
@@ -911,21 +867,8 @@ def generate_resume(app_id):
         
         # Load base resume and qualifications content
         resume = resume_manager.load_base_resume()
-        from app.utils.file_utils import read_text_file
-        qual_content = read_text_file(application.qualifications_path)
-        
-        # Build a minimal QualificationAnalysis instance from stored data
-        from app.models.qualification import QualificationAnalysis
-        qualifications = QualificationAnalysis(
-            match_score=application.match_score or 0.0,
-            features_compared=0,
-            strong_matches=[],
-            missing_skills=[],
-            partial_matches=[],
-            soft_skills=[],
-            recommendations=[],
-            detailed_analysis=qual_content
-        )
+        # Load qualifications (uses JSON if available, includes preliminary_analysis)
+        qualifications = doc_generator._load_qualifications(application)
         
         # Generate resume
         doc_generator.generate_custom_resume(application, qualifications, resume.content)
@@ -960,21 +903,8 @@ def generate_intros(app_id):
         
         # Load resume and qualifications
         resume = resume_manager.load_base_resume()
-        from app.utils.file_utils import read_text_file
-        qual_content = read_text_file(application.qualifications_path)
-        
-        # Build a minimal QualificationAnalysis instance from stored data
-        from app.models.qualification import QualificationAnalysis
-        qualifications = QualificationAnalysis(
-            match_score=application.match_score or 0.0,
-            features_compared=0,
-            strong_matches=[],
-            missing_skills=[],
-            partial_matches=[],
-            soft_skills=[],
-            recommendations=[],
-            detailed_analysis=qual_content
-        )
+        # Load qualifications (uses JSON if available, includes preliminary_analysis)
+        qualifications = doc_generator._load_qualifications(application)
         
         # Generate intro messages (both types always generated together for efficiency)
         doc_generator.generate_intro_messages(application, qualifications, resume.full_name)
@@ -1144,6 +1074,86 @@ def get_reports_data():
             status_changes_count += 1  # Include all status changes
             status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
         
+        # Calculate daily and cumulative activities by status
+        # Count ALL activities: initial application creation + all update files
+        from collections import defaultdict
+        daily_counts = defaultdict(lambda: defaultdict(int))
+        
+        # Iterate through all applications and count activities
+        for app in applications:
+            # Get all update files for this application
+            updates = job_processor.get_application_updates(app)
+            
+            # If no updates exist, count the application creation with current status
+            # (This handles apps that were created and never updated)
+            if not updates:
+                app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+                if start_date <= app_created_at <= end_date:
+                    date = app_created_at.date()
+                    status = normalize_status_label(app.status)
+                    daily_counts[date][status] += 1
+            
+            # Count all update files
+            for update in updates:
+                try:
+                    # Parse timestamp from update
+                    from datetime import datetime as dt
+                    update_dt = dt.strptime(update['timestamp'], '%Y%m%d%H%M%S')
+                    update_dt = update_dt.replace(tzinfo=timezone(timedelta(hours=-4)))
+                    
+                    # Check if update is in the selected period
+                    if start_date <= update_dt <= end_date:
+                        date = update_dt.date()
+                        status = normalize_status_label(update['status'])
+                        daily_counts[date][status] += 1
+                except:
+                    continue
+        
+        # Get all dates in the period range (only where there's actual data)
+        all_dates = []
+        if daily_counts:
+            # Find the earliest date with actual data
+            actual_start_date = min(daily_counts.keys())
+            # Use the later of actual_start_date or period start_date
+            effective_start_date = max(actual_start_date, start_date.date())
+            
+            current_date = effective_start_date
+            end_date_only = end_date.date()
+            while current_date <= end_date_only:
+                all_dates.append(current_date)
+                current_date += timedelta(days=1)
+        else:
+            # If no data, just use an empty list
+            all_dates = []
+        
+        # Get all statuses that appear in the data
+        all_statuses = set()
+        for date in daily_counts:
+            all_statuses.update(daily_counts[date].keys())
+        
+        # Format daily activities for frontend: {status: [{date: "YYYY-MM-DD", count: N}, ...]}
+        daily_activities_by_status = {}
+        for status in all_statuses:
+            daily_activities_by_status[status] = []
+            for date in all_dates:
+                count = daily_counts[date].get(status, 0)
+                daily_activities_by_status[status].append({
+                    'date': str(date),
+                    'count': count
+                })
+        
+        # Calculate cumulative activities
+        cumulative_activities_by_status = {}
+        for status in all_statuses:
+            cumulative_activities_by_status[status] = []
+            cumulative_count = 0
+            for date in all_dates:
+                cumulative_count += daily_counts[date].get(status, 0)
+                cumulative_activities_by_status[status].append({
+                    'date': str(date),
+                    'count': cumulative_count
+                })
+        
         # Follow-up applications (more than one week without updates)
         one_week_ago = now - timedelta(days=7)
         followup_applications = []
@@ -1239,9 +1249,147 @@ def get_reports_data():
             'summary': summary,
             'applications_by_status': applications_by_status,
             'status_changes': status_changes_by_status,
+            'daily_activities_by_status': daily_activities_by_status,
+            'cumulative_activities_by_status': cumulative_activities_by_status,
             'followup_applications': followup_applications,
             'flagged_applications': flagged_applications
         })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/reports/export-csv', methods=['GET'])
+def export_reports_csv():
+    """Export daily and cumulative activities to CSV"""
+    try:
+        from datetime import datetime, timedelta, timezone
+        from flask import Response
+        import io
+        import csv
+        
+        period = request.args.get('period', 'all')
+        applications = job_processor.list_all_applications()
+        
+        # Calculate date ranges based on period
+        now = datetime.now(timezone(timedelta(hours=-4)))
+        
+        if period == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        elif period == 'yesterday':
+            yesterday = now - timedelta(days=1)
+            start_date = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = yesterday.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif period == '7days':
+            start_date = now - timedelta(days=7)
+            end_date = now
+        elif period == '30days':
+            start_date = now - timedelta(days=30)
+            end_date = now
+        elif period == 'all':
+            start_date = datetime(2020, 1, 1, tzinfo=timezone(timedelta(hours=-4)))
+            end_date = now
+        else:
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        
+        # Filter applications by period
+        status_changes = []
+        for app in applications:
+            app_status_updated_at = app.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if app.status_updated_at else None
+            if app_status_updated_at and start_date <= app_status_updated_at <= end_date:
+                status_changes.append(app)
+        
+        # Calculate daily activities - count ALL activities (creation + updates)
+        from collections import defaultdict
+        daily_counts = defaultdict(lambda: defaultdict(int))
+        
+        # Iterate through all applications and count activities
+        for app in applications:
+            # Get all update files
+            updates = job_processor.get_application_updates(app)
+            
+            # If no updates exist, count the application creation with current status
+            if not updates:
+                app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+                if start_date <= app_created_at <= end_date:
+                    date = app_created_at.date()
+                    status = normalize_status_label(app.status)
+                    daily_counts[date][status] += 1
+            
+            # Count all update files
+            for update in updates:
+                try:
+                    from datetime import datetime as dt
+                    update_dt = dt.strptime(update['timestamp'], '%Y%m%d%H%M%S')
+                    update_dt = update_dt.replace(tzinfo=timezone(timedelta(hours=-4)))
+                    
+                    if start_date <= update_dt <= end_date:
+                        date = update_dt.date()
+                        status = normalize_status_label(update['status'])
+                        daily_counts[date][status] += 1
+                except:
+                    continue
+        
+        # Get all dates with actual data
+        all_dates = []
+        if daily_counts:
+            actual_start_date = min(daily_counts.keys())
+            effective_start_date = max(actual_start_date, start_date.date())
+            
+            current_date = effective_start_date
+            end_date_only = end_date.date()
+            while current_date <= end_date_only:
+                all_dates.append(current_date)
+                current_date += timedelta(days=1)
+        
+        # Get all statuses
+        all_statuses = set()
+        for date in daily_counts:
+            all_statuses.update(daily_counts[date].keys())
+        all_statuses = sorted(all_statuses)
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write daily activities section
+        writer.writerow(['Daily Activities by Status'])
+        writer.writerow(['Date'] + all_statuses)
+        for date in all_dates:
+            row = [str(date)]
+            for status in all_statuses:
+                row.append(daily_counts[date].get(status, 0))
+            writer.writerow(row)
+        
+        # Add blank row
+        writer.writerow([])
+        
+        # Write cumulative activities section
+        writer.writerow(['Cumulative Activities by Status'])
+        writer.writerow(['Date'] + all_statuses)
+        cumulative_counts = {status: 0 for status in all_statuses}
+        for date in all_dates:
+            row = [str(date)]
+            for status in all_statuses:
+                cumulative_counts[status] += daily_counts[date].get(status, 0)
+                row.append(cumulative_counts[status])
+            writer.writerow(row)
+        
+        # Prepare response
+        csv_data = output.getvalue()
+        output.close()
+        
+        # Create filename with period
+        filename = f"daily_activities_{period}_{now.strftime('%Y%m%d')}.csv"
+        
+        return Response(
+            csv_data,
+            mimetype='text/csv',
+            headers={'Content-Disposition': f'attachment; filename={filename}'}
+        )
         
     except Exception as e:
         import traceback
@@ -1460,8 +1608,9 @@ def serve_application_file(filepath):
             file_path.parent,
             file_path.name
         )
-    # File not found - return 404
-    return "File not found", 404
+    # File not found - redirect to dashboard instead of showing error
+    # This handles cases where summary files were deleted (e.g., rejected applications)
+    return redirect('/dashboard'), 302
 
 
 @app.errorhandler(404)

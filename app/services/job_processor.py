@@ -613,32 +613,16 @@ class JobProcessor:
         """Regenerate summary HTML with updated status and timeline"""
         try:
             from app.services.document_generator import DocumentGenerator
-            from app.models.qualification import QualificationAnalysis
             
-            # Load qualifications from file
-            if not application.qualifications_path or not application.qualifications_path.exists():
+            # Load qualifications (uses JSON if available, includes preliminary_analysis)
+            doc_generator = DocumentGenerator()
+            qualifications = doc_generator._load_qualifications(application)
+            
+            if not qualifications.detailed_analysis:
                 print("Warning: Cannot regenerate summary - qualifications file not found")
                 return
             
-            qual_content = read_text_file(application.qualifications_path)
-            
-            # Parse match score from qualifications file
-            match_score = application.match_score if application.match_score else 0.0
-            
-            # Create a basic QualificationAnalysis object
-            qualifications = QualificationAnalysis(
-                match_score=match_score,
-                features_compared=0,
-                strong_matches=[],
-                missing_skills=[],
-                partial_matches=[],
-                soft_skills=[],
-                recommendations=[],
-                detailed_analysis=qual_content
-            )
-            
             # Regenerate summary
-            doc_generator = DocumentGenerator()
             doc_generator.generate_summary_page(application, qualifications)
             
             print(f"  ✓ Summary regenerated with latest updates")

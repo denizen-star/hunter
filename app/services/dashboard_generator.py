@@ -1247,9 +1247,14 @@ class DashboardGenerator:
         """Create HTML for a single application card"""
         # Generate proper URLs for summary and folder
         if app.summary_path:
-            folder_name = app.folder_path.name
-            summary_filename = app.summary_path.name
-            summary_link = f"/applications/{folder_name}/{summary_filename}"
+            # Check if file actually exists before creating link
+            from pathlib import Path
+            if Path(app.summary_path).exists():
+                folder_name = app.folder_path.name
+                summary_filename = app.summary_path.name
+                summary_link = f"/applications/{folder_name}/{summary_filename}"
+            else:
+                summary_link = "#"
         else:
             summary_link = "#"
         

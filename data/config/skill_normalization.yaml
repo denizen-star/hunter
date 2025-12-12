@@ -3221,7 +3221,7 @@ fuzzy_rules:
   similarity_threshold: 0.85
   word_replacements:
     - ['aws', 'amazon web services']
-    - ['bi', 'business intelligence']
+    # REMOVED: ['bi', 'business intelligence'] - Too broad, causes "power-bi" to match "Business Intelligence"
     - ['sql', 'structured query language']
     - ['etl', 'extract transform load']
     - ['api', 'application programming interface']

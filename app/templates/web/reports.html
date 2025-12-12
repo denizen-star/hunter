@@ -816,6 +816,9 @@
                 <button class="period-btn" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
                 <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
             </div>
+            <button class="period-btn" onclick="exportToCSV()" style="margin-left: 8px; background: #10b981; color: white;">
+                Export CSV
+            </button>
         </div>
     </div>
     
@@ -857,6 +860,34 @@
                 </div>
             </div>
             
+        </div>
+        
+        <div class="reports-grid" style="margin-top: var(--space-lg);">
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Daily Activities by Status</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="dailyActivitiesChart"></canvas>
+                        <div class="chart-timestamp" id="dailyActivitiesChart-timestamp"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Cumulative Activities by Status</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="cumulativeActivitiesChart"></canvas>
+                        <div class="chart-timestamp" id="cumulativeActivitiesChart-timestamp"></div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="followup-flagged-container">
@@ -1031,6 +1062,8 @@
                     // Try to create charts first
                     updateApplicationsByStatusChart(data.applications_by_status);
                     updateStatusChangesChart(data.status_changes);
+                    updateDailyActivitiesChart(data.daily_activities_by_status);
+                    updateCumulativeActivitiesChart(data.cumulative_activities_by_status);
                     
                     // Update timestamps
                     updateAllTimestamps();
@@ -1299,6 +1332,244 @@
             }
         }
         
+        // Update daily activities chart
+        function updateDailyActivitiesChart(data) {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            const canvas = document.getElementById('dailyActivitiesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.dailyActivitiesChart && typeof window.dailyActivitiesChart.destroy === 'function') {
+                window.dailyActivitiesChart.destroy();
+            }
+            
+            // Check if data is empty
+            if (!data || Object.keys(data).length === 0) {
+                console.log('No daily activities data to display');
+                return;
+            }
+            
+            // Get status color mapping
+            const statusColors = {
+                'pending': '#fbbf24',
+                'applied': '#3b82f6',
+                'contacted someone': '#6b7280',
+                'company response': '#3b82f6',
+                'scheduled interview': '#fbbf24',
+                'interview notes': '#10b981',
+                'interview - follow up': '#ec4899',
+                'offered': '#10b981',
+                'rejected': '#ef4444',
+                'accepted': '#10b981'
+            };
+            
+            // Prepare datasets
+            const datasets = [];
+            const allDates = [];
+            
+            // Get all dates from first status (they should all have same dates)
+            const statuses = Object.keys(data);
+            if (statuses.length > 0 && data[statuses[0]]) {
+                allDates.push(...data[statuses[0]].map(d => d.date));
+            }
+            
+            // Create a dataset for each status
+            statuses.forEach(status => {
+                const statusData = data[status] || [];
+                const counts = statusData.map(d => d.count);
+                
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: counts,
+                    borderColor: statusColors[status] || '#6b7280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2
+                });
+            });
+            
+            try {
+                window.dailyActivitiesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: allDates,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const date = context[0].label;
+                                        // Calculate total count for this date across all statuses
+                                        let total = 0;
+                                        context.forEach(item => {
+                                            total += item.parsed.y;
+                                        });
+                                        return `${date} - ${total}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Daily Activities Chart created successfully');
+            } catch (error) {
+                console.error('Error creating Daily Activities Chart:', error);
+            }
+        }
+        
+        // Update cumulative activities chart
+        function updateCumulativeActivitiesChart(data) {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            const canvas = document.getElementById('cumulativeActivitiesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.cumulativeActivitiesChart && typeof window.cumulativeActivitiesChart.destroy === 'function') {
+                window.cumulativeActivitiesChart.destroy();
+            }
+            
+            // Check if data is empty
+            if (!data || Object.keys(data).length === 0) {
+                console.log('No cumulative activities data to display');
+                return;
+            }
+            
+            // Get status color mapping
+            const statusColors = {
+                'pending': '#fbbf24',
+                'applied': '#3b82f6',
+                'contacted someone': '#6b7280',
+                'company response': '#3b82f6',
+                'scheduled interview': '#fbbf24',
+                'interview notes': '#10b981',
+                'interview - follow up': '#ec4899',
+                'offered': '#10b981',
+                'rejected': '#ef4444',
+                'accepted': '#10b981'
+            };
+            
+            // Prepare datasets
+            const datasets = [];
+            const allDates = [];
+            
+            // Get all dates from first status (they should all have same dates)
+            const statuses = Object.keys(data);
+            if (statuses.length > 0 && data[statuses[0]]) {
+                allDates.push(...data[statuses[0]].map(d => d.date));
+            }
+            
+            // Create a dataset for each status
+            statuses.forEach(status => {
+                const statusData = data[status] || [];
+                const counts = statusData.map(d => d.count);
+                
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: counts,
+                    borderColor: statusColors[status] || '#6b7280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2
+                });
+            });
+            
+            try {
+                window.cumulativeActivitiesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: allDates,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const date = context[0].label;
+                                        // Calculate total count for this date across all statuses
+                                        let total = 0;
+                                        context.forEach(item => {
+                                            total += item.parsed.y;
+                                        });
+                                        return `${date} - ${total}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Cumulative Activities Chart created successfully');
+            } catch (error) {
+                console.error('Error creating Cumulative Activities Chart:', error);
+            }
+        }
+        
         // Show data as text when charts fail
         function showDataAsText(elementId, data) {
             const element = document.getElementById(elementId);
@@ -1426,6 +1697,12 @@
                     `;
                 }
             }
+        }
+        
+        // Export to CSV Function
+        function exportToCSV() {
+            const url = `/api/reports/export-csv?period=${currentPeriod}`;
+            window.location.href = url;
         }
         
         // AI Status Check Function

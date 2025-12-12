@@ -130,19 +130,21 @@ class PreliminaryMatcher:
         # Check each candidate skill against job description
         matched_skills = set()
         for skill_name, skill_data in self.candidate_skills.items():
-            # Use advanced SkillNormalizer
-            normalized_result = self.skill_normalizer.normalize(skill_name, fuzzy=True)
-            skill_normalized = normalized_result.lower() if normalized_result else ""
+            # Get normalized form for later validation (but don't use it for primary search)
+            skill_normalized = self._get_normalized_skill(skill_name)
             
             # Skip invalid or empty skills
             if not skill_normalized:
                 continue
-                
-            skill_variations = [skill_normalized] + skill_data.get('variations_found', [])
+            
+            # CRITICAL: Search using ORIGINAL skill name + variations, NOT normalized form
+            # This prevents "power-bi" from searching for "business intelligence" in the job description
+            skill_variations = [skill_name.lower()] + skill_data.get('variations_found', [])
             
             # Check for exact matches
             exact_match = False
             partial_match = False
+            matched_variation = None
             
             for variation in skill_variations:
                 if not variation:
@@ -154,6 +156,7 @@ class PreliminaryMatcher:
                     # Single-character skills need special handling (e.g., "R" should not match "R&D")
                     if self._is_valid_single_char_match(variation, job_description):
                         exact_match = True
+                        matched_variation = variation
                         matched_skills.add(skill_name)
                         break
                 else:
@@ -161,30 +164,50 @@ class PreliminaryMatcher:
                     pattern = r'\b' + re.escape(variation) + r'\b'
                     if re.search(pattern, job_desc_lower):
                         exact_match = True
+                        matched_variation = variation
                         matched_skills.add(skill_name)
                         break
                     elif self._is_partial_match(variation, job_desc_lower):
                         partial_match = True
+                        matched_variation = variation
                         matched_skills.add(skill_name)
             
             if exact_match:
                 # Find which job skill this matches
                 matched_job_skill = self._find_matched_job_skill(skill_name, skill_normalized, job_skills_found)
-                matches['exact_matches'].append({
-                    'skill': skill_name,
-                    'job_skill': matched_job_skill,
-                    'category': skill_data.get('category', 'Unknown'),
-                    'source': skill_data.get('source', 'Unknown')
-                })
+                
+                # CRITICAL: Validate the match is semantically valid
+                # This prevents false positives from normalization
+                if matched_job_skill:
+                    job_skill_normalized = self._get_normalized_skill(matched_job_skill)
+                    
+                    # Validate the match before adding it
+                    if self._validate_skill_match(skill_name, skill_normalized, 
+                                                  matched_job_skill, job_skill_normalized):
+                        matches['exact_matches'].append({
+                            'skill': skill_name,
+                            'job_skill': matched_job_skill,
+                            'category': skill_data.get('category', 'Unknown'),
+                            'source': skill_data.get('source', 'Unknown')
+                        })
+                    # If validation fails, silently skip (it's a false positive)
+                
             elif partial_match:
                 # Find which job skill this matches
                 matched_job_skill = self._find_matched_job_skill(skill_name, skill_normalized, job_skills_found)
-                matches['partial_matches'].append({
-                    'skill': skill_name,
-                    'job_skill': matched_job_skill,
-                    'category': skill_data.get('category', 'Unknown'),
-                    'source': skill_data.get('source', 'Unknown')
-                })
+                
+                # Validate partial matches too
+                if matched_job_skill:
+                    job_skill_normalized = self._get_normalized_skill(matched_job_skill)
+                    
+                    if self._validate_skill_match(skill_name, skill_normalized, 
+                                                  matched_job_skill, job_skill_normalized):
+                        matches['partial_matches'].append({
+                            'skill': skill_name,
+                            'job_skill': matched_job_skill,
+                            'category': skill_data.get('category', 'Unknown'),
+                            'source': skill_data.get('source', 'Unknown')
+                        })
         
         # Find unmatched candidate skills
         for skill_name, skill_data in self.candidate_skills.items():
@@ -864,10 +887,21 @@ class PreliminaryMatcher:
             candidate_skill_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_skill_normalized).strip()
             
             # Direct match (fast check)
-            if (job_skill_normalized == candidate_skill_normalized or 
-                job_skill_normalized in candidate_skill_normalized or
-                candidate_skill_normalized in job_skill_normalized):
+            # SIMPLIFIED: Only exact matches for multi-word skills to avoid false positives
+            # e.g., "power bi" should NOT match "business intelligence" even though "bi" is in both
+            if job_skill_normalized == candidate_skill_normalized:
                 return True
+            
+            # For single-word skills, allow substring matching (e.g., "sql" in "postgresql")
+            # But for multi-word, require exact match to avoid false positives
+            job_words = job_skill_normalized.split()
+            candidate_words = candidate_skill_normalized.split()
+            
+            if len(job_words) == 1 and len(candidate_words) == 1:
+                # Both single word - allow substring matching
+                if (job_skill_normalized in candidate_skill_normalized or
+                    candidate_skill_normalized in job_skill_normalized):
+                    return True
             
             # Check for skill equivalences (only if direct match failed)
             if job_skill_normalized in skill_equivalences:
@@ -1167,46 +1201,78 @@ Please focus your analysis on the areas above and provide detailed insights on:
         
         return consolidated
     
+    def _get_normalized_skill(self, skill: str) -> str:
+        """Get normalized form of a skill (helper method)"""
+        normalized_result = self.skill_normalizer.normalize(skill, fuzzy=True)
+        return normalized_result.lower() if normalized_result else skill.lower()
+    
+    def _validate_skill_match(self, candidate_skill: str, candidate_normalized: str, 
+                              job_skill: str, job_skill_normalized: str) -> bool:
+        """
+        Validate that a skill match is semantically valid.
+        
+        Prevents false positives where normalization creates spurious matches
+        (e.g., "power-bi" -> "Business Intelligence" matching "Business Intelligence" requirement)
+        
+        Args:
+            candidate_skill: Original candidate skill name (e.g., "power-bi")
+            candidate_normalized: Normalized candidate skill (e.g., "business intelligence")
+            job_skill: Original job skill name (e.g., "Business Intelligence")
+            job_skill_normalized: Normalized job skill (e.g., "business intelligence")
+        
+        Returns:
+            True if match is valid, False if it's a false positive
+        """
+        # Case 1: Normalized forms are identical - check if originals are related
+        if candidate_normalized == job_skill_normalized:
+            # Check if original names share significant words
+            cand_lower = candidate_skill.lower().replace('-', ' ').replace('_', ' ')
+            job_lower = job_skill.lower().replace('-', ' ').replace('_', ' ')
+            
+            cand_words = set(cand_lower.split())
+            job_words = set(job_lower.split())
+            
+            # If they're identical, always valid
+            if cand_lower == job_lower:
+                return True
+            
+            # Check for substring relationship (e.g., "Airflow" in "Apache Airflow")
+            if cand_lower in job_lower or job_lower in cand_lower:
+                return True
+            
+            # Check word overlap - require at least 50% overlap
+            if cand_words and job_words:
+                overlap = len(cand_words & job_words)
+                min_words = min(len(cand_words), len(job_words))
+                if min_words > 0:
+                    overlap_ratio = overlap / min_words
+                    # If overlap is too low, it's likely a false match from normalization
+                    # e.g., "power bi" vs "business intelligence" = 0% overlap
+                    if overlap_ratio < 0.5:
+                        return False
+            
+            return True
+        
+        # Case 2: Normalized forms differ - should not have matched in the first place
+        return False
+    
     def _find_matched_job_skill(self, candidate_skill: str, candidate_skill_normalized: str, job_skills: list) -> str:
         """Find which job skill matches a candidate skill"""
-        # First try to find exact matches by checking if the candidate skill matches any job skill
+        # SIMPLIFIED: Only exact matches to avoid false positives
+        # e.g., "power-bi" should NOT match "business intelligence"
         for job_skill in job_skills:
             # Use advanced SkillNormalizer
             normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
             job_skill_normalized = normalized_result.lower() if normalized_result else ""
             
-            # Check for exact matches
+            # Only exact matches - no substring matching
             if candidate_skill_normalized == job_skill_normalized:
                 return job_skill
-            
-            # Check for substring matches (exact match logic)
-            if (candidate_skill_normalized in job_skill_normalized or 
-                job_skill_normalized in candidate_skill_normalized):
-                return job_skill
         
-        # If no exact match, try to find the best partial match using word overlap
-        best_match = None
-        best_score = 0
-        
-        for job_skill in job_skills:
-            # Use advanced SkillNormalizer
-            normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
-            job_skill_normalized = normalized_result.lower() if normalized_result else ""
-            
-            # Calculate word overlap score
-            candidate_words = set(candidate_skill_normalized.split())
-            job_words = set(job_skill_normalized.split())
-            
-            if candidate_words and job_words:
-                overlap = len(candidate_words & job_words)
-                total_words = len(candidate_words | job_words)
-                score = overlap / total_words if total_words > 0 else 0
-                
-                if score > best_score and score > 0.3:  # At least 30% overlap
-                    best_score = score
-                    best_match = job_skill
-        
-        return best_match if best_match else candidate_skill
+        # SIMPLIFIED: No fuzzy/word overlap matching - only exact matches
+        # This prevents false positives like "power-bi" matching "business intelligence" 
+        # because they share the word "bi"
+        return ""
 
 if __name__ == "__main__":
     matcher = PreliminaryMatcher()

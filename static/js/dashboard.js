@@ -38,6 +38,10 @@ class DashboardManager {
             if (e.target.matches('.card-btn')) {
                 e.preventDefault();
                 const url = e.target.href;
+                // Don't navigate if URL is invalid
+                if (!url || url === '#' || url === '') {
+                    return;
+                }
                 this.openSummary(url);
             }
         });
@@ -121,6 +125,11 @@ class DashboardManager {
     }
 
     openSummary(url) {
+        // Don't navigate if URL is "#" or empty
+        if (!url || url === '#' || url === '') {
+            console.log('Summary unavailable for this application');
+            return;
+        }
         // Open summary in same window with back button
         window.location.href = url;
     }
