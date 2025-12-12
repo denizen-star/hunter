@@ -1057,7 +1057,8 @@ def list_networking_contacts():
                 'location': c.location,
                 'flagged': c.flagged,
                 'days_since_update': c.get_days_since_update(),
-                'timing_color': c.get_timing_color_class()
+                'timing_color': c.get_timing_color_class(),
+                'next_step': c.get_next_step()
             } for c in contacts],
             'count': len(contacts)
         })
@@ -1094,6 +1095,7 @@ def get_networking_contact(contact_id):
                 'email': contact.email,
                 'location': contact.location,
                 'flagged': contact.flagged,
+                'next_step': contact.get_next_step(),
                 'updates': updates
             }
         })

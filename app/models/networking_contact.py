@@ -208,3 +208,27 @@ class NetworkingContact:
             return 'blue'
         else:  # > 90 days
             return 'gray'
+    
+    def get_next_step(self) -> str:
+        """Get the next action step based on current status"""
+        # Workflow mapping: status -> next action
+        next_steps = {
+            'To Research': 'Research their background, company, or recent activity to personalize your message',
+            'Ready to Contact': 'Send the initial connection request or message',
+            'Contacted - Sent': 'Set a follow-up reminder. Wait 5-7 business days for a response',
+            'Contacted - Replied': 'Log the reply, craft a response, and propose a specific next step',
+            'Contacted - No Response': 'Send a second, polite follow-up message',
+            'Cold/Archive': 'Move to Cold list for occasional contact (3-6 months)',
+            'In Conversation': 'Keep the conversation moving toward a scheduled call or meeting',
+            'Meeting Scheduled': 'Prepare for the meeting, send confirmation/agenda',
+            'Meeting Complete': 'Send a thank-you note within 24 hours',
+            'Action Pending - You': 'Complete your committed action and update status',
+            'Action Pending - Them': 'Set a reminder to follow up on their committed action',
+            'New Connection': 'Schedule a light, value-add check-in in 1-2 months',
+            'Nurture (1-3 Mo.)': 'Set a specific date for your next check-in',
+            'Nurture (4-6 Mo.)': 'Schedule a reminder to reach out in 4-6 months',
+            'Referral Partner': 'Prioritize providing value and seek ways to help them',
+            'Inactive/Dormant': 'Look for an opportunity to genuinely re-engage'
+        }
+        
+        return next_steps.get(self.status, 'Review contact status and determine next action')
