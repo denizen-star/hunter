@@ -478,6 +478,26 @@
             background: #ffeef8;
             color: #b21f66;
         }
+        
+        .type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+        
+        .type-job {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .type-networking {
+            background: #d1fae5;
+            color: #065f46;
+        }
     </style>
 </head>
 <body>
@@ -486,8 +506,10 @@
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
             <li><a href="/progress" class="nav-link">Progress</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>
@@ -572,10 +594,16 @@
                         .replace(/\s*-\s*/g, '-')
                         .replace(/[()'.,]/g, '')
                         .replace(/\s+/g, '-')}`;
+                    const typeClass = activity.type === 'networking' ? 'type-networking' : 'type-job';
+                    const typeLabel = activity.type === 'networking' ? 'Networking' : 'Job';
+                    const typeIcon = activity.type === 'networking' ? '🤝' : '💼';
                     return `
                         <div class="activity-item">
                             <div class="activity-info">
-                                <div class="activity-company">${activity.company}</div>
+                                <div class="activity-company">
+                                    ${typeIcon} ${activity.company}
+                                    <span class="type-badge ${typeClass}">${typeLabel}</span>
+                                </div>
                                 <div class="activity-position">${activity.position}</div>
                                 <div class="activity-description">
                                     ${activity.activity}

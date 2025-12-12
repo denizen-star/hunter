@@ -785,8 +785,10 @@
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
             <li><a href="/progress" class="nav-link">Progress</a></li>
             <li><a href="/reports" class="nav-link active">Reports</a></li>
@@ -806,9 +808,16 @@
                 </svg>
                 Back to Dashboard
             </a>
-            <h1>Application Reports</h1>
+            <h1>Reports</h1>
         </div>
-        <div class="hero-header-period">
+        <div class="hero-header-period" style="display: flex; align-items: center; gap: 16px;">
+            <!-- Type Filter -->
+            <div class="period-selector" style="margin-right: 16px;">
+                <button class="period-btn active" data-type="jobs" onclick="selectType('jobs')">Jobs</button>
+                <button class="period-btn" data-type="networking" onclick="selectType('networking')">Networking</button>
+                <button class="period-btn" data-type="both" onclick="selectType('both')">Both</button>
+            </div>
+            <!-- Period Filter -->
             <div class="period-selector">
                 <button class="period-btn active" data-period="today" onclick="selectPeriod('today')">Today</button>
                 <button class="period-btn" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
@@ -927,6 +936,7 @@
     
     <script>
         let currentPeriod = 'today';
+        let currentType = 'jobs';
         let reportsData = null;
         
         // Format current time in EST timezone
@@ -1008,6 +1018,21 @@
             }
         }
         
+        // Type selection
+        function selectType(type) {
+            // Remove active from all type buttons
+            document.querySelectorAll('[data-type]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Activate the clicked button
+            const clickedButton = document.querySelector(`[data-type="${type}"]`);
+            clickedButton.classList.add('active');
+            currentType = type;
+            
+            // Reload data
+            loadReportsData();
+        }
+        
         // Period selection
         function selectPeriod(period) {
             const clickedButton = document.querySelector(`[data-period="${period}"]`);
@@ -1032,8 +1057,8 @@
                     }
                 }
             } else {
-                // Remove active from all buttons
-                document.querySelectorAll('.period-btn').forEach(btn => {
+                // Remove active from all period buttons
+                document.querySelectorAll('[data-period]').forEach(btn => {
                     btn.classList.remove('active');
                 });
                 // Activate the clicked button
@@ -1048,8 +1073,8 @@
         // Load reports data
         async function loadReportsData() {
             try {
-                console.log('Loading reports data for period:', currentPeriod);
-                const response = await fetch(`/api/reports?period=${currentPeriod}`);
+                console.log('Loading reports data for period:', currentPeriod, 'type:', currentType);
+                const response = await fetch(`/api/reports?period=${currentPeriod}&type=${currentType}`);
                 const data = await response.json();
                 
                 console.log('Reports data received:', data);

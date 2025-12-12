@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Networking Contact</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/forms.css">
+    <link rel="stylesheet" href="/static/css/colors.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/navigation.css">
+    
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            margin: 0;
+            padding: 0;
+            margin-left: 180px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            padding: 16px 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+        }
+        
+        .sidebar-header h3 {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 24px;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sidebar-menu a:hover {
+            background: #f9fafb;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+        }
+        
+        .sidebar-menu a.active {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        
+        .header {
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+        }
+        
+        .header p {
+            font-size: 15px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-group label .required {
+            color: #ef4444;
+            margin-left: 4px;
+        }
+        
+        .form-group label .optional {
+            color: #9ca3af;
+            font-weight: 400;
+            font-size: 13px;
+            margin-left: 4px;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            transition: all 0.15s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .form-group .help-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 6px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .status-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .status-message.show {
+            display: block;
+        }
+        
+        .markdown-hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link active">New Contact</a></li>
+            <li><a href="/templates" class="nav-link">Templates</a></li>
+            <li><a href="/progress" class="nav-link">Progress</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="/analytics" class="nav-link">Analytics</a></li>
+            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header">
+            <h1>New Networking Contact</h1>
+            <p>Add a professional contact to your networking pipeline</p>
+        </div>
+        
+        <div class="form-card">
+            <div id="statusMessage" class="status-message"></div>
+            
+            <form id="networkingForm">
+                <div class="form-group">
+                    <label for="personName">
+                        Person Name
+                        <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="personName" 
+                        name="person_name" 
+                        required 
+                        placeholder="e.g., Jane Smith"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyName">
+                        Company Name
+                        <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="companyName" 
+                        name="company_name" 
+                        required 
+                        placeholder="e.g., Google"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobTitle">
+                        Job Title
+                        <span class="optional">(optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="jobTitle" 
+                        name="job_title" 
+                        placeholder="e.g., Senior Product Manager"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="linkedinUrl">
+                        LinkedIn Profile URL
+                        <span class="optional">(optional)</span>
+                    </label>
+                    <input 
+                        type="url" 
+                        id="linkedinUrl" 
+                        name="linkedin_url" 
+                        placeholder="https://www.linkedin.com/in/..."
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="profileDetails">
+                        Profile Details
+                        <span class="required">*</span>
+                    </label>
+                    <textarea 
+                        id="profileDetails" 
+                        name="profile_details" 
+                        required 
+                        placeholder="Paste LinkedIn profile text, articles written by them, or any relevant information about this person...
+
+You can use Markdown formatting:
+# Heading
+## Subheading
+- Bullet point
+**Bold text**
+*Italic text*
+"
+                    ></textarea>
+                    <div class="help-text">
+                        Paste the person's LinkedIn profile, bio, articles, or any relevant information. Markdown formatting is supported.
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Create Contact
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('networkingForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Analyzing with AI...';
+            
+            // Hide any previous status messages
+            statusMessage.classList.remove('show', 'success', 'error');
+            
+            // Get form data
+            const formData = {
+                person_name: document.getElementById('personName').value.trim(),
+                company_name: document.getElementById('companyName').value.trim(),
+                job_title: document.getElementById('jobTitle').value.trim() || null,
+                linkedin_url: document.getElementById('linkedinUrl').value.trim() || null,
+                profile_details: document.getElementById('profileDetails').value.trim()
+            };
+            
+            try {
+                const response = await fetch('/api/networking/contacts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message with match score
+                    const matchScore = data.match_score ? Math.round(data.match_score) : 0;
+                    statusMessage.textContent = `Contact created! ${data.person_name} at ${data.company_name} - Match Score: ${matchScore}%`;
+                    statusMessage.classList.add('show', 'success');
+                    
+                    // Reset form
+                    form.reset();
+                    
+                    // Redirect to summary page if available, otherwise dashboard
+                    setTimeout(() => {
+                        if (data.summary_url) {
+                            window.location.href = data.summary_url;
+                        } else {
+                            window.location.href = '/networking';
+                        }
+                    }, 2000);
+                } else {
+                    // Show error message
+                    statusMessage.textContent = `Error: ${data.error}`;
+                    statusMessage.classList.add('show', 'error');
+                    
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Contact';
+                }
+            } catch (error) {
+                console.error('Error creating contact:', error);
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.classList.add('show', 'error');
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Contact';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -76,3 +76,4 @@ def delete_applications_before_date(cutoff_date_str: str = "2025-10-01"):
 
 if __name__ == "__main__":
     delete_applications_before_date("2025-10-01")
+

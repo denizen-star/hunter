@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/colors.css">
+    <link rel="stylesheet" href="/static/css/navigation.css">
+    
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            margin: 0;
+            padding: 0;
+            margin-left: 180px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
+            z-index: 1000;
+            padding: var(--space-md, 16px) 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: var(--space-md, 16px) var(--space-lg, 24px);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md, 16px);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px var(--space-lg, 24px);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sidebar-menu a:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a.active {
+            background: var(--bg-active, #f3f4f6);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .container {
+            width: calc(100vw - 180px);
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border-primary);
+            padding: 16px 24px;
+            margin: -24px -24px 24px -24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 4px 0;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .filter-btn:hover {
+            background: var(--bg-hover);
+        }
+        
+        .filter-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+        
+        .filter-btn .count {
+            margin-left: 6px;
+            opacity: 0.8;
+        }
+        
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .contact-tile {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease;
+            border: 2px solid transparent;
+        }
+        
+        .contact-tile:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .contact-tile.timing-white { border-left: 4px solid #e5e7eb; }
+        .contact-tile.timing-green { border-left: 4px solid #10b981; }
+        .contact-tile.timing-yellow { border-left: 4px solid #f59e0b; }
+        .contact-tile.timing-red { border-left: 4px solid #ef4444; }
+        .contact-tile.timing-blue { border-left: 4px solid #3b82f6; }
+        .contact-tile.timing-gray { border-left: 4px solid #6b7280; }
+        
+        .contact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .contact-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .match-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+        
+        .flag {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.3;
+            transition: opacity 0.15s ease;
+        }
+        
+        .flag.flagged {
+            opacity: 1;
+        }
+        
+        .contact-company {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin: 4px 0;
+            font-weight: 500;
+        }
+        
+        .contact-title {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin: 4px 0;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            margin-top: 8px;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+        
+        .contact-dates {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .date-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .view-btn {
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid var(--border-primary);
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .view-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 8px 0;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 24px 0;
+        }
+        
+        .empty-state .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: var(--accent-blue);
+            color: white;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        
+        .empty-state .btn:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link active">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
+            <li><a href="/templates" class="nav-link">Templates</a></li>
+            <li><a href="/progress" class="nav-link">Progress</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="/analytics" class="nav-link">Analytics</a></li>
+            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header">
+            <h1>Networking Contacts</h1>
+            <p>Manage your professional networking pipeline</p>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-row" id="stats">
+            <div class="stat-card">
+                <div class="label">Total Contacts</div>
+                <div class="value" id="totalContacts">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Active</div>
+                <div class="value" id="activeContacts">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Meetings Scheduled</div>
+                <div class="value" id="meetingsScheduled">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Referral Partners</div>
+                <div class="value" id="referralPartners">-</div>
+            </div>
+        </div>
+        
+        <!-- Status Filters -->
+        <div class="filters" id="statusFilters">
+            <h3 style="font-size: 14px; color: #6b7280; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Status Filters</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="filter-btn active" data-filter-type="status" data-filter="all">
+                    All <span class="count" id="count-all">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="status" data-filter="To Research">
+                    To Research <span class="count" id="count-research">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="status" data-filter="Contacted">
+                    Contacted <span class="count" id="count-contacted">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="status" data-filter="In Conversation">
+                    In Conversation <span class="count" id="count-conversation">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="status" data-filter="Meeting Scheduled">
+                    Meetings <span class="count" id="count-meetings">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Timing Filters -->
+        <div class="filters" id="timingFilters" style="margin-top: 20px;">
+            <h3 style="font-size: 14px; color: #6b7280; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Activity Timing</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="filter-btn active" data-filter-type="timing" data-timing="all">
+                    All <span class="count" id="count-timing-all">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="timing" data-timing="white" style="border-left: 4px solid #e5e7eb;">
+                    Recent (&lt;7d) <span class="count" id="count-recent">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="timing" data-timing="green" style="border-left: 4px solid #10b981;">
+                    Needs Activity (8-15d) <span class="count" id="count-needs">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="timing" data-timing="yellow" style="border-left: 4px solid #f59e0b;">
+                    Approaching (15-30d) <span class="count" id="count-approaching">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="timing" data-timing="red" style="border-left: 4px solid #ef4444;">
+                    Overdue (30-60d) <span class="count" id="count-overdue">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="timing" data-timing="blue" style="border-left: 4px solid #3b82f6;">
+                    Nurture (60-90d) <span class="count" id="count-nurture">0</span>
+                </button>
+                <button class="filter-btn" data-filter-type="timing" data-timing="gray" style="border-left: 4px solid #6b7280;">
+                    Cold (&gt;90d) <span class="count" id="count-cold">0</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contacts Grid -->
+        <div class="contacts-grid" id="contactsGrid"></div>
+    </div>
+
+    <script>
+        let allContacts = [];
+        let currentStatusFilter = 'all';
+        let currentTimingFilter = null;
+
+        // Load contacts on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContacts();
+            setupFilters();
+        });
+
+        async function loadContacts() {
+            try {
+                const response = await fetch('/api/networking/contacts');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allContacts = data.contacts;
+                    updateStats();
+                    updateFilterCounts();
+                    renderContacts();
+                }
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalContacts').textContent = allContacts.length;
+            
+            const active = allContacts.filter(c => 
+                !['Cold/Archive', 'Inactive/Dormant'].includes(c.status)
+            ).length;
+            document.getElementById('activeContacts').textContent = active;
+            
+            const meetings = allContacts.filter(c => 
+                c.status === 'Meeting Scheduled'
+            ).length;
+            document.getElementById('meetingsScheduled').textContent = meetings;
+            
+            const partners = allContacts.filter(c => 
+                c.status === 'Referral Partner'
+            ).length;
+            document.getElementById('referralPartners').textContent = partners;
+        }
+
+        function updateFilterCounts() {
+            // Status counts
+            document.getElementById('count-all').textContent = allContacts.length;
+            
+            const research = allContacts.filter(c => c.status === 'To Research').length;
+            document.getElementById('count-research').textContent = research;
+            
+            const contacted = allContacts.filter(c => c.status.includes('Contacted')).length;
+            document.getElementById('count-contacted').textContent = contacted;
+            
+            const conversation = allContacts.filter(c => c.status === 'In Conversation').length;
+            document.getElementById('count-conversation').textContent = conversation;
+            
+            const meetings = allContacts.filter(c => c.status === 'Meeting Scheduled').length;
+            document.getElementById('count-meetings').textContent = meetings;
+            
+            // Timing counts
+            const recent = allContacts.filter(c => c.timing_color === 'white').length;
+            document.getElementById('count-recent').textContent = recent;
+            
+            const needs = allContacts.filter(c => c.timing_color === 'green').length;
+            document.getElementById('count-needs').textContent = needs;
+            
+            const approaching = allContacts.filter(c => c.timing_color === 'yellow').length;
+            document.getElementById('count-approaching').textContent = approaching;
+            
+            const overdue = allContacts.filter(c => c.timing_color === 'red').length;
+            document.getElementById('count-overdue').textContent = overdue;
+            
+            const nurture = allContacts.filter(c => c.timing_color === 'blue').length;
+            document.getElementById('count-nurture').textContent = nurture;
+            
+            const cold = allContacts.filter(c => c.timing_color === 'gray').length;
+            document.getElementById('count-cold').textContent = cold;
+            
+            // Timing "All" count (same as total)
+            document.getElementById('count-timing-all').textContent = allContacts.length;
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filterType = btn.dataset.filterType;
+                    
+                    if (filterType === 'status') {
+                        // Update status filter active state
+                        document.querySelectorAll('[data-filter-type="status"]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentStatusFilter = btn.dataset.filter;
+                    } else if (filterType === 'timing') {
+                        // Update timing filter active state
+                        document.querySelectorAll('[data-filter-type="timing"]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        // Set timing filter (null for "all")
+                        const timing = btn.dataset.timing;
+                        currentTimingFilter = timing === 'all' ? null : timing;
+                    }
+                    
+                    // Re-render contacts
+                    renderContacts();
+                });
+            });
+        }
+
+        function renderContacts() {
+            const grid = document.getElementById('contactsGrid');
+            
+            // Filter contacts by status
+            let filtered = allContacts;
+            if (currentStatusFilter !== 'all') {
+                filtered = allContacts.filter(c => c.status === currentStatusFilter || c.status.includes(currentStatusFilter));
+            }
+            
+            // Further filter by timing if selected (null means "all")
+            if (currentTimingFilter !== null) {
+                filtered = filtered.filter(c => c.timing_color === currentTimingFilter);
+            }
+            
+            // Render
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🤝</div>
+                        <h2>No contacts yet</h2>
+                        <p>Start building your professional network by adding your first contact</p>
+                        <a href="/new-networking-contact" class="btn">Add First Contact</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = filtered.map(contact => createContactTile(contact)).join('');
+        }
+
+        function createContactTile(contact) {
+            const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
+            const flagIcon = contact.flagged ? '⚐' : '⚑';
+            const flagClass = contact.flagged ? 'flagged' : '';
+            
+            return `
+                <div class="contact-tile timing-${contact.timing_color}">
+                    <div class="contact-header">
+                        <h3 class="contact-name">${escapeHtml(contact.person_name)}</h3>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="match-score">${matchScore}%</span>
+                            <span class="flag ${flagClass}" onclick="toggleFlag('${contact.id}', ${!contact.flagged})">${flagIcon}</span>
+                        </div>
+                    </div>
+                    <div class="contact-company">${escapeHtml(contact.company_name)}</div>
+                    ${contact.job_title ? `<div class="contact-title">${escapeHtml(contact.job_title)}</div>` : ''}
+                    <div class="status-badge">${escapeHtml(contact.status)}</div>
+                    <div class="contact-dates">
+                        <div class="date-row">
+                            <span>📅</span>
+                            <span>Connected: ${formatDate(contact.created_at)}</span>
+                        </div>
+                        <div class="date-row">
+                            <span>🔄</span>
+                            <span>Updated: ${formatDate(contact.status_updated_at || contact.created_at)}</span>
+                        </div>
+                        <div class="date-row">
+                            <span>⏰</span>
+                            <span>${contact.days_since_update} days ago</span>
+                        </div>
+                    </div>
+                    <button class="view-btn" onclick="viewContact('${contact.id}')">View Summary</button>
+                </div>
+            `;
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            }) + ' EST';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function toggleFlag(contactId, flagged) {
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/flag`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ flagged })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Reload contacts
+                    await loadContacts();
+                }
+            } catch (error) {
+                console.error('Error toggling flag:', error);
+            }
+        }
+
+        async function viewContact(contactId) {
+            // Get contact details to find summary path
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}`);
+                const data = await response.json();
+                
+                if (data.success && data.contact) {
+                    // Construct summary URL
+                    const contact = data.contact;
+                    // Extract folder name from contact data
+                    // For now, navigate using a simple pattern
+                    const folderName = `${contact.person_name.replace(/\s+/g, '-')}-${contact.company_name.replace(/\s+/g, '-')}`;
+                    const summaryFilename = `${contact.person_name.replace(/\s+/g, '-')}-summary.html`;
+                    window.location.href = `/networking/${folderName}/${summaryFilename}`;
+                } else {
+                    alert('Could not load contact summary');
+                }
+            } catch (error) {
+                console.error('Error loading contact:', error);
+                alert('Error loading contact summary');
+            }
+        }
+    </script>
+</body>
+</html>

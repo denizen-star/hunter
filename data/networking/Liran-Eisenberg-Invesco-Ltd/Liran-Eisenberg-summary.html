@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liran Eisenberg - Invesco Ltd</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 24px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+        }
+        
+        .match-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-left: 12px;
+        }
+        
+        .metadata {
+            background: #f9fafb;
+            padding: 16px 32px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+        
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .metadata-item strong {
+            color: #374151;
+        }
+        
+        .tabs {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 32px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.15s ease;
+        }
+        
+        .tab:hover {
+            color: #374151;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+        
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 16px 0 8px 0;
+            color: #374151;
+        }
+        
+        .message-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .message-box h3 {
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            transition: all 0.15s ease;
+        }
+        
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .timeline {
+            margin-top: 32px;
+        }
+        
+        .timeline-item {
+            padding: 16px;
+            border-left: 3px solid #e5e7eb;
+            margin-bottom: 16px;
+            background: #f9fafb;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .timeline-item.latest {
+            border-left-color: #3b82f6;
+        }
+        
+        .timeline-date {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        
+        .timeline-status {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-notes {
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+        
+        .copy-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        .char-count {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        
+        pre {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1>
+                    Liran Eisenberg
+                    <span class="match-badge">85% Match</span>
+                </h1>
+                <div class="subtitle">Invesco Ltd • VP Data Analytics</div>
+                <div class="action-buttons">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Liran+Eisenberg&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Liran+Eisenberg%0A%0ACompany%3A+Invesco+Ltd%0ATitle%3A+VP+Data+Analytics%0AStatus%3A+Contacted+-+Sent%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Fliraneisenberg%2F%0AEmail%3A+Not+available%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FLiran-Eisenberg-Invesco-Ltd%2FLiran-Eisenberg-summary.html%0A&location=Invesco+Ltd&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                        📅 Add Follow-up to Google Calendar
+                    </a>
+                    <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
+                        🔄 Regenerate Documents
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="metadata">
+        <div class="metadata-item">
+            <span>📍</span>
+            <span>N/A</span>
+        </div>
+        <div class="metadata-item">
+            <span>📅</span>
+            <span><strong>Connected:</strong> Dec 12, 2025 11:38 AM EST</span>
+        </div>
+        <div class="metadata-item">
+            <span>🔄</span>
+            <span><strong>Updated:</strong> Dec 12, 2025 12:22 PM EST</span>
+        </div>
+        <div class="metadata-item">
+            <span>📊</span>
+            <span><strong>Status:</strong> Contacted - Sent</span>
+        </div>
+        <div class="metadata-item"><span>🔗</span><a href="https://www.linkedin.com/in/liraneisenberg/" target="_blank">LinkedIn Profile</a></div>
+        
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('summary')">Summary</div>
+        <div class="tab" onclick="switchTab('raw')">Raw Entry</div>
+        <div class="tab" onclick="switchTab('skills')">Skills</div>
+        <div class="tab" onclick="switchTab('research')">Research</div>
+        <div class="tab" onclick="switchTab('messages')">Messages</div>
+        <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+    </div>
+    
+    <div class="content">
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-content active">
+            <div class="section">
+                <h2>Match Analysis</h2>
+                <pre>MATCH SCORE: 85
+
+SKILL OVERLAP: High
+Shared Skills:
+- Data Engineering & Analytics
+- Cloud & AI Transformation
+- GCP, AWS, Snowflake, SQL, Python, AI/ML, B2B/B2C, Tableau
+
+CAREER SIMILARITY: Medium
+Common Elements:
+- Experience in leading data transformation initiatives
+- Strong background in data architecture and engineering
+- Familiarity with multiple industries (retail, finance)
+
+COMMON INTERESTS:
+- Interest in leveraging AI/ML for business growth
+- Desire to drive innovation through technology
+
+NETWORKING VALUE: High
+Opportunities:
+- Collaborative project opportunities
+- Potential mentorship or guidance
+- Referral/introduction potential within the industry
+
+CONVERSATION TOPICS:
+1. How do you see AI/ML evolving in the retail industry, and what role can data engineering play in driving this change?
+2. Can you share your experience with GCP and Snowflake? What led you to choose these cloud platforms for your projects?
+3. What are some of the most significant challenges you've faced in implementing AI-driven analytics solutions, and how did you overcome them?
+4. How do you prioritize data engineering skills when building a team? Are there any specific certifications or training programs that you recommend?
+5. What's the biggest misconception about working with data in the finance industry, and how can we address this through education and awareness?
+
+SYNTHESIS:
+Liran Eisenberg is an experienced data engineer and analytics leader with a strong background in AI/ML. As a valuable connection, he brings a wealth of knowledge on cloud platforms, data architecture, and engineering. To approach him effectively, focus on shared interests in AI-driven analytics and explore potential collaboration opportunities. Start conversations by referencing his experience with GCP and Snowflake, or ask for insights on the retail industry's adoption of AI/ML. By highlighting your own expertise in these areas and expressing genuine interest in his perspective, you can establish a strong foundation for a valuable professional connection.</pre>
+            </div>
+        </div>
+        
+        <!-- Raw Entry Tab -->
+        <div id="raw" class="tab-content">
+            <div class="section">
+                <h2>Raw Profile Details</h2>
+                <pre>Liran Eisenberg 
+ Lee  1st degree connection1st
+VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
+New York, New York, United States  Contact info
+6,354 followers 
+500+ connections
+
+
+Joe Porretta, Alex Merced, and 16 other mutual connectionsJoe Porretta, Alex Merced, and 16 other mutual connections
+
+Message
+
+More
+People similar to Liran Eisenberg
+
+See all
+
+Page 1 of 6Previous
+Next
+Dena McHenry
+Member’s name
+Dena McHenry
+Member’s occupation
+Recruiting MLEs, Applied Scientist, Data Scientists/Causal Inference, Distributed Systems Engineers
+B.J. Fesq
+B.J. is a mutual connection
+
+Connect
+Apparsamy Balaji
+Member’s name
+Apparsamy Balaji
+Member’s occupation
+Chief Data & Analytics Officer | Transforming Businesses with Data, AI, and Purpose
+Michael Atkinson
+Michael and 13 other mutual connections
+
+Connect
+Robin Shears-Huth
+Member’s name
+Robin Shears-Huth
+Member’s occupation
+Sr. Technical Recruiter | Sr. Full Life Cycle Recruiter | Talent Acquisition
+Ron Ferreira
+Ron and 1 other mutual connection
+
+Connect
+HighlightsHighlights
+Liran Eisenberg
+Liran is a new connection
+Liran is a new connection
+Now is a great time to start a conversation.
+Now is a great time to start a conversation.
+
+Introduce myself
+AboutAbout
+With over 25 years of experience, I specialize in building and scaling high-performance teams, modernizing platforms, and driving enterprise value through data engineering, AI, and analytics. I’ve helped Fortune 500s and startups alike transform their capabilities — whether that’s migrating 100+ applications to the cloud, delivering $100M+ in AI-driven revenue gains, or building orgs from 10 to 60+ engineers while cutting contractor overhead by 60%.
+
+What I bring to the table:
+Strategic Data & Engineering Leadership , Full lifecycle execution — from vision to delivery — across GCP, AWS, Snowflake, Databricks, and beyond.
+AI/ML Enablement, Hands-on technical leadership and architecture to deliver real-world insights and engineering best practices.
+Scalable Architecture, End-to-end cloud modernization, microservices, and self-service data platforms.
+Team & Culture Builder: Cultivating curiosity, speed, and trust across cross-functional teams.
+Business Impact First: Whether it’s cost savings or revenue growth, everything I do is aligned to high-impact outcomes.
+
+My passion? Turning complex problems into elegant solutions that move the business forward — and mentoring the next generation of technical leaders & engineers along the way.
+
+Let’s connect if you’re looking to scale your data vision or explore transformative leadership in engineering.
+
+"It doesn’t matter who scores the points, it’s who can get the ball to the scorer"
+Larry BirdWith over 25 years of experience, I specialize in building and scaling high-performance teams, modernizing platforms, and driving enterprise value through data engineering, AI, and analytics. I’ve helped Fortune 500s and startups alike transform their capabilities — whether that’s migrating 100+ applications to the cloud, delivering $100M+ in AI-driven revenue gains, or building orgs from 10 to 60+ engineers while cutting contractor overhead by 60%. What I bring to the table: Strategic Data & Engineering Leadership , Full lifecycle execution — from vision to delivery — across GCP, AWS, Snowflake, Databricks, and beyond. AI/ML Enablement, Hands-on technical leadership and architecture to deliver real-world insights and engineering best practices. Scalable Architecture, End-to-end cloud modernization, microservices, and self-service data platforms. Team & Culture Builder: Cultivating curiosity, speed, and trust across cross-functional teams. Business Impact First: Whether it’s cost savings or revenue growth, everything I do is aligned to high-impact outcomes. My passion? Turning complex problems into elegant solutions that move the business forward — and mentoring the next generation of technical leaders & engineers along the way. Let’s connect if you’re looking to scale your data vision or explore transformative leadership in engineering. "It doesn’t matter who scores the points, it’s who can get the ball to the scorer" Larry Bird…see more
+FeaturedFeatured
+Post
+Post
+
+Chris Hopkins recently interviewed me for an episode of his podcast and it was a real pleasure to catch up. Having a sense of humor is important, no doubt the phrase of the day for me was "game changer" :) Feel free to share or ping me if you'd like to discuss any of these topics further.
+likelovecelebrate
+42
+6 comments
+ActivityActivity
+6,354 followers6,354 followers
+
+
+Following
+
+Posts
+
+Comments
+Loaded 7 Posts posts
+View Liran Eisenberg’s  graphic link
+Liran EisenbergLiran Eisenberg
+   • 1stVerified • 1st
+VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBMVP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
+1mo •  1 month ago • Visible to anyone on or off LinkedIn
+
+Veterans Day is a chance to acknowledge the men and women who took an oath to protect the United States. Service brings long days and harder nights, a sense of responsibility that rarely fades. It grows from teamwork trust and the quiet promise to stand with the person beside you no matter how uncertain the world becomes.
+To every veteran and every family who supported them, I thank you. Your strength and your sacrifice matter more than words can express. Our nation holds a debt to you and honoring it means offering care support and gratitude throughout the year, not only today.
+Many organizations help carry that commitment forward, here are a few:
+https://lnkd.in/enf2X-mi
+https://lnkd.in/eJtiAKge
+https://lnkd.in/ed_Y6nKH
+https://lnkd.in/eDKR8bWW
+…more
+likelovesupport
+23
+
+
+
+
+View Liran Eisenberg’s  graphic link
+Liran EisenbergLiran Eisenberg
+   • 1stVerified • 1st
+VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBMVP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
+2mo •  2 months ago • Visible to Liran’s connections
+
+Excited to be attending Snowflake World tomorrow in NYC! If you're there too, let's catch up! hashtag#Networking hashtag#SnowflakeWorld hashtag#NYC
+like
+16
+2 comments
+
+
+
+Show all posts
+ExperienceExperience
+Invesco Ltd. logo
+Head of Data Architecture | Financial Services, AWS, Snowflake
+Head of Data Architecture | Financial Services, AWS, Snowflake
+Invesco Ltd.Invesco Ltd.
+Jul 2025 - Present · 6 mosJul 2025 to Present · 6 mos
+Consumer Edge logo
+VP Data Analytics | GCP, Snowflake, SQL, Python, AI, Analytics, product design, migration
+VP Data Analytics | GCP, Snowflake, SQL, Python, AI, Analytics, product design, migration
+Consumer EdgeConsumer Edge
+Jun 2024 - May 2025 · 1 yrJun 2024 to May 2025 · 1 yr
+● Spearheading the development of 5 AI-driven analytical products, unlocking $20M+ USD.
+● Leading a team of 12 analysts and engineers, leveraging GCP, AWS, Snowflake, Databricks, DBT & Python for scalable financial & corporate data insights.
+● Leveraging ChatGPT and GitHub Copilot for rapid prototyping and hands-on coding, including work with structured, semi-structured, and OCR-derived datasets powered by NLP.
+● Integrating Gemini for AI assisted data analysis and mapping.
+● Orchestrating a multi-cloud overhaul to drive speed, scale, and satisfaction and building new CI/CD processes.
+● Influencing product and data strategy through close partnership with executive stakeholders.● Spearheading the development of 5 AI-driven analytical products, unlocking $20M+ USD. ● Leading a team of 12 analysts and engineers, leveraging GCP, AWS, Snowflake, Databricks, DBT & Python for scalable financial & corporate data insights. ● Leveraging ChatGPT and GitHub Copilot for rapid prototyping and hands-on coding, including work with structured, semi-structured, and OCR-derived datasets powered by NLP. ● Integrating Gemini for AI assisted data analysis and mapping. ● Orchestrating a multi-cloud overhaul to drive speed, scale, and satisfaction and building new CI/CD processes. ● Influencing product and data strategy through close partnership with executive stakeholders.…see more
+Eliassen Group logo
+Senior Engineering Consultant | AWS, SQL, Python, AI, B2B, B2C, Analytics
+Senior Engineering Consultant | AWS, SQL, Python, AI, B2B, B2C, Analytics
+Eliassen GroupEliassen Group
+Feb 2024 - Jun 2024 · 5 mosFeb 2024 to Jun 2024 · 5 mos
+Brought in as a strategic advisor and hands-on mentor for cross-functional engineering and analytics
+teams in a Fortune 500 retail environment.
+Coached two teams on scalable architecture, data workflows, and ML enablement.
+Guided the implementation of next-gen analytics for Mars Pets Care while Improved engineering efficiency and cross-team collaboration.Brought in as a strategic advisor and hands-on mentor for cross-functional engineering and analytics teams in a Fortune 500 retail environment. Coached two teams on scalable architecture, data workflows, and ML enablement. Guided the implementation of next-gen analytics for Mars Pets Care while Improved engineering efficiency and cross-team collaboration.…see more
+Macy's logo
+Senior Director Data Architecture & Engineering | GCP, SQL, Python, AI, ML, B2B, B2C, migration
+Senior Director Data Architecture & Engineering | GCP, SQL, Python, AI, ML, B2B, B2C, migration
+Macy's · Full-timeMacy's · Full-time
+Jul 2021 - Dec 2023 · 2 yrs 6 mosJul 2021 to Dec 2023 · 2 yrs 6 mos
+New York, New York, United States · HybridNew York, New York, United States · Hybrid
+Architected and led Macys end-to-end data transformation, modernizing infrastructure and unlocking
+$100M+ in AI-driven revenue.
+Directed migration of 100+ apps to GCP and Snowflake.
+Implemented a microservices-based data platform for analytics and ML.
+Scaled internal engineering from 10 to 60+ FTEs and reduced contractor count from 600+ to 250, significantly improving delivery velocity and long-term cost efficiency.
+Introduced a C-suite analytics ecosystem with BI tools and a semantic layer.
+Led 4 major AI/ML initiatives including dynamic pricing and inventory optimization.Architected and led Macys end-to-end data transformation, modernizing infrastructure and unlocking $100M+ in AI-driven revenue. Directed migration of 100+ apps to GCP and Snowflake. Implemented a microservices-based data platform for analytics and ML. Scaled internal engineering from 10 to 60+ FTEs and reduced contractor count from 600+ to 250, significantly improving delivery velocity and long-term cost efficiency. Introduced a C-suite analytics ecosystem with BI tools and a semantic layer. Led 4 major AI/ML initiatives including dynamic pricing and inventory optimization.…see more
+Engineering Leadership, Negotiation and +5 skills
+2U logo
+Senior Director Data Engineering | AWS, Snowflake, SQL, Python, Docker, Automation, B2C, Tableau
+Senior Director Data Engineering | AWS, Snowflake, SQL, Python, Docker, Automation, B2C, Tableau
+2U · Full-time2U · Full-time
+Jan 2020 - Jul 2021 · 1 yr 7 mosJan 2020 to Jul 2021 · 1 yr 7 mos
+New York, New York, United StatesNew York, New York, United States
+Led modernization of 2Us data platform and empowered analytics and ML teams to deliver smarter
+insights at scale.
+Directed Snowflake migration and built a global BI dataset ecosystem.
+Implemented CCPA automation and Master Data Management (MDM) integrations.
+Enhanced self-service capabilities through API/CLI automation.
+Advocated for Agile and modern SDLC improvements.Led modernization of 2Us data platform and empowered analytics and ML teams to deliver smarter insights at scale. Directed Snowflake migration and built a global BI dataset ecosystem. Implemented CCPA automation and Master Data Management (MDM) integrations. Enhanced self-service capabilities through API/CLI automation. Advocated for Agile and modern SDLC improvements.…see more
+Engineering Leadership, Negotiation and +3 skills
+Show all 13 experiences
+EducationEducation
+Bar-Ilan University logo
+Bar-Ilan University
+Bar-Ilan University
+Bachelor of Science (BSc), Mathematics and Computer ScienceBachelor of Science (BSc), Mathematics and Computer Science
+Licenses & certificationsLicenses & certifications
+Great Thinkers Learning Academy logo
+How to Build your own Chatbot using Python
+How to Build your own Chatbot using Python
+Great Thinkers Learning AcademyGreat Thinkers Learning Academy
+Issued Sep 2023Issued Sep 2023
+LinkedIn logo
+Introduction to Artificial Intelligence
+Introduction to Artificial Intelligence
+LinkedInLinkedIn
+Issued Sep 2023Issued Sep 2023
+Show credential
+Show all 7 licenses & certifications
+SkillsSkills
+Google Gemini
+Google Gemini
+ChatGPT
+ChatGPT
+Show all 100 skills
+RecommendationsRecommendations
+Recommend Liran
+ReceivedReceived
+GivenGiven
+Janet Shuman is open to work
+Janet Shuman
+Janet Shuman
+· 2ndSecond degree connection
+VP of ProductVP of Product
+June 10, 2025, Janet worked with Liran but on different teamsJune 10, 2025, Janet worked with Liran but on different teams
+Lee is the person you want to go to if you have to present something and you want great statistics. The research and data he provides are top notch. He's also willing to have the difficult conversations that others sometimes avoid. It was a pleasure to work with Lee.Lee is the person you want to go to if you have to present something and you want great statistics. The research and data he provides are top notch. He's also willing to have the difficult conversations that others sometimes avoid. It was a pleasure to work with Lee.
+Katie Strohl
+Katie Strohl
+Katie Strohl
+· 2ndSecond degree connection
+Sr. Data Product Operations Manager at 2U/edX & BeekeeperSr. Data Product Operations Manager at 2U/edX & Beekeeper
+February 6, 2024, Katie worked with Liran on the same teamFebruary 6, 2024, Katie worked with Liran on the same team
+The stand out things about Li that may not come through in his resume would be:
+1. His high standards and expectations of both himself and his team that are balanced with his commitment to the importance of learning and growth for everyone on the team. If you worked with Li and didn't learn something, it was because you didn't want to. The entirety of my sql skills today are because Li made the time to teach me & get me started. Even when he has back-to-back meetings, I have seen him make time to mentor someone.
+2. I've also always respected his direct approach and even when we disagreed - I knew we both respected each other enough to speak honestly. 
+3. Li is one of the most intelligent/quick-witted individuals that you'll have the opportunity to work with.
+
+I'd welcome the opportunity to work with Li again.The stand out things about Li that may not come through in his resume would be: 1. His high standards and expectations of both himself and his team that are balanced with his commitment to the importance of learning and growth for everyone on the team. If you worked with Li and didn't learn something, it was because you didn't want to. The entirety of my sql skills today are because Li made the time to teach me & get me started. Even when he has back-to-back meetings, I have seen him make time to mentor someone. 2. I've also always respected his direct approach and even when we disagreed - I knew we both respected each other enough to speak honestly. 3. Li is one of the most intelligent/quick-witted individuals that you'll have the opportunity to work with. I'd welcome the opportunity to work with Li again.…see more
+Show all 11 received
+CoursesCourses
+AWS RedShift
+AWS RedShift
+Company logo
+Associated with Amber IT Consulting
+Associated with Amber IT Consulting
+Apache Hadoop
+Apache Hadoop
+Show all 11 courses
+LanguagesLanguages
+English
+English
+Native or bilingual proficiencyNative or bilingual proficiency
+German
+German
+Elementary proficiencyElementary proficiency
+Show all 3 languages
+InterestsInterests
+CompaniesCompanies
+GroupsGroups
+NewslettersNewsletters
+SchoolsSchools
+Intel Corporation logo
+Intel Corporation
+Intel Corporation
+4,077,204 followers4,077,204 followers
+
+Follow
+Atos logo
+Atos
+Atos
+2,504,439 followers2,504,439 followers
+
+Follow</pre>
+            </div>
+        </div>
+        
+        <!-- Skills Tab -->
+        <div id="skills" class="tab-content">
+            <div class="section">
+                <h2>Skills Analysis</h2>
+                <p style="color: #6b7280; margin-bottom: 16px;">
+                    Comparison of your skills with Liran Eisenberg's profile.
+                </p>
+                
+                <h3>Shared Skills</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+                    <span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Data Engineering & Analytics</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Cloud & AI Transformation</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">GCP</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">AWS</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Snowflake</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">SQL</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Python</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">AI/ML</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">B2B/B2C</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Tableau</span>
+                </div>
+                
+                <h3>Your Unique Skills</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+                    <span style="padding: 6px 12px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 13px;">Your unique skills will be highlighted in future updates</span>
+                </div>
+                
+                <h3>Their Skills (Learning Opportunities)</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px;">Their unique skills will be highlighted in future updates</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Research Tab -->
+        <div id="research" class="tab-content">
+            <div class="section">
+                <h2>Research & Background</h2>
+                <p style="color: #6b7280; margin-bottom: 16px;">
+                    Use this section to track research about Liran Eisenberg and their work.
+                </p>
+                
+                <h3>Company Background</h3>
+                <p><strong>Invesco Ltd</strong></p>
+                <p style="margin-top: 8px;">Industry insights and company information relevant to your conversation.</p>
+                
+                <h3>Recent Activity</h3>
+                <p style="color: #6b7280; margin-top: 8px;">
+                    Track their LinkedIn posts, articles, or recent accomplishments here.
+                </p>
+                
+                <h3>Common Connections</h3>
+                <p style="color: #6b7280; margin-top: 8px;">
+                    Note any mutual connections or shared networks.
+                </p>
+                
+                <h3>Notes</h3>
+                <p style="color: #6b7280; margin-top: 8px;">
+                    Add your research notes about their background, interests, or recent projects.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content">
+            <div class="section">
+                <h2>Networking Messages</h2>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>1. Initial Connection Request (LinkedIn)</span>
+                        <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
+                    </h3>
+                    <div id="connection-message">"Liran, I'm fascinated by your insights on AI/ML in retail and your experience with GCP & Snowflake. As a fellow data enthusiast, I'd love to hear more about what drove you to choose these cloud platforms. Let's explore how we can drive innovation together!"</div>
+                    <div class="char-count">258 characters</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>2. Meeting Invitation</span>
+                        <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
+                    </h3>
+                    <div id="meeting-message">Here's a message inviting Liran Eisenberg to a 1:1 meet & greet:
+
+Subject: Let's Connect Over Coffee!
+
+Hi Liran,
+
+A huge thank you for accepting my connection request! I'm excited to start exploring the world of finance and technology through your lens at Invesco Ltd.
+
+As someone who's passionate about AI/ML, data engineering, and cloud computing, I couldn't help but notice our shared interests. I'd love to learn more about your experiences with GCP and Snowflake, as well as your thoughts on how AI is shaping the retail industry. Your insights would be incredibly valuable!
+
+Would you be available for a casual 15-20 minute virtual coffee chat? No agendas or formalities – just an opportunity to connect, share stories, and learn from each other. Let me know if this is something that interests you, and we can schedule a time that suits you.
+
+Looking forward to hearing back from you, Liran!
+
+Best regards,
+[Your Name]</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>3. Thank You Message</span>
+                        <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
+                    </h3>
+                    <div id="thankyou-message">Here's a draft thank-you message:
+
+Subject: Thank you for the meeting, Liran!
+
+Dear Liran,
+
+I wanted to take a moment to express my sincere gratitude for taking the time to meet with me yesterday at Invesco Ltd. I truly appreciated your insights on [topic discussed] and how it relates to our goals. Your expertise in this area is impressive, and I'm excited to apply some of the strategies we discussed.
+
+One thing that really resonated with me was your emphasis on [specific point or quote]. It's clear that Invesco Ltd. is committed to innovation and staying ahead of the curve, and I'm looking forward to exploring how we can leverage those strengths in our partnership.
+
+As a follow-up, I'd love to touch base in a few weeks to see how the ideas we discussed are taking shape. If there's anything specific you'd like me to keep in mind or any additional information you need from me, please don't hesitate to reach out.
+
+It was great meeting you, Liran, and I look forward to staying in touch. Let's connect on LinkedIn and continue the conversation.
+
+Best regards,
+[Your Name]</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>4. Consulting Services Offer</span>
+                        <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
+                    </h3>
+                    <div id="consulting-message">Here is a professional message offering consulting services:
+
+**Email:**
+
+Subject: Consulting Services - Enhancing Your Organization's Data Engineering Capabilities
+
+Dear [Recipient],
+
+I hope this message finds you well. As we've had the opportunity to connect, I wanted to follow up and introduce myself as Liran Eisenberg from Invesco Ltd. With my expertise in Data Engineering, Analytics, AI/ML Implementation, and Technical Leadership, I'm confident that our conversation has sparked some interesting ideas on how your organization can leverage data-driven insights to drive business growth.
+
+As you may know, [Industry] companies like yours are constantly seeking ways to optimize their operations, improve customer experiences, and gain a competitive edge. In this context, effective data engineering and analytics capabilities are crucial for informed decision-making and strategic planning. My consulting services focus on helping organizations like yours develop tailored solutions that address specific pain points and opportunities.
+
+I'd love the opportunity to discuss your organization's current challenges and goals in more detail. A brief discovery call would allow us to explore potential areas of improvement, identify key initiatives, and determine how my expertise can best support your objectives. This conversation will be entirely consultative, with no pressure or obligation to move forward. Your time is valuable, and I respect that.
+
+If you're interested in exploring this further, please let me know, and we can schedule a 30-minute call at your convenience. I'm looking forward to hearing from you and potentially collaborating on a project that drives meaningful results for your organization.
+
+Best regards,
+
+Liran Eisenberg
+Invesco Ltd.
+
+**LinkedIn message:**
+
+Hi [Recipient],
+
+I wanted to follow up on our recent connection. As we discussed, my expertise in Data Engineering, Analytics, AI/ML Implementation, and Technical Leadership can help organizations like yours unlock the value of their data. With a strong understanding of your industry's challenges and opportunities, I believe my consulting services could provide valuable insights to drive business growth.
+
+I'd love to explore potential areas of improvement and identify key initiatives that align with your organization's goals. A brief discovery call would be a great starting point to discuss your current challenges and see how my expertise can support your objectives. This conversation will be entirely consultative, with no pressure or obligation to move forward. Your time is valuable, and I respect that.
+
+If you're interested in learning more, please let me know, and we can schedule a 30-minute call at your convenience. I'm looking forward to hearing from you and potentially collaborating on a project that drives meaningful results for your organization.
+
+Best regards,
+
+Liran Eisenberg
+Invesco Ltd.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Updates & Notes Tab -->
+        <div id="updates" class="tab-content">
+            <div class="section">
+                <h2>Update Status</h2>
+                
+                <div id="updateAlert" class="alert"></div>
+                
+                <form id="statusUpdateForm">
+                    <div class="form-group">
+                        <label for="status">Select Status</label>
+                        <select id="status" name="status" required>
+                            <option value="">-- Select Status --</option>
+                            <optgroup label="Research & Contact">
+                                <option value="To Research" >To Research</option>
+                                <option value="Ready to Contact" >Ready to Contact</option>
+                                <option value="Contacted - Sent" selected>Contacted - Sent</option>
+                                <option value="Contacted - Replied" >Contacted - Replied</option>
+                                <option value="Contacted - No Response" >Contacted - No Response</option>
+                                <option value="Cold/Archive" >Cold/Archive</option>
+                            </optgroup>
+                            <optgroup label="Engagement">
+                                <option value="In Conversation" >In Conversation</option>
+                                <option value="Meeting Scheduled" >Meeting Scheduled</option>
+                                <option value="Meeting Complete" >Meeting Complete</option>
+                                <option value="Action Pending - You" >Action Pending - You</option>
+                                <option value="Action Pending - Them" >Action Pending - Them</option>
+                            </optgroup>
+                            <optgroup label="Relationship">
+                                <option value="New Connection" >New Connection</option>
+                                <option value="Nurture (1-3 Mo.)" >Nurture (1-3 Mo.)</option>
+                                <option value="Nurture (4-6 Mo.)" >Nurture (4-6 Mo.)</option>
+                                <option value="Referral Partner" >Referral Partner</option>
+                                <option value="Inactive/Dormant" >Inactive/Dormant</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes (optional)</label>
+                        <textarea id="notes" name="notes" placeholder="Add any notes about this status update..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
+                </form>
+                
+                <div class="timeline" id="timeline">
+                    <h2>Status History</h2>
+                    <div id="timelineContent">
+                        <p style="color: #6b7280;">Loading timeline...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const contactId = '20251212113832-Liran Eisenberg-Invesco Ltd';
+        
+        // Load timeline on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTimeline();
+        });
+        
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Mark selected tab as active
+            event.target.classList.add('active');
+            
+            // Load timeline if updates tab is selected
+            if (tabName === 'updates') {
+                loadTimeline();
+            }
+        }
+        
+        function copyMessage(messageType) {
+            const messageElement = document.getElementById(messageType + '-message');
+            const text = messageElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+        
+        // Handle status update form submission
+        document.getElementById('statusUpdateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const updateBtn = document.getElementById('updateBtn');
+            const updateAlert = document.getElementById('updateAlert');
+            const status = document.getElementById('status').value;
+            const notes = document.getElementById('notes').value;
+            
+            // Disable button
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            
+            // Hide previous alerts
+            updateAlert.classList.remove('show', 'success', 'error');
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status, notes })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    updateAlert.textContent = `Status updated to "${status}"`;
+                    updateAlert.classList.add('show', 'success');
+                    
+                    // Clear notes field
+                    document.getElementById('notes').value = '';
+                    
+                    // Reload timeline
+                    await loadTimeline();
+                    
+                    // Update page metadata if needed
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    // Show error message
+                    updateAlert.textContent = `Error: ${data.error}`;
+                    updateAlert.classList.add('show', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                updateAlert.textContent = `Error: ${error.message}`;
+                updateAlert.classList.add('show', 'error');
+            } finally {
+                // Re-enable button
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Update Status';
+            }
+        });
+        
+        async function loadTimeline() {
+            const timelineContent = document.getElementById('timelineContent');
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}`);
+                const data = await response.json();
+                
+                if (data.success && data.contact.updates) {
+                    const updates = data.contact.updates;
+                    
+                    if (updates.length === 0) {
+                        timelineContent.innerHTML = '<p style="color: #6b7280;">No status updates yet.</p>';
+                        return;
+                    }
+                    
+                    // Render timeline items (already sorted newest first from API)
+                    timelineContent.innerHTML = updates.map((update, index) => {
+                        const isLatest = index === 0;
+                        const timestamp = update.timestamp;
+                        const date = new Date(
+                            parseInt(timestamp.substring(0, 4)),
+                            parseInt(timestamp.substring(4, 6)) - 1,
+                            parseInt(timestamp.substring(6, 8)),
+                            parseInt(timestamp.substring(8, 10)),
+                            parseInt(timestamp.substring(10, 12)),
+                            parseInt(timestamp.substring(12, 14))
+                        );
+                        
+                        return `
+                            <div class="timeline-item ${isLatest ? 'latest' : ''}">
+                                <div class="timeline-date">${date.toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric', 
+                                    year: 'numeric',
+                                    hour: 'numeric',
+                                    minute: '2-digit'
+                                })}</div>
+                                <div class="timeline-status">${update.status}</div>
+                                ${update.notes ? `<div class="timeline-notes">${update.notes}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    timelineContent.innerHTML = '<p style="color: #6b7280;">Error loading timeline.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading timeline:', error);
+                timelineContent.innerHTML = '<p style="color: #ef4444;">Error loading timeline.</p>';
+            }
+        }
+        
+        async function regenerateDocuments() {
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            
+            if (!confirm('Regenerate all AI analysis and messages? This will take 5-6 minutes.')) {
+                return;
+            }
+            
+            regenerateBtn.disabled = true;
+            regenerateBtn.textContent = '🔄 Regenerating...';
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/regenerate`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Documents regenerated successfully! Reloading page...');
+                    location.reload();
+                } else {
+                    alert(`Error: ${data.error}`);
+                    regenerateBtn.disabled = false;
+                    regenerateBtn.textContent = '🔄 Regenerate Documents';
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                regenerateBtn.disabled = false;
+                regenerateBtn.textContent = '🔄 Regenerate Documents';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -746,8 +746,10 @@ class DashboardGenerator:
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link active">Dashboard</a></li>
+            <li><a href="/dashboard" class="nav-link active">App Dash</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
             <li><a href="/progress" class="nav-link">Progress</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>
@@ -1976,8 +1978,10 @@ class DashboardGenerator:
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
             <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
             <li><a href="/templates" class="nav-link">Templates</a></li>
             <li><a href="/progress" class="nav-link active">Progress</a></li>
             <li><a href="/reports" class="nav-link">Reports</a></li>

@@ -17,6 +17,8 @@ from app.services.document_generator import DocumentGenerator
 from app.services.dashboard_generator import DashboardGenerator
 from app.services.template_manager import TemplateManager
 from app.services.analytics_generator import AnalyticsGenerator
+from app.services.networking_processor import NetworkingProcessor
+from app.services.networking_document_generator import NetworkingDocumentGenerator
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root
 
@@ -26,6 +28,14 @@ app = Flask(__name__,
            static_url_path='/static')
 CORS(app)
 
+# #region agent log
+import json
+import time
+# Debug logging disabled - .cursor directory has special protections
+# with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+#     f.write(json.dumps({"location":"web.py:init","message":"Starting service initialization","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
+# #endregion
+
 # Initialize services
 resume_manager = ResumeManager()
 job_processor = JobProcessor()
@@ -34,6 +44,21 @@ doc_generator = DocumentGenerator()
 dashboard_generator = DashboardGenerator()
 template_manager = TemplateManager()
 analytics_generator = AnalyticsGenerator()
+
+# #region agent log
+# Debug logging disabled - .cursor directory has special protections
+# with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+#     f.write(json.dumps({"location":"web.py:init","message":"About to initialize NetworkingProcessor","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
+# #endregion
+
+networking_processor = NetworkingProcessor()
+networking_doc_generator = NetworkingDocumentGenerator()
+
+# #region agent log
+# Debug logging disabled - .cursor directory has special protections
+# with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+#     f.write(json.dumps({"location":"web.py:init","message":"All services initialized successfully","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
+# #endregion
 
 STATUS_NORMALIZATION_MAP = {
     'contacted hiring manager': 'company response',
@@ -82,6 +107,18 @@ def index():
 def new_application():
     """New application form page"""
     return render_template('ui.html')
+
+
+@app.route('/new-networking-contact')
+def new_networking_contact():
+    """New networking contact form page"""
+    return render_template('networking_form.html')
+
+
+@app.route('/networking')
+def networking_dashboard():
+    """Networking contacts dashboard"""
+    return render_template('networking_dashboard.html')
 
 
 @app.route('/api/dashboard-stats', methods=['GET'])
@@ -923,6 +960,313 @@ def generate_intros(app_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ============================================================================
+# NETWORKING ENDPOINTS
+# ============================================================================
+
+@app.route('/api/networking/contacts', methods=['POST'])
+def create_networking_contact():
+    """Create a new networking contact"""
+    try:
+        data = request.json
+        person_name = data.get('person_name')
+        company_name = data.get('company_name')
+        profile_details = data.get('profile_details')
+        job_title = data.get('job_title')
+        linkedin_url = data.get('linkedin_url')
+        
+        if not all([person_name, company_name, profile_details]):
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: person_name, company_name, profile_details'
+            }), 400
+        
+        # Check if resume exists
+        try:
+            resume = resume_manager.load_base_resume()
+        except FileNotFoundError:
+            return jsonify({
+                'success': False,
+                'error': 'Base resume not found. Please create a resume first.'
+            }), 400
+        
+        # Check Ollama connection
+        if not ai_analyzer.check_connection():
+            return jsonify({
+                'success': False,
+                'error': 'Cannot connect to Ollama. Please ensure Ollama is running.'
+            }), 503
+        
+        # Create contact
+        contact = networking_processor.create_networking_contact(
+            person_name=person_name,
+            company_name=company_name,
+            profile_details=profile_details,
+            job_title=job_title,
+            linkedin_url=linkedin_url
+        )
+        
+        # Generate all documents (AI analysis and messages)
+        networking_doc_generator.generate_all_documents(contact, resume.content)
+        
+        # Save updated metadata with paths and match score
+        networking_processor._save_contact_metadata(contact)
+        
+        # Generate summary URL
+        summary_url = None
+        if contact.summary_path:
+            folder_name = contact.folder_path.name
+            summary_filename = contact.summary_path.name
+            summary_url = f"/networking/{folder_name}/{summary_filename}"
+        
+        return jsonify({
+            'success': True,
+            'message': 'Networking contact created successfully',
+            'contact_id': contact.id,
+            'person_name': contact.person_name,
+            'company_name': contact.company_name,
+            'match_score': contact.match_score,
+            'summary_url': summary_url,
+            'folder_path': str(contact.folder_path)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts', methods=['GET'])
+def list_networking_contacts():
+    """List all networking contacts"""
+    try:
+        contacts = networking_processor.list_all_contacts()
+        
+        return jsonify({
+            'success': True,
+            'contacts': [{
+                'id': c.id,
+                'person_name': c.person_name,
+                'company_name': c.company_name,
+                'job_title': c.job_title,
+                'status': c.status,
+                'created_at': c.created_at.isoformat(),
+                'status_updated_at': c.status_updated_at.isoformat() if c.status_updated_at else None,
+                'match_score': c.match_score,
+                'linkedin_url': c.linkedin_url,
+                'email': c.email,
+                'location': c.location,
+                'flagged': c.flagged,
+                'days_since_update': c.get_days_since_update(),
+                'timing_color': c.get_timing_color_class()
+            } for c in contacts],
+            'count': len(contacts)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts/<contact_id>', methods=['GET'])
+def get_networking_contact(contact_id):
+    """Get networking contact details"""
+    try:
+        contact = networking_processor.get_contact_by_id(contact_id)
+        
+        if not contact:
+            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        
+        # Get updates
+        updates = networking_processor.get_contact_updates(contact)
+        
+        return jsonify({
+            'success': True,
+            'contact': {
+                'id': contact.id,
+                'person_name': contact.person_name,
+                'company_name': contact.company_name,
+                'job_title': contact.job_title,
+                'status': contact.status,
+                'created_at': format_for_display(contact.created_at),
+                'updated_at': format_for_display(contact.status_updated_at),
+                'match_score': contact.match_score,
+                'linkedin_url': contact.linkedin_url,
+                'email': contact.email,
+                'location': contact.location,
+                'flagged': contact.flagged,
+                'updates': updates
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts/<contact_id>/status', methods=['PUT'])
+def update_networking_status(contact_id):
+    """Update networking contact status"""
+    try:
+        data = request.json
+        status = data.get('status')
+        notes = data.get('notes')
+        
+        if not status:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: status'
+            }), 400
+        
+        # Load contact
+        contact = networking_processor.get_contact_by_id(contact_id)
+        
+        if not contact:
+            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        
+        # Update status with notes
+        networking_processor.update_contact_status(contact, status, notes)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Status updated to {status}',
+            'contact_id': contact.id,
+            'status': status,
+            'updated_at': format_for_display(contact.status_updated_at)
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts/<contact_id>/details', methods=['PUT'])
+def update_networking_details(contact_id):
+    """Update networking contact details"""
+    try:
+        data = request.json
+        email = data.get('email')
+        location = data.get('location')
+        job_title = data.get('job_title')
+        
+        # Load contact
+        contact = networking_processor.get_contact_by_id(contact_id)
+        
+        if not contact:
+            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        
+        # Update details
+        networking_processor.update_contact_details(
+            contact,
+            email=email,
+            location=location,
+            job_title=job_title
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Contact details updated successfully',
+            'contact_id': contact.id,
+            'updated_fields': {
+                'email': contact.email,
+                'location': contact.location,
+                'job_title': contact.job_title
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts/<contact_id>/flag', methods=['PUT'])
+def toggle_networking_flag(contact_id):
+    """Toggle flag status for a networking contact"""
+    try:
+        data = request.json
+        flagged = data.get('flagged')
+        
+        if flagged is None:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: flagged (boolean)'
+            }), 400
+        
+        # Load contact
+        contact = networking_processor.get_contact_by_id(contact_id)
+        
+        if not contact:
+            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        
+        # Update flagged status
+        contact.flagged = bool(flagged)
+        
+        # Save updated metadata
+        networking_processor._save_contact_metadata(contact)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Contact {"flagged" if contact.flagged else "unflagged"} successfully',
+            'contact_id': contact.id,
+            'flagged': contact.flagged
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts/<contact_id>/regenerate', methods=['POST'])
+def regenerate_networking_documents(contact_id):
+    """Regenerate AI analysis and messages for a networking contact"""
+    try:
+        # Reimport to get latest code changes (fixes Flask reload issue)
+        import importlib
+        from app.services import networking_document_generator as ndg_module
+        importlib.reload(ndg_module)
+        doc_gen_fresh = ndg_module.NetworkingDocumentGenerator()
+        
+        # Load contact
+        contact = networking_processor.get_contact_by_id(contact_id)
+        
+        if not contact:
+            return jsonify({'success': False, 'error': 'Contact not found'}), 404
+        
+        # Load resume
+        try:
+            resume = resume_manager.load_base_resume()
+        except FileNotFoundError:
+            return jsonify({
+                'success': False,
+                'error': 'Base resume not found. Please create a resume first.'
+            }), 400
+        
+        # Regenerate all documents with fresh instance
+        doc_gen_fresh.generate_all_documents(contact, resume.content)
+        
+        # Save updated metadata
+        networking_processor._save_contact_metadata(contact)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Documents regenerated successfully',
+            'contact_id': contact.id,
+            'match_score': contact.match_score
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/networking/<path:filepath>')
+def serve_networking_file(filepath):
+    """Serve networking files (summaries, documents, etc.)"""
+    from app.utils.file_utils import get_data_path
+    # Get data directory and add networking subfolder
+    data_dir = get_data_path('.')
+    networking_dir = data_dir / 'networking'
+    file_path = networking_dir / filepath
+    
+    if file_path.exists() and file_path.is_file():
+        return send_from_directory(
+            file_path.parent,
+            file_path.name
+        )
+    return "File not found", 404
+
+
 @app.route('/api/dashboard/update', methods=['POST'])
 def update_dashboard():
     """Update the dashboard"""
@@ -1017,8 +1361,17 @@ def get_reports_data():
         from datetime import datetime, timedelta, timezone
         
         period = request.args.get('period', '30days')
+        report_type = request.args.get('type', 'jobs')  # 'jobs', 'networking', or 'both'
         gap_period = request.args.get('gap_period', 'all')  # For skill gaps: 'daily', 'weekly', 'monthly', 'all'
-        applications = job_processor.list_all_applications()
+        
+        # Load data based on type
+        applications = []
+        networking_contacts = []
+        
+        if report_type in ['jobs', 'both']:
+            applications = job_processor.list_all_applications()
+        if report_type in ['networking', 'both']:
+            networking_contacts = networking_processor.list_all_contacts()
         
         # Calculate date ranges based on period
         now = datetime.now(timezone(timedelta(hours=-4)))
@@ -1213,28 +1566,135 @@ def get_reports_data():
         # Sort flagged applications by newest update first
         flagged_applications.sort(key=lambda x: x['last_updated'], reverse=True)
         
+        # ===== NETWORKING DATA PROCESSING =====
+        # Process networking contacts similarly to applications
+        networking_by_status = {}
+        networking_status_changes = []
+        networking_followup_list = []
+        networking_flagged_list = []
+        
+        for contact in networking_contacts:
+            # Convert contact datetimes to same timezone
+            contact_created_at = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+            contact_status_updated_at = contact.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if contact.status_updated_at else None
+            
+            # Count contacts created in period
+            if start_date <= contact_created_at <= end_date:
+                status = contact.status
+                networking_by_status[status] = networking_by_status.get(status, 0) + 1
+            
+            # Count status changes in period
+            if contact_status_updated_at and start_date <= contact_status_updated_at <= end_date:
+                networking_status_changes.append(contact)
+            
+            # Follow-up contacts (more than one week without updates)
+            last_update = contact_status_updated_at or contact_created_at
+            if last_update < one_week_ago and contact.status not in ['Cold/Archive']:
+                summary_url = None
+                if contact.summary_path and contact.summary_path.exists():
+                    folder_name = contact.folder_path.name
+                    summary_filename = contact.summary_path.name
+                    summary_url = f"/networking/{folder_name}/{summary_filename}"
+                
+                networking_followup_list.append({
+                    'company': contact.company_name,
+                    'job_title': contact.job_title or 'N/A',
+                    'match_score': round(contact.match_score or 0),
+                    'last_updated': format_for_display(last_update),
+                    'summary_url': summary_url,
+                    'contact_count': contact.contact_count or 0,
+                    'type': 'networking'
+                })
+            
+            # Flagged contacts
+            if contact.flagged:
+                summary_url = None
+                if contact.summary_path and contact.summary_path.exists():
+                    folder_name = contact.folder_path.name
+                    summary_filename = contact.summary_path.name
+                    summary_url = f"/networking/{folder_name}/{summary_filename}"
+                
+                last_update = contact_status_updated_at or contact_created_at
+                networking_flagged_list.append({
+                    'company': contact.company_name,
+                    'job_title': contact.job_title or 'N/A',
+                    'match_score': round(contact.match_score or 0),
+                    'last_updated': format_for_display(last_update),
+                    'summary_url': summary_url,
+                    'contact_count': contact.contact_count or 0,
+                    'status': contact.status,
+                    'type': 'networking'
+                })
+        
+        # Networking status changes count
+        networking_status_changes_by_status = {}
+        networking_status_changes_count = 0
+        for contact in networking_status_changes:
+            status = contact.status
+            networking_status_changes_count += 1
+            networking_status_changes_by_status[status] = networking_status_changes_by_status.get(status, 0) + 1
+        
+        # ===== COMBINE DATA BASED ON TYPE =====
+        if report_type == 'networking':
+            # Use only networking data
+            applications_by_status = networking_by_status
+            status_changes_by_status = networking_status_changes_by_status
+            followup_applications = networking_followup_list
+            flagged_applications = networking_flagged_list
+            status_changes_count = networking_status_changes_count
+            total_count = len([c for c in networking_contacts if start_date <= c.created_at.replace(tzinfo=timezone(timedelta(hours=-4))) <= end_date])
+        elif report_type == 'both':
+            # Combine both
+            for status, count in networking_by_status.items():
+                applications_by_status[f'Net: {status}'] = count
+            for status, count in networking_status_changes_by_status.items():
+                status_changes_by_status[f'Net: {status}'] = count
+            followup_applications.extend(networking_followup_list)
+            flagged_applications.extend(networking_flagged_list)
+            status_changes_count += networking_status_changes_count
+            total_count = len(period_applications) + len([c for c in networking_contacts if start_date <= c.created_at.replace(tzinfo=timezone(timedelta(hours=-4))) <= end_date])
+        else:  # 'jobs' - already set, no changes needed
+            total_count = len(period_applications)
+        
+        # Sort combined lists
+        followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
+        flagged_applications.sort(key=lambda x: x['last_updated'], reverse=True)
+        
         # Calculate rejected applications from status changes (applications rejected in period)
         rejected_count = status_changes_by_status.get('rejected', 0)
+        if report_type == 'both':
+            rejected_count += status_changes_by_status.get('Net: Cold/Archive', 0)
         
         # Calculate active applications (total - rejected)
-        active_applications = len(period_applications) - rejected_count
+        active_applications = total_count - rejected_count
         
         # Calculate total contact count from status_changes_by_status (matches the chart)
         total_contact_count = 0
-        if 'contacted someone' in status_changes_by_status:
-            total_contact_count += status_changes_by_status['contacted someone']
-        if 'company response' in status_changes_by_status:
-            total_contact_count += status_changes_by_status['company response']
-        if 'contacted hiring manager' in status_changes_by_status:
-            total_contact_count += status_changes_by_status['contacted hiring manager']
+        if report_type in ['jobs', 'both']:
+            if 'contacted someone' in status_changes_by_status:
+                total_contact_count += status_changes_by_status['contacted someone']
+            if 'company response' in status_changes_by_status:
+                total_contact_count += status_changes_by_status['company response']
+            if 'contacted hiring manager' in status_changes_by_status:
+                total_contact_count += status_changes_by_status['contacted hiring manager']
+        if report_type in ['networking', 'both']:
+            # Count networking contacts
+            if report_type == 'networking':
+                for status, count in networking_status_changes_by_status.items():
+                    if 'Contacted' in status:
+                        total_contact_count += count
+            else:  # 'both'
+                for status, count in status_changes_by_status.items():
+                    if status.startswith('Net:') and 'Contacted' in status:
+                        total_contact_count += count
         
-        # Calculate total actions (applications created + status changes) for the period
-        total_actions = len(period_applications) + status_changes_count
+        # Calculate total actions (applications/contacts created + status changes) for the period
+        total_actions = total_count + status_changes_count
         
         # Summary statistics
         summary = {
-            'total_applications': len(period_applications),
-            'new_applications': len(period_applications),
+            'total_applications': total_count,
+            'new_applications': total_count,
             'active_applications': active_applications,
             'status_changes': status_changes_count,
             'rejected': rejected_count,
@@ -1398,11 +1858,12 @@ def export_reports_csv():
 
 @app.route('/api/daily-activities', methods=['GET'])
 def get_daily_activities():
-    """Get daily activities data"""
+    """Get daily activities data (combined jobs + networking)"""
     try:
         from datetime import datetime, timezone, timedelta
         
         applications = job_processor.list_all_applications()
+        networking_contacts = networking_processor.list_all_contacts()
         
         # Group activities by date
         daily_activities = {}
@@ -1426,7 +1887,8 @@ def get_daily_activities():
                 'activity': 'Application Created',
                 'status': 'Created',
                 'application_id': app.id,
-                'datetime': app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))  # Add datetime for sorting
+                'datetime': app.created_at.replace(tzinfo=timezone(timedelta(hours=-4))),  # Add datetime for sorting
+                'type': 'job'
             })
             
             # Add status updates as activities
@@ -1451,10 +1913,62 @@ def get_daily_activities():
                         'activity': f'Status Changed to {update["status"]}',
                         'status': update['status'],
                         'application_id': app.id,
-                        'datetime': dt  # Add datetime for sorting
+                        'datetime': dt,  # Add datetime for sorting
+                        'type': 'job'
                     })
                 except Exception as e:
                     print(f"Error processing update {update}: {e}")
+                    continue
+        
+        # Add networking activities
+        for contact in networking_contacts:
+            # Add contact creation as an activity
+            created_date = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).date()
+            if created_date not in daily_activities:
+                daily_activities[created_date] = []
+            
+            # Format timestamp for display
+            created_timestamp = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).strftime('%I:%M %p EST')
+            
+            daily_activities[created_date].append({
+                'company': contact.company_name,
+                'position': contact.job_title or 'Networking Contact',
+                'timestamp': created_timestamp,
+                'activity': 'Networking Contact Created',
+                'status': contact.status,
+                'application_id': contact.id,
+                'datetime': contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4))),
+                'type': 'networking'
+            })
+            
+            # Add status updates for networking contacts
+            updates = networking_processor.get_contact_updates(contact)
+            for update in updates:
+                try:
+                    # Parse timestamp from filename
+                    timestamp_str = update['timestamp']
+                    dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                    dt = dt.replace(tzinfo=timezone(timedelta(hours=-4)))
+                    update_date = dt.date()
+                    
+                    if update_date not in daily_activities:
+                        daily_activities[update_date] = []
+                    
+                    # Format timestamp for display
+                    display_timestamp = dt.strftime('%I:%M %p EST')
+                    
+                    daily_activities[update_date].append({
+                        'company': contact.company_name,
+                        'position': contact.job_title or 'Networking Contact',
+                        'timestamp': display_timestamp,
+                        'activity': f'Status Changed to {update["status"]}',
+                        'status': update['status'],
+                        'application_id': contact.id,
+                        'datetime': dt,
+                        'type': 'networking'
+                    })
+                except Exception as e:
+                    print(f"Error processing networking update {update}: {e}")
                     continue
         
         # Sort activities within each day by datetime (newest first)
@@ -1624,26 +2138,49 @@ def internal_error(error):
 
 
 if __name__ == '__main__':
+    # #region agent log
+    # Debug logging disabled - .cursor directory has special protections
+    # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+    #     f.write(json.dumps({"location":"web.py:main","message":"Starting main execution","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"A"}) + '\n')
+    # #endregion
+    
     # Get port from environment variable or use default
     port = int(os.environ.get('PORT', 51003))
+    
+    # #region agent log
+    # Debug logging disabled - .cursor directory has special protections
+    # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+    #     f.write(json.dumps({"location":"web.py:main","message":"Port configured","data":{"port":port},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
+    # #endregion
     
     print("🚀 Starting Job Hunter Application...")
     print(f"📱 Open http://localhost:{port} in your browser")
     print(f"📊 Dashboard: http://localhost:{port}/dashboard")
+    print(f"🤝 Networking: http://localhost:{port}/networking")
     print("Press Ctrl+C to stop")
     print()
     
     # Check Ollama connection
-    if ai_analyzer.check_connection():
-        print("✅ Ollama is connected")
-        models = ai_analyzer.list_available_models()
-        print(f"📦 Available models: {', '.join(models) if models else 'None'}")
-    else:
-        print("⚠️  Ollama is not connected. Please start Ollama:")
-        print("   1. Install: brew install ollama")
-        print("   2. Start: ollama serve")
-        print("   3. Pull model: ollama pull llama3")
+    try:
+        if ai_analyzer.check_connection():
+            print("✅ Ollama is connected")
+            models = ai_analyzer.list_available_models()
+            print(f"📦 Available models: {', '.join(models) if models else 'None'}")
+        else:
+            print("⚠️  Ollama is not connected. Please start Ollama:")
+            print("   1. Install: brew install ollama")
+            print("   2. Start: ollama serve")
+            print("   3. Pull model: ollama pull llama3")
+    except Exception as e:
+        print(f"⚠️  Could not check Ollama connection: {e}")
+    
+    # #region agent log
+    # Debug logging disabled - .cursor directory has special protections
+    # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+    #     f.write(json.dumps({"location":"web.py:main","message":"About to start Flask app","data":{"port":port,"host":"0.0.0.0","debug":True},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"A"}) + '\n')
+    # #endregion
     
     print()
+    print("🔄 Starting Flask server...")
     app.run(debug=True, port=port, host='0.0.0.0')
 
