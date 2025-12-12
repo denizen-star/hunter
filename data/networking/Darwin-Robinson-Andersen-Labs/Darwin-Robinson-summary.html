@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liran Eisenberg - Invesco Ltd</title>
+    <title>Darwin Robinson - Andersen Labs</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -183,33 +183,37 @@
         .tabs {
             background: white;
             border-bottom: 1px solid #e5e7eb;
-            padding: 0 32px;
+            padding: 0;
             display: flex;
-            gap: 8px;
+            gap: 0;
+            margin: 0 32px;
         }
         
         .tab {
             padding: 16px 24px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            font-weight: 400;
             color: #6b7280;
             transition: all 0.15s ease;
+            position: relative;
         }
         
         .tab:hover {
             color: #374151;
+            background: #f9fafb;
         }
         
         .tab.active {
-            color: #3b82f6;
+            color: #1f2937;
             border-bottom-color: #3b82f6;
+            font-weight: 500;
         }
         
         .content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px;
+            margin: 0 32px;
+            padding: 0;
+            padding-top: 0;
         }
         
         .tab-content {
@@ -222,27 +226,45 @@
         
         .section {
             background: white;
-            border-radius: 12px;
-            padding: 28px;
+            border-radius: 0;
+            padding: 0;
             margin-bottom: 24px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-            border: 1px solid #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .section-header {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: 0;
         }
         
         .section h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
             color: #1f2937;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f3f4f6;
+            padding: 0;
+            border-bottom: none;
         }
         
-        .section h3 {
+        .section-content {
+            padding: 28px;
+        }
+        
+        .section-content h3 {
             font-size: 16px;
             font-weight: 600;
             margin: 20px 0 12px 0;
             color: #374151;
+        }
+        
+        .section-content h3:first-child {
+            margin-top: 0;
         }
         
         .info-grid {
@@ -566,11 +588,11 @@
         <a href="/networking" class="back-link">Back to Network Dash</a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-                <h1>Liran Eisenberg</h1>
-                <div class="subtitle">Invesco Ltd • VP Data Analytics</div>
+                <h1>Darwin Robinson</h1>
+                <div class="subtitle">Andersen Labs • Strategic Program Director</div>
             </div>
             <div style="display: flex; gap: 12px;">
-                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Liran+Eisenberg&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Liran+Eisenberg%0A%0ACompany%3A+Invesco+Ltd%0ATitle%3A+VP+Data+Analytics%0AStatus%3A+Contacted+-+Sent%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Fliraneisenberg%2F%0AEmail%3A+liran.eisenberg%40invesco.us%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FLiran-Eisenberg-Invesco-Ltd%2FLiran-Eisenberg-summary.html%0A&location=Invesco+Ltd&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Darwin+Robinson&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Darwin+Robinson%0A%0ACompany%3A+Andersen+Labs%0ATitle%3A+Strategic+Program+Director%0AStatus%3A+To+Research%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Fdarwin-robinson-66b520279%2F%0AEmail%3A+Not+available%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FDarwin-Robinson-Andersen-Labs%2FDarwin-Robinson-summary.html%0A&location=Andersen+Labs&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
                         📅 Add to GCal
                     </a>
                     <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
@@ -589,25 +611,25 @@
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
-                <span>New York, NY</span>
+                <span>N/A</span>
             </div>
             <div class="meta-item">
                 <span>📅</span>
-                <span><strong>Connected:</strong> Dec 12, 2025 11:38 AM EST</span>
+                <span><strong>Connected:</strong> Dec 12, 2025 05:20 PM EST</span>
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> Dec 12, 2025 04:36 PM EST</span>
+                <span><strong>Updated:</strong> Dec 12, 2025 05:20 PM EST</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> Contacted - Sent</span>
+                <span><strong>Status:</strong> To Research</span>
             </div>
-            <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/liraneisenberg/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
+            <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/darwin-robinson-66b520279/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
             <div class="meta-item" id="emailMetaItem">
                 <span>📧</span>
-                <span id="emailDisplay" style="cursor: pointer; text-decoration: underline; text-decoration-style: dotted;" onclick="editEmailInline()" title="Click to edit">liran.eisenberg@invesco.us</span>
-                <input type="email" id="emailInput" value="liran.eisenberg@invesco.us" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
+                <span id="emailDisplay" style="cursor: pointer; color: #3b82f6; text-decoration: underline;" onclick="editEmailInline()">Add Email</span>
+                <input type="email" id="emailInput" value="" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
             </div>
         </div>
     </div>
@@ -626,81 +648,88 @@
         <div id="summary" class="tab-content active">
             <!-- Contact Details Section -->
             <div class="section">
-                <h2>Contact Details</h2>
+                <div class="section-header">
+                    <h2>Contact Details</h2>
+                </div>
+                <div class="section-content">
                 <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
-                        <input type="email" id="contactEmail" name="email" value="liran.eisenberg@invesco.us" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        <input type="email" id="contactEmail" name="email" value="" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
-                        <input type="text" id="contactLocation" name="location" value="New York, NY" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        <input type="text" id="contactLocation" name="location" value="" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
-                        <input type="text" id="contactJobTitle" name="job_title" value="VP Data Analytics" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        <input type="text" id="contactJobTitle" name="job_title" value="Strategic Program Director" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
                     </div>
                 </form>
                 <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
                 <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
             </div>
             
             <!-- Match Analysis Section -->
             <div class="section">
-                <h2>Match Analysis</h2>
+                <div class="section-header">
+                    <h2>Match Analysis</h2>
+                </div>
+                <div class="section-content">
                 <div class="analysis-section">
                     <div class="analysis-text">MATCH SCORE: 85
 
 SKILL OVERLAP: High
 Shared Skills:
-- Cloud & Infrastructure (AWS, GCP, Snowflake)
-- Data Engineering (Python, SQL, AWS Lake Formation)
-- AI/ML Enablement (ChatGPT, GitHub Copilot)
-- Analytics (Tableau)
+- Data Visualization
+- IT Strategy
+- SQL for Data Science
 
 CAREER SIMILARITY: Medium
 Common Elements:
-- Experience in data engineering and analytics
-- Leadership roles in finance and retail
+- Both have experience in customer-facing roles (Customer Service Representative and Customer Support Analyst)
+- Both have some experience in IT strategy and data visualization
 
 COMMON INTERESTS:
-- Artificial intelligence and machine learning applications
-- Data-driven decision making
-- Cloud-based infrastructure and migration
+- AI and its applications in e-commerce
+- Retail innovation and technology adoption
+- Data-driven decision-making
 
 NETWORKING VALUE: High
 Opportunities:
-- Collaboration on AI/ML projects
-- Referral for data engineering or analytics positions
-- Introduction to industry leaders in finance and retail
+- Collaboration on AI-powered retail projects or initiatives
+- Learning opportunities through shared experiences and expertise
+- Referral potential for each other's professional networks
 
 CONVERSATION TOPICS:
-1. "What's the most innovative AI application you've seen recently?"
-2. "How do you approach migrating legacy systems to cloud-based infrastructure?"
-3. "Can you share your experience with using ChatGPT for data analysis?"
-4. "What are some best practices for ensuring data quality in a cloud-based environment?"
-5. "Have you considered applying AI/ML to optimize supply chain management?"
+1. "What do you think is the most exciting application of AI in e-commerce today, and why?"
+2. "How have you seen AI change the customer experience in your previous roles?"
+3. "What are some common pain points you've encountered when implementing AI solutions in retail, and how did you overcome them?"
+4. "I'm interested in exploring the intersection of AI and data visualization – what are some key takeaways from your experience with this?"
+5. "Have you seen any promising new trends or technologies emerging in the e-commerce space that we should keep an eye on?"
 
 SYNTHESIS:
-
-Liran and Kervin both have extensive experience in data engineering, analytics, and AI/ML enablement, making them valuable connections for anyone looking to expand their professional network. Their shared skills in cloud & infrastructure, data engineering, and AI/ML make them a great fit for collaboration on projects or sharing best practices.
-
-To approach Liran, start by highlighting your own expertise in AI/ML applications and ask about his experience with using ChatGPT for data analysis. You could also ask for advice on migrating legacy systems to cloud-based infrastructure or share your perspective on the importance of data quality in a cloud-based environment. By showing genuine interest in his work and experiences, you can establish a strong foundation for future collaboration or referral opportunities.
-
-Overall, Liran's connection is an excellent opportunity to expand your professional network and gain insights from someone with extensive experience in AI/ML applications and data engineering.</div>
+This connection has significant value due to the overlap in skills, career paths, and interests. By exploring AI applications in e-commerce, data visualization best practices, and retail innovation, we can identify opportunities for collaboration, learning, and referral potential. Approach this connection by starting with a conversation topic that aligns with their current interests or expertise (e.g., AI in e-commerce). Show genuine curiosity about their experiences and perspectives, and be prepared to share your own insights and ideas.</div>
+                </div>
                 </div>
             </div>
             
             <!-- Key Strengths & Talking Points -->
             <div class="section">
-                <h2>Key Strengths & Talking Points</h2>
+                <div class="section-header">
+                    <h2>Key Strengths & Talking Points</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px;">
                     <ul style="margin: 0; padding-left: 20px; color: #166534; line-height: 1.8;">
     <li>CAREER SIMILARITY: Medium</li>
-    <li>Experience in data engineering and analytics</li>
-    <li>Liran and Kervin both have extensive experience in data engineering, analytics, and AI/ML enablement, making them valuable connections for anyone looking to expand their professional network. Their shared skills in cloud & infrastructure, data engineering, and AI/ML make them a great fit for collaboration on projects or sharing best practices.</li>
-    <li>Overall, Liran's connection is an excellent opportunity to expand your professional network and gain insights from someone with extensive experience in AI/ML applications and data engineering.</li>
+    <li>Both have experience in customer-facing roles (Customer Service Representative and Customer Support Analyst)</li>
+    <li>Both have some experience in IT strategy and data visualization</li>
+    <li>Learning opportunities through shared experiences and expertise</li>
+    <li>2. "How have you seen AI change the customer experience in your previous roles?"</li>
 </ul>
+                </div>
                 </div>
             </div>
         </div>
@@ -708,279 +737,271 @@ Overall, Liran's connection is an excellent opportunity to expand your professio
         <!-- Raw Entry Tab -->
         <div id="raw" class="tab-content">
             <div class="section">
-                <h2>Raw Profile Details</h2>
-                <pre>Liran Eisenberg 
- Lee  1st degree connection1st
-VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
+                <div class="section-header">
+                    <h2>Raw Profile Details</h2>
+                </div>
+                <div class="section-content">
+                <pre>Darwin Robinson 
+  1st degree connection1st
+Strategic Program Director, North America @ Andersen
+
+Andersen Lab
+
+University of Oklahoma
 New York, New York, United States  Contact info
-6,354 followers 
-500+ connections
+417 connections
 
 
-Joe Porretta, Alex Merced, and 16 other mutual connectionsJoe Porretta, Alex Merced, and 16 other mutual connections
+David McCann, Hody Crouch, and 1 other mutual connectionDavid McCann, Hody Crouch, and 1 other mutual connection
 
 Message
 
 More
-People similar to Liran Eisenberg
-
-See all
-
-Page 1 of 6Previous
-Next
-Dena McHenry
-Member’s name
-Dena McHenry
-Member’s occupation
-Recruiting MLEs, Applied Scientist, Data Scientists/Causal Inference, Distributed Systems Engineers
-B.J. Fesq
-B.J. is a mutual connection
-
-Connect
-Apparsamy Balaji
-Member’s name
-Apparsamy Balaji
-Member’s occupation
-Chief Data & Analytics Officer | Transforming Businesses with Data, AI, and Purpose
-Michael Atkinson
-Michael and 13 other mutual connections
-
-Connect
-Robin Shears-Huth
-Member’s name
-Robin Shears-Huth
-Member’s occupation
-Sr. Technical Recruiter | Sr. Full Life Cycle Recruiter | Talent Acquisition
-Ron Ferreira
-Ron and 1 other mutual connection
-
-Connect
-HighlightsHighlights
-Liran Eisenberg
-Liran is a new connection
-Liran is a new connection
-Now is a great time to start a conversation.
-Now is a great time to start a conversation.
-
-Introduce myself
 AboutAbout
-With over 25 years of experience, I specialize in building and scaling high-performance teams, modernizing platforms, and driving enterprise value through data engineering, AI, and analytics. I’ve helped Fortune 500s and startups alike transform their capabilities — whether that’s migrating 100+ applications to the cloud, delivering $100M+ in AI-driven revenue gains, or building orgs from 10 to 60+ engineers while cutting contractor overhead by 60%.
+Good at reading the room, staying flexible, and finding the right approach for each situation. I don’t shy away from responsibility and always try to make things easier for the team. Communication comes naturally, and I enjoy helping people feel heard and understood. I stay focused, even when things get hectic.
 
-What I bring to the table:
-Strategic Data & Engineering Leadership , Full lifecycle execution — from vision to delivery — across GCP, AWS, Snowflake, Databricks, and beyond.
-AI/ML Enablement, Hands-on technical leadership and architecture to deliver real-world insights and engineering best practices.
-Scalable Architecture, End-to-end cloud modernization, microservices, and self-service data platforms.
-Team & Culture Builder: Cultivating curiosity, speed, and trust across cross-functional teams.
-Business Impact First: Whether it’s cost savings or revenue growth, everything I do is aligned to high-impact outcomes.
+I help organizations turn strategy into systems that actually work. As a Strategic Program Director at Andersen, I manage complex IT programs across North America - connecting people, data, and infrastructure to make technology feel seamless. Most of my work revolves around CRM implementations (Salesforce), enterprise integrations, and helping teams see their data in a clearer, more actionable way.
 
-My passion? Turning complex problems into elegant solutions that move the business forward — and mentoring the next generation of technical leaders & engineers along the way.
+I started out in customer support, learning firsthand what clients value most (clarity, reliability, and being heard). That mindset still shapes how I work today. I like building frameworks that adapt to change instead of breaking under it.
 
-Let’s connect if you’re looking to scale your data vision or explore transformative leadership in engineering.
-
-"It doesn’t matter who scores the points, it’s who can get the ball to the scorer"
-Larry BirdWith over 25 years of experience, I specialize in building and scaling high-performance teams, modernizing platforms, and driving enterprise value through data engineering, AI, and analytics. I’ve helped Fortune 500s and startups alike transform their capabilities — whether that’s migrating 100+ applications to the cloud, delivering $100M+ in AI-driven revenue gains, or building orgs from 10 to 60+ engineers while cutting contractor overhead by 60%. What I bring to the table: Strategic Data & Engineering Leadership , Full lifecycle execution — from vision to delivery — across GCP, AWS, Snowflake, Databricks, and beyond. AI/ML Enablement, Hands-on technical leadership and architecture to deliver real-world insights and engineering best practices. Scalable Architecture, End-to-end cloud modernization, microservices, and self-service data platforms. Team & Culture Builder: Cultivating curiosity, speed, and trust across cross-functional teams. Business Impact First: Whether it’s cost savings or revenue growth, everything I do is aligned to high-impact outcomes. My passion? Turning complex problems into elegant solutions that move the business forward — and mentoring the next generation of technical leaders & engineers along the way. Let’s connect if you’re looking to scale your data vision or explore transformative leadership in engineering. "It doesn’t matter who scores the points, it’s who can get the ball to the scorer" Larry Bird…see more
+At Andersen, we focus on long-term partnerships. We help companies modernize their systems, improve transparency, and make confident, data-backed decisions. If that’s something you’re exploring, I’m always open to sharing ideas or experiences that might help.Good at reading the room, staying flexible, and finding the right approach for each situation. I don’t shy away from responsibility and always try to make things easier for the team. Communication comes naturally, and I enjoy helping people feel heard and understood. I stay focused, even when things get hectic. I help organizations turn strategy into systems that actually work. As a Strategic Program Director at Andersen, I manage complex IT programs across North America - connecting people, data, and infrastructure to make technology feel seamless. Most of my work revolves around CRM implementations (Salesforce), enterprise integrations, and helping teams see their data in a clearer, more actionable way. I started out in customer support, learning firsthand what clients value most (clarity, reliability, and being heard). That mindset still shapes how I work today. I like building frameworks that adapt to change instead of breaking under it. At Andersen, we focus on long-term partnerships. We help companies modernize their systems, improve transparency, and make confident, data-backed decisions. If that’s something you’re exploring, I’m always open to sharing ideas or experiences that might help.…see more
+Top skills
+Top skills
+ROI Strategies • Analytical Skills • Agile Methodologies • Project Management
+ROI Strategies • Analytical Skills • Agile Methodologies • Project Management
 FeaturedFeatured
-Post
-Post
+Link
+Link
 
-Chris Hopkins recently interviewed me for an episode of his podcast and it was a real pleasure to catch up. Having a sense of humor is important, no doubt the phrase of the day for me was "game changer" :) Feel free to share or ping me if you'd like to discuss any of these topics further.
-likelovecelebrate
-42
-6 comments
+A CRM System Implementation for Exigo by AndersenA CRM System Implementation for Exigo by Andersen
+andersenlab.comandersenlab.com
+Link
+Link
+
+A Mobile Insurance App for a Health Insurance Company by AndersenA Mobile Insurance App for a Health Insurance Company by Andersen
+andersenlab.comandersenlab.com
+Link
+Link
+
+The Project Portfolio of the IT Company AndersenThe Project Portfolio of the IT Company Andersen
+andersenlab.comandersenlab.com
+Link
+Link
+
+Andersen Inc.Andersen Inc.
+clutch.coclutch.co
+
 ActivityActivity
-6,354 followers6,354 followers
+418 followers418 followers
 
-
-Following
 
 Posts
 
 Comments
-Loaded 7 Posts posts
-View Liran Eisenberg’s  graphic link
-Liran EisenbergLiran Eisenberg
-   • 1stVerified • 1st
-VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBMVP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
+Loaded 9 Posts posts
+Darwin’s profile photo
+Darwin Robinson reposted this
+
+View Mike Leber’s  graphic link
+Mike LeberMike Leber
+   • 2ndPremium • 2nd
+Leadership Coach, Mentor & Keynote Speaker • Helping leaders grow agility and spark innovation • Follow for posts about personal growth, productivity, and process improvement • Founder at Agile Experts.Leadership Coach, Mentor & Keynote Speaker • Helping leaders grow agility and spark innovation • Follow for posts about personal growth, productivity, and process improvement • Founder at Agile Experts.
+1mo •  1 month ago • Visible to anyone on or off LinkedIn
+Your circle shapes your future.
+
+Some feed your fire - others fear your flame.
+
+Spend time with dreamers,
+you’ll start dreaming bigger.
+Spend time with doubters,
+you’ll start shrinking your dreams.
+
+The right circle doesn’t just inspire -
+they stretch what you believe is possible.
+
+How growth really happens 👇
+
+1. They expand your thinking
+Sharper questions. Honest mirrors. 
+New angles you never saw before.
+
+2. They celebrate without comparison
+Your win fuels theirs. 
+Their success fuels yours.
+
+3. They challenge your comfort
+No fake praise. No safe silence. 
+Just the push that moves you forward.
+
+4. They energize your belief
+Every talk leaves you clearer, lighter, 
+and ready to move.
+
+5. They model discipline over drama
+Focus is their default. 
+Consistency is their superpower.
+
+6. They make you believe bigger.
+They see your potential 
+long before you do.
+
+7. They hold you accountable to your dreams
+They don’t chase you - but remind you.
+of the vision you promised yourself.
+
+Keep people who see your spark.
+Who challenge you - 
+not change you.
+
+And who remind you what’s possible 
+when you stop playing small.
+
+♻ Repost to help someone upgrade their circle and rise higher.
+➕ Follow Mike Leber for daily insights on leadership and growth.
+…more
+Activate to view larger image,
+text
+Activate to view larger image,
+likelovesupport
+6,753
+894 comments
+701 reposts
+
+
+
+
+View Darwin Robinson’s  graphic link
+Darwin RobinsonDarwin Robinson
+   • 1stPremium • 1st
+Strategic Program Director, North America @ AndersenStrategic Program Director, North America @ Andersen
 1mo •  1 month ago • Visible to anyone on or off LinkedIn
 
-Veterans Day is a chance to acknowledge the men and women who took an oath to protect the United States. Service brings long days and harder nights, a sense of responsibility that rarely fades. It grows from teamwork trust and the quiet promise to stand with the person beside you no matter how uncertain the world becomes.
-To every veteran and every family who supported them, I thank you. Your strength and your sacrifice matter more than words can express. Our nation holds a debt to you and honoring it means offering care support and gratitude throughout the year, not only today.
-Many organizations help carry that commitment forward, here are a few:
-https://lnkd.in/enf2X-mi
-https://lnkd.in/eJtiAKge
-https://lnkd.in/ed_Y6nKH
-https://lnkd.in/eDKR8bWW
+From smart advisors to virtual try-ons — AI is truly reshaping the future of e-commerce.
+
+Andersen LabAndersen Lab
+102,516 followers102,516 followers
+AI is playing an increasingly important role in how online stores design, recommend, and sell. 🤖
+
+Retailers are experimenting with smart advisors, generative design tools, and immersive experiences that blend the physical and the digital. 
+
+In his recent article, Marcin Wawryszczuk, PhD, MBA, PMP, PSM, Head of Artificial Intelligence at Andersen, explains how these technologies shape product design, personalization, and customer interaction. He also highlights the factors that still limit broader adoption. 
+
+Read the article here: 
+
+👉 https://lnkd.in/efMGvV6D
+
+hashtag#AI hashtag#AIInEcommerce hashtag#RetailInnovation hashtag#MachineLearning hashtag#DigitalCommerce
 …more
-likelovesupport
-23
+Activate to view larger image,
+AI is playing an increasingly important role in how online stores design, recommend, and sell. Retailers are experimenting with smart advisors, generative design tools, and immersive experiences that blend the physical and the digital. In his recent article, Marcin Wawryszczuk, Head of Artificial Intelligence at Andersen, explains how these technologies shape product design, personalization, and customer interaction. He also highlights the factors that still limit broader adoption. 
+Read the article here: 
+Activate to view larger image,
+insightfullikecelebrate
+6
 
 
-
-
-View Liran Eisenberg’s  graphic link
-Liran EisenbergLiran Eisenberg
-   • 1stVerified • 1st
-VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBMVP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
-2mo •  2 months ago • Visible to Liran’s connections
-
-Excited to be attending Snowflake World tomorrow in NYC! If you're there too, let's catch up! hashtag#Networking hashtag#SnowflakeWorld hashtag#NYC
-like
-16
-2 comments
 
 
 
 Show all posts
 ExperienceExperience
-Invesco Ltd. logo
-Head of Data Architecture | Financial Services, AWS, Snowflake
-Head of Data Architecture | Financial Services, AWS, Snowflake
-Invesco Ltd.Invesco Ltd.
-Jul 2025 - Present · 6 mosJul 2025 to Present · 6 mos
-Consumer Edge logo
-VP Data Analytics | GCP, Snowflake, SQL, Python, AI, Analytics, product design, migration
-VP Data Analytics | GCP, Snowflake, SQL, Python, AI, Analytics, product design, migration
-Consumer EdgeConsumer Edge
-Jun 2024 - May 2025 · 1 yrJun 2024 to May 2025 · 1 yr
-● Spearheading the development of 5 AI-driven analytical products, unlocking $20M+ USD.
-● Leading a team of 12 analysts and engineers, leveraging GCP, AWS, Snowflake, Databricks, DBT & Python for scalable financial & corporate data insights.
-● Leveraging ChatGPT and GitHub Copilot for rapid prototyping and hands-on coding, including work with structured, semi-structured, and OCR-derived datasets powered by NLP.
-● Integrating Gemini for AI assisted data analysis and mapping.
-● Orchestrating a multi-cloud overhaul to drive speed, scale, and satisfaction and building new CI/CD processes.
-● Influencing product and data strategy through close partnership with executive stakeholders.● Spearheading the development of 5 AI-driven analytical products, unlocking $20M+ USD. ● Leading a team of 12 analysts and engineers, leveraging GCP, AWS, Snowflake, Databricks, DBT & Python for scalable financial & corporate data insights. ● Leveraging ChatGPT and GitHub Copilot for rapid prototyping and hands-on coding, including work with structured, semi-structured, and OCR-derived datasets powered by NLP. ● Integrating Gemini for AI assisted data analysis and mapping. ● Orchestrating a multi-cloud overhaul to drive speed, scale, and satisfaction and building new CI/CD processes. ● Influencing product and data strategy through close partnership with executive stakeholders.…see more
-Eliassen Group logo
-Senior Engineering Consultant | AWS, SQL, Python, AI, B2B, B2C, Analytics
-Senior Engineering Consultant | AWS, SQL, Python, AI, B2B, B2C, Analytics
-Eliassen GroupEliassen Group
-Feb 2024 - Jun 2024 · 5 mosFeb 2024 to Jun 2024 · 5 mos
-Brought in as a strategic advisor and hands-on mentor for cross-functional engineering and analytics
-teams in a Fortune 500 retail environment.
-Coached two teams on scalable architecture, data workflows, and ML enablement.
-Guided the implementation of next-gen analytics for Mars Pets Care while Improved engineering efficiency and cross-team collaboration.Brought in as a strategic advisor and hands-on mentor for cross-functional engineering and analytics teams in a Fortune 500 retail environment. Coached two teams on scalable architecture, data workflows, and ML enablement. Guided the implementation of next-gen analytics for Mars Pets Care while Improved engineering efficiency and cross-team collaboration.…see more
-Macy's logo
-Senior Director Data Architecture & Engineering | GCP, SQL, Python, AI, ML, B2B, B2C, migration
-Senior Director Data Architecture & Engineering | GCP, SQL, Python, AI, ML, B2B, B2C, migration
-Macy's · Full-timeMacy's · Full-time
-Jul 2021 - Dec 2023 · 2 yrs 6 mosJul 2021 to Dec 2023 · 2 yrs 6 mos
-New York, New York, United States · HybridNew York, New York, United States · Hybrid
-Architected and led Macys end-to-end data transformation, modernizing infrastructure and unlocking
-$100M+ in AI-driven revenue.
-Directed migration of 100+ apps to GCP and Snowflake.
-Implemented a microservices-based data platform for analytics and ML.
-Scaled internal engineering from 10 to 60+ FTEs and reduced contractor count from 600+ to 250, significantly improving delivery velocity and long-term cost efficiency.
-Introduced a C-suite analytics ecosystem with BI tools and a semantic layer.
-Led 4 major AI/ML initiatives including dynamic pricing and inventory optimization.Architected and led Macys end-to-end data transformation, modernizing infrastructure and unlocking $100M+ in AI-driven revenue. Directed migration of 100+ apps to GCP and Snowflake. Implemented a microservices-based data platform for analytics and ML. Scaled internal engineering from 10 to 60+ FTEs and reduced contractor count from 600+ to 250, significantly improving delivery velocity and long-term cost efficiency. Introduced a C-suite analytics ecosystem with BI tools and a semantic layer. Led 4 major AI/ML initiatives including dynamic pricing and inventory optimization.…see more
-Engineering Leadership, Negotiation and +5 skills
-2U logo
-Senior Director Data Engineering | AWS, Snowflake, SQL, Python, Docker, Automation, B2C, Tableau
-Senior Director Data Engineering | AWS, Snowflake, SQL, Python, Docker, Automation, B2C, Tableau
-2U · Full-time2U · Full-time
-Jan 2020 - Jul 2021 · 1 yr 7 mosJan 2020 to Jul 2021 · 1 yr 7 mos
-New York, New York, United StatesNew York, New York, United States
-Led modernization of 2Us data platform and empowered analytics and ML teams to deliver smarter
-insights at scale.
-Directed Snowflake migration and built a global BI dataset ecosystem.
-Implemented CCPA automation and Master Data Management (MDM) integrations.
-Enhanced self-service capabilities through API/CLI automation.
-Advocated for Agile and modern SDLC improvements.Led modernization of 2Us data platform and empowered analytics and ML teams to deliver smarter insights at scale. Directed Snowflake migration and built a global BI dataset ecosystem. Implemented CCPA automation and Master Data Management (MDM) integrations. Enhanced self-service capabilities through API/CLI automation. Advocated for Agile and modern SDLC improvements.…see more
-Engineering Leadership, Negotiation and +3 skills
-Show all 13 experiences
+Andersen Lab logo
+Andersen Lab
+Andersen Lab
+4 yrs 7 mos4 yrs 7 mos
+Strategic Program Director
+Strategic Program Director
+Dec 2024 - Present · 1 yr 1 moDec 2024 to Present · 1 yr 1 mo
+Data Visualization, IT Strategy and +1 skill
+Project Delivery Manager
+Project Delivery Manager
+Full-timeFull-time
+Nov 2023 - Nov 2024 · 1 yr 1 moNov 2023 to Nov 2024 · 1 yr 1 mo
+Strategic Business Development, IT Integration and +2 skills
+Customer Service Representative
+Customer Service Representative
+Full-timeFull-time
+Jun 2021 - Oct 2023 · 2 yrs 5 mosJun 2021 to Oct 2023 · 2 yrs 5 mos
+Teamwork, Scrum and +20 skills
+Penske Logistics logo
+Customer Service Analyst
+Customer Service Analyst
+Penske Logistics · Full-timePenske Logistics · Full-time
+Mar 2018 - May 2021 · 3 yrs 3 mosMar 2018 to May 2021 · 3 yrs 3 mos
+Customer Support and Technical Support
 EducationEducation
-Bar-Ilan University logo
-Bar-Ilan University
-Bar-Ilan University
-Bachelor of Science (BSc), Mathematics and Computer ScienceBachelor of Science (BSc), Mathematics and Computer Science
-Licenses & certificationsLicenses & certifications
-Great Thinkers Learning Academy logo
-How to Build your own Chatbot using Python
-How to Build your own Chatbot using Python
-Great Thinkers Learning AcademyGreat Thinkers Learning Academy
-Issued Sep 2023Issued Sep 2023
-LinkedIn logo
-Introduction to Artificial Intelligence
-Introduction to Artificial Intelligence
-LinkedInLinkedIn
-Issued Sep 2023Issued Sep 2023
-Show credential
-Show all 7 licenses & certifications
+University of Oklahoma logo
+University of Oklahoma
+University of Oklahoma
+Bachelor of Business Administration - BBA, Business/Commerce, GeneralBachelor of Business Administration - BBA, Business/Commerce, General
+Coursera logo
+Coursera
+Coursera
+SQL for Data ScienceSQL for Data Science
+20222022
 SkillsSkills
-Google Gemini
-Google Gemini
-ChatGPT
-ChatGPT
-Show all 100 skills
-RecommendationsRecommendations
-Recommend Liran
-ReceivedReceived
-GivenGiven
-Janet Shuman is open to work
-Janet Shuman
-Janet Shuman
-· 2ndSecond degree connection
-VP of ProductVP of Product
-June 10, 2025, Janet worked with Liran but on different teamsJune 10, 2025, Janet worked with Liran but on different teams
-Lee is the person you want to go to if you have to present something and you want great statistics. The research and data he provides are top notch. He's also willing to have the difficult conversations that others sometimes avoid. It was a pleasure to work with Lee.Lee is the person you want to go to if you have to present something and you want great statistics. The research and data he provides are top notch. He's also willing to have the difficult conversations that others sometimes avoid. It was a pleasure to work with Lee.
-Katie Strohl
-Katie Strohl
-Katie Strohl
-· 2ndSecond degree connection
-Sr. Data Product Operations Manager at 2U/edX & BeekeeperSr. Data Product Operations Manager at 2U/edX & Beekeeper
-February 6, 2024, Katie worked with Liran on the same teamFebruary 6, 2024, Katie worked with Liran on the same team
-The stand out things about Li that may not come through in his resume would be:
-1. His high standards and expectations of both himself and his team that are balanced with his commitment to the importance of learning and growth for everyone on the team. If you worked with Li and didn't learn something, it was because you didn't want to. The entirety of my sql skills today are because Li made the time to teach me & get me started. Even when he has back-to-back meetings, I have seen him make time to mentor someone.
-2. I've also always respected his direct approach and even when we disagreed - I knew we both respected each other enough to speak honestly. 
-3. Li is one of the most intelligent/quick-witted individuals that you'll have the opportunity to work with.
-
-I'd welcome the opportunity to work with Li again.The stand out things about Li that may not come through in his resume would be: 1. His high standards and expectations of both himself and his team that are balanced with his commitment to the importance of learning and growth for everyone on the team. If you worked with Li and didn't learn something, it was because you didn't want to. The entirety of my sql skills today are because Li made the time to teach me & get me started. Even when he has back-to-back meetings, I have seen him make time to mentor someone. 2. I've also always respected his direct approach and even when we disagreed - I knew we both respected each other enough to speak honestly. 3. Li is one of the most intelligent/quick-witted individuals that you'll have the opportunity to work with. I'd welcome the opportunity to work with Li again.…see more
-Show all 11 received
-CoursesCourses
-AWS RedShift
-AWS RedShift
+IT Strategy
+IT Strategy
 Company logo
-Associated with Amber IT Consulting
-Associated with Amber IT Consulting
-Apache Hadoop
-Apache Hadoop
-Show all 11 courses
-LanguagesLanguages
-English
-English
-Native or bilingual proficiencyNative or bilingual proficiency
-German
-German
-Elementary proficiencyElementary proficiency
-Show all 3 languages
+Strategic Program Director at Andersen LabStrategic Program Director at Andersen Lab
+Andersen Lab logo
+Endorsed by 10 colleagues at Andersen LabEndorsed by 10 colleagues at Andersen Lab
+Constantine Famenka profile picture
+Endorsed by 11 people in the last 6 monthsEndorsed by 11 people in the last 6 months
+Show all 4 details
+
+Endorse
+ROI Strategies
+ROI Strategies
+Company logo
+Strategic Program Director at Andersen LabStrategic Program Director at Andersen Lab
+Andersen Lab logo
+Endorsed by 10 colleagues at Andersen LabEndorsed by 10 colleagues at Andersen Lab
+Marcel Bodor profile picture
+Endorsed by 11 people in the last 6 monthsEndorsed by 11 people in the last 6 months
+Show all 4 details
+
+Endorse
+Show all 35 skills
 InterestsInterests
+Top VoicesTop Voices
 CompaniesCompanies
-GroupsGroups
 NewslettersNewsletters
 SchoolsSchools
-Intel Corporation logo
-Intel Corporation
-Intel Corporation
-4,077,204 followers4,077,204 followers
+Igor Buinevici
+Igor Buinevici
+Igor Buinevici
+· 2ndSecond degree connection
+I help founders scale their businesses | Top 10 LinkedIn Creator Worldwide & #1 Finance LinkedIn Creator Globally | Founder @ Wild Capital | ex-Goldman | LSE AlumnusI help founders scale their businesses | Top 10 LinkedIn Creator Worldwide & #1 Finance LinkedIn Creator Globally | Founder @ Wild Capital | ex-Goldman | LSE Alumnus
+306,841 followers306,841 followers
 
 Follow
-Atos logo
-Atos
-Atos
-2,504,439 followers2,504,439 followers
+Simon Sinek
+Simon Sinek
+Simon Sinek
+· 3rdThird degree connection
+Optimist, New York Times bestselling author of "Start with Why" and "The Infinite Game", and founder of The Optimism CompanyOptimist, New York Times bestselling author of "Start with Why" and "The Infinite Game", and founder of The Optimism Company
+8,765,277 followers8,765,277 followers
 
 Follow</pre>
+                </div>
             </div>
         </div>
         
         <!-- Skills Tab -->
         <div id="skills" class="tab-content">
             <div class="section">
-                <h2>Skills Analysis</h2>
+                <div class="section-header">
+                    <h2>Skills Analysis</h2>
+                </div>
+                <div class="section-content">
                 <p style="color: #6b7280; margin-bottom: 16px;">
-                    Comparison of your skills with Liran Eisenberg's profile.
+                    Comparison of your skills with Darwin Robinson's profile.
                 </p>
                 
                 <h3>Shared Skills</h3>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
-                    <span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Cloud & Infrastructure (AWS</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">GCP</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Snowflake)</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Data Engineering (Python</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">SQL</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">AWS Lake Formation)</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">AI/ML Enablement (ChatGPT</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">GitHub Copilot)</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Analytics (Tableau)</span>
+                    <span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Data Visualization</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">IT Strategy</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">SQL for Data Science</span>
                 </div>
                 
                 <h3>Your Unique Skills</h3>
@@ -992,51 +1013,57 @@ Follow</pre>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px;">Their unique skills will be highlighted in future updates</span>
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Research Tab -->
         <div id="research" class="tab-content">
             <div class="section">
-                <h2>AI-Generated Research & Background</h2>
+                <div class="section-header">
+                    <h2>AI-Generated Research & Background</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                     <p style="color: #1e40af; font-size: 14px; margin-bottom: 12px;">
                         <strong>Note:</strong> This research was automatically generated from the LinkedIn profile data and available information.
                     </p>
                 </div>
                 <div class="analysis-text" style="white-space: pre-wrap; line-height: 1.8;">
-## COMPANY BACKGROUND: Invesco Ltd
+## COMPANY BACKGROUND: Andersen Labs
 
-Invesco Ltd is a global asset management company that specializes in investment management services. Based on Liran Eisenberg's LinkedIn profile, it appears that he holds the title of VP Data Analytics at the company. No specific information about the size or industry of the company is available from the profile data.
+Andersen Labs appears to be a technology consulting company that helps organizations modernize their systems, improve transparency, and make confident, data-backed decisions. The company focuses on long-term partnerships with its clients. Based on the profile context, it seems that Andersen Labs operates in the IT industry, specifically in areas such as CRM implementations (Salesforce), enterprise integrations, and data visualization.
+
+Size indicators: Not available in profile data
+
+Mission/Values: Not mentioned explicitly in the profile, but the company's focus on long-term partnerships and helping clients make confident decisions suggests a value-oriented approach to its work.
 
 ## RECENT COMPANY NEWS & UPDATES
 
-No recent company achievements, initiatives, or news are mentioned in Liran Eisenberg's LinkedIn profile.
+Not available in profile data. The profile does not provide any recent company achievements, initiatives, or news.
 
-## Liran Eisenberg'S RECENT ACTIVITY
+## Darwin Robinson'S RECENT ACTIVITY
 
-Not applicable as there is no information provided about his recent posts, articles, or professional activities.
+Not mentioned in the profile. There are no posts, articles, or professional activities listed as recent activity for Darwin Robinson.
 
 ## MUTUAL CONNECTIONS & NETWORKS
 
-Liran Eisenberg has 500+ connections on LinkedIn, including mutual connections with:
+Darwin Robinson has 417 connections on LinkedIn, including:
 
-* Joe Porretta
-* Alex Merced
-* Dena McHenry (Recruiting MLEs, Applied Scientist, Data Scientists/Causal Inference, Distributed Systems Engineers)
-* B.J. Fesq (mutual connection)
-* Apparsamy Balaji (Chief Data & Analytics Officer | Transforming Businesses with Data, AI, and Purpose)
-* Michael Atkinson (and 13 other mutual connections)
-* Robin Shears-Huth (Sr. Technical Recruiter | Sr. Full Life Cycle Recruiter | Talent Acquisition)
-* Ron Ferreira (and 1 other mutual connection)
+* David McCann
+* Hody Crouch
+* Another mutual connection (name not specified)
+
+The profile also mentions that Andersen Labs is part of the University of Oklahoma. This suggests a potential connection to academia or research.
 
 ## KEY TALKING POINTS
 
-Based on Liran Eisenberg's profile, some potential conversation topics could include:
+Based on Darwin Robinson's profile and background, some key talking points could include:
 
-1. Data engineering and analytics strategies for cloud-based platforms
-2. AI/ML enablement and hands-on technical leadership in real-world applications
-3. Scalable architecture and end-to-end cloud modernization initiatives
+1. CRM implementation strategies: As someone who manages complex IT programs at Andersen, Darwin has likely worked with numerous clients on Salesforce implementations. You could discuss best practices, common challenges, and innovative approaches to CRM integration.
+2. Enterprise integrations: With experience in connecting people, data, and infrastructure, Darwin may have insights into effective enterprise integration strategies. This could include discussions about APIs, data lakes, or cloud-based solutions.
+3. Data visualization and analytics: As someone who helps teams see their data in a clearer, more actionable way, Darwin might have expertise in data visualization tools, data storytelling, or predictive analytics.
+                </div>
                 </div>
             </div>
         </div>
@@ -1044,16 +1071,17 @@ Based on Liran Eisenberg's profile, some potential conversation topics could inc
         <!-- Messages Tab -->
         <div id="messages" class="tab-content">
             <div class="section">
-                <h2>Networking Messages</h2>
-                
+                <div class="section-header">
+                    <h2>Networking Messages</h2>
+                </div>
+                <div class="section-content">
                 <div class="message-box">
                     <h3>
                         <span>1. Initial Connection Request (LinkedIn)</span>
                         <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
                     </h3>
-                    <div id="connection-message">"Liran, great to see your thoughts on innovative AI applications and legacy system migrations! As someone who's driven by data insights at Invesco Ltd., I'm excited to learn more about your team's approach to harnessing AI for business value. Let's explore how we can leverage analytics to drive d...
-Character count: 300</div>
-                    <div class="char-count">321 characters</div>
+                    <div id="connection-message">"Darwin, as someone who's driving innovation at Andersen Labs, I'm intrigued by your perspective on AI in e-commerce. Your insights on changing customer experiences have piqued my interest - what's the most exciting application of AI you're seeing today?"</div>
+                    <div class="char-count">255 characters</div>
                 </div>
                 
                 <div class="message-box">
@@ -1061,14 +1089,20 @@ Character count: 300</div>
                         <span>2. Meeting Invitation</span>
                         <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
                     </h3>
-                    <div id="meeting-message">Here's a friendly invitation for a 1:1 meet & greet:
-Subject: Let's Connect and Explore Some Tech Topics!
-Hi Liran,
-I wanted to personally thank you for accepting my connection request on LinkedIn! I'm excited to have the opportunity to expand our professional network.
-As we both work in the financial industry, I thought it would be great to connect with someone who shares similar interests. I came across your profile and was impressed by Invesco Ltd.'s innovative approach to investment solutions.
-I'd love to grab a virtual coffee (15-20 minutes) and chat about some of the latest tech trends that fascinate me. I'm curious to know: what's the most innovative AI application you've seen recently? How do you approach migrating legacy systems to cloud-based infrastructure? And, have you had any experience using ChatGPT for data analysis?
-No pressure, just a casual conversation to share ideas and learn from each other. Let me know if you're interested, and we can schedule a time that suits you best.
+                    <div id="meeting-message">Here's a message inviting Darwin Robinson to a 1:1 meet & greet:
+
+Subject: Let's Grab Virtual Coffee!
+
+Darwin,
+
+A huge thank you for accepting my connection request! I'm excited to connect with someone from Andersen Labs, and I think we might have some common interests in AI-driven innovation.
+
+As someone who shares your passion for AI in e-commerce, I'd love to hear more about your thoughts on the most exciting applications of AI today. What do you think is driving the most value? We could also swap stories about how AI has changed the customer experience in our respective roles. I've had some interesting experiences implementing AI solutions in retail, and I'm sure we could both learn from each other's successes and challenges.
+
+Would you be up for a casual 15-20 minute virtual coffee chat to explore these topics further? No agenda, just a chance to connect and share ideas. Let me know if you're interested, and we can schedule a time that works for you.
+
 Looking forward to hearing back from you!
+
 Best regards,
 [Your Name]</div>
                 </div>
@@ -1078,14 +1112,24 @@ Best regards,
                         <span>3. Thank You Message</span>
                         <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
                     </h3>
-                    <div id="thankyou-message">Here's a sample thank-you message:
-Subject: Thank you for meeting with me, Liran!
-Dear Liran,
-I wanted to take a moment to express my gratitude for taking the time to meet with me today at Invesco Ltd. I truly appreciated our conversation about [topic discussed] and learning more about your work in [specific area of interest]. Your insights were incredibly valuable, and I'm excited to continue exploring ways to leverage them.
-One specific takeaway from our discussion was [insight gained], which has given me a lot to think about as we move forward. I'm looking forward to putting this into practice and seeing the impact it can have.
-Once again, thank you for your time and expertise today. It was an absolute pleasure meeting with you, and I'd love to stay in touch. If there's anything I can do to help or if you're willing to continue our conversation, please don't hesitate to reach out.
+                    <div id="thankyou-message">Here's a draft thank you message:
+
+Subject: Grateful for our meeting today, Darwin!
+
+Hi Darwin,
+
+I wanted to take a moment to express my sincere gratitude for taking the time to meet with me today at Andersen Labs. I truly appreciated learning more about [topic discussed] and the exciting work being done at Andersen Labs.
+
+Our conversation gave me some valuable insights, and one thing that stood out was [specific point or idea discussed]. I'm excited to explore this further and see how it might align with our own goals. 
+
+Before we go, I wanted to follow up on a few action items. I'll make sure to [action item or next step], and I look forward to keeping you updated.
+
+It was an absolute pleasure meeting you, Darwin! If there's anything I can do to support Andersen Labs or if you'd like to stay in touch, please don't hesitate to reach out.
+
 Best regards,
-[Your Name]</div>
+[Your Name]
+
+Let me know if this meets your requirements or if you'd like me to make any changes!</div>
                 </div>
                 
                 <div class="message-box">
@@ -1093,17 +1137,27 @@ Best regards,
                         <span>4. Consulting Services Offer</span>
                         <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
                     </h3>
-                    <div id="consulting-message">Subject: Leveraging Data Engineering Expertise for Your Organization's Growth
-Dear [Recipient],
-I hope this message finds you well. I wanted to take a moment to express my appreciation for the opportunity to connect with you at [Event/Meeting]. It was great discussing [Shared Interest or Topic] and learning more about your organization's innovative approach to [Industry/Field].
-As someone who has spent years building data engineering, analytics, AI/ML implementation, and technical leadership expertise, I've had the privilege of helping numerous companies like yours unlock new opportunities for growth. I couldn't help but notice that [Company X] is facing similar challenges in [Specific Area], such as optimizing operational efficiency or enhancing customer experiences through data-driven insights.
-As a neutral third-party expert, I believe my consulting services could provide valuable guidance on how to address these challenges and drive meaningful results. If you're open to exploring potential solutions, I'd be happy to set up a brief discovery call (30 minutes) to discuss your specific needs and goals. This would allow us to identify potential areas where we could collaborate to achieve positive outcomes.
-Please let me know if this is something that interests you, and we can schedule the call at your convenience. I'm confident that my expertise in data engineering and analytics could bring significant value to your organization. I look forward to the possibility of working together.
+                    <div id="consulting-message">Here is a professional message offering consulting services:
+
+**Email:**
+
+Subject: Expert Consulting Services for Data Engineering and Analytics
+
+Dear [Recipient's Name],
+
+I hope this message finds you well. As we've had the pleasure of discussing your organization's goals and challenges, I wanted to follow up on our conversation and offer my expertise as a consultant in data engineering, analytics, and AI/ML implementation. With over [X] years of experience in technical leadership roles at Andersen Labs, I'm confident that my knowledge can help you drive business value.
+
+As we've discussed the importance of leveraging data-driven insights to inform decision-making, I believe your organization may be facing common challenges such as integrating disparate systems, optimizing processes, or scaling analytics capabilities. By bringing a fresh perspective and expertise in these areas, I'd like to explore how my consulting services can help you address these needs.
+
+If you're interested in learning more about how I can support your goals, I'd be happy to set up a brief discovery call (30 minutes) to discuss further. This call would provide an opportunity for us to review your current landscape, identify potential areas of improvement, and outline a customized approach to achieving your objectives.
+
+Please let me know if this is something you'd like to explore further. I respect your time and look forward to the possibility of collaborating with your organization.
+
 Best regards,
-Liran Eisenberg
-Data Engineering Expert & Consultant
-Invesco Ltd.
-[Contact Information]</div>
+
+Darwin Robinson
+Consultant & Technical Leader at Andersen Labs</div>
+                </div>
                 </div>
             </div>
         </div>
@@ -1111,7 +1165,10 @@ Invesco Ltd.
         <!-- Updates & Notes Tab -->
         <div id="updates" class="tab-content">
             <div class="section">
-                <h2>Update Status</h2>
+                <div class="section-header">
+                    <h2>Update Status</h2>
+                </div>
+                <div class="section-content">
                 
                 <div id="updateAlert" class="alert"></div>
                 
@@ -1121,9 +1178,9 @@ Invesco Ltd.
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
                             <optgroup label="Research & Contact">
-                                <option value="To Research" >To Research</option>
+                                <option value="To Research" selected>To Research</option>
                                 <option value="Ready to Contact" >Ready to Contact</option>
-                                <option value="Contacted - Sent" selected>Contacted - Sent</option>
+                                <option value="Contacted - Sent" >Contacted - Sent</option>
                                 <option value="Contacted - Replied" >Contacted - Replied</option>
                                 <option value="Contacted - No Response" >Contacted - No Response</option>
                                 <option value="Cold/Archive" >Cold/Archive</option>
@@ -1181,12 +1238,13 @@ Invesco Ltd.
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
                 </div>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
-        const contactId = '20251212113832-Liran Eisenberg-Invesco Ltd';
+        const contactId = '20251212172012-Darwin Robinson-Andersen Labs';
         let quill;
         
         // Load timeline on page load
@@ -1219,7 +1277,7 @@ Invesco Ltd.
                 'connection': '<p><strong>Connection Request Sent</strong></p><p>Sent LinkedIn connection request with personalized message.</p><p>Next step: Follow up in 5-7 business days if no response.</p>',
                 'followup': '<p><strong>Follow-up</strong></p><p>Following up on previous outreach.</p><p>Key points discussed:</p><ul><li>Point 1</li><li>Point 2</li></ul>',
                 'meeting': '<p><strong>Meeting Notes</strong></p><p>Date: [Date]</p><p>Duration: [Duration]</p><p>Discussion Topics:</p><ul><li>Topic 1</li><li>Topic 2</li></ul><p>Action Items:</p><ul><li>Action 1</li><li>Action 2</li></ul><p>Next Steps: [Next Steps]</p>',
-                'thankyou': '<p><strong>Thank You Note Sent</strong></p><p>Thanked Liran Eisenberg for their time and insights.</p><p>Key takeaways:</p><ul><li>Takeaway 1</li><li>Takeaway 2</li></ul><p>Next step: [Next Step]</p>'
+                'thankyou': '<p><strong>Thank You Note Sent</strong></p><p>Thanked Darwin Robinson for their time and insights.</p><p>Key takeaways:</p><ul><li>Takeaway 1</li><li>Takeaway 2</li></ul><p>Next step: [Next Step]</p>'
             };
             
             const template = templates[type] || '';

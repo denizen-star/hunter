@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andy Clyne - Comcast</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #1f2937;
+            line-height: 1.6;
+            margin-left: 180px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 16px 16px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: #f9fafb;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+        }
+        
+        .sidebar-menu a.active {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            transition: color 0.2s ease;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .back-link::before {
+            content: '←';
+            font-size: 18px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        /* Application Header Card */
+        .app-header-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .meta-item strong {
+            color: #374151;
+        }
+        
+        .status-pill {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .tag-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .tag-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag-gray {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .tabs {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 32px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.15s ease;
+        }
+        
+        .tab:hover {
+            color: #374151;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f3f4f6;
+        }
+        
+        .section h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1f2937;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+            color: #374151;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .info-card-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .info-card-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .analysis-section {
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        
+        .analysis-section h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .analysis-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        
+        .message-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        
+        .message-box h3 {
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            transition: all 0.15s ease;
+        }
+        
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .timeline {
+            margin-top: 32px;
+        }
+        
+        .timeline-item {
+            padding: 20px;
+            border-left: 3px solid #e5e7eb;
+            margin-bottom: 20px;
+            background: #f9fafb;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .timeline-item.latest {
+            border-left-color: #3b82f6;
+            background: #f0f9ff;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .timeline-status {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .timeline-date {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .timeline-notes-label {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .timeline-notes {
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+        
+        .copy-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        .char-count {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        
+        .template-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .template-btn:hover {
+            background: #f3f4f6;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        /* Quill Editor Styles */
+        .ql-editor {
+            min-height: 150px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+        }
+        
+        .ql-toolbar.ql-snow {
+            border: 1px solid #d1d5db;
+            border-radius: 8px 8px 0 0;
+            background: #f9fafb;
+        }
+        
+        .ql-container.ql-snow {
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        pre {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Hunter</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="/dashboard">App Dash</a></li>
+            <li><a href="/new-application">New Application</a></li>
+            <li><a href="/networking" class="active">Network Dash</a></li>
+            <li><a href="/new-networking-contact">New Contact</a></li>
+            <li><a href="/templates">Templates</a></li>
+            <li><a href="/progress">Progress</a></li>
+            <li><a href="/reports">Reports</a></li>
+            <li><a href="/analytics">Analytics</a></li>
+            <li><a href="/daily-activities">Daily Activities</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true">Manage Resume</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="header">
+        <a href="/networking" class="back-link">Back to Network Dash</a>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1>Andy Clyne</h1>
+                <div class="subtitle">Comcast • Chief Data Officer</div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Andy+Clyne&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Andy+Clyne%0A%0ACompany%3A+Comcast%0ATitle%3A+Chief+Data+Officer%0AStatus%3A+To+Research%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Fandrew-clyne-1679584%2F%0AEmail%3A+Not+available%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FAndy-Clyne-Comcast%2FAndy-Clyne-summary.html%0A&location=Comcast&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                        📅 Add to GCal
+                    </a>
+                    <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
+                        🔄 Regen
+                    </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hero Card with Metadata -->
+    <div class="app-header-card">
+        <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
+            <span class="status-pill tag tag-blue">Connected</span>
+            <span class="status-pill tag tag-green">75% Match</span>
+        </div>
+        <div class="app-meta">
+            <div class="meta-item">
+                <span>📍</span>
+                <span>N/A</span>
+            </div>
+            <div class="meta-item">
+                <span>📅</span>
+                <span><strong>Connected:</strong> Dec 12, 2025 02:26 PM EST</span>
+            </div>
+            <div class="meta-item">
+                <span>🔄</span>
+                <span><strong>Updated:</strong> Dec 12, 2025 02:36 PM EST</span>
+            </div>
+            <div class="meta-item">
+                <span>📊</span>
+                <span><strong>Status:</strong> To Research</span>
+            </div>
+            <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/andrew-clyne-1679584/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
+            
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('summary')">Summary</div>
+        <div class="tab" onclick="switchTab('raw')">Raw Entry</div>
+        <div class="tab" onclick="switchTab('skills')">Skills</div>
+        <div class="tab" onclick="switchTab('research')">Research</div>
+        <div class="tab" onclick="switchTab('messages')">Messages</div>
+        <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+    </div>
+    
+    <div class="content">
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-content active">
+            <!-- Match Analysis Section -->
+            <div class="section">
+                <h2>Match Analysis</h2>
+                <div class="analysis-section">
+                    <div class="analysis-text">MATCH SCORE: **75**
+
+SKILL OVERLAP: **High**
+Shared Skills:
+- Data Warehousing
+- Business Intelligence
+- Enterprise Architecture
+- Leadership
+
+CAREER SIMILARITY: **Medium**
+Common Elements:
+- Both have experience in the financial services and technology industries
+- Both have held leadership positions, including Chief Data Officer
+
+COMMON INTERESTS:
+- Innovation in data management and analytics
+- Strategic planning for business growth
+
+NETWORKING VALUE: **High**
+Opportunities:
+- Collaboration on data-driven projects
+- Learning from each other's experiences in leadership roles
+- Referrals to potential clients or partners
+
+CONVERSATION TOPICS:
+1. "What do you think is the most exciting innovation in data management right now?"
+2. "How did you approach building your team as a Chief Data Officer?"
+3. "Can you share some insights on how to effectively communicate data-driven decisions to stakeholders?"
+4. "What are some common challenges you've faced in implementing business intelligence solutions, and how did you overcome them?"
+5. "Have you seen any interesting applications of machine learning or AI in the financial services industry?"
+
+SYNTHESIS:
+Andy Clyne's profile suggests a strong background in data management and leadership, making him an attractive connection for professionals looking to learn from his experiences or collaborate on data-driven projects. To approach Andy, start by highlighting shared interests or skills, such as innovation in data management or business intelligence. Be prepared to discuss your own experiences and perspectives, and be open to learning from his insights. By framing the conversation around shared values and expertise, you can establish a strong foundation for a valuable connection.</div>
+                </div>
+            </div>
+            
+            <!-- Key Strengths & Talking Points -->
+            <div class="section">
+                <h2>Key Strengths & Talking Points</h2>
+                <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #166534; line-height: 1.8;">
+    <li>CAREER SIMILARITY: **Medium**</li>
+    <li>Both have experience in the financial services and technology industries</li>
+    <li>Both have held leadership positions, including Chief Data Officer</li>
+    <li>4. "What are some common challenges you've faced in implementing business intelligence solutions, and how did you overcome them?"</li>
+    <li>Andy Clyne's profile suggests a strong background in data management and leadership, making him an attractive connection for professionals looking to learn from his experiences or collaborate on data-driven projects. To approach Andy, start by highlighting shared interests or skills, such as innovation in data management or business intelligence. Be prepared to discuss your own experiences and perspectives, and be open to learning from his insights. By framing the conversation around shared values and expertise, you can establish a strong foundation for a valuable connection.</li>
+</ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Raw Entry Tab -->
+        <div id="raw" class="tab-content">
+            <div class="section">
+                <h2>Raw Profile Details</h2>
+                <pre>Andrew Clyne
+  1st degree connection1st
+Chief Data Officer
+
+United States Air Force Academy
+Chesterfield, Missouri, United States  Contact info
+500+ connections
+
+
+Rajavarman Gopalakrishnan, Alex Merced, and 35 other mutual connectionsRajavarman Gopalakrishnan, Alex Merced, and 35 other mutual connections
+
+Message
+
+More
+People similar to Andrew Clyne
+
+See all
+
+Page 1 of 6Previous
+Next
+Craig Cameron
+Member’s name
+Craig Cameron
+Member’s occupation
+Talent Acquisition @ Lloyds Banking Group
+Aaron Gustin
+Aaron is a mutual connection
+
+Connect
+Dena McHenry
+Member’s name
+Dena McHenry
+Member’s occupation
+Recruiting MLEs, Applied Scientist, Data Scientists/Causal Inference, Distributed Systems Engineers
+B.J. Fesq
+B.J. is a mutual connection
+
+Connect
+Apparsamy Balaji
+Member’s name
+Apparsamy Balaji
+Member’s occupation
+Chief Data & Analytics Officer | Transforming Businesses with Data, AI, and Purpose
+Michael Atkinson
+Michael and 13 other mutual connections
+
+Connect
+HighlightsHighlights
+Andrew Clyne
+Andrew is a new connection
+Andrew is a new connection
+Now is a great time to start a conversation.
+Now is a great time to start a conversation.
+
+Introduce myself
+Group logo
+3 mutual groups
+3 mutual groups
+You and Andrew are both in TDWI: Analytics and Data Management Discussion Group, Big Data and Analytics, and 1 otherYou and Andrew are both in TDWI: Analytics and Data Management Discussion Group, Big Data and Analytics, and 1 other
+ActivityActivity
+6,694 followers6,694 followers
+
+Loaded 3 Comments posts
+Andrew Clyne commented on a post • 1w1w
+Congratulations Alexis!
+Congratulations Alexis!
+Andrew Clyne commented on a post • 2mo2mo
+My condolences Jim to Sheila and your family. Prayers from ours.
+My condolences Jim to Sheila and your family. Prayers from ours.
+Andrew Clyne commented on a post • 3mo3mo
+Congratulations Brian
+Congratulations Brian
+Show all comments
+ExperienceExperience
+Comcast logo
+Comcast
+Comcast
+Full-time · 7 yrs 4 mosFull-time · 7 yrs 4 mos
+Chief Data Officer
+Chief Data Officer
+Jun 2023 - Sep 2025 · 2 yrs 4 mosJun 2023 to Sep 2025 · 2 yrs 4 mos
+Philadelphia, Pennsylvania, United States · On-sitePhiladelphia, Pennsylvania, United States · On-site
+Leadership, Business Intelligence and +3 skills
+Head of Comcast Dx Data Platform
+Head of Comcast Dx Data Platform
+Jun 2018 - Jun 2023 · 5 yrs 1 moJun 2018 to Jun 2023 · 5 yrs 1 mo
+Philadelphia, PennsylvaniaPhiladelphia, Pennsylvania
+CenturyLink logo
+Chief Data Officer
+Chief Data Officer
+CenturyLinkCenturyLink
+Jul 2014 - Jun 2018 · 4 yrsJul 2014 to Jun 2018 · 4 yrs
+Town and Country, MissouriTown and Country, Missouri
+CenturyLink Big Data As A Service General Manager and Head of Big Data Consulting Practice for CenturyLink. CTL is an $18B global technology company, 3rd largest US network and 2nd data center company worldwide with 60+ data centers and one of the fastest growing cloud services/Hybrid IT and IOT services.  By combining with CenturyLink, Cognilytics is now able to deliver truly end to end big data and analytic services to our clients. 
+
+Responsible for Big Data As A Service “Go to Market” strategy and execution including developing strategic relationships across key partners such as Cisco, SAP, Cloudera and several other firms.
+
+Manage teams delivering large scale “Big Data” complex systems and data governance initiatives for several Fortune 50 companies in Financail Services, Retail, and Healthcare. 
+
+Leader for CenturyLink internal Data Management, Architecture and Governance across lines of business.
+
+Chief Operating Officer - Cognilytics (Purchased By CenturyLink)
+
+Head of delivery and data innovation, Chief Data Officer functions for Cognilytics, A Big Data and Analytics consulting firm servicing fortune 100 clients in the healthcare, financial services, manufacturing, oil and gas, and retail industries. 
+ 
+Assisted with CenturyLink Acquisition process and key company operations activities.
+
+Established data practice by hiring key personnel and provided vision, strategy and policy guidance for client data acquisition, data usage and data management activities. 
+
+In conjunction with the CTO, Chief Analytics Officer oversee product vision, strategy and delivery.CenturyLink Big Data As A Service General Manager and Head of Big Data Consulting Practice for CenturyLink. CTL is an $18B global technology company, 3rd largest US network and 2nd data center company worldwide with 60+ data centers and one of the fastest growing cloud services/Hybrid IT and IOT services.  By combining with CenturyLink, Cognilytics is now able to deliver truly end to end big data and analytic services to our clients. Responsible for Big Data As A Service “Go to Market” strategy and execution including developing strategic relationships across key partners such as Cisco, SAP, Cloudera and several other firms. Manage teams delivering large scale “Big Data” complex systems and data governance initiatives for several Fortune 50 companies in Financail Services, Retail, and Healthcare. Leader for CenturyLink internal Data Management, Architecture and Governance across lines of business. Chief Operating Officer - Cognilytics (Purchased By CenturyLink) Head of delivery and data innovation, Chief Data Officer functions for Cognilytics, A Big Data and Analytics consulting firm servicing fortune 100 clients in the healthcare, financial services, manufacturing, oil and gas, and retail industries. Assisted with CenturyLink Acquisition process and key company operations activities. Established data practice by hiring key personnel and provided vision, strategy and policy guidance for client data acquisition, data usage and data management activities. In conjunction with the CTO, Chief Analytics Officer oversee product vision, strategy and delivery.…see more
+Visa logo
+Head of Global Data & Info Servc
+Head of Global Data & Info Servc
+VisaVisa
+Jan 2008 - Jul 2014 · 6 yrs 7 mosJan 2008 to Jul 2014 · 6 yrs 7 mos
+Head of Visa’s Enterprise Data Platform which drives 150+ application services for millions of cardholders, merchants, corporations and banks worldwide. Responsible for the Visa Data Warehouse, Business Intelligence, Data Services and Big Data systems. 
+
+Delivered over 300 projects annually, teams in Austin, TX, Foster City, CA, Singapore, and India. 
+ 
+Developed Enterprise Data Strategy for the company and led mutli-year Enterprise Data Program. Delivered against 20+ major initiatives across all areas of the company driving $360M in total benefits.
+
+Led reengineering of Visa Commercial Data Services platform which services 200,000 corporations worldwide. Successfully completed on time and budget reengineering and customer migration effort for 50,000 companies, 130 banks.
+
+Led strategic development projects for Consumer Loyalty Platform across several platforms including Visa Incentive Network, sweepstakes, campaign management and real time offers data delivery servicing millions of cardholders. 
+
+Successfully implemented Visa’s 10+ PB Data Platform across three data centers including Business Intelligence. Implemented "Big Data" multi PB Hadoop data analytics system, a 300 TB data warehouse delivering value across fraud monitoring, risk analysis and consumer analytics needs and global business intelligence.Head of Visa’s Enterprise Data Platform which drives 150+ application services for millions of cardholders, merchants, corporations and banks worldwide. Responsible for the Visa Data Warehouse, Business Intelligence, Data Services and Big Data systems. Delivered over 300 projects annually, teams in Austin, TX, Foster City, CA, Singapore, and India. Developed Enterprise Data Strategy for the company and led mutli-year Enterprise Data Program. Delivered against 20+ major initiatives across all areas of the company driving $360M in total benefits. Led reengineering of Visa Commercial Data Services platform which services 200,000 corporations worldwide. Successfully completed on time and budget reengineering and customer migration effort for 50,000 companies, 130 banks. Led strategic development projects for Consumer Loyalty Platform across several platforms including Visa Incentive Network, sweepstakes, campaign management and real time offers data delivery servicing millions of cardholders. Successfully implemented Visa’s 10+ PB Data Platform across three data centers including Business Intelligence. Implemented "Big Data" multi PB Hadoop data analytics system, a 300 TB data warehouse delivering value across fraud monitoring, risk analysis and consumer analytics needs and global business intelligence.…see more
+INTTRA logo
+Interim Chief Information Officer
+Interim Chief Information Officer
+INTTRAINTTRA
+Aug 2007 - Jan 2008 · 6 mosAug 2007 to Jan 2008 · 6 mos
+Recruited by the CEO to be interim Chief Information Officer to develop strategic plan for next phase of company growth and implement a new product development plan for the technology platform. Led all IT functions including Enterprise Architecture, Application Development and Operations.Recruited by the CEO to be interim Chief Information Officer to develop strategic plan for next phase of company growth and implement a new product development plan for the technology platform. Led all IT functions including Enterprise Architecture, Application Development and Operations.…see more
+Expedia Group logo
+Vice President Enterprise Architecture and Data
+Vice President Enterprise Architecture and Data
+Expedia GroupExpedia Group
+2005 - 2007 · 2 yrs2005 to 2007 · 2 yrs
+Direct report to the CTO of Expedia Inc, an $8B publicly traded company including Expedia.com, Hotels.com, Hotwire.com, Trip Advisor, and Expedia Corporate Travel. Leader of Enterprise Architecture, Data Base Development, Data Warehousing/Business Intelligence, and Global Development Sourcing. Managed teams in Bellevue, WA, Dallas, TX, China and India.Direct report to the CTO of Expedia Inc, an $8B publicly traded company including Expedia.com, Hotels.com, Hotwire.com, Trip Advisor, and Expedia Corporate Travel. Leader of Enterprise Architecture, Data Base Development, Data Warehousing/Business Intelligence, and Global Development Sourcing. Managed teams in Bellevue, WA, Dallas, TX, China and India.…see more
+Show all 11 experiences
+EducationEducation
+United States Air Force Academy logo
+United States Air Force Academy
+United States Air Force Academy
+Bachelor of Science (B.S.)Bachelor of Science (B.S.)
+1983 - 19871983 - 1987
+Saint Louis University School of Law logo
+Saint Louis University School of Law
+Saint Louis University School of Law
+Law, JDLaw, JD
+1989 - 19951989 - 1995
+SkillsSkills
+Enterprise Architecture
+Enterprise Architecture
+Company logo
+Chief Data Officer at ComcastChief Data Officer at Comcast
+Sekhar N. profile picture
+Endorsed by Sekhar N. and 4 others who are highly skilled at thisEndorsed by Sekhar N. and 4 others who are highly skilled at this
+CenturyLink logo
+Endorsed by 5 colleagues at CenturyLinkEndorsed by 5 colleagues at CenturyLink
+Show all 4 details
+
+Endorse
+Data Warehousing
+Data Warehousing
+Hemanth Thota profile picture
+Endorsed by Hemanth Thota and 6 others who are highly skilled at thisEndorsed by Hemanth Thota and 6 others who are highly skilled at this
+CenturyLink logo
+Endorsed by 3 colleagues at CenturyLinkEndorsed by 3 colleagues at CenturyLink
+77 endorsements
+77 endorsements
+
+Endorse
+Show all 50 skills
+RecommendationsRecommendations
+Recommend Andrew
+ReceivedReceived
+GivenGiven
+Cindy Crump is open to work
+Cindy Crump
+Cindy Crump
+· 2ndSecond degree connection
+Business Analyst III at True ManufacturingBusiness Analyst III at True Manufacturing
+December 29, 2012, Cindy reported directly to AndrewDecember 29, 2012, Cindy reported directly to Andrew
+I reported to Andrew for almost 5 years at MasterCard. He was a demanding but fair person to work for. He really taught me how to think outside the box, an ability I have always admired about him. He has the ability to see the big picture. Andrew took what was a small department and built it to over 200 employees and contractors. It was a pleasure to work for him. - Cindy CrumpI reported to Andrew for almost 5 years at MasterCard. He was a demanding but fair person to work for. He really taught me how to think outside the box, an ability I have always admired about him. He has the ability to see the big picture. Andrew took what was a small department and built it to over 200 employees and contractors. It was a pleasure to work for him. - Cindy Crump
+Malay Verma
+Malay Verma
+Malay Verma
+· 2ndSecond degree connection
+Entrepreneur, Business Leader, Mentor, and Board Member TiE SeattleEntrepreneur, Business Leader, Mentor, and Board Member TiE Seattle
+September 23, 2008, Andrew was Malay’s clientSeptember 23, 2008, Andrew was Malay’s client
+It was a pleasure working with Andrew and he was a fair customer. He was very warm and professional and at the same time was a demanding customer. He challenged us and set high benchmarks for us.It was a pleasure working with Andrew and he was a fair customer. He was very warm and professional and at the same time was a demanding customer. He challenged us and set high benchmarks for us.
+Show all 3 received
+InterestsInterests
+Top VoicesTop Voices
+CompaniesCompanies
+GroupsGroups
+NewslettersNewsletters
+SchoolsSchools
+Ian Bremmer
+Ian Bremmer
+Ian Bremmer
+· 2ndSecond degree connection
+President at Eurasia GroupPresident at Eurasia Group
+3,677,142 followers3,677,142 followers
+
+Follow
+Marshall Goldsmith
+Marshall Goldsmith
+Marshall Goldsmith
+· 2ndSecond degree connection
+My latest project: MarshallGoldsmith.ai Ask me any question. Everything I know is available for free! | Thinkers50 Hall of Fame | #1 Executive Coach | #1 Leadership Thought Leader | #1 NYT Bestselling AuthorMy latest project: MarshallGoldsmith.ai Ask me any question. Everything I know is available for free! | Thinkers50 Hall of Fame | #1 Executive Coach | #1 Leadership Thought Leader | #1 NYT Bestselling Author
+1,596,022 followers1,596,022 followers</pre>
+            </div>
+        </div>
+        
+        <!-- Skills Tab -->
+        <div id="skills" class="tab-content">
+            <div class="section">
+                <h2>Skills Analysis</h2>
+                <p style="color: #6b7280; margin-bottom: 16px;">
+                    Comparison of your skills with Andy Clyne's profile.
+                </p>
+                
+                <h3>Shared Skills</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+                    <span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Data Warehousing</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Business Intelligence</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Enterprise Architecture</span><span style="padding: 6px 12px; background: #d1fae5; color: #065f46; border-radius: 6px; font-size: 13px; font-weight: 500;">Leadership</span>
+                </div>
+                
+                <h3>Your Unique Skills</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+                    <span style="padding: 6px 12px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 13px;">Your unique skills will be highlighted in future updates</span>
+                </div>
+                
+                <h3>Their Skills (Learning Opportunities)</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px;">Their unique skills will be highlighted in future updates</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Research Tab -->
+        <div id="research" class="tab-content">
+            <div class="section">
+                <h2>AI-Generated Research & Background</h2>
+                <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                    <p style="color: #1e40af; font-size: 14px; margin-bottom: 12px;">
+                        <strong>Note:</strong> This research was automatically generated from the LinkedIn profile data and available information.
+                    </p>
+                </div>
+                <div class="analysis-text" style="white-space: pre-wrap; line-height: 1.8;">
+Here are the research notes based on Andy Clyne's LinkedIn profile:
+
+## COMPANY BACKGROUND: Comcast
+
+Comcast is a multinational telecommunications conglomerate that provides cable television, internet, and phone services to millions of customers worldwide. As the Chief Data Officer, Andy Clyne likely plays a crucial role in shaping the company's data strategy and decision-making processes.
+
+## RECENT COMPANY NEWS & UPDATES
+
+None mentioned in the profile.
+
+## ANDY CLYNE'S RECENT ACTIVITY
+
+Andy has been actively engaging with his connections by commenting on posts (6,694 followers). His comments are mostly congratulatory or offering condolences to colleagues. No specific articles or professional activities are mentioned in the profile.
+
+## MUTUAL CONNECTIONS & NETWORKS
+
+Andy shares mutual connections with 35 other professionals, including Rajavarman Gopalakrishnan, Alex Merced, and B.J. Fesq. He is also part of three groups: TDWI: Analytics and Data Management Discussion Group, Big Data and Analytics, and another group (name not specified).
+
+## KEY TALKING POINTS
+
+Based on Andy's profile and recent activity, some potential topics for discussion could be:
+
+1. **Data Strategy in the Telecommunications Industry**: As Chief Data Officer at Comcast, Andy likely has valuable insights into how data can inform business decisions in this sector.
+2. **Business Intelligence and Analytics**: With experience as Head of Comcast Dx Data Platform, Andy may have expertise in implementing effective analytics solutions for business growth.
+3. **Leadership and Team Management**: As a leader in the organization, Andy's approach to team management and leadership might be worth exploring.
+
+Please note that these points are based solely on the provided profile data and may not reflect Andy's actual areas of expertise or interests outside of his LinkedIn presence.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content">
+            <div class="section">
+                <h2>Networking Messages</h2>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>1. Initial Connection Request (LinkedIn)</span>
+                        <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
+                    </h3>
+                    <div id="connection-message">"Andy, as a fellow data enthusiast, I'm intrigued by Comcast's innovative approaches in data management. How do you think your team leverages data storytelling to drive business decisions? Let's explore the intersection of data and strategy!"</div>
+                    <div class="char-count">242 characters</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>2. Meeting Invitation</span>
+                        <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
+                    </h3>
+                    <div id="meeting-message">Here's a message inviting Andy Clyne to a 1:1 meet & greet:
+
+Subject: Let's grab a virtual cup of coffee!
+
+Hi Andy,
+
+A huge thank you for accepting my connection request! I'm excited to have you on my professional network, and I hope our paths will cross more often in the future.
+
+As we both work in the field of data management, I thought it would be great to connect on a personal level. I've been following your journey as Chief Data Officer at Comcast, and I'm impressed by the impact you're making in the industry. Your perspectives on innovation, team-building, and communication are particularly fascinating to me.
+
+I'd love to grab a virtual cup of coffee with you for 15-20 minutes and explore some of these topics further. We could discuss what excites you most about current data management innovations, how you approached building your team, or even share insights on effectively communicating data-driven decisions to stakeholders. The conversation will be relaxed and informal - just an opportunity for us to connect and learn from each other.
+
+Would you be available for a quick virtual coffee chat in the next few weeks? Let me know a time that works for you, and I'll make sure to schedule it accordingly. Looking forward to hearing back from you!
+
+Best regards,
+[Your Name]</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>3. Thank You Message</span>
+                        <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
+                    </h3>
+                    <div id="thankyou-message">Here is a thank-you message you can send after meeting with Andy Clyne from Comcast:
+
+Subject: Thanks for the Meeting!
+
+Hi Andy,
+
+I wanted to take a moment to express my sincere gratitude for taking the time to meet with me today at Comcast. I truly appreciated your insights on [topic discussed] and the valuable information you shared about [specific aspect of the discussion]. Your expertise was incredibly informative, and I'm excited to apply some of the ideas we discussed to our current projects.
+
+One key takeaway I gained from our conversation is [insight or actionable follow-up]. I'm looking forward to exploring this further and potentially implementing it in the near future. Your input was invaluable, and I'm grateful for your willingness to share your knowledge with me.
+
+Please know that you're welcome to stay in touch, and I'd love to keep the conversation going. If there's anything I can do to support Comcast or its initiatives, please don't hesitate to reach out. Thanks again for your time today, Andy - it was a pleasure meeting you!
+
+Best regards,
+[Your Name]</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>4. Consulting Services Offer</span>
+                        <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
+                    </h3>
+                    <div id="consulting-message">Here is a professional message offering consulting services:
+
+Subject: Collaborating on Data Engineering and Analytics Solutions
+
+Dear [Recipient],
+
+I hope this message finds you well. I wanted to reach out and follow up on our previous conversations about the potential opportunities for Comcast in the realm of data engineering, analytics, and AI/ML implementation. As someone who has a deep understanding of these technologies and their applications, I believe my expertise could be valuable in helping your organization drive innovation and growth.
+
+In today's fast-paced digital landscape, companies like Comcast are constantly seeking ways to optimize operations, improve customer experiences, and stay ahead of the competition. By leveraging data engineering and analytics capabilities, you can gain deeper insights into customer behavior, identify new business opportunities, and make more informed decisions. As someone with a strong background in technical leadership, I've had the privilege of helping numerous organizations like yours navigate these challenges.
+
+If you're interested in exploring how my consulting services could support your goals, I'd be happy to schedule a brief discovery call to discuss further. This would provide an opportunity for us to explore specific pain points, identify potential areas for improvement, and determine if there's alignment between our expertise and your needs.
+
+Please let me know if you're available for a 15-minute call at your convenience. I'm committed to respecting your time and ensuring that any conversation we have is productive and valuable for both of us. Looking forward to the possibility of collaborating with Comcast.
+
+Best regards,
+
+Andy Clyne
+Data Engineering and Analytics Consultant
+Comcast</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Updates & Notes Tab -->
+        <div id="updates" class="tab-content">
+            <div class="section">
+                <h2>Update Status</h2>
+                
+                <div id="updateAlert" class="alert"></div>
+                
+                <form id="statusUpdateForm">
+                    <div class="form-group">
+                        <label for="status">Select Status</label>
+                        <select id="status" name="status" required>
+                            <option value="">-- Select Status --</option>
+                            <optgroup label="Research & Contact">
+                                <option value="To Research" selected>To Research</option>
+                                <option value="Ready to Contact" >Ready to Contact</option>
+                                <option value="Contacted - Sent" >Contacted - Sent</option>
+                                <option value="Contacted - Replied" >Contacted - Replied</option>
+                                <option value="Contacted - No Response" >Contacted - No Response</option>
+                                <option value="Cold/Archive" >Cold/Archive</option>
+                            </optgroup>
+                            <optgroup label="Engagement">
+                                <option value="In Conversation" >In Conversation</option>
+                                <option value="Meeting Scheduled" >Meeting Scheduled</option>
+                                <option value="Meeting Complete" >Meeting Complete</option>
+                                <option value="Action Pending - You" >Action Pending - You</option>
+                                <option value="Action Pending - Them" >Action Pending - Them</option>
+                            </optgroup>
+                            <optgroup label="Relationship">
+                                <option value="New Connection" >New Connection</option>
+                                <option value="Nurture (1-3 Mo.)" >Nurture (1-3 Mo.)</option>
+                                <option value="Nurture (4-6 Mo.)" >Nurture (4-6 Mo.)</option>
+                                <option value="Referral Partner" >Referral Partner</option>
+                                <option value="Inactive/Dormant" >Inactive/Dormant</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <button type="button" class="template-btn" onclick="insertTemplate('connection')">Connection Request</button>
+                            <button type="button" class="template-btn" onclick="insertTemplate('followup')">Follow-up</button>
+                            <button type="button" class="template-btn" onclick="insertTemplate('meeting')">Meeting Notes</button>
+                            <button type="button" class="template-btn" onclick="insertTemplate('thankyou')">Thank You</button>
+                        </div>
+                        <div id="editor" style="background: white; min-height: 150px;"></div>
+                        <input type="hidden" id="notes" name="notes">
+                        
+                        <!-- Message Templates Dropdown -->
+                        <div style="margin-top: 16px; display: flex; gap: 12px; align-items: center;">
+                            <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
+                            <select id="messageTemplate" onchange="loadMessageIntoEditor()" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-width: 250px; flex: 1;">
+                                <option value="">-- Select a Message Template --</option>
+                                <option value="connection">1. Connection Request</option>
+                                <option value="meeting">2. Meeting Invitation</option>
+                                <option value="thankyou">3. Thank You Message</option>
+                                <option value="consulting">4. Consulting Services Offer</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
+                </form>
+                
+                <div class="timeline" id="timeline">
+                    <h2>Status History</h2>
+                    <div id="timelineContent">
+                        <p style="color: #6b7280;">Loading timeline...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const contactId = '20251212142652-Andy Clyne-Comcast';
+        let quill;
+        
+        // Load timeline on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTimeline();
+            initializeEditor();
+        });
+        
+        // Initialize Quill Rich Text Editor
+        function initializeEditor() {
+            quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Add notes about this status update...'
+            });
+        }
+        
+        // Template insertion
+        function insertTemplate(type) {
+            if (!quill) return;
+            
+            const templates = {
+                'connection': '<p><strong>Connection Request Sent</strong></p><p>Sent LinkedIn connection request with personalized message.</p><p>Next step: Follow up in 5-7 business days if no response.</p>',
+                'followup': '<p><strong>Follow-up</strong></p><p>Following up on previous outreach.</p><p>Key points discussed:</p><ul><li>Point 1</li><li>Point 2</li></ul>',
+                'meeting': '<p><strong>Meeting Notes</strong></p><p>Date: [Date]</p><p>Duration: [Duration]</p><p>Discussion Topics:</p><ul><li>Topic 1</li><li>Topic 2</li></ul><p>Action Items:</p><ul><li>Action 1</li><li>Action 2</li></ul><p>Next Steps: [Next Steps]</p>',
+                'thankyou': '<p><strong>Thank You Note Sent</strong></p><p>Thanked Andy Clyne for their time and insights.</p><p>Key takeaways:</p><ul><li>Takeaway 1</li><li>Takeaway 2</li></ul><p>Next step: [Next Step]</p>'
+            };
+            
+            const template = templates[type] || '';
+            quill.root.innerHTML = template;
+        }
+        
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Mark selected tab as active
+            event.target.classList.add('active');
+            
+            // Load timeline if updates tab is selected
+            if (tabName === 'updates') {
+                loadTimeline();
+            }
+        }
+        
+        // Load message template into editor
+        function loadMessageIntoEditor() {
+            if (!quill) return;
+            
+            const select = document.getElementById('messageTemplate');
+            const selectedValue = select.value;
+            
+            if (!selectedValue) {
+                return;
+            }
+            
+            // Get message from Messages tab
+            const messageElement = document.getElementById(selectedValue + '-message');
+            if (!messageElement) {
+                console.error('Message element not found:', selectedValue);
+                return;
+            }
+            
+            const text = messageElement.textContent.trim();
+            
+            // Convert plain text to HTML paragraphs for Quill
+            const paragraphs = text.split('\n\n').filter(p => p.trim());
+            const htmlContent = paragraphs.map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`).join('');
+            
+            // Set the editor content
+            quill.root.innerHTML = htmlContent || `<p>${text}</p>`;
+        }
+        
+        function copyMessage(messageType) {
+            const messageElement = document.getElementById(messageType + '-message');
+            const text = messageElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+        
+        // Handle status update form submission
+        document.getElementById('statusUpdateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const updateBtn = document.getElementById('updateBtn');
+            const updateAlert = document.getElementById('updateAlert');
+            const status = document.getElementById('status').value;
+            
+            // Get HTML content from Quill editor
+            const notes = quill.root.innerHTML;
+            
+            // Disable button
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            
+            // Hide previous alerts
+            updateAlert.classList.remove('show', 'success', 'error');
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status, notes })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message
+                    updateAlert.textContent = `Status updated to "${status}"`;
+                    updateAlert.classList.add('show', 'success');
+                    
+                    // Clear editor
+                    quill.root.innerHTML = '';
+                    
+                    // Reload timeline
+                    await loadTimeline();
+                    
+                    // Update page metadata if needed
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    // Show error message
+                    updateAlert.textContent = `Error: ${data.error}`;
+                    updateAlert.classList.add('show', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                updateAlert.textContent = `Error: ${error.message}`;
+                updateAlert.classList.add('show', 'error');
+            } finally {
+                // Re-enable button
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Update Status';
+            }
+        });
+        
+        async function loadTimeline() {
+            const timelineContent = document.getElementById('timelineContent');
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}`);
+                const data = await response.json();
+                
+                if (data.success && data.contact.updates) {
+                    const updates = data.contact.updates;
+                    
+                    if (updates.length === 0) {
+                        timelineContent.innerHTML = '<p style="color: #6b7280;">No status updates yet.</p>';
+                        return;
+                    }
+                    
+                    // Render timeline items (already sorted newest first from API)
+                    timelineContent.innerHTML = updates.map((update, index) => {
+                        const isLatest = index === 0;
+                        const timestamp = update.timestamp;
+                        const date = new Date(
+                            parseInt(timestamp.substring(0, 4)),
+                            parseInt(timestamp.substring(4, 6)) - 1,
+                            parseInt(timestamp.substring(6, 8)),
+                            parseInt(timestamp.substring(8, 10)),
+                            parseInt(timestamp.substring(10, 12)),
+                            parseInt(timestamp.substring(12, 14))
+                        );
+                        
+                        const dateStr = date.toLocaleDateString('en-US', { 
+                            month: 'long', 
+                            day: 'numeric', 
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        }) + ' EST';
+                        
+                        return `
+                            <div class="timeline-item ${isLatest ? 'latest' : ''}">
+                                <div class="timeline-header">
+                                    <span class="timeline-status">${update.status}</span>
+                                    <span class="timeline-date">${dateStr}</span>
+                                </div>
+                                ${update.notes ? `
+                                    <div class="timeline-notes-label">Notes:</div>
+                                    <div class="timeline-notes">${update.notes}</div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    timelineContent.innerHTML = '<p style="color: #6b7280;">Error loading timeline.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading timeline:', error);
+                timelineContent.innerHTML = '<p style="color: #ef4444;">Error loading timeline.</p>';
+            }
+        }
+        
+        async function regenerateDocuments() {
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            
+            if (!confirm('Regenerate all AI analysis and messages? This will take 5-6 minutes.')) {
+                return;
+            }
+            
+            regenerateBtn.disabled = true;
+            regenerateBtn.textContent = '🔄 Regenerating...';
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/regenerate`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Documents regenerated successfully! Reloading page...');
+                    location.reload();
+                } else {
+                    alert(`Error: ${data.error}`);
+                    regenerateBtn.disabled = false;
+                    regenerateBtn.textContent = '🔄 Regen';
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                regenerateBtn.disabled = false;
+                regenerateBtn.textContent = '🔄 Regenerate Documents';
+            }
+        }
+        
+    </script>
+</body>
+</html>
