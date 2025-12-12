@@ -1146,19 +1146,92 @@ def update_networking_details(contact_id):
         location = data.get('location')
         job_title = data.get('job_title')
         
+        # Check which fields were explicitly provided in the request
+        email_provided = 'email' in data
+        location_provided = 'location' in data
+        job_title_provided = 'job_title' in data
+        
         # Load contact
         contact = networking_processor.get_contact_by_id(contact_id)
         
         if not contact:
             return jsonify({'success': False, 'error': 'Contact not found'}), 404
         
-        # Update details
+        # Update details (only update fields that were explicitly provided)
         networking_processor.update_contact_details(
             contact,
             email=email,
             location=location,
-            job_title=job_title
+            job_title=job_title,
+            _email_provided=email_provided,
+            _location_provided=location_provided,
+            _job_title_provided=job_title_provided
         )
+        
+        # Regenerate summary page to reflect updated contact details
+        try:
+            # Reload contact to get fresh data from YAML
+            contact = networking_processor.get_contact_by_id(contact_id)
+            
+            # Check if we have the required files to regenerate summary
+            if contact.summary_path:
+                from app.utils.file_utils import read_text_file
+                
+                # Read existing match analysis and messages if available
+                match_analysis = ""
+                messages = {}
+                research_content = ""
+                
+                if contact.match_analysis_path and contact.match_analysis_path.exists():
+                    match_analysis = read_text_file(contact.match_analysis_path)
+                
+                if contact.messages_path and contact.messages_path.exists():
+                    messages_content = read_text_file(contact.messages_path)
+                    # Parse messages from the formatted file
+                    lines = messages_content.split('\n')
+                    current_section = None
+                    current_message = []
+                    
+                    for line in lines:
+                        if '1. INITIAL CONNECTION REQUEST' in line:
+                            current_section = 'connection_request'
+                            current_message = []
+                        elif '2. MEETING INVITATION' in line:
+                            if current_section:
+                                messages[current_section] = '\n'.join(current_message).strip()
+                            current_section = 'meeting_invitation'
+                            current_message = []
+                        elif '3. THANK YOU MESSAGE' in line:
+                            if current_section:
+                                messages[current_section] = '\n'.join(current_message).strip()
+                            current_section = 'thank_you'
+                            current_message = []
+                        elif '4. CONSULTING SERVICES OFFER' in line:
+                            if current_section:
+                                messages[current_section] = '\n'.join(current_message).strip()
+                            current_section = 'consulting_offer'
+                            current_message = []
+                        elif current_section and line.strip() and not line.startswith('-') and not line.startswith('='):
+                            current_message.append(line)
+                    
+                    # Save last section
+                    if current_section:
+                        messages[current_section] = '\n'.join(current_message).strip()
+                
+                if contact.research_path and contact.research_path.exists():
+                    research_content = read_text_file(contact.research_path)
+                
+                # Regenerate summary page with updated contact data
+                networking_doc_generator.generate_summary_page(
+                    contact,
+                    match_analysis,
+                    messages,
+                    research_content
+                )
+        except Exception as e:
+            print(f"Warning: Could not regenerate summary page after update: {e}")
+            import traceback
+            traceback.print_exc()
         
         return jsonify({
             'success': True,
@@ -1171,6 +1244,8 @@ def update_networking_details(contact_id):
             }
         })
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

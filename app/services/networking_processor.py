@@ -239,19 +239,26 @@ class NetworkingProcessor:
         contact: NetworkingContact,
         email: Optional[str] = None,
         location: Optional[str] = None,
-        job_title: Optional[str] = None
+        job_title: Optional[str] = None,
+        _email_provided: bool = False,
+        _location_provided: bool = False,
+        _job_title_provided: bool = False
     ) -> None:
-        """Update contact details"""
-        if email is not None:
-            contact.email = email
-        if location is not None:
-            contact.location = location
-        if job_title is not None:
-            contact.job_title = job_title
+        """Update contact details
+        
+        The _*_provided flags indicate whether the field was explicitly provided in the request,
+        allowing us to distinguish between "not provided" and "explicitly set to None/empty"
+        """
+        if _email_provided:
+            contact.email = email if email else None
+        if _location_provided:
+            contact.location = location if location else None
+        if _job_title_provided:
+            contact.job_title = job_title if job_title else None
         
         contact.status_updated_at = get_est_now()
         self._save_contact_metadata(contact)
-        print(f"✓ Updated contact details")
+        print(f"✓ Updated contact details: email={contact.email}, location={contact.location}, job_title={contact.job_title}")
     
     def get_contact_updates(self, contact: NetworkingContact) -> List[dict]:
         """Get all status updates for a contact"""
