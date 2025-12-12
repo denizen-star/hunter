@@ -708,6 +708,7 @@
             const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
             const flagIcon = contact.flagged ? '⚐' : '⚑';
             const flagClass = contact.flagged ? 'flagged' : '';
+            const nextStep = contact.next_step || 'Review contact status and determine next action';
             
             return `
                 <div class="contact-tile timing-${contact.timing_color}">
@@ -721,6 +722,10 @@
                     <div class="contact-company">${escapeHtml(contact.company_name)}</div>
                     ${contact.job_title ? `<div class="contact-title">${escapeHtml(contact.job_title)}</div>` : ''}
                     <div class="status-badge">${escapeHtml(contact.status)}</div>
+                    <div class="next-step-section">
+                        <div class="next-step-label">Next Step</div>
+                        <div class="next-step-text">${escapeHtml(nextStep)}</div>
+                    </div>
                     <div class="contact-dates">
                         <div class="date-row">
                             <span>📅</span>
