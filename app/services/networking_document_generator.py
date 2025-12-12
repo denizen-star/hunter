@@ -693,33 +693,37 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         .tabs {{
             background: white;
             border-bottom: 1px solid #e5e7eb;
-            padding: 0 32px;
+            padding: 0;
             display: flex;
-            gap: 8px;
+            gap: 0;
+            margin: 0 32px;
         }}
         
         .tab {{
             padding: 16px 24px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            font-weight: 400;
             color: #6b7280;
             transition: all 0.15s ease;
+            position: relative;
         }}
         
         .tab:hover {{
             color: #374151;
+            background: #f9fafb;
         }}
         
         .tab.active {{
-            color: #3b82f6;
+            color: #1f2937;
             border-bottom-color: #3b82f6;
+            font-weight: 500;
         }}
         
         .content {{
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px;
+            margin: 0 32px;
+            padding: 0;
+            padding-top: 0;
         }}
         
         .tab-content {{
@@ -732,27 +736,45 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         
         .section {{
             background: white;
-            border-radius: 12px;
-            padding: 28px;
+            border-radius: 0;
+            padding: 0;
             margin-bottom: 24px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-            border: 1px solid #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+            width: 100%;
+        }}
+        
+        .section-header {{
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: 0;
         }}
         
         .section h2 {{
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
             color: #1f2937;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f3f4f6;
+            padding: 0;
+            border-bottom: none;
         }}
         
-        .section h3 {{
+        .section-content {{
+            padding: 28px;
+        }}
+        
+        .section-content h3 {{
             font-size: 16px;
             font-weight: 600;
             margin: 20px 0 12px 0;
             color: #374151;
+        }}
+        
+        .section-content h3:first-child {{
+            margin-top: 0;
         }}
         
         .info-grid {{
@@ -1136,7 +1158,10 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         <div id="summary" class="tab-content active">
             <!-- Contact Details Section -->
             <div class="section">
-                <h2>Contact Details</h2>
+                <div class="section-header">
+                    <h2>Contact Details</h2>
+                </div>
+                <div class="section-content">
                 <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
@@ -1153,21 +1178,30 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 </form>
                 <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
                 <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
             </div>
             
             <!-- Match Analysis Section -->
             <div class="section">
-                <h2>Match Analysis</h2>
+                <div class="section-header">
+                    <h2>Match Analysis</h2>
+                </div>
+                <div class="section-content">
                 <div class="analysis-section">
                     <div class="analysis-text">{match_analysis}</div>
+                </div>
                 </div>
             </div>
             
             <!-- Key Strengths & Talking Points -->
             <div class="section">
-                <h2>Key Strengths & Talking Points</h2>
+                <div class="section-header">
+                    <h2>Key Strengths & Talking Points</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px;">
                     {self._generate_talking_points(match_analysis, contact)}
+                </div>
                 </div>
             </div>
         </div>
@@ -1175,15 +1209,22 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         <!-- Raw Entry Tab -->
         <div id="raw" class="tab-content">
             <div class="section">
-                <h2>Raw Profile Details</h2>
+                <div class="section-header">
+                    <h2>Raw Profile Details</h2>
+                </div>
+                <div class="section-content">
                 <pre>{raw_profile}</pre>
+                </div>
             </div>
         </div>
         
         <!-- Skills Tab -->
         <div id="skills" class="tab-content">
             <div class="section">
-                <h2>Skills Analysis</h2>
+                <div class="section-header">
+                    <h2>Skills Analysis</h2>
+                </div>
+                <div class="section-content">
                 <p style="color: #6b7280; margin-bottom: 16px;">
                     Comparison of your skills with {contact.person_name}'s profile.
                 </p>
@@ -1202,13 +1243,17 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     {self._extract_skills_html(match_analysis, 'theirs')}
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Research Tab -->
         <div id="research" class="tab-content">
             <div class="section">
-                <h2>AI-Generated Research & Background</h2>
+                <div class="section-header">
+                    <h2>AI-Generated Research & Background</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                     <p style="color: #1e40af; font-size: 14px; margin-bottom: 12px;">
                         <strong>Note:</strong> This research was automatically generated from the LinkedIn profile data and available information.
@@ -1217,14 +1262,17 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 <div class="analysis-text" style="white-space: pre-wrap; line-height: 1.8;">
 {research_content if research_content else self._get_default_research(contact)}
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Messages Tab -->
         <div id="messages" class="tab-content">
             <div class="section">
-                <h2>Networking Messages</h2>
-                
+                <div class="section-header">
+                    <h2>Networking Messages</h2>
+                </div>
+                <div class="section-content">
                 <div class="message-box">
                     <h3>
                         <span>1. Initial Connection Request (LinkedIn)</span>
@@ -1257,13 +1305,17 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     </h3>
                     <div id="consulting-message">{messages.get('consulting_offer', 'N/A')}</div>
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Updates & Notes Tab -->
         <div id="updates" class="tab-content">
             <div class="section">
-                <h2>Update Status</h2>
+                <div class="section-header">
+                    <h2>Update Status</h2>
+                </div>
+                <div class="section-content">
                 
                 <div id="updateAlert" class="alert"></div>
                 
@@ -1332,6 +1384,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     <div id="timelineContent">
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
+                </div>
                 </div>
             </div>
         </div>

@@ -115,7 +115,7 @@
         
         .header h1 {
             font-size: 24px;
-            font-weight: 700;
+            font-weight: 400;
             color: var(--text-primary);
             margin: 0 0 4px 0;
         }
@@ -142,11 +142,23 @@
             overflow: hidden;
             transition: all 0.3s ease;
             border: 1px solid rgba(59, 130, 246, 0.1);
+            cursor: pointer;
         }
         
         .stat-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .stat-card.active {
+            border: 2px solid var(--accent-blue);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2), 0 4px 8px rgba(0, 0, 0, 0.06);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+        
+        .stat-card.active::before {
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            height: 6px;
         }
         
         .stat-card::before {
@@ -165,7 +177,7 @@
             margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-weight: 700;
+            font-weight: 400;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -179,7 +191,7 @@
         
         .stat-card .value {
             font-size: 42px;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--text-primary);
             line-height: 1;
             background: linear-gradient(135deg, #1f2937 0%, #3b82f6 100%);
@@ -191,43 +203,55 @@
         .filters {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 12px 16px;
             margin-bottom: 28px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-primary);
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
         .filters h3 {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-secondary);
-            margin: 0 0 16px 0;
+            margin: 0;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
+            letter-spacing: 0.5px;
+            font-weight: 400;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
         }
         
         .filters h3::before {
             content: '';
-            width: 3px;
-            height: 16px;
+            width: 2px;
+            height: 12px;
             background: linear-gradient(180deg, #3b82f6, #10b981);
             border-radius: 2px;
         }
         
         .filter-buttons {
             display: flex;
-            gap: 10px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         
         .filter-btn {
-            padding: 10px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 400;
+            border-radius: 8px;
             border: 2px solid var(--border-primary);
             background: white;
             color: var(--text-primary);
@@ -236,7 +260,8 @@
             position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
         }
         
         .filter-btn:hover {
@@ -255,11 +280,11 @@
         
         .filter-btn .count {
             background: rgba(0, 0, 0, 0.1);
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            min-width: 20px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 400;
+            min-width: 18px;
             text-align: center;
         }
         
@@ -491,71 +516,74 @@
         
         <!-- Stats -->
         <div class="stats-row" id="stats">
-            <div class="stat-card">
+            <div class="stat-card" data-stat-filter="all" id="stat-all">
                 <div class="label">Total Contacts</div>
                 <div class="value" id="totalContacts">-</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card active" data-stat-filter="active" id="stat-active">
                 <div class="label">Active</div>
                 <div class="value" id="activeContacts">-</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-stat-filter="meetings" id="stat-meetings">
                 <div class="label">Meetings Scheduled</div>
                 <div class="value" id="meetingsScheduled">-</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" data-stat-filter="partners" id="stat-partners">
                 <div class="label">Referral Partners</div>
                 <div class="value" id="referralPartners">-</div>
             </div>
         </div>
         
-        <!-- Status Filters -->
-        <div class="filters" id="statusFilters">
-            <h3>Status Filters</h3>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter-type="status" data-filter="all">
-                    All <span class="count" id="count-all">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="status" data-filter="To Research">
-                    To Research <span class="count" id="count-research">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="status" data-filter="Contacted">
-                    Contacted <span class="count" id="count-contacted">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="status" data-filter="In Conversation">
-                    In Conversation <span class="count" id="count-conversation">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="status" data-filter="Meeting Scheduled">
-                    Meetings <span class="count" id="count-meetings">0</span>
-                </button>
+        <!-- Combined Filters -->
+        <div class="filters">
+            <!-- Status Filters -->
+            <div class="filter-group" id="statusFilters">
+                <h3>Status Filters</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter-type="status" data-filter="all">
+                        All <span class="count" id="count-all">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="status" data-filter="To Research">
+                        To Research <span class="count" id="count-research">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Contacted">
+                        Contacted <span class="count" id="count-contacted">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="status" data-filter="In Conversation">
+                        In Conversation <span class="count" id="count-conversation">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Meeting Scheduled">
+                        Meetings <span class="count" id="count-meetings">0</span>
+                    </button>
+                </div>
             </div>
-        </div>
-        
-        <!-- Timing Filters -->
-        <div class="filters" id="timingFilters">
-            <h3>Activity Timing</h3>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter-type="timing" data-timing="all">
-                    All <span class="count" id="count-timing-all">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="timing" data-timing="white" style="border-left: 4px solid #e5e7eb;">
-                    Recent (&lt;7d) <span class="count" id="count-recent">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="timing" data-timing="green" style="border-left: 4px solid #10b981;">
-                    Needs Activity (8-15d) <span class="count" id="count-needs">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="timing" data-timing="yellow" style="border-left: 4px solid #f59e0b;">
-                    Approaching (15-30d) <span class="count" id="count-approaching">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="timing" data-timing="red" style="border-left: 4px solid #ef4444;">
-                    Overdue (30-60d) <span class="count" id="count-overdue">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="timing" data-timing="blue" style="border-left: 4px solid #3b82f6;">
-                    Nurture (60-90d) <span class="count" id="count-nurture">0</span>
-                </button>
-                <button class="filter-btn" data-filter-type="timing" data-timing="gray" style="border-left: 4px solid #6b7280;">
-                    Cold (&gt;90d) <span class="count" id="count-cold">0</span>
-                </button>
+            
+            <!-- Timing Filters -->
+            <div class="filter-group" id="timingFilters">
+                <h3>Activity Timing</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter-type="timing" data-timing="all">
+                        All <span class="count" id="count-timing-all">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="timing" data-timing="white" style="border-left: 4px solid #e5e7eb;" title="Recent">
+                        &lt;7d <span class="count" id="count-recent">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="timing" data-timing="green" style="border-left: 4px solid #10b981;" title="Needs Activity">
+                        8-15d <span class="count" id="count-needs">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="timing" data-timing="yellow" style="border-left: 4px solid #f59e0b;" title="Approaching">
+                        15-30d <span class="count" id="count-approaching">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="timing" data-timing="red" style="border-left: 4px solid #ef4444;" title="Overdue">
+                        30-60d <span class="count" id="count-overdue">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="timing" data-timing="blue" style="border-left: 4px solid #3b82f6;" title="Nurture">
+                        60-90d <span class="count" id="count-nurture">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="timing" data-timing="gray" style="border-left: 4px solid #6b7280;" title="Cold">
+                        &gt;90d <span class="count" id="count-cold">0</span>
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -567,11 +595,13 @@
         let allContacts = [];
         let currentStatusFilter = 'all';
         let currentTimingFilter = null;
+        let currentStatFilter = 'active'; // Default to "Active"
 
         // Load contacts on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadContacts();
             setupFilters();
+            setupStatFilters();
         });
 
         async function loadContacts() {
@@ -583,6 +613,10 @@
                     allContacts = data.contacts;
                     updateStats();
                     updateFilterCounts();
+                    // Set "Active" stat card as active on load
+                    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+                    document.getElementById('stat-active').classList.add('active');
+                    currentStatFilter = 'active';
                     renderContacts();
                 }
             } catch (error) {
@@ -673,14 +707,44 @@
                 });
             });
         }
+        
+        function setupStatFilters() {
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    // Update stat card active state
+                    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    
+                    // Set stat filter
+                    currentStatFilter = card.dataset.statFilter;
+                    
+                    // Re-render contacts
+                    renderContacts();
+                });
+            });
+        }
 
         function renderContacts() {
             const grid = document.getElementById('contactsGrid');
             
-            // Filter contacts by status
+            // Start with all contacts
             let filtered = allContacts;
+            
+            // Apply stat filter first
+            if (currentStatFilter === 'active') {
+                filtered = filtered.filter(c => 
+                    !['Cold/Archive', 'Inactive/Dormant'].includes(c.status)
+                );
+            } else if (currentStatFilter === 'meetings') {
+                filtered = filtered.filter(c => c.status === 'Meeting Scheduled');
+            } else if (currentStatFilter === 'partners') {
+                filtered = filtered.filter(c => c.status === 'Referral Partner');
+            }
+            // 'all' stat filter shows all contacts
+            
+            // Then filter by status filter buttons
             if (currentStatusFilter !== 'all') {
-                filtered = allContacts.filter(c => c.status === currentStatusFilter || c.status.includes(currentStatusFilter));
+                filtered = filtered.filter(c => c.status === currentStatusFilter || c.status.includes(currentStatusFilter));
             }
             
             // Further filter by timing if selected (null means "all")
