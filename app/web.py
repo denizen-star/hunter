@@ -2173,18 +2173,332 @@ def view_dashboard():
 
 @app.route('/progress')
 def view_progress_dashboard():
-    """View the generated progress dashboard"""
-    from app.utils.file_utils import get_data_path
-    # Always regenerate progress dashboard to ensure it's up to date
-    dashboard_generator.generate_progress_dashboard()
-    progress_path = get_data_path('output') / 'progress.html'
-    
-    if progress_path.exists():
-        return send_from_directory(
-            progress_path.parent,
-            progress_path.name
-        )
-    return "Dashboard not generated yet.", 404
+    """View the unified progress dashboard"""
+    return render_template('progress.html')
+
+
+@app.route('/api/progress', methods=['GET'])
+def get_progress_data():
+    """Get combined applications and contacts data for progress page"""
+    try:
+        # Get filter parameters
+        type_filter = request.args.get('type', 'both')  # jobs, networking, both
+        period = request.args.get('period', 'all')  # today, yesterday, 7days, 30days, all
+        
+        # Default period to 'all' if invalid
+        if period not in ['today', 'yesterday', '7days', '30days', 'all']:
+            period = 'all'
+        company_filter = request.args.get('company', '')
+        position_filter = request.args.get('position', '')
+        status_filter = request.args.get('status', 'all')
+        networking_status_filter = request.args.get('networking_status', 'all')
+        timing_filter = request.args.get('timing', 'all')
+        
+        from datetime import datetime, timedelta
+        from app.utils.datetime_utils import parse_datetime, get_est_now
+        
+        # Calculate date range based on period
+        # Use timezone-aware datetime to match Application and Contact models
+        now = get_est_now()
+        period_start = None
+        period_end = None
+        if period == 'today':
+            period_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif period == 'yesterday':
+            period_start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            period_end = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif period == '7days':
+            period_start = now - timedelta(days=7)
+        elif period == '30days':
+            period_start = now - timedelta(days=30)
+        
+        applications_data = []
+        contacts_data = []
+        
+        # Get applications if type is 'jobs' or 'both'
+        if type_filter in ['jobs', 'both']:
+            try:
+                applications = job_processor.list_all_applications()
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                applications = []
+            
+            # Filter by period
+            if period_start:
+                if period == 'yesterday':
+                    applications = [app for app in applications 
+                                  if period_start <= app.created_at < period_end]
+                else:
+                    applications = [app for app in applications 
+                                  if app.created_at >= period_start]
+            
+            # Filter by company
+            if company_filter:
+                applications = [app for app in applications 
+                              if company_filter.lower() in app.company.lower()]
+            
+            # Filter by position
+            if position_filter:
+                applications = [app for app in applications 
+                              if position_filter.lower() in app.job_title.lower()]
+            
+            # Filter by status
+            if status_filter and status_filter != 'all':
+                if status_filter == 'active':
+                    applications = [app for app in applications 
+                                  if app.status.lower() not in ['rejected', 'accepted']]
+                elif status_filter == 'flagged':
+                    applications = [app for app in applications if app.flagged]
+                elif status_filter == 'To Research':
+                    # This is a networking status, skip for applications
+                    pass
+                elif status_filter == 'Contacted':
+                    applications = [app for app in applications 
+                                  if 'contacted' in app.status.lower()]
+                elif status_filter == 'In Conversation':
+                    # This is a networking status, skip for applications
+                    pass
+                elif status_filter == 'Meeting Scheduled':
+                    applications = [app for app in applications 
+                                  if 'scheduled' in app.status.lower() or 'interview' in app.status.lower()]
+                elif status_filter == 'Inactive/Dormant':
+                    applications = [app for app in applications 
+                                  if 'inactive' in app.status.lower() or 'dormant' in app.status.lower()]
+                else:
+                    # Map filter to status
+                    status_map = {
+                        'pending': 'pending',
+                        'applied': 'applied',
+                        'contacted': 'contacted someone',
+                        'company': 'company response',
+                        'scheduled': 'scheduled interview',
+                        'follow-up': 'interview - follow up',
+                        'offered': 'offered',
+                        'rejected': 'rejected',
+                        'accepted': 'accepted'
+                    }
+                    target_status = status_map.get(status_filter, status_filter)
+                    applications = [app for app in applications 
+                                  if app.status.lower() == target_status.lower()]
+            
+            applications_data = [{
+                'id': app.id,
+                'type': 'application',
+                'company': app.company,
+                'job_title': app.job_title,
+                'position': app.job_title,  # Alias for unified sorting
+                'status': app.status,
+                'created_at': app.created_at.isoformat(),
+                'status_updated_at': app.status_updated_at.isoformat() if app.status_updated_at else app.created_at.isoformat(),
+                'match_score': app.match_score or 0,
+                'posted_date': app.posted_date,
+                'job_url': app.job_url,
+                'salary_range': app.salary_range,
+                'location': app.location,
+                'hiring_manager': app.hiring_manager,
+                'summary_path': str(app.summary_path) if app.summary_path else None,
+                'summary_filename': app.summary_path.name if app.summary_path and app.summary_path.exists() else None,
+                'flagged': app.flagged,
+                'folder_path': str(app.folder_path.name) if app.folder_path else None
+            } for app in applications]
+        
+        # Get contacts if type is 'networking' or 'both'
+        if type_filter in ['networking', 'both']:
+            try:
+                contacts = networking_processor.list_all_contacts()
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                contacts = []
+            
+            # Filter by period
+            if period_start:
+                if period == 'yesterday':
+                    contacts = [c for c in contacts 
+                              if period_start <= c.created_at < period_end]
+                else:
+                    contacts = [c for c in contacts 
+                              if c.created_at >= period_start]
+            
+            # Filter by company
+            if company_filter:
+                contacts = [c for c in contacts 
+                          if company_filter.lower() in c.company_name.lower()]
+            
+            # Filter by position
+            if position_filter:
+                contacts = [c for c in contacts 
+                          if position_filter.lower() in (c.job_title or '').lower()]
+            
+            # Filter by networking status
+            if networking_status_filter and networking_status_filter != 'all':
+                if networking_status_filter == 'active':
+                    contacts = [c for c in contacts 
+                              if c.status not in ['Cold/Archive', 'Inactive/Dormant']]
+                elif networking_status_filter == 'flagged':
+                    contacts = [c for c in contacts if c.flagged]
+                else:
+                    contacts = [c for c in contacts 
+                              if networking_status_filter.lower() in c.status.lower()]
+            
+            # Filter by timing
+            if timing_filter and timing_filter != 'all':
+                contacts = [c for c in contacts 
+                          if c.get_timing_color_class() == timing_filter]
+            
+            contacts_data = []
+            for c in contacts:
+                try:
+                    # Safely get timing color and other computed fields
+                    try:
+                        timing_color = c.get_timing_color_class()
+                    except:
+                        timing_color = 'white'
+                    
+                    try:
+                        days_since_update = c.get_days_since_update()
+                    except:
+                        days_since_update = 0
+                    
+                    try:
+                        next_step = c.get_next_step()
+                    except:
+                        next_step = ''
+                    
+                    contacts_data.append({
+                        'id': c.id,
+                        'type': 'contact',
+                        'company': c.company_name,
+                        'person_name': c.person_name,
+                        'job_title': c.job_title or '',
+                        'position': c.job_title or '',  # Alias for unified sorting
+                        'status': c.status or '',
+                        'created_at': c.created_at.isoformat() if c.created_at else datetime.now().isoformat(),
+                        'status_updated_at': c.status_updated_at.isoformat() if c.status_updated_at else (c.created_at.isoformat() if c.created_at else datetime.now().isoformat()),
+                        'match_score': c.match_score or 0,
+                        'linkedin_url': c.linkedin_url or '',
+                        'email': c.email or '',
+                        'location': c.location or '',
+                        'flagged': bool(c.flagged) if hasattr(c, 'flagged') else False,
+                        'days_since_update': days_since_update,
+                        'timing_color': timing_color,
+                        'next_step': next_step
+                    })
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+                    continue
+        
+        # Calculate stats from FULL dataset (before filtering)
+        # We need to get full datasets for accurate counts
+        all_applications_for_stats = job_processor.list_all_applications() if type_filter in ['jobs', 'both'] else []
+        all_contacts_for_stats = []
+        if type_filter in ['networking', 'both']:
+            try:
+                all_contacts_for_stats = networking_processor.list_all_contacts()
+            except:
+                all_contacts_for_stats = []
+        
+        def count_app_status(*labels):
+            return len([a for a in all_applications_for_stats 
+                      if any(label.lower() in (a.status or '').lower() for label in labels)])
+        
+        def count_contact_status(*labels):
+            return len([c for c in all_contacts_for_stats 
+                      if any(label.lower() in (c.status or '').lower() for label in labels)])
+        
+        # Application stats (from full dataset)
+        app_stats = {
+            'active': len([a for a in all_applications_for_stats 
+                          if (a.status or '').lower() not in ['rejected', 'accepted', 'inactive', 'dormant']]),
+            'all': len(all_applications_for_stats),
+            'flagged': len([a for a in all_applications_for_stats if a.flagged]),
+            'pending': count_app_status('pending'),
+            'applied': count_app_status('applied'),
+            'contacted': count_app_status('contacted someone'),
+            'company': count_app_status('company response', 'contacted hiring manager'),
+            'scheduled': count_app_status('scheduled interview'),
+            'follow-up': count_app_status('interview - follow up'),
+            'offered': count_app_status('offered'),
+            'rejected': count_app_status('rejected'),
+            'accepted': count_app_status('accepted'),
+            'inactive': count_app_status('inactive', 'dormant')
+        }
+        
+        # Helper function for safe timing color retrieval
+        def safe_get_timing(c):
+            try:
+                return c.get_timing_color_class() if hasattr(c, 'get_timing_color_class') else 'white'
+            except:
+                return 'white'
+        
+        # Contact stats (from full dataset)
+        contact_stats = {
+            'total': len(all_contacts_for_stats),
+            'active': len([c for c in all_contacts_for_stats 
+                          if (c.status or '') not in ['Cold/Archive', 'Inactive/Dormant']]),
+            'meetings': len([c for c in all_contacts_for_stats 
+                           if (c.status or '') == 'Meeting Scheduled']),
+            'partners': len([c for c in all_contacts_for_stats 
+                            if (c.status or '') == 'Referral Partner']),
+            # Networking status counts
+            'to_research': len([c for c in all_contacts_for_stats if (c.status or '') == 'To Research']),
+            'contacted': len([c for c in all_contacts_for_stats if 'Contacted' in (c.status or '')]),
+            'in_conversation': len([c for c in all_contacts_for_stats if (c.status or '') == 'In Conversation']),
+            'inactive': len([c for c in all_contacts_for_stats if (c.status or '') == 'Inactive/Dormant']),
+            # Timing counts (with error handling)
+            'timing_white': len([c for c in all_contacts_for_stats if safe_get_timing(c) == 'white']),
+            'timing_green': len([c for c in all_contacts_for_stats if safe_get_timing(c) == 'green']),
+            'timing_yellow': len([c for c in all_contacts_for_stats if safe_get_timing(c) == 'yellow']),
+            'timing_red': len([c for c in all_contacts_for_stats if safe_get_timing(c) == 'red']),
+            'timing_blue': len([c for c in all_contacts_for_stats if safe_get_timing(c) == 'blue']),
+            'timing_gray': len([c for c in all_contacts_for_stats if safe_get_timing(c) == 'gray'])
+        }
+        
+        # Combined stats (when type is 'both')
+        combined_stats = {
+            'active': app_stats['active'] + contact_stats['active'],
+            'all': app_stats['all'] + contact_stats['total'],
+            'flagged': app_stats['flagged'] + len([c for c in all_contacts_for_stats if getattr(c, 'flagged', False)])
+        }
+        
+        # Get unique companies and positions for dropdowns (from full dataset)
+        all_companies = set()
+        all_positions = set()
+        
+        # From all applications
+        for app in all_applications_for_stats:
+            if app.company:
+                all_companies.add(app.company)
+            if app.job_title:
+                all_positions.add(app.job_title)
+        
+        # From all contacts
+        for c in all_contacts_for_stats:
+            if c.company_name:
+                all_companies.add(c.company_name)
+            if c.job_title:
+                all_positions.add(c.job_title)
+        
+        companies = sorted(all_companies)
+        positions = sorted(all_positions)
+        
+        return jsonify({
+            'success': True,
+            'applications': applications_data,
+            'contacts': contacts_data,
+            'app_stats': app_stats,
+            'contact_stats': contact_stats,
+            'combined_stats': combined_stats,
+            'companies': companies,
+            'positions': positions,
+            'type_filter': type_filter
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/applications/<path:filepath>')
