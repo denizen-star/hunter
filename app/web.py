@@ -20,7 +20,8 @@ from app.services.analytics_generator import AnalyticsGenerator
 from app.services.networking_processor import NetworkingProcessor
 from app.services.networking_document_generator import NetworkingDocumentGenerator
 from app.utils.datetime_utils import format_for_display
-from app.utils.file_utils import get_project_root
+from app.utils.file_utils import get_project_root, get_data_path
+from app.utils.cache_utils import is_cache_stale, get_cached_json, save_cached_json
 
 app = Flask(__name__, 
            template_folder='templates/web',
@@ -1517,10 +1518,23 @@ def get_reports_data():
     """Get reports data for specified period"""
     try:
         from datetime import datetime, timedelta, timezone
+        from pathlib import Path
         
         period = request.args.get('period', '30days')
         report_type = request.args.get('type', 'jobs')  # 'jobs', 'networking', or 'both'
         gap_period = request.args.get('gap_period', 'all')  # For skill gaps: 'daily', 'weekly', 'monthly', 'all'
+
+        # ------------------------------------------------------------------
+        # Simple file-based caching, similar to dashboard caching.
+        # Cache key includes period, report_type, and gap_period.
+        # ------------------------------------------------------------------
+        cache_filename = f"reports_cache_{period}_{report_type}_{gap_period}.json"
+        cache_path = get_data_path('output') / Path(cache_filename)
+
+        if not is_cache_stale(cache_path, ttl_seconds=300):
+            cached = get_cached_json(cache_path)
+            if cached is not None:
+                return jsonify(cached)
         
         # Load data based on type
         applications = []
@@ -1860,8 +1874,8 @@ def get_reports_data():
             'total_contact_count': total_contact_count,
             'total_actions': total_actions
         }
-        
-        return jsonify({
+
+        response_payload = {
             'success': True,
             'period': period,
             'summary': summary,
@@ -1871,7 +1885,12 @@ def get_reports_data():
             'cumulative_activities_by_status': cumulative_activities_by_status,
             'followup_applications': followup_applications,
             'flagged_applications': flagged_applications
-        })
+        }
+
+        # Save to cache for subsequent fast loads.
+        save_cached_json(cache_path, response_payload)
+
+        return jsonify(response_payload)
         
     except Exception as e:
         import traceback
@@ -2019,7 +2038,20 @@ def get_daily_activities():
     """Get daily activities data (combined jobs + networking)"""
     try:
         from datetime import datetime, timezone, timedelta
+        from pathlib import Path
         
+        # ------------------------------------------------------------------
+        # File-based caching for daily activities.
+        # Single cache file since this endpoint has no query parameters.
+        # ------------------------------------------------------------------
+        cache_filename = "daily_activities_cache.json"
+        cache_path = get_data_path('output') / Path(cache_filename)
+
+        if not is_cache_stale(cache_path, ttl_seconds=300):
+            cached = get_cached_json(cache_path)
+            if cached is not None:
+                return jsonify(cached)
+
         applications = job_processor.list_all_applications()
         networking_contacts = networking_processor.list_all_contacts()
         
@@ -2144,11 +2176,16 @@ def get_daily_activities():
                 'activity_count': len(daily_activities[date]),
                 'activities': daily_activities[date]
             })
-        
-        return jsonify({
+
+        response_payload = {
             'success': True,
             'daily_activities': activities_list
-        })
+        }
+
+        # Save to cache for subsequent fast loads.
+        save_cached_json(cache_path, response_payload)
+
+        return jsonify(response_payload)
         
     except Exception as e:
         import traceback
@@ -2214,6 +2251,8 @@ def delete_template(template_id):
 def get_analytics():
     """Get comprehensive analytics data for specified period"""
     try:
+        from pathlib import Path
+
         period = request.args.get('period', '30days')
         
         # Validate period
@@ -2223,12 +2262,30 @@ def get_analytics():
         
         # Generate analytics
         gap_period = request.args.get('gap_period', 'all')  # For skill gaps: 'daily', 'weekly', 'monthly', 'all'
+
+        # ------------------------------------------------------------------
+        # File-based caching for analytics.
+        # Cache key includes period and gap_period.
+        # ------------------------------------------------------------------
+        cache_filename = f"analytics_cache_{period}_{gap_period}.json"
+        cache_path = get_data_path('output') / Path(cache_filename)
+
+        if not is_cache_stale(cache_path, ttl_seconds=300):
+            cached = get_cached_json(cache_path)
+            if cached is not None:
+                return jsonify(cached)
+
         analytics_data = analytics_generator.generate_analytics(period, gap_period)
-        
-        return jsonify({
+
+        response_payload = {
             'success': True,
             **analytics_data
-        })
+        }
+
+        # Save to cache for subsequent fast loads.
+        save_cached_json(cache_path, response_payload)
+
+        return jsonify(response_payload)
     except Exception as e:
         import traceback
         traceback.print_exc()
