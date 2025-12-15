@@ -394,9 +394,6 @@ def create_application():
         # Save updated metadata with paths
         job_processor._save_application_metadata(application)
         
-        # Update dashboard
-        dashboard_generator.generate_index_page()
-        
         # Generate relative URL for summary
         summary_url = None
         if application.summary_path:
@@ -662,9 +659,6 @@ def update_status(app_id):
         except Exception as e:
             print(f"Warning: Could not regenerate summary page: {e}")
         
-        # Update dashboard
-        dashboard_generator.generate_index_page()
-        
         # Generate response data
         response_data = {
             'success': True,
@@ -713,9 +707,6 @@ def update_job_details(app_id):
             location=location,
             hiring_manager=hiring_manager
         )
-        
-        # Update dashboard
-        dashboard_generator.generate_index_page()
         
         return jsonify({
             'success': True,
@@ -802,10 +793,6 @@ def update_checklist(app_id):
         except Exception as e:
             print(f"Warning: Could not regenerate summary page: {e}")
         
-        # Regenerate both dashboards to show updated progress pills
-        dashboard_generator.generate_index_page()
-        dashboard_generator.generate_progress_dashboard()
-        
         return jsonify({
             'success': True,
             'message': 'Checklist updated successfully',
@@ -830,9 +817,6 @@ def regenerate_documents(app_id):
         
         # Save updated metadata
         job_processor._save_application_metadata(application)
-        
-        # Update dashboard
-        dashboard_generator.generate_index_page()
         
         return jsonify({
             'success': True,
@@ -877,9 +861,6 @@ def set_custom_resume(app_id):
         
         # Save updated metadata
         job_processor._save_application_metadata(application)
-        
-        # Update dashboard
-        dashboard_generator.generate_index_page()
         
         return jsonify({
             'success': True,
@@ -1451,9 +1432,6 @@ def serve_networking_file(filepath):
 def update_dashboard():
     """Update the dashboard"""
     try:
-        dashboard_generator.generate_index_page()
-        dashboard_generator.generate_progress_dashboard()
-        
         return jsonify({
             'success': True,
             'message': 'Dashboards updated successfully'
@@ -2262,10 +2240,12 @@ def get_analytics():
 @app.route('/dashboard')
 def view_dashboard():
     """View the generated dashboard"""
-    from app.utils.file_utils import get_data_path
-    # Always regenerate dashboard to ensure it's up to date
-    dashboard_generator.generate_index_page()
-    dashboard_path = get_data_path('output') / 'index.html'
+    # Only regenerate the dashboard when the cached HTML is missing or stale.
+    # This avoids re-loading all applications and rebuilding the page on every request.
+    if dashboard_generator.is_dashboard_stale():
+        dashboard_generator.generate_index_page()
+    
+    dashboard_path = dashboard_generator.get_dashboard_path()
     
     if dashboard_path.exists():
         return send_from_directory(

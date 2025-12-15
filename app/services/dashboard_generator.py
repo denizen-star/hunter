@@ -2,6 +2,8 @@
 from pathlib import Path
 from typing import List, Optional
 import re
+import time
+
 from app.models.application import Application
 from app.services.job_processor import JobProcessor
 from app.utils.file_utils import get_data_path, ensure_dir_exists, write_text_file, read_text_file
@@ -25,6 +27,31 @@ class DashboardGenerator:
         self.output_dir = get_data_path('output')
         ensure_dir_exists(self.output_dir)
         self.job_processor = JobProcessor()
+    
+    def get_dashboard_path(self) -> Path:
+        """Get the filesystem path to the main dashboard HTML file."""
+        return self.output_dir / 'index.html'
+    
+    def is_dashboard_stale(self, ttl_seconds: int = 300) -> bool:
+        """
+        Return True if the dashboard HTML should be regenerated.
+        
+        The dashboard is considered stale if:
+        - The file does not exist
+        - The file's modification time is older than ttl_seconds
+        """
+        dashboard_path = self.get_dashboard_path()
+        if not dashboard_path.exists():
+            return True
+        
+        try:
+            mtime = dashboard_path.stat().st_mtime
+        except OSError:
+            # If we can't stat the file for any reason, treat it as stale
+            return True
+        
+        age_seconds = time.time() - mtime
+        return age_seconds > ttl_seconds
     
     def _normalize_status(self, status: str) -> str:
         """Normalize status strings for consistent reporting."""
@@ -60,12 +87,12 @@ class DashboardGenerator:
         )
 
     def generate_index_page(self) -> None:
-        """Generate the main dashboard HTML page"""
+        """Generate the main dashboard HTML page."""
         applications = self.job_processor.list_all_applications()
         
         html = self._create_dashboard_html(applications)
         
-        dashboard_path = self.output_dir / 'index.html'
+        dashboard_path = self.get_dashboard_path()
         write_text_file(html, dashboard_path)
         
         print(f"Dashboard generated: {dashboard_path}")
