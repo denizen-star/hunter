@@ -19,6 +19,7 @@ from app.services.template_manager import TemplateManager
 from app.services.analytics_generator import AnalyticsGenerator
 from app.services.networking_processor import NetworkingProcessor
 from app.services.networking_document_generator import NetworkingDocumentGenerator
+from app.services.activity_log_service import ActivityLogService
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root, get_data_path
 from app.utils.cache_utils import is_cache_stale, get_cached_json, save_cached_json
@@ -45,6 +46,7 @@ doc_generator = DocumentGenerator()
 dashboard_generator = DashboardGenerator()
 template_manager = TemplateManager()
 analytics_generator = AnalyticsGenerator()
+activity_log_service = ActivityLogService()
 
 # #region agent log
 # Debug logging disabled - .cursor directory has special protections
@@ -80,6 +82,141 @@ def normalize_status_label(status: str) -> str:
     normalized = normalized.replace('–', '-').replace('—', '-')
     normalized = normalized.replace('  ', ' ')
     return STATUS_NORMALIZATION_MAP.get(normalized, normalized)
+
+
+def is_networking_status(status: str) -> bool:
+    """Check if a status is a networking-related status (vs job application status)"""
+    if not status:
+        return False
+    status_lower = status.lower().strip()
+    
+    # Clear networking status indicators (these are definitely networking)
+    clear_networking_indicators = [
+        'contacted sent', 'contacted---sent', 'ready to contact', 'to research',
+        'in conversation', 'conversation', 'action pending', 'new connection',
+        'cold', 'archive', 'dormant', 'inactive', 'research', 'sent'
+    ]
+    
+    # Check for clear networking indicators first
+    if any(indicator in status_lower for indicator in clear_networking_indicators):
+        return True
+    
+    # Job application statuses that should NOT be grouped
+    job_statuses = [
+        'applied', 'rejected', 'accepted', 'offered',
+        'interview notes', 'interview follow up', 'scheduled interview',
+        'company response', 'contacted hiring manager', 'contacted someone'
+    ]
+    
+    # If it's a clear job status, it's not networking
+    if any(job_status in status_lower for job_status in job_statuses):
+        return False
+    
+    # Ambiguous: "Contacted" alone could be job or networking
+    # But "Contacted Sent" is networking (already caught above)
+    # "Pending" alone is ambiguous - check if it's "Action Pending" (networking)
+    if status_lower == 'contacted':
+        # "Contacted" without "Someone" or "Hiring Manager" is likely networking
+        return True
+    
+    # If we get here, it's likely not a networking status
+    return False
+
+
+def categorize_networking_status(status: str) -> str:
+    """
+    Categorize networking statuses into groups for better chart readability.
+    
+    Categories (in order):
+    1. Research & Contact: Initial research and outreach activities
+    2. Engagement: Active communication and conversation
+    3. Relationship: Ongoing relationship building
+    
+    Uses exact status mappings as specified.
+    Returns the category name, or the original status if not a networking status.
+    """
+    if not status:
+        return status
+    
+    status_lower = status.lower().strip()
+    
+    # Research & Contact category - exact status mappings
+    research_contact_statuses = [
+        'to research',
+        'ready to contact',
+        'contacted - sent',
+        'contacted---sent',
+        'contacted sent',
+        'contacted - replied',
+        'contacted---replied',
+        'contacted replied',
+        'contacted - no response',
+        'contacted---no response',
+        'contacted no response'
+    ]
+    
+    # Engagement category - exact status mappings
+    engagement_statuses = [
+        'in conversation',
+        'meeting scheduled',
+        'meeting complete',
+        'action pending - you',
+        'action pending---you',
+        'action pending you',
+        'action pending - them',
+        'action pending---them',
+        'action pending them',
+        'action pending',
+        'conversation'
+    ]
+    
+    # Relationship category - exact status mappings
+    relationship_statuses = [
+        'new connection',
+        'nurture (1-3 mo.)',
+        'nurture (4-6 mo.)',
+        'nurture 1-3 mo',
+        'nurture 4-6 mo',
+        'referral partner',
+        'referral'
+    ]
+    
+    # Normalize status for comparison (handle variations)
+    normalized_for_match = status_lower.replace('  ', ' ').replace('---', ' - ')
+    
+    # Check Research & Contact first (most specific)
+    for research_status in research_contact_statuses:
+        if research_status in normalized_for_match or research_status in status_lower:
+            return 'Research & Contact'
+    
+    # Check Engagement second
+    for engagement_status in engagement_statuses:
+        if engagement_status in normalized_for_match or engagement_status in status_lower:
+            return 'Engagement'
+    
+    # Check Relationship third
+    for relationship_status in relationship_statuses:
+        if relationship_status in normalized_for_match or relationship_status in status_lower:
+            return 'Relationship'
+    
+    # Fallback: keyword-based matching for variations not in the exact list
+    if 'research' in status_lower and 'to' in status_lower:
+        return 'Research & Contact'
+    if 'ready' in status_lower and 'contact' in status_lower:
+        return 'Research & Contact'
+    if 'contacted' in status_lower and ('sent' in status_lower or 'replied' in status_lower or 'no response' in status_lower):
+        return 'Research & Contact'
+    
+    if 'conversation' in status_lower or 'meeting' in status_lower:
+        return 'Engagement'
+    if 'action pending' in status_lower:
+        return 'Engagement'
+    
+    if 'new connection' in status_lower or 'nurture' in status_lower or 'referral' in status_lower:
+        return 'Relationship'
+    
+    # If not a networking status, return original (for job application statuses)
+    return status
 
 
 def status_matches(current_status: str, *targets: str) -> bool:
@@ -1536,15 +1673,6 @@ def get_reports_data():
             if cached is not None:
                 return jsonify(cached)
         
-        # Load data based on type
-        applications = []
-        networking_contacts = []
-        
-        if report_type in ['jobs', 'both']:
-            applications = job_processor.list_all_applications()
-        if report_type in ['networking', 'both']:
-            networking_contacts = networking_processor.list_all_contacts()
-        
         # Calculate date ranges based on period
         now = datetime.now(timezone(timedelta(hours=-4)))
         
@@ -1569,70 +1697,153 @@ def get_reports_data():
             start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
             end_date = now
         
-        # Filter applications by period
-        period_applications = []
-        status_changes = []
+        # ===== USE ACTIVITY LOG FOR FAST DATA RETRIEVAL =====
+        # Get activities from activity log (much faster than scanning files)
+        activities = activity_log_service.get_activities(start_date=start_date, end_date=end_date)
         
-        for app in applications:
-            # Convert application datetimes to the same timezone format for comparison
-            app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
-            app_status_updated_at = app.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if app.status_updated_at else None
-            
-            if start_date <= app_created_at <= end_date:
-                period_applications.append(app)
-            
-            # Check if status was updated in period
-            if app_status_updated_at and start_date <= app_status_updated_at <= end_date:
-                status_changes.append(app)
+        # Filter by type
+        if report_type == 'jobs':
+            activities = [a for a in activities if 'application' in a.get('type', '')]
+        elif report_type == 'networking':
+            activities = [a for a in activities if 'networking' in a.get('type', '')]
+        # 'both' includes all activities
         
-        # Applications by status (for period) - count applications created in period by their current status
-        applications_by_status = {}
-        for app in period_applications:
-            status = normalize_status_label(app.status)
-            applications_by_status[status] = applications_by_status.get(status, 0) + 1
-        
-        # Status changes by status (for period) - count status changes that happened in period by the new status
-        status_changes_by_status = {}
-        status_changes_count = 0
-        for app in status_changes:
-            status = normalize_status_label(app.status)
-            status_changes_count += 1  # Include all status changes
-            status_changes_by_status[status] = status_changes_by_status.get(status, 0) + 1
-        
-        # Calculate daily and cumulative activities by status
-        # Count ALL activities: initial application creation + all update files
+        # Process activities for reports
         from collections import defaultdict
+        applications_by_status = {}
+        status_changes_by_status = {}
         daily_counts = defaultdict(lambda: defaultdict(int))
+        status_changes_count = 0
         
-        # Iterate through all applications and count activities
-        for app in applications:
-            # Get all update files for this application
-            updates = job_processor.get_application_updates(app)
+        # Track whether we're showing networking data (for grouping)
+        is_networking_view = report_type in ['networking', 'both']
+        
+        for activity in activities:
+            activity_type = activity.get('type', '')
+            activity_date = activity['date']
+            is_networking_activity = 'networking' in activity_type
             
-            # If no updates exist, count the application creation with current status
-            # (This handles apps that were created and never updated)
-            if not updates:
-                app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
-                if start_date <= app_created_at <= end_date:
-                    date = app_created_at.date()
-                    status = normalize_status_label(app.status)
-                    daily_counts[date][status] += 1
-            
-            # Count all update files
-            for update in updates:
-                try:
-                    # Parse timestamp from update
-                    from datetime import datetime as dt
-                    update_dt = dt.strptime(update['timestamp'], '%Y%m%d%H%M%S')
-                    update_dt = update_dt.replace(tzinfo=timezone(timedelta(hours=-4)))
+            if activity_type in ['job_application_created', 'networking_contact_created']:
+                status = activity.get('status', '')
+                if status:
+                    # Normalize statuses that might contain person names
+                    parts = status.replace('---', '-').replace('--', '-').split('-')
+                    status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
+                                      'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
+                    if len(parts) > 1:
+                        for part in reversed(parts):
+                            part_lower = part.lower()
+                            if any(keyword in part_lower for keyword in status_keywords):
+                                status = part.replace('-', ' ').strip()
+                                break
+                        else:
+                            status = parts[-1].replace('-', ' ').strip()
                     
-                    # Check if update is in the selected period
-                    if start_date <= update_dt <= end_date:
-                        date = update_dt.date()
-                        status = normalize_status_label(update['status'])
-                        daily_counts[date][status] += 1
-                except:
-                    continue
+                    normalized_status = normalize_status_label(status)
+                    
+                    # Group networking statuses for charts if in networking view
+                    # Check both activity type AND if status looks like networking
+                    if is_networking_view and (is_networking_activity or is_networking_status(normalized_status)):
+                        category = categorize_networking_status(normalized_status)
+                        display_status = category if category != normalized_status else normalized_status
+                    else:
+                        display_status = normalized_status
+                    
+                    applications_by_status[display_status] = applications_by_status.get(display_status, 0) + 1
+                
+                # Count daily (apply same normalization and grouping)
+                date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
+                original_status = activity.get('status', '')
+                parts = original_status.replace('---', '-').replace('--', '-').split('-')
+                if len(parts) > 1:
+                    for part in reversed(parts):
+                        part_lower = part.lower()
+                        if any(keyword in part_lower for keyword in status_keywords):
+                            status = part.replace('-', ' ').strip()
+                            break
+                    else:
+                        status = parts[-1].replace('-', ' ').strip()
+                else:
+                    status = original_status
+                normalized_status = normalize_status_label(status)
+                
+                # Group networking statuses for charts if in networking view
+                # Check both activity type AND if status looks like networking
+                if is_networking_view and (is_networking_activity or is_networking_status(normalized_status)):
+                    category = categorize_networking_status(normalized_status)
+                    display_status = category if category != normalized_status else normalized_status
+                else:
+                    display_status = normalized_status
+                
+                daily_counts[date_obj][display_status] += 1
+            
+            elif activity_type in ['job_application_status_changed', 'networking_status_changed']:
+                new_status = activity.get('new_status', '')
+                is_networking_activity = activity_type == 'networking_status_changed'
+                
+                if new_status:
+                    # Normalize ALL statuses that contain person names (not just networking)
+                    # Pattern: "Name-Status" or "Name---Status" -> "Status"
+                    # Check if status looks like it contains a person name (has dashes and status keywords)
+                    parts = new_status.replace('---', '-').replace('--', '-').split('-')
+                    status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
+                                      'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
+                    
+                    # If status has multiple parts and contains status keywords, normalize it
+                    if len(parts) > 1:
+                        for part in reversed(parts):
+                            part_lower = part.lower()
+                            if any(keyword in part_lower for keyword in status_keywords):
+                                new_status = part.replace('-', ' ').strip()
+                                break
+                        else:
+                            # If no keyword found in any part, use last part
+                            new_status = parts[-1].replace('-', ' ').strip()
+                    
+                    normalized_status = normalize_status_label(new_status)
+                    
+                    # Group networking statuses for charts if in networking view
+                    # Check both activity type AND if status looks like networking
+                    if is_networking_view and (is_networking_activity or is_networking_status(normalized_status)):
+                        category = categorize_networking_status(normalized_status)
+                        display_status = category if category != normalized_status else normalized_status
+                    else:
+                        display_status = normalized_status
+                    
+                    status_changes_by_status[display_status] = status_changes_by_status.get(display_status, 0) + 1
+                    status_changes_count += 1
+                
+                # Count daily (apply same normalization and grouping)
+                date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
+                # Re-normalize for daily counts (same logic as above)
+                original_status = activity.get('new_status', '')
+                parts = original_status.replace('---', '-').replace('--', '-').split('-')
+                status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
+                                  'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
+                if len(parts) > 1:
+                    for part in reversed(parts):
+                        part_lower = part.lower()
+                        if any(keyword in part_lower for keyword in status_keywords):
+                            new_status = part.replace('-', ' ').strip()
+                            break
+                    else:
+                        new_status = parts[-1].replace('-', ' ').strip()
+                else:
+                    new_status = original_status
+                normalized_status = normalize_status_label(new_status)
+                
+                # Group networking statuses for charts if in networking view
+                # Check both activity type AND if status looks like networking
+                if is_networking_view and (is_networking_activity or is_networking_status(normalized_status)):
+                    category = categorize_networking_status(normalized_status)
+                    display_status = category if category != normalized_status else normalized_status
+                else:
+                    display_status = normalized_status
+                
+                daily_counts[date_obj][display_status] += 1
+        
+        # Calculate total count from activities
+        total_count = len([a for a in activities if a.get('type') in ['job_application_created', 'networking_contact_created']])
         
         # Get all dates in the period range (only where there's actual data)
         all_dates = []
@@ -1656,9 +1867,20 @@ def get_reports_data():
         for date in daily_counts:
             all_statuses.update(daily_counts[date].keys())
         
+        # Sort statuses: networking categories first (in order), then others alphabetically
+        def sort_status_key(status):
+            """Sort statuses with networking categories first"""
+            category_order = ['Research & Contact', 'Engagement', 'Relationship']
+            if status in category_order:
+                return (category_order.index(status), status)
+            else:
+                return (len(category_order), status)
+        
+        sorted_statuses = sorted(all_statuses, key=sort_status_key)
+        
         # Format daily activities for frontend: {status: [{date: "YYYY-MM-DD", count: N}, ...]}
         daily_activities_by_status = {}
-        for status in all_statuses:
+        for status in sorted_statuses:
             daily_activities_by_status[status] = []
             for date in all_dates:
                 count = daily_counts[date].get(status, 0)
@@ -1669,7 +1891,7 @@ def get_reports_data():
         
         # Calculate cumulative activities
         cumulative_activities_by_status = {}
-        for status in all_statuses:
+        for status in sorted_statuses:
             cumulative_activities_by_status[status] = []
             cumulative_count = 0
             for date in all_dates:
@@ -1679,154 +1901,119 @@ def get_reports_data():
                     'count': cumulative_count
                 })
         
-        # Follow-up applications (more than one week without updates)
+        # ===== LOAD APPLICATIONS/CONTACTS ONLY FOR FOLLOW-UP AND FLAGGED =====
+        # These need current state, so we still need to load them (but only when needed)
         one_week_ago = now - timedelta(days=7)
         followup_applications = []
-        
-        for app in applications:
-            # Skip applications that are already rejected or accepted
-            if normalize_status_label(app.status) in ['rejected', 'accepted']:
-                continue
-            
-            # Convert to same timezone for comparison
-            app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
-            app_status_updated_at = app.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if app.status_updated_at else None
-            
-            last_update = app_status_updated_at or app_created_at
-            if last_update < one_week_ago:
-                # Generate summary URL
-                summary_url = None
-                if app.summary_path and app.summary_path.exists():
-                    folder_name = app.folder_path.name
-                    summary_filename = app.summary_path.name
-                    summary_url = f"/applications/{folder_name}/{summary_filename}"
-                
-                followup_applications.append({
-                    'company': app.company,
-                    'job_title': app.job_title,
-                    'match_score': round(app.match_score or 0),
-                    'last_updated': format_for_display(last_update),
-                    'summary_url': summary_url,
-                    'contact_count': app.calculate_contact_count()
-                })
-        
-        # Sort follow-up applications by newest update first
-        followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
-        
-        # Flagged applications
         flagged_applications = []
-        for app in applications:
-            if app.flagged:
-                # Generate summary URL
-                summary_url = None
-                if app.summary_path and app.summary_path.exists():
-                    folder_name = app.folder_path.name
-                    summary_filename = app.summary_path.name
-                    summary_url = f"/applications/{folder_name}/{summary_filename}"
-                
-                last_update = app.status_updated_at or app.created_at
-                flagged_applications.append({
-                    'company': app.company,
-                    'job_title': app.job_title,
-                    'match_score': round(app.match_score or 0),
-                    'last_updated': format_for_display(last_update),
-                    'summary_url': summary_url,
-                    'contact_count': app.calculate_contact_count(),
-                    'status': app.status
-                })
-        
-        # Sort flagged applications by newest update first
-        flagged_applications.sort(key=lambda x: x['last_updated'], reverse=True)
-        
-        # ===== NETWORKING DATA PROCESSING =====
-        # Process networking contacts similarly to applications
-        networking_by_status = {}
-        networking_status_changes = []
         networking_followup_list = []
         networking_flagged_list = []
         
-        for contact in networking_contacts:
-            # Convert contact datetimes to same timezone
-            contact_created_at = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
-            contact_status_updated_at = contact.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if contact.status_updated_at else None
-            
-            # Count contacts created in period
-            if start_date <= contact_created_at <= end_date:
-                status = contact.status
-                networking_by_status[status] = networking_by_status.get(status, 0) + 1
-            
-            # Count status changes in period
-            if contact_status_updated_at and start_date <= contact_status_updated_at <= end_date:
-                networking_status_changes.append(contact)
-            
-            # Follow-up contacts (more than one week without updates)
-            last_update = contact_status_updated_at or contact_created_at
-            if last_update < one_week_ago and contact.status not in ['Cold/Archive']:
-                summary_url = None
-                if contact.summary_path and contact.summary_path.exists():
-                    folder_name = contact.folder_path.name
-                    summary_filename = contact.summary_path.name
-                    summary_url = f"/networking/{folder_name}/{summary_filename}"
+        # Only load applications/contacts if we need follow-up or flagged data
+        if report_type in ['jobs', 'both']:
+            applications = job_processor.list_all_applications()
+            for app in applications:
+                # Follow-up applications
+                app_created_at = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+                app_status_updated_at = app.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if app.status_updated_at else None
+                last_update = app_status_updated_at or app_created_at
                 
-                networking_followup_list.append({
-                    'company': contact.company_name,
-                    'job_title': contact.job_title or 'N/A',
-                    'match_score': round(contact.match_score or 0),
-                    'last_updated': format_for_display(last_update),
-                    'summary_url': summary_url,
-                    'contact_count': contact.contact_count or 0,
-                    'type': 'networking'
-                })
-            
-            # Flagged contacts
-            if contact.flagged:
-                summary_url = None
-                if contact.summary_path and contact.summary_path.exists():
-                    folder_name = contact.folder_path.name
-                    summary_filename = contact.summary_path.name
-                    summary_url = f"/networking/{folder_name}/{summary_filename}"
+                if (last_update < one_week_ago and 
+                    normalize_status_label(app.status) not in ['rejected', 'accepted']):
+                    summary_url = None
+                    if app.summary_path and app.summary_path.exists():
+                        folder_name = app.folder_path.name
+                        summary_filename = app.summary_path.name
+                        summary_url = f"/applications/{folder_name}/{summary_filename}"
+                    
+                    followup_applications.append({
+                        'company': app.company,
+                        'job_title': app.job_title,
+                        'match_score': round(app.match_score or 0),
+                        'last_updated': format_for_display(last_update),
+                        'summary_url': summary_url,
+                        'contact_count': app.calculate_contact_count()
+                    })
                 
-                last_update = contact_status_updated_at or contact_created_at
-                networking_flagged_list.append({
-                    'company': contact.company_name,
-                    'job_title': contact.job_title or 'N/A',
-                    'match_score': round(contact.match_score or 0),
-                    'last_updated': format_for_display(last_update),
-                    'summary_url': summary_url,
-                    'contact_count': contact.contact_count or 0,
-                    'status': contact.status,
-                    'type': 'networking'
-                })
+                # Flagged applications
+                if app.flagged:
+                    summary_url = None
+                    if app.summary_path and app.summary_path.exists():
+                        folder_name = app.folder_path.name
+                        summary_filename = app.summary_path.name
+                        summary_url = f"/applications/{folder_name}/{summary_filename}"
+                    
+                    last_update = app.status_updated_at or app.created_at
+                    flagged_applications.append({
+                        'company': app.company,
+                        'job_title': app.job_title,
+                        'match_score': round(app.match_score or 0),
+                        'last_updated': format_for_display(last_update),
+                        'summary_url': summary_url,
+                        'contact_count': app.calculate_contact_count(),
+                        'status': app.status
+                    })
         
-        # Networking status changes count
-        networking_status_changes_by_status = {}
-        networking_status_changes_count = 0
-        for contact in networking_status_changes:
-            status = contact.status
-            networking_status_changes_count += 1
-            networking_status_changes_by_status[status] = networking_status_changes_by_status.get(status, 0) + 1
+        if report_type in ['networking', 'both']:
+            networking_contacts = networking_processor.list_all_contacts()
+            for contact in networking_contacts:
+                contact_created_at = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4)))
+                contact_status_updated_at = contact.status_updated_at.replace(tzinfo=timezone(timedelta(hours=-4))) if contact.status_updated_at else None
+                last_update = contact_status_updated_at or contact_created_at
+                
+                # Follow-up contacts
+                if (last_update < one_week_ago and 
+                    contact.status not in ['Cold/Archive']):
+                    summary_url = None
+                    if contact.summary_path and contact.summary_path.exists():
+                        folder_name = contact.folder_path.name
+                        summary_filename = contact.summary_path.name
+                        summary_url = f"/networking/{folder_name}/{summary_filename}"
+                    
+                    networking_followup_list.append({
+                        'company': contact.company_name,
+                        'job_title': contact.job_title or 'N/A',
+                        'match_score': round(contact.match_score or 0),
+                        'last_updated': format_for_display(last_update),
+                        'summary_url': summary_url,
+                        'contact_count': contact.contact_count or 0,
+                        'type': 'networking'
+                    })
+                
+                # Flagged contacts
+                if contact.flagged:
+                    summary_url = None
+                    if contact.summary_path and contact.summary_path.exists():
+                        folder_name = contact.folder_path.name
+                        summary_filename = contact.summary_path.name
+                        summary_url = f"/networking/{folder_name}/{summary_filename}"
+                    
+                    last_update = contact_status_updated_at or contact_created_at
+                    networking_flagged_list.append({
+                        'company': contact.company_name,
+                        'job_title': contact.job_title or 'N/A',
+                        'match_score': round(contact.match_score or 0),
+                        'last_updated': format_for_display(last_update),
+                        'summary_url': summary_url,
+                        'contact_count': contact.contact_count or 0,
+                        'status': contact.status,
+                        'type': 'networking'
+                    })
+        
+        # Sort lists
+        followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
+        flagged_applications.sort(key=lambda x: x['last_updated'], reverse=True)
         
         # ===== COMBINE DATA BASED ON TYPE =====
         if report_type == 'networking':
-            # Use only networking data
-            applications_by_status = networking_by_status
-            status_changes_by_status = networking_status_changes_by_status
+            # Use only networking data from activity log
+            # (networking_by_status already processed from activities above)
             followup_applications = networking_followup_list
             flagged_applications = networking_flagged_list
-            status_changes_count = networking_status_changes_count
-            total_count = len([c for c in networking_contacts if start_date <= c.created_at.replace(tzinfo=timezone(timedelta(hours=-4))) <= end_date])
         elif report_type == 'both':
-            # Combine both
-            for status, count in networking_by_status.items():
-                applications_by_status[f'Net: {status}'] = count
-            for status, count in networking_status_changes_by_status.items():
-                status_changes_by_status[f'Net: {status}'] = count
+            # Combine follow-up and flagged lists
             followup_applications.extend(networking_followup_list)
             flagged_applications.extend(networking_flagged_list)
-            status_changes_count += networking_status_changes_count
-            total_count = len(period_applications) + len([c for c in networking_contacts if start_date <= c.created_at.replace(tzinfo=timezone(timedelta(hours=-4))) <= end_date])
-        else:  # 'jobs' - already set, no changes needed
-            total_count = len(period_applications)
         
         # Sort combined lists
         followup_applications.sort(key=lambda x: x['last_updated'], reverse=True)
@@ -1834,31 +2021,21 @@ def get_reports_data():
         
         # Calculate rejected applications from status changes (applications rejected in period)
         rejected_count = status_changes_by_status.get('rejected', 0)
-        if report_type == 'both':
-            rejected_count += status_changes_by_status.get('Net: Cold/Archive', 0)
+        if report_type in ['networking', 'both']:
+            # Check for networking archived status
+            for status_key in status_changes_by_status.keys():
+                if 'cold' in status_key.lower() or 'archive' in status_key.lower():
+                    rejected_count += status_changes_by_status.get(status_key, 0)
         
         # Calculate active applications (total - rejected)
         active_applications = total_count - rejected_count
         
         # Calculate total contact count from status_changes_by_status (matches the chart)
         total_contact_count = 0
-        if report_type in ['jobs', 'both']:
-            if 'contacted someone' in status_changes_by_status:
-                total_contact_count += status_changes_by_status['contacted someone']
-            if 'company response' in status_changes_by_status:
-                total_contact_count += status_changes_by_status['company response']
-            if 'contacted hiring manager' in status_changes_by_status:
-                total_contact_count += status_changes_by_status['contacted hiring manager']
-        if report_type in ['networking', 'both']:
-            # Count networking contacts
-            if report_type == 'networking':
-                for status, count in networking_status_changes_by_status.items():
-                    if 'Contacted' in status:
-                        total_contact_count += count
-            else:  # 'both'
-                for status, count in status_changes_by_status.items():
-                    if status.startswith('Net:') and 'Contacted' in status:
-                        total_contact_count += count
+        for status_key, count in status_changes_by_status.items():
+            status_lower = status_key.lower()
+            if 'contacted' in status_lower or 'company response' in status_lower:
+                total_contact_count += count
         
         # Calculate total actions (applications/contacts created + status changes) for the period
         total_actions = total_count + status_changes_count
@@ -1875,12 +2052,27 @@ def get_reports_data():
             'total_actions': total_actions
         }
 
+        # Sort status dictionaries by category order
+        def sort_dict_by_status_order(d):
+            """Sort dictionary keys with networking categories first"""
+            category_order = ['Research & Contact', 'Engagement', 'Relationship']
+            sorted_items = []
+            # Add categories in order
+            for category in category_order:
+                if category in d:
+                    sorted_items.append((category, d[category]))
+            # Add remaining statuses alphabetically
+            remaining = [(k, v) for k, v in d.items() if k not in category_order]
+            remaining.sort(key=lambda x: x[0])
+            sorted_items.extend(remaining)
+            return dict(sorted_items)
+        
         response_payload = {
             'success': True,
             'period': period,
             'summary': summary,
-            'applications_by_status': applications_by_status,
-            'status_changes': status_changes_by_status,
+            'applications_by_status': sort_dict_by_status_order(applications_by_status),
+            'status_changes': sort_dict_by_status_order(status_changes_by_status),
             'daily_activities_by_status': daily_activities_by_status,
             'cumulative_activities_by_status': cumulative_activities_by_status,
             'followup_applications': followup_applications,
@@ -2035,7 +2227,7 @@ def export_reports_csv():
 
 @app.route('/api/daily-activities', methods=['GET'])
 def get_daily_activities():
-    """Get daily activities data (combined jobs + networking)"""
+    """Get daily activities data (combined jobs + networking) - optimized using activity log"""
     try:
         from datetime import datetime, timezone, timedelta
         from pathlib import Path
@@ -2043,6 +2235,7 @@ def get_daily_activities():
         # ------------------------------------------------------------------
         # File-based caching for daily activities.
         # Single cache file since this endpoint has no query parameters.
+        # Cache for 5 minutes (300 seconds) - activities are logged in real-time
         # ------------------------------------------------------------------
         cache_filename = "daily_activities_cache.json"
         cache_path = get_data_path('output') / Path(cache_filename)
@@ -2052,129 +2245,18 @@ def get_daily_activities():
             if cached is not None:
                 return jsonify(cached)
 
-        applications = job_processor.list_all_applications()
-        networking_contacts = networking_processor.list_all_contacts()
-        
-        # Group activities by date
-        daily_activities = {}
-        
-        for app in applications:
-            # Get all updates for this application
-            updates = job_processor.get_application_updates(app)
-            
-            # Add application creation as an activity
-            created_date = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).date()
-            if created_date not in daily_activities:
-                daily_activities[created_date] = []
-            
-            # Format timestamp for display
-            created_timestamp = app.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).strftime('%I:%M %p EST')
-            
-            daily_activities[created_date].append({
-                'company': app.company,
-                'position': app.job_title,
-                'timestamp': created_timestamp,
-                'activity': 'Application Created',
-                'status': 'Created',
-                'application_id': app.id,
-                'datetime': app.created_at.replace(tzinfo=timezone(timedelta(hours=-4))),  # Add datetime for sorting
-                'type': 'job'
-            })
-            
-            # Add status updates as activities
-            for update in updates:
-                try:
-                    # Parse timestamp from filename
-                    timestamp_str = update['timestamp']
-                    dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
-                    dt = dt.replace(tzinfo=timezone(timedelta(hours=-4)))
-                    update_date = dt.date()
-                    
-                    if update_date not in daily_activities:
-                        daily_activities[update_date] = []
-                    
-                    # Format timestamp for display
-                    display_timestamp = dt.strftime('%I:%M %p EST')
-                    
-                    daily_activities[update_date].append({
-                        'company': app.company,
-                        'position': app.job_title,
-                        'timestamp': display_timestamp,
-                        'activity': f'Status Changed to {update["status"]}',
-                        'status': update['status'],
-                        'application_id': app.id,
-                        'datetime': dt,  # Add datetime for sorting
-                        'type': 'job'
-                    })
-                except Exception as e:
-                    print(f"Error processing update {update}: {e}")
-                    continue
-        
-        # Add networking activities
-        for contact in networking_contacts:
-            # Add contact creation as an activity
-            created_date = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).date()
-            if created_date not in daily_activities:
-                daily_activities[created_date] = []
-            
-            # Format timestamp for display
-            created_timestamp = contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4))).strftime('%I:%M %p EST')
-            
-            daily_activities[created_date].append({
-                'company': contact.company_name,
-                'position': contact.job_title or 'Networking Contact',
-                'timestamp': created_timestamp,
-                'activity': 'Networking Contact Created',
-                'status': contact.status,
-                'application_id': contact.id,
-                'datetime': contact.created_at.replace(tzinfo=timezone(timedelta(hours=-4))),
-                'type': 'networking'
-            })
-            
-            # Add status updates for networking contacts
-            updates = networking_processor.get_contact_updates(contact)
-            for update in updates:
-                try:
-                    # Parse timestamp from filename
-                    timestamp_str = update['timestamp']
-                    dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
-                    dt = dt.replace(tzinfo=timezone(timedelta(hours=-4)))
-                    update_date = dt.date()
-                    
-                    if update_date not in daily_activities:
-                        daily_activities[update_date] = []
-                    
-                    # Format timestamp for display
-                    display_timestamp = dt.strftime('%I:%M %p EST')
-                    
-                    daily_activities[update_date].append({
-                        'company': contact.company_name,
-                        'position': contact.job_title or 'Networking Contact',
-                        'timestamp': display_timestamp,
-                        'activity': f'Status Changed to {update["status"]}',
-                        'status': update['status'],
-                        'application_id': contact.id,
-                        'datetime': dt,
-                        'type': 'networking'
-                    })
-                except Exception as e:
-                    print(f"Error processing networking update {update}: {e}")
-                    continue
-        
-        # Sort activities within each day by datetime (newest first)
-        for date in daily_activities:
-            daily_activities[date].sort(key=lambda x: x['datetime'], reverse=True)
-            # Remove datetime field from final output (keep only for sorting)
-            for activity in daily_activities[date]:
-                del activity['datetime']
+        # Use activity log service for fast data retrieval
+        daily_summary = activity_log_service.get_daily_activities_summary()
         
         # Convert to list format sorted by date (newest first)
         activities_list = []
-        for date in sorted(daily_activities.keys(), reverse=True):
+        for date_str in sorted(daily_summary.keys(), reverse=True):
+            # Parse date string and format for display
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
             activities_list.append({
-                'date': date.strftime('%B %d, %Y'),
-                'activity_count': len(daily_activities[date]),
-                'activities': daily_activities[date]
+                'date': date_obj.strftime('%B %d, %Y'),
+                'activity_count': len(daily_summary[date_str]),
+                'activities': daily_summary[date_str]
             })
 
         response_payload = {
@@ -2266,11 +2348,12 @@ def get_analytics():
         # ------------------------------------------------------------------
         # File-based caching for analytics.
         # Cache key includes period and gap_period.
+        # Analytics refreshes once per day (24 hours = 86400 seconds)
         # ------------------------------------------------------------------
         cache_filename = f"analytics_cache_{period}_{gap_period}.json"
         cache_path = get_data_path('output') / Path(cache_filename)
 
-        if not is_cache_stale(cache_path, ttl_seconds=300):
+        if not is_cache_stale(cache_path, ttl_seconds=86400):  # 24 hours
             cached = get_cached_json(cache_path)
             if cached is not None:
                 return jsonify(cached)

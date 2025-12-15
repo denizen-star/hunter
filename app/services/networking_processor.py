@@ -8,6 +8,7 @@ from app.utils.file_utils import (
     load_yaml, save_yaml, write_text_file, read_text_file
 )
 from app.utils.datetime_utils import get_est_now, format_datetime_for_filename
+from app.services.activity_log_service import ActivityLogService
 
 
 class NetworkingProcessor:
@@ -32,6 +33,7 @@ class NetworkingProcessor:
         # #endregion
         
         ensure_dir_exists(self.networking_dir)
+        self.activity_log = ActivityLogService()
         
         # #region agent log
         # Debug logging disabled - .cursor directory has special protections
@@ -155,6 +157,20 @@ class NetworkingProcessor:
         # Save metadata
         self._save_contact_metadata(contact)
         
+        # Log activity
+        try:
+            self.activity_log.log_networking_contact_created(
+                contact_id=contact.id,
+                person_name=contact.person_name,
+                company_name=contact.company_name,
+                job_title=contact.job_title,
+                created_at=contact.created_at,
+                status=contact.status,
+                match_score=contact.match_score
+            )
+        except Exception as e:
+            print(f"Warning: Could not log networking contact creation activity: {e}")
+        
         print(f"✓ Created networking contact: {person_name} at {company_name}")
         return contact
     
@@ -201,6 +217,21 @@ class NetworkingProcessor:
         
         # Save updated metadata
         self._save_contact_metadata(contact)
+        
+        # Log activity
+        try:
+            self.activity_log.log_networking_status_changed(
+                contact_id=contact.id,
+                person_name=contact.person_name,
+                company_name=contact.company_name,
+                old_status=old_status,
+                new_status=status,
+                updated_at=contact.status_updated_at,
+                notes=notes
+            )
+        except Exception as e:
+            print(f"Warning: Could not log networking status change activity: {e}")
+        
         print(f"✓ Updated contact status to: {status}")
     
     def update_contact_details(

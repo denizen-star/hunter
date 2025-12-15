@@ -908,6 +908,7 @@
                 </div>
             </div>
         </div>
+        
     </div>
     
     <script>
@@ -1093,23 +1094,6 @@
                         }
                     }, 2000); // Increased timeout to 2 seconds to give charts time to render
                     
-                    // Force follow-up section to update if it's still loading
-                    setTimeout(() => {
-                        const followupContainer = document.getElementById('followup-list');
-                        if (followupContainer && followupContainer.innerHTML.includes('Loading')) {
-                            console.log('Follow-up section still loading, forcing update');
-                            updateFollowupList(data.followup_applications);
-                        }
-                    }, 500);
-                    
-                    // Force flagged section to update if it's still loading
-                    setTimeout(() => {
-                        const flaggedContainer = document.getElementById('flagged-list');
-                        if (flaggedContainer && flaggedContainer.innerHTML.includes('Loading')) {
-                            console.log('Flagged section still loading, forcing update');
-                            updateFlaggedList(data.flagged_applications);
-                        }
-                    }, 500);
                 } else {
                     console.error('Failed to load reports data:', data.error);
                 }

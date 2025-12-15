@@ -9,6 +9,7 @@ from app.utils.file_utils import (
 )
 from app.utils.datetime_utils import get_est_now, format_datetime_for_filename
 from app.services.ai_analyzer import AIAnalyzer
+from app.services.activity_log_service import ActivityLogService
 
 
 class JobProcessor:
@@ -18,6 +19,7 @@ class JobProcessor:
         self.applications_dir = get_data_path('applications')
         ensure_dir_exists(self.applications_dir)
         self.ai_analyzer = AIAnalyzer()
+        self.activity_log = ActivityLogService()
     
     def _clean_job_description(self, job_description: str) -> str:
         """Remove LinkedIn metadata and clutter from job descriptions"""
@@ -203,6 +205,19 @@ class JobProcessor:
         # Save application metadata
         self._save_application_metadata(application)
         
+        # Log activity
+        try:
+            self.activity_log.log_application_created(
+                application_id=application.id,
+                company=application.company,
+                job_title=application.job_title,
+                created_at=application.created_at,
+                match_score=application.match_score,
+                status=application.status
+            )
+        except Exception as e:
+            print(f"Warning: Could not log application creation activity: {e}")
+        
         return application
     
     def _save_application_metadata(self, application: Application) -> None:
@@ -252,6 +267,7 @@ class JobProcessor:
         notes: Optional[str] = None
     ) -> None:
         """Update application status with optional notes"""
+        old_status = application.status
         application.status = status
         application.status_updated_at = get_est_now()
         
@@ -516,6 +532,20 @@ class JobProcessor:
         
         # Update metadata
         self._save_application_metadata(application)
+        
+        # Log activity
+        try:
+            self.activity_log.log_application_status_changed(
+                application_id=application.id,
+                company=application.company,
+                job_title=application.job_title,
+                old_status=old_status,
+                new_status=status,
+                updated_at=application.status_updated_at,
+                notes=notes
+            )
+        except Exception as e:
+            print(f"Warning: Could not log status change activity: {e}")
         
         # Regenerate summary to include the new update
         self._regenerate_summary(application)
