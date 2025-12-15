@@ -484,6 +484,22 @@
         .empty-state .btn:hover {
             background: #2563eb;
         }
+        
+        .hero-header-action-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+        
+        .hero-header-action-link:hover {
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
     </style>
 <!-- Shared sidebar is injected by static/js/shared-menu.js -->
 </head>
@@ -496,7 +512,7 @@
                     <h1>Networking Contacts</h1>
                     <p>Manage your professional networking pipeline</p>
                 </div>
-                <a href="/new-networking-contact" class="header-link-action">New Contact</a>
+                <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
             </div>
         </div>
         

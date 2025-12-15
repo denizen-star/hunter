@@ -109,6 +109,83 @@
             margin: 0;
         }
         
+        .hero-header-search-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 12px;
+            width: 100%;
+            gap: 12px;
+        }
+        
+        .company-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+        
+        .company-suggestion-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #111827;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .company-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .company-suggestion-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .company-suggestion-item.highlighted {
+            background-color: #eff6ff;
+        }
+        
+        .company-suggestion-item.selected {
+            background-color: #eff6ff;
+            font-weight: 500;
+        }
+        
+        .company-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #eff6ff;
+            color: #3b82f6;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .company-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            color: #3b82f6;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .company-tag-remove:hover {
+            opacity: 1;
+        }
+        
         /* Footer */
         .page-footer {
             background: #ffffff;
@@ -448,6 +525,25 @@
                 Back to Dashboard
             </a>
             <h1>Daily Activities</h1>
+            <p class="hero-header-subtitle">This is what you actually did.</p>
+        </div>
+        <div class="hero-header-search-row">
+            <div class="search-filter-container" style="position: relative; min-width: 250px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 4px 36px 4px 4px; border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; min-height: 36px;">
+                    <div id="selectedCompanies" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1;"></div>
+                    <input type="text" 
+                           id="companyFilter" 
+                           class="search-input" 
+                           placeholder="Search companies..." 
+                           oninput="handleCompanySearch(event)"
+                           onfocus="handleCompanySearchFocus()"
+                           onblur="hideCompanySuggestions()"
+                           autocomplete="off"
+                           style="border: none; outline: none; font-size: 14px; flex: 1; min-width: 120px; padding: 4px 0;">
+                </div>
+                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; pointer-events: none; z-index: 1;">🔍</span>
+                <div id="companySuggestions" class="company-suggestions" style="display: none;"></div>
+            </div>
         </div>
     </div>
     
@@ -461,9 +557,14 @@
     </div>
     
     <script>
+        let allActivities = [];
+        let companies = [];
+        let currentCompanyFilter = [];
+        
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadDailyActivities();
+            setupCompanySearchKeyboard();
         });
         
         // Load daily activities data
@@ -476,7 +577,9 @@
                 console.log('Daily activities data received:', data);
                 
                 if (data.success) {
-                    updateActivitiesDisplay(data.daily_activities);
+                    allActivities = data.daily_activities || [];
+                    companies = extractCompaniesFromActivities(allActivities);
+                    updateActivitiesDisplay();
                 } else {
                     console.error('Failed to load daily activities data:', data.error);
                     showErrorState(data.error);
@@ -487,11 +590,23 @@
             }
         }
         
+        function extractCompaniesFromActivities(days) {
+            const set = new Set();
+            (days || []).forEach(day => {
+                (day.activities || []).forEach(activity => {
+                    if (activity.company) {
+                        set.add(activity.company);
+                    }
+                });
+            });
+            return Array.from(set).sort((a, b) => a.localeCompare(b));
+        }
+        
         // Update activities display
-        function updateActivitiesDisplay(activities) {
+        function updateActivitiesDisplay() {
             const container = document.getElementById('activities-container');
             
-            if (!activities || activities.length === 0) {
+            if (!allActivities || allActivities.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📅</div>
@@ -504,7 +619,22 @@
                 return;
             }
             
-            const html = activities.map(day => {
+            const daysToRender = getFilteredDaysByCompany();
+            
+            if (!daysToRender || daysToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>No activities match your current filters.</p>
+                        <p style="font-size: 14px; color: #999; margin-top: 10px;">
+                            Clear your company filters to see all activities again.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = daysToRender.map(day => {
                 const activitiesHtml = day.activities.map(activity => {
                     const statusClass = `status-${activity.status
                         .toLowerCase()
@@ -550,6 +680,31 @@
             container.innerHTML = html;
         }
         
+        function getFilteredDaysByCompany() {
+            if (!currentCompanyFilter || currentCompanyFilter.length === 0) {
+                return allActivities;
+            }
+            
+            const selected = currentCompanyFilter.map(c => c.toLowerCase());
+            
+            return (allActivities || []).map(day => {
+                const filteredActivities = (day.activities || []).filter(activity => {
+                    const company = (activity.company || '').toLowerCase();
+                    return selected.some(sel => company.includes(sel));
+                });
+                
+                if (filteredActivities.length === 0) {
+                    return null;
+                }
+                
+                return {
+                    ...day,
+                    activities: filteredActivities,
+                    activity_count: filteredActivities.length
+                };
+            }).filter(Boolean);
+        }
+        
         // Show error state
         function showErrorState(errorMessage) {
             const container = document.getElementById('activities-container');
@@ -574,6 +729,195 @@
             
             // Toggle collapsed class on content
             dayContent.classList.toggle('collapsed');
+        }
+        
+        function setupCompanySearchKeyboard() {
+            const companyInput = document.getElementById('companyFilter');
+            if (!companyInput) return;
+            
+            companyInput.addEventListener('keydown', (e) => {
+                const suggestionsDiv = document.getElementById('companySuggestions');
+                const items = suggestionsDiv ? suggestionsDiv.querySelectorAll('.company-suggestion-item:not([style*=\"cursor: default\"])') : [];
+                const highlighted = suggestionsDiv ? suggestionsDiv.querySelector('.company-suggestion-item.highlighted') : null;
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (items.length > 0) {
+                        if (highlighted) {
+                            const currentIndex = Array.from(items).indexOf(highlighted);
+                            const nextIndex = (currentIndex + 1) % items.length;
+                            highlighted.classList.remove('highlighted');
+                            items[nextIndex].classList.add('highlighted');
+                            items[nextIndex].scrollIntoView({ block: 'nearest' });
+                        } else {
+                            items[0].classList.add('highlighted');
+                        }
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (items.length > 0) {
+                        if (highlighted) {
+                            const currentIndex = Array.from(items).indexOf(highlighted);
+                            const prevIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
+                            highlighted.classList.remove('highlighted');
+                            items[prevIndex].classList.add('highlighted');
+                            items[prevIndex].scrollIntoView({ block: 'nearest' });
+                        } else {
+                            items[items.length - 1].classList.add('highlighted');
+                        }
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (highlighted) {
+                        const firstSpan = highlighted.querySelector('span:first-child');
+                        const companyText = firstSpan ? firstSpan.textContent.trim() : highlighted.textContent.replace('✓', '').trim();
+                        toggleCompany(companyText);
+                    } else if (items.length > 0) {
+                        const firstItem = items[0];
+                        const firstSpan = firstItem.querySelector('span:first-child');
+                        const companyText = firstSpan ? firstSpan.textContent.trim() : firstItem.textContent.replace('✓', '').trim();
+                        toggleCompany(companyText);
+                    } else {
+                        hideCompanySuggestions();
+                    }
+                } else if (e.key === 'Escape') {
+                    hideCompanySuggestions();
+                    companyInput.blur();
+                } else if (e.key === 'Backspace' && companyInput.value === '' && currentCompanyFilter.length > 0) {
+                    currentCompanyFilter.pop();
+                    updateSelectedCompaniesDisplay();
+                    updateActivitiesDisplay();
+                }
+            });
+        }
+        
+        function handleCompanySearch(event) {
+            const input = event.target;
+            const query = input.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                showCompanySuggestions(query);
+            } else {
+                showCompanySuggestions('');
+            }
+        }
+        
+        function handleCompanySearchFocus() {
+            const input = document.getElementById('companyFilter');
+            const query = input.value;
+            showCompanySuggestions(query);
+        }
+        
+        function hideCompanySuggestions() {
+            setTimeout(() => {
+                const suggestionsDiv = document.getElementById('companySuggestions');
+                if (suggestionsDiv) {
+                    suggestionsDiv.style.display = 'none';
+                }
+            }, 200);
+        }
+        
+        function showCompanySuggestions(query = '') {
+            const suggestionsDiv = document.getElementById('companySuggestions');
+            if (!suggestionsDiv) return;
+            
+            const list = companies || [];
+            let filtered;
+            if (!query || query.length === 0) {
+                filtered = list.slice(0, 15);
+            } else {
+                filtered = list.filter(company => company.toLowerCase().includes(query.toLowerCase())).slice(0, 15);
+            }
+            
+            renderSuggestions(filtered, suggestionsDiv);
+            
+            if (suggestionsDiv.children.length > 0) {
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        }
+        
+        function renderSuggestions(companyList, container) {
+            container.innerHTML = '';
+            
+            if (!companyList || companyList.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'company-suggestion-item';
+                noResults.textContent = 'No companies found';
+                noResults.style.color = '#6b7280';
+                noResults.style.cursor = 'default';
+                container.appendChild(noResults);
+                return;
+            }
+            
+            companyList.forEach(company => {
+                const isSelected = currentCompanyFilter.includes(company);
+                const item = document.createElement('div');
+                item.className = 'company-suggestion-item' + (isSelected ? ' selected' : '');
+                item.innerHTML = `
+                    <span>${company}</span>
+                    ${isSelected ? '<span style="margin-left: auto; color: #3b82f6;">✓</span>' : ''}
+                `;
+                item.onmousedown = (e) => {
+                    e.preventDefault();
+                    toggleCompany(company);
+                };
+                item.onmouseenter = () => {
+                    container.querySelectorAll('.company-suggestion-item').forEach(el => {
+                        el.classList.remove('highlighted');
+                    });
+                    item.classList.add('highlighted');
+                };
+                container.appendChild(item);
+            });
+        }
+        
+        function toggleCompany(company) {
+            if (currentCompanyFilter.includes(company)) {
+                currentCompanyFilter = currentCompanyFilter.filter(c => c !== company);
+            } else {
+                currentCompanyFilter.push(company);
+            }
+            
+            const input = document.getElementById('companyFilter');
+            if (input) {
+                input.value = '';
+            }
+            
+            updateSelectedCompaniesDisplay();
+            showCompanySuggestions('');
+            updateActivitiesDisplay();
+        }
+        
+        function updateSelectedCompaniesDisplay() {
+            const container = document.getElementById('selectedCompanies');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            currentCompanyFilter.forEach((company, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'company-tag';
+                tag.innerHTML = `
+                    <span>${company}</span>
+                    <span class="company-tag-remove" data-company-index="${index}" title="Remove">×</span>
+                `;
+                const removeBtn = tag.querySelector('.company-tag-remove');
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeCompany(index);
+                };
+                container.appendChild(tag);
+            });
+        }
+        
+        function removeCompany(index) {
+            if (index >= 0 && index < currentCompanyFilter.length) {
+                currentCompanyFilter.splice(index, 1);
+                updateSelectedCompaniesDisplay();
+                updateActivitiesDisplay();
+            }
         }
         
         // AI Status Check Function
