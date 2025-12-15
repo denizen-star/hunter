@@ -806,8 +806,8 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         }}
         
         .upgrade-banner {{
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 1px solid #f59e0b;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 16px 20px;
             margin: 24px 32px;
@@ -820,7 +820,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         .upgrade-banner-text {{
             flex: 1;
             font-size: 14px;
-            color: #92400e;
+            color: #6b7280;
         }}
         
         .upgrade-banner strong {{
@@ -836,6 +836,11 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             <div>
                 <h1>{contact.person_name}</h1>
                 <div class="subtitle">{contact.company_name}{f' • {contact.job_title}' if contact.job_title else ''}</div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <a href="{self.generate_google_calendar_url(contact)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    📅 Add to GCal
+                </a>
             </div>
         </div>
     </div>
@@ -884,8 +889,8 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
             <!-- Contact Details Section -->
-            <div class="section">
-                <div class="section-header clickable" onclick="toggleSection(this)">
+            <div class="section collapsed" id="contact-details-section">
+                <div class="section-header clickable" onclick="toggleSection('contact-details-section')">
                     <h2>Contact Details</h2>
                     <span class="section-toggle-indicator">▶</span>
                 </div>
