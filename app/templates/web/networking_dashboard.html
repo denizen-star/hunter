@@ -804,7 +804,7 @@
                             <span>${contact.days_since_update} days ago</span>
                         </div>
                     </div>
-                    <button class="view-btn" onclick="viewContact('${contact.id}')">View Summary</button>
+                    <button class="view-btn" onclick="viewContact('${contact.id}')">${contact.summary_path ? 'View Summary' : 'View Contact'}</button>
                 </div>
             `;
         }
@@ -854,13 +854,27 @@
                 const data = await response.json();
                 
                 if (data.success && data.contact) {
-                    // Construct summary URL
                     const contact = data.contact;
-                    // Extract folder name from contact data
-                    // For now, navigate using a simple pattern
-                    const folderName = `${contact.person_name.replace(/\s+/g, '-')}-${contact.company_name.replace(/\s+/g, '-')}`;
-                    const summaryFilename = `${contact.person_name.replace(/\s+/g, '-')}-summary.html`;
-                    window.location.href = `/networking/${folderName}/${summaryFilename}`;
+                    
+                    // Check if contact has a summary page (full AI processing)
+                    if (contact.summary_path) {
+                        // Extract folder name and summary filename from summary_path
+                        const folderName = `${contact.person_name.replace(/\s+/g, '-')}-${contact.company_name.replace(/\s+/g, '-')}`;
+                        const summaryFilename = `${contact.person_name.replace(/\s+/g, '-')}-summary.html`;
+                        window.location.href = `/networking/${folderName}/${summaryFilename}`;
+                    } else {
+                        // Simple contact - show message and offer to view messages file instead
+                        const folderName = `${contact.person_name.replace(/\s+/g, '-')}-${contact.company_name.replace(/\s+/g, '-')}`;
+                        if (contact.messages_path) {
+                            const messagesFilename = contact.messages_path.split('/').pop();
+                            const confirmed = confirm(`This is a simple contact without a full summary page.\n\nWould you like to view the intro message instead?`);
+                            if (confirmed) {
+                                window.location.href = `/networking/${folderName}/${messagesFilename}`;
+                            }
+                        } else {
+                            alert('This is a simple contact. No summary page or messages are available yet.');
+                        }
+                    }
                 } else {
                     alert('Could not load contact summary');
                 }
@@ -870,5 +884,7 @@
             }
         }
     </script>
+    <!-- Shared Menu Injection -->
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>

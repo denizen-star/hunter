@@ -22,67 +22,6 @@
             background: #fafafa;
             margin: 0;
             padding: 0;
-            margin-left: 180px;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e5e7eb;
-            z-index: 1000;
-            padding: 16px 0;
-            overflow-y: auto;
-        }
-        
-        .sidebar-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 16px;
-        }
-        
-        .sidebar-header h3 {
-            color: #1f2937;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
-            display: block;
-            padding: 12px 24px;
-            color: #6b7280;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .sidebar-menu a:hover {
-            background: #f9fafb;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-        }
-        
-        .sidebar-menu a.active {
-            background: #f3f4f6;
-            color: #1f2937;
-            border-left-color: #3b82f6;
         }
         
         .container {
@@ -247,29 +186,31 @@
             margin-top: 4px;
             font-style: italic;
         }
+        
+        /* Radio button styling */
+        .form-group label:hover {
+            border-color: #3b82f6;
+            background: #f9fafb;
+        }
+        
+        .form-group label input[type="radio"]:checked + div {
+            color: #1f2937;
+        }
+        
+        .form-group label:has(input[type="radio"]:checked) {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+        
+        /* Fallback for browsers that don't support :has() */
+        @supports not selector(:has(*)) {
+            .form-group label input[type="radio"]:checked {
+                border-color: #3b82f6;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
-            <li><a href="/new-application" class="nav-link">New Application</a></li>
-            <li><a href="/networking" class="nav-link">Network Dash</a></li>
-            <li><a href="/new-networking-contact" class="nav-link active">New Contact</a></li>
-            <li><a href="/templates" class="nav-link">Templates</a></li>
-            <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/reports" class="nav-link">Reports</a></li>
-            <li><a href="/analytics" class="nav-link">Analytics</a></li>
-            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
-        </ul>
-    </div>
-
     <!-- Main Content -->
     <div class="container">
         <div class="header">
@@ -306,6 +247,7 @@
                         name="company_name" 
                         required 
                         placeholder="e.g., Google"
+                        value="{{ company if company else '' }}"
                     >
                 </div>
                 
@@ -359,6 +301,40 @@ You can use Markdown formatting:
                     </div>
                 </div>
                 
+                <div class="form-group">
+                    <label>
+                        Contact Processing Type
+                        <span class="required">*</span>
+                    </label>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                        <label style="display: flex; align-items: flex-start; cursor: pointer; font-weight: 400; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                            <input 
+                                type="radio" 
+                                name="processing_type" 
+                                value="full" 
+                                checked 
+                                style="margin-right: 10px; margin-top: 2px;"
+                            >
+                            <div>
+                                <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Full AI Processing</div>
+                                <div style="font-size: 13px; color: #6b7280;">Complete analysis including match scoring, research, multiple message templates, and detailed insights (5-6 minutes)</div>
+                            </div>
+                        </label>
+                        <label style="display: flex; align-items: flex-start; cursor: pointer; font-weight: 400; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                            <input 
+                                type="radio" 
+                                name="processing_type" 
+                                value="simple" 
+                                style="margin-right: 10px; margin-top: 2px;"
+                            >
+                            <div>
+                                <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">Simple Contact</div>
+                                <div style="font-size: 13px; color: #6b7280;">Quick creation with basic personalized intro message only. Perfect for recruiters or talent profiles (30 seconds)</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary" id="submitBtn">
                         Create Contact
@@ -387,13 +363,20 @@ You can use Markdown formatting:
             statusMessage.classList.remove('show', 'success', 'error');
             
             // Get form data
+            const processingType = document.querySelector('input[name="processing_type"]:checked').value;
             const formData = {
                 person_name: document.getElementById('personName').value.trim(),
                 company_name: document.getElementById('companyName').value.trim(),
                 job_title: document.getElementById('jobTitle').value.trim() || null,
                 linkedin_url: document.getElementById('linkedinUrl').value.trim() || null,
-                profile_details: document.getElementById('profileDetails').value.trim()
+                profile_details: document.getElementById('profileDetails').value.trim(),
+                requires_ai_processing: processingType === 'full'
             };
+            
+            // Update button text based on processing type
+            if (processingType === 'simple') {
+                submitBtn.textContent = 'Creating Simple Contact...';
+            }
             
             try {
                 const response = await fetch('/api/networking/contacts', {
@@ -415,14 +398,31 @@ You can use Markdown formatting:
                     // Reset form
                     form.reset();
                     
-                    // Redirect to summary page if available, otherwise dashboard
-                    setTimeout(() => {
-                        if (data.summary_url) {
-                            window.location.href = data.summary_url;
-                        } else {
-                            window.location.href = '/networking';
-                        }
-                    }, 2000);
+                    // If we're in an iframe, notify parent window instead of redirecting
+                    if (window.self !== window.top) {
+                        // Notify parent window that contact was created
+                        window.parent.postMessage({
+                            type: 'networking-contact-created',
+                            contact_id: data.contact_id,
+                            summary_url: data.summary_url,
+                            person_name: data.person_name,
+                            company_name: data.company_name
+                        }, '*');
+                        
+                        // Optionally reload parent's networking contacts
+                        setTimeout(() => {
+                            // Parent window should handle reloading contacts
+                        }, 2000);
+                    } else {
+                        // Not in iframe, redirect normally
+                        setTimeout(() => {
+                            if (data.summary_url) {
+                                window.location.href = data.summary_url;
+                            } else {
+                                window.location.href = '/networking';
+                            }
+                        }, 2000);
+                    }
                 } else {
                     // Show error message
                     statusMessage.textContent = `Error: ${data.error}`;
@@ -443,5 +443,7 @@ You can use Markdown formatting:
             }
         });
     </script>
+    <!-- Shared Menu Injection -->
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>

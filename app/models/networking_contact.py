@@ -43,6 +43,9 @@ class NetworkingContact:
     # Flagging
     flagged: bool = False
     
+    # AI Processing flag
+    requires_ai_processing: bool = True
+    
     # Checklist tracking (if needed later)
     checklist_items: Optional[dict] = None
     
@@ -91,6 +94,7 @@ class NetworkingContact:
             calendar_invite_generated=data.get('calendar_invite_generated', False),
             contact_count=data.get('contact_count'),
             flagged=data.get('flagged', False),
+            requires_ai_processing=data.get('requires_ai_processing', True),
             checklist_items=data.get('checklist_items')
         )
     
@@ -120,6 +124,7 @@ class NetworkingContact:
             'calendar_invite_generated': self.calendar_invite_generated,
             'contact_count': self.contact_count,
             'flagged': self.flagged,
+            'requires_ai_processing': self.requires_ai_processing,
             'checklist_items': self.checklist_items
         }
     

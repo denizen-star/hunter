@@ -112,7 +112,8 @@ def new_application():
 @app.route('/new-networking-contact')
 def new_networking_contact():
     """New networking contact form page"""
-    return render_template('networking_form.html')
+    company = request.args.get('company', '')
+    return render_template('networking_form.html', company=company)
 
 
 @app.route('/networking')
@@ -974,6 +975,7 @@ def create_networking_contact():
         profile_details = data.get('profile_details')
         job_title = data.get('job_title')
         linkedin_url = data.get('linkedin_url')
+        requires_ai_processing = data.get('requires_ai_processing', True)  # Default to True for backwards compatibility
         
         if not all([person_name, company_name, profile_details]):
             return jsonify({
@@ -990,12 +992,13 @@ def create_networking_contact():
                 'error': 'Base resume not found. Please create a resume first.'
             }), 400
         
-        # Check Ollama connection
-        if not ai_analyzer.check_connection():
+        # Check Ollama connection - warn for simple contacts but allow fallback
+        if requires_ai_processing and not ai_analyzer.check_connection():
             return jsonify({
                 'success': False,
-                'error': 'Cannot connect to Ollama. Please ensure Ollama is running.'
+                'error': 'Cannot connect to Ollama. Please ensure Ollama is running for full AI processing.'
             }), 503
+        # For simple contacts, we'll use a fallback template if Ollama isn't available
         
         # Create contact
         contact = networking_processor.create_networking_contact(
@@ -1003,11 +1006,17 @@ def create_networking_contact():
             company_name=company_name,
             profile_details=profile_details,
             job_title=job_title,
-            linkedin_url=linkedin_url
+            linkedin_url=linkedin_url,
+            requires_ai_processing=requires_ai_processing
         )
         
-        # Generate all documents (AI analysis and messages)
-        networking_doc_generator.generate_all_documents(contact, resume.content)
+        # Generate documents based on processing type
+        if requires_ai_processing:
+            # Full AI processing (current behavior)
+            networking_doc_generator.generate_all_documents(contact, resume.content)
+        else:
+            # Simple contact - just generate basic intro message
+            networking_doc_generator.generate_simple_intro_message(contact, resume.content)
         
         # Save updated metadata with paths and match score
         networking_processor._save_contact_metadata(contact)
@@ -1027,7 +1036,8 @@ def create_networking_contact():
             'company_name': contact.company_name,
             'match_score': contact.match_score,
             'summary_url': summary_url,
-            'folder_path': str(contact.folder_path)
+            'folder_path': str(contact.folder_path),
+            'requires_ai_processing': contact.requires_ai_processing
         })
     except Exception as e:
         import traceback
@@ -1035,11 +1045,23 @@ def create_networking_contact():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app.route('/api/networking/contacts', methods=['GET'])
-def list_networking_contacts():
-    """List all networking contacts"""
+@app.route('/api/applications/<app_id>/networking-contacts', methods=['GET'])
+def get_application_networking_contacts(app_id):
+    """Get networking contacts matching the application's company"""
     try:
-        contacts = networking_processor.list_all_contacts()
+        # Get application
+        application = job_processor.get_application_by_id(app_id)
+        if not application:
+            return jsonify({'success': False, 'error': 'Application not found'}), 404
+        
+        # Get all contacts
+        all_contacts = networking_processor.list_all_contacts()
+        
+        # Filter contacts matching the company (case-insensitive)
+        matched_contacts = [
+            c for c in all_contacts
+            if c.company_name.lower().strip() == application.company.lower().strip()
+        ]
         
         return jsonify({
             'success': True,
@@ -1059,6 +1081,41 @@ def list_networking_contacts():
                 'days_since_update': c.get_days_since_update(),
                 'timing_color': c.get_timing_color_class(),
                 'next_step': c.get_next_step()
+            } for c in matched_contacts],
+            'count': len(matched_contacts)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/networking/contacts', methods=['GET'])
+def list_networking_contacts():
+    """List all networking contacts"""
+    try:
+        contacts = networking_processor.list_all_contacts()
+        
+        return jsonify({
+            'success': True,
+                'contacts': [{
+                'id': c.id,
+                'person_name': c.person_name,
+                'company_name': c.company_name,
+                'job_title': c.job_title,
+                'status': c.status,
+                'created_at': c.created_at.isoformat(),
+                'status_updated_at': c.status_updated_at.isoformat() if c.status_updated_at else None,
+                'match_score': c.match_score,
+                'linkedin_url': c.linkedin_url,
+                'email': c.email,
+                'location': c.location,
+                'flagged': c.flagged,
+                'days_since_update': c.get_days_since_update(),
+                'timing_color': c.get_timing_color_class(),
+                'next_step': c.get_next_step(),
+                'summary_path': str(c.summary_path) if c.summary_path else None,
+                'messages_path': str(c.messages_path) if c.messages_path else None
             } for c in contacts],
             'count': len(contacts)
         })
@@ -1125,6 +1182,24 @@ def update_networking_status(contact_id):
         
         # Update status with notes
         networking_processor.update_contact_status(contact, status, notes)
+        
+        # Check if contact's company matches any application and create timeline entry
+        try:
+            applications = job_processor.list_all_applications()
+            for app in applications:
+                if app.company.lower().strip() == contact.company_name.lower().strip():
+                    # Create networking timeline entry in matching application
+                    job_processor.create_networking_timeline_entry(
+                        app,
+                        contact.person_name,
+                        status,
+                        notes
+                    )
+                    # Regenerate summary to include the new timeline entry
+                    job_processor._regenerate_summary(app)
+        except Exception as e:
+            # Don't fail the status update if timeline entry creation fails
+            print(f"Warning: Could not create timeline entry for contact update: {e}")
         
         return jsonify({
             'success': True,
@@ -1309,17 +1384,37 @@ def regenerate_networking_documents(contact_id):
                 'error': 'Base resume not found. Please create a resume first.'
             }), 400
         
-        # Regenerate all documents with fresh instance
+        # Check Ollama connection
+        if not ai_analyzer.check_connection():
+            return jsonify({
+                'success': False,
+                'error': 'Cannot connect to Ollama. Please ensure Ollama is running.'
+            }), 503
+        
+        # Upgrade simple contacts to full AI processing when regenerating
+        was_simple_contact = not contact.requires_ai_processing
+        if was_simple_contact:
+            contact.requires_ai_processing = True
+        
+        # Regenerate all documents with fresh instance (this will create full summary page)
         doc_gen_fresh.generate_all_documents(contact, resume.content)
         
-        # Save updated metadata
+        # Save updated metadata (including the upgraded requires_ai_processing flag)
         networking_processor._save_contact_metadata(contact)
+        
+        # Generate summary URL for redirect
+        summary_url = None
+        if contact.summary_path:
+            folder_name = contact.folder_path.name
+            summary_filename = contact.summary_path.name
+            summary_url = f"/networking/{folder_name}/{summary_filename}"
         
         return jsonify({
             'success': True,
-            'message': 'Documents regenerated successfully',
+            'message': 'Documents regenerated successfully' + (' (upgraded to full AI processing)' if was_simple_contact else ''),
             'contact_id': contact.id,
-            'match_score': contact.match_score
+            'match_score': contact.match_score,
+            'summary_url': summary_url
         })
     except Exception as e:
         import traceback

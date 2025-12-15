@@ -86,6 +86,92 @@ class NetworkingDocumentGenerator:
         self.generate_summary_page(contact, match_result['detailed_analysis'], messages, research_content)
         print("  ✓ Summary page generated")
     
+    def generate_simple_intro_message(
+        self,
+        contact: NetworkingContact,
+        resume_content: str
+    ) -> None:
+        """Generate a simple personalized intro message for contacts that don't require full AI processing"""
+        print(f"  → Generating simple intro message for {contact.person_name}...")
+        
+        # Extract basic info from resume (first line is usually the name)
+        resume_lines = resume_content.split('\n')
+        your_name = resume_lines[0].strip() if resume_lines else "Kervin"
+        # Remove markdown headers if present
+        your_name = your_name.replace('#', '').strip()
+        
+        # Create a simple personalized intro message using AI but minimal processing
+        intro_prompt = f"""Write a brief, professional LinkedIn connection request message (under 300 characters) for:
+
+Your name: {your_name}
+Their name: {contact.person_name}
+Company: {contact.company_name}
+{f'Their title: {contact.job_title}' if contact.job_title else ''}
+
+Your background (from resume):
+{resume_content[:500]}
+
+Their profile:
+{read_text_file(contact.profile_path) if contact.profile_path and contact.profile_path.exists() else 'No profile details available'}
+
+Requirements:
+- Maximum 300 characters (including spaces)
+- Professional and personable
+- Reference something specific from their profile or company
+- Mention your relevant background briefly
+- No generic "I'd like to connect" phrases
+- Make it engaging and worth accepting
+
+Return just the message text, no subject line or extra formatting."""
+
+        try:
+            # Check if Ollama is available
+            if self.ai_analyzer.check_connection():
+                intro_message = self.ai_analyzer._call_ollama(intro_prompt)
+                # Ensure it's under 300 chars
+                if len(intro_message) > 300:
+                    intro_message = intro_message[:297] + "..."
+                intro_message = intro_message.strip()
+            else:
+                raise ConnectionError("Ollama not available")
+        except Exception as e:
+            print(f"  ⚠ Warning: Could not generate intro message with AI: {e}")
+            # Fallback to template-based personalized message
+            profile_text = read_text_file(contact.profile_path) if contact.profile_path and contact.profile_path.exists() else ""
+            job_context = ""
+            if contact.job_title:
+                job_context = f" as a {contact.job_title}"
+            
+            # Extract key skills/technologies from resume (simple extraction)
+            resume_lower = resume_content.lower()
+            tech_keywords = ['data', 'engineering', 'analytics', 'python', 'sql', 'cloud', 'machine learning', 'ai']
+            relevant_skills = [kw for kw in tech_keywords if kw in resume_lower][:3]
+            skills_text = ", ".join(relevant_skills) if relevant_skills else "data and analytics"
+            
+            intro_message = f"Hi {contact.person_name}, I came across your profile{job_context} at {contact.company_name}. I'm a professional with expertise in {skills_text} and would like to connect to exchange insights and explore potential opportunities. Would love to connect!"
+            
+            # Ensure under 300 chars
+            if len(intro_message) > 300:
+                intro_message = intro_message[:297] + "..."
+        
+        # Save simple message file
+        messages_path = contact.folder_path / f"{contact.person_name.replace(' ', '-')}-messages.txt"
+        messages_content = f"""SIMPLE INTRO MESSAGE
+{'=' * 80}
+
+INITIAL CONNECTION REQUEST (LinkedIn - Under 300 chars)
+{'-' * 80}
+{intro_message}
+
+Character count: {len(intro_message)}
+
+NOTE: This is a simple contact. For full AI analysis, match scoring, and additional message templates, you can regenerate this contact with full AI processing.
+"""
+        write_text_file(messages_content, messages_path)
+        contact.messages_path = messages_path
+        
+        print("  ✓ Simple intro message generated")
+    
     def generate_networking_messages(
         self,
         contact: NetworkingContact,
@@ -531,68 +617,8 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             background: #fafafa;
             color: #1f2937;
             line-height: 1.6;
-            margin-left: 180px;
-        }}
-        
-        /* Sidebar Styles */
-        .sidebar {{
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e5e7eb;
-            z-index: 1000;
-            padding: 20px 0;
-            overflow-y: auto;
-        }}
-        
-        .sidebar-header {{
-            padding: 0 16px 16px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 12px;
-        }}
-        
-        .sidebar-header h3 {{
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
             margin: 0;
-        }}
-        
-        .sidebar-menu {{
-            list-style: none;
             padding: 0;
-            margin: 0;
-        }}
-        
-        .sidebar-menu li {{
-            margin: 0;
-        }}
-        
-        .sidebar-menu a {{
-            display: block;
-            padding: 10px 16px;
-            color: #6b7280;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }}
-        
-        .sidebar-menu a:hover {{
-            background: #f9fafb;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-        }}
-        
-        .sidebar-menu a.active {{
-            background: #f3f4f6;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-            font-weight: 600;
         }}
         
         .header {{
@@ -1073,26 +1099,6 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard">App Dash</a></li>
-            <li><a href="/new-application">New Application</a></li>
-            <li><a href="/networking" class="active">Network Dash</a></li>
-            <li><a href="/new-networking-contact">New Contact</a></li>
-            <li><a href="/templates">Templates</a></li>
-            <li><a href="/progress">Progress</a></li>
-            <li><a href="/reports">Reports</a></li>
-            <li><a href="/analytics">Analytics</a></li>
-            <li><a href="/daily-activities">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true">Manage Resume</a></li>
-        </ul>
-    </div>
-    
     <!-- Main Content -->
     <div class="header">
         <a href="/networking" class="back-link">Back to Network Dash</a>

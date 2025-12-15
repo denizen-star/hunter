@@ -103,7 +103,8 @@ class NetworkingProcessor:
         company_name: str,
         profile_details: str,
         job_title: Optional[str] = None,
-        linkedin_url: Optional[str] = None
+        linkedin_url: Optional[str] = None,
+        requires_ai_processing: bool = True
     ) -> NetworkingContact:
         """Create a new networking contact"""
         # Store raw profile for future reference
@@ -125,7 +126,8 @@ class NetworkingProcessor:
             linkedin_url=linkedin_url,
             created_at=get_est_now(),
             status="To Research",
-            status_updated_at=get_est_now()
+            status_updated_at=get_est_now(),
+            requires_ai_processing=requires_ai_processing
         )
         
         # Create contact folder
