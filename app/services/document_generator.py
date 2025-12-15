@@ -2942,9 +2942,11 @@ Format this as a professional research document that demonstrates thorough prepa
         
         /* Main Container */
         .container {{
-            margin-left: 180px;
+            width: calc(100vw - 180px);
+            margin-left: 0;
             min-height: 100vh;
             background: #fafafa;
+            box-sizing: border-box;
         }}
         
         /* Header */
@@ -3922,25 +3924,7 @@ Format this as a professional research document that demonstrates thorough prepa
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
-            <li><a href="/new-application" class="nav-link">New Application</a></li>
-            <li><a href="/networking" class="nav-link">Network Dash</a></li>
-            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
-            <li><a href="/templates" class="nav-link">Templates</a></li>
-            <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/reports" class="nav-link">Reports</a></li>
-            <li><a href="/analytics" class="nav-link">Analytics</a></li>
-            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
-        </ul>
-    </div>
+    <!-- Sidebar Navigation - Injected by shared-menu.js -->
     
     <!-- Main Container -->
     <div class="container">
@@ -5141,6 +5125,8 @@ Format this as a professional research document that demonstrates thorough prepa
             }}
         }}
     </script>
+    <!-- Shared Menu Injection -->
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>"""
         return html
