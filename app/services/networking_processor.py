@@ -194,43 +194,10 @@ class NetworkingProcessor:
         status: str,
         notes: Optional[str] = None
     ) -> None:
-        """Update contact status and create timeline entry"""
+        """Update contact status (timeline entry is created separately in application folder)"""
         old_status = contact.status
         contact.status = status
         contact.status_updated_at = get_est_now()
-        
-        # Create update file in updates folder
-        if contact.folder_path:
-            updates_dir = contact.folder_path / "updates"
-            ensure_dir_exists(updates_dir)
-            
-            timestamp = format_datetime_for_filename()
-            update_filename = f"{timestamp}-{status.replace(' ', '-')}.html"
-            update_path = updates_dir / update_filename
-            
-            # Create simple update HTML
-            update_html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Status Update: {status}</title>
-    <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; }}
-        .update {{ background: #f9fafb; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; }}
-        .timestamp {{ color: #6b7280; font-size: 14px; }}
-        .status {{ font-weight: 600; color: #1f2937; margin: 8px 0; }}
-        .notes {{ margin-top: 12px; color: #374151; }}
-    </style>
-</head>
-<body>
-    <div class="update">
-        <div class="timestamp">{contact.status_updated_at.strftime('%B %d, %Y at %I:%M %p EST')}</div>
-        <div class="status">Status changed from "{old_status}" to "{status}"</div>
-        {f'<div class="notes">{notes}</div>' if notes else ''}
-    </div>
-</body>
-</html>"""
-            write_text_file(update_html, update_path)
         
         # Save updated metadata
         self._save_contact_metadata(contact)

@@ -701,10 +701,24 @@ class JobProcessor:
                         updates.append(update_entry)
         
         # Also get updates from matching networking contacts
+        # But skip duplicates that are already in the application's updates folder
         try:
             from app.services.networking_processor import NetworkingProcessor
             from app.utils.file_utils import get_data_path
             import re
+            
+            # Build a set of (timestamp, contact_name, status) tuples from application updates
+            # to check for duplicates
+            existing_networking_updates = set()
+            for update in updates:
+                if update.get('type') == 'networking' and update.get('contact_name'):
+                    # Normalize status for comparison (replace dashes with spaces, lowercase)
+                    status_normalized = update['status'].replace('-', ' ').lower().strip()
+                    existing_networking_updates.add((
+                        update['timestamp'],
+                        update['contact_name'],
+                        status_normalized
+                    ))
             
             networking_processor = NetworkingProcessor()
             networking_dir = get_data_path('networking')
@@ -738,6 +752,15 @@ class JobProcessor:
                                             if len(filename_parts) == 2:
                                                 timestamp_str = filename_parts[0]
                                                 status = filename_parts[1].replace('-', ' ')
+                                                
+                                                # Check if this update is already represented in application's updates folder
+                                                # (i.e., there's a networking-ContactName-Status entry with same timestamp)
+                                                # Normalize status for comparison (lowercase, strip)
+                                                status_normalized = status.lower().strip()
+                                                update_key = (timestamp_str, contact_name, status_normalized)
+                                                if update_key in existing_networking_updates:
+                                                    # Skip this duplicate - it's already in the application's updates folder
+                                                    continue
                                                 
                                                 # Format timestamp for display
                                                 try:
