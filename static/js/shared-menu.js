@@ -12,16 +12,17 @@
     }
 
     // Menu configuration
-    const menuItems = [
+    const mainItems = [
         { href: '/dashboard', label: 'App Dash' },
-        { href: '/new-application', label: 'New Application' },
         { href: '/networking', label: 'Network Dash' },
-        { href: '/new-networking-contact', label: 'New Contact' },
-        { href: '/templates', label: 'Templates' },
-        { href: '/progress', label: 'Progress' },
+        { href: '/progress', label: 'Progress Dash' },
         { href: '/reports', label: 'Reports' },
         { href: '/analytics', label: 'Analytics' },
-        { href: '/daily-activities', label: 'Daily Activities' },
+        { href: '/daily-activities', label: 'Daily Activities' }
+    ];
+
+    const adminItems = [
+        { href: '/templates', label: 'Templates' },
         { href: '#', label: 'Check AI Status', onclick: 'showAIStatus(); return false;' },
         { href: '/new-application?resume=true', label: 'Manage Resume' }
     ];
@@ -32,8 +33,11 @@
         const search = window.location.search;
         const fullPath = path + search;
 
+        // Helper list of all items
+        const allItems = [...mainItems, ...adminItems];
+
         // Check for exact matches first
-        for (const item of menuItems) {
+        for (const item of allItems) {
             if (item.href === fullPath || item.href === path) {
                 return item.href;
             }
@@ -59,10 +63,32 @@
             <div class="sidebar-header">
                 <h3>Hunter</h3>
             </div>
-            <ul class="sidebar-menu">
+            <ul class="sidebar-menu sidebar-menu-main">
         `;
 
-        menuItems.forEach(item => {
+        // Main navigation items
+        mainItems.forEach(item => {
+            const isActive = item.href === activePath || 
+                           (item.href !== '#' && window.location.pathname.startsWith(item.href));
+            const activeClass = isActive ? 'active' : '';
+            const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            
+            menuHTML += `
+                <li>
+                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${item.label}</a>
+                </li>
+            `;
+        });
+
+        // Admin section
+        menuHTML += `
+            </ul>
+            <div class="sidebar-admin-section">
+                <div class="sidebar-section-label">Admin</div>
+                <ul class="sidebar-menu sidebar-menu-admin">
+        `;
+
+        adminItems.forEach(item => {
             const isActive = item.href === activePath || 
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
@@ -76,7 +102,8 @@
         });
 
         menuHTML += `
-            </ul>
+                </ul>
+            </div>
         </div>
         `;
 
@@ -98,12 +125,15 @@
             z-index: 1000;
             padding: 16px 0;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         
         .sidebar-header {
             padding: 16px 24px;
             border-bottom: 1px solid #e5e7eb;
             margin-bottom: 16px;
+            flex-shrink: 0;
         }
         
         .sidebar-header h3 {
@@ -117,6 +147,11 @@
             list-style: none;
             padding: 0;
             margin: 0;
+        }
+        
+        .sidebar-menu-main {
+            flex: 1;
+            overflow-y: auto;
         }
         
         .sidebar-menu li {
@@ -145,6 +180,22 @@
             color: #1f2937;
             border-left-color: #3b82f6;
             font-weight: 600;
+        }
+
+        .sidebar-admin-section {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-label {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #9ca3af;
+            padding: 0 24px 8px 24px;
         }
         
         /* Adjust body margin if sidebar is injected */

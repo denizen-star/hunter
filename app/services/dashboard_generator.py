@@ -184,7 +184,6 @@ class DashboardGenerator:
             width: calc(100vw - 180px);
             margin: 0;
             padding: var(--space-lg);
-            margin-left: 180px;
             box-sizing: border-box;
         }}
         
@@ -196,21 +195,16 @@ class DashboardGenerator:
             position: sticky;
             top: 0;
             z-index: 100;
-            width: calc(100% - 180px);
-            margin-left: 180px;
+            width: 100%;
             box-sizing: border-box;
         }}
         
         .hero-header-top {{
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-        }}
-        
-        .back-link-spacer {{
-            height: 22px;
-            visibility: hidden;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
         }}
         
         .hero-header h1 {{
@@ -226,14 +220,29 @@ class DashboardGenerator:
             color: #6b7280;
             margin: 0;
         }}
+
+        .hero-header-action-link {{
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }}
+
+        .hero-header-action-link:hover {{
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue-hover);
+        }}
         
         /* Footer */
         .page-footer {{
             background: #ffffff;
             border-top: 1px solid #e5e7eb;
             padding: 20px 32px;
-            width: calc(100% - 180px);
-            margin-left: 180px;
+            width: calc(100vw - 180px);
             box-sizing: border-box;
             position: fixed;
             bottom: 0;
@@ -690,13 +699,12 @@ class DashboardGenerator:
             border-color: var(--accent-blue);
         }}
         
-        /* Dashboard Stats Container - Full Width, Aligned with Hero and Sidebar, No Gap */
+        /* Dashboard Stats Container - match main content width (no extra left offset) */
         .dashboard-stats-container {{
             padding: 0;
             margin: 0;
             margin-top: 0;
             width: calc(100vw - 180px);
-            margin-left: 180px;
             box-sizing: border-box;
         }}
         
@@ -768,32 +776,18 @@ class DashboardGenerator:
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link active">App Dash</a></li>
-            <li><a href="/new-application" class="nav-link">New Application</a></li>
-            <li><a href="/networking" class="nav-link">Network Dash</a></li>
-            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
-            <li><a href="/templates" class="nav-link">Templates</a></li>
-            <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/reports" class="nav-link">Reports</a></li>
-            <li><a href="/analytics" class="nav-link">Analytics</a></li>
-            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
-        </ul>
-    </div>
+    <!-- Shared sidebar is injected by static/js/shared-menu.js -->
     
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
-            <div class="back-link-spacer"></div>
-            <h1>Job Application Dashboard - {total}</h1>
+            <div>
+                <h1>Job Application Dashboard - {total}</h1>
+                <p class="hero-header-subtitle">Overview of your job search pipeline</p>
+            </div>
+            <a href="/new-application" class="hero-header-action-link">New Application</a>
         </div>
-        </div>
+    </div>
         
     {dashboard_html}
     
@@ -1024,6 +1018,8 @@ class DashboardGenerator:
         }}
         
     </script>
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>"""
         return html
@@ -2122,6 +2118,8 @@ class DashboardGenerator:
             <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
         </div>
     </div>
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>"""
         return html

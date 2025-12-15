@@ -485,33 +485,19 @@
             background: #2563eb;
         }
     </style>
+<!-- Shared sidebar is injected by static/js/shared-menu.js -->
 </head>
 <body>
-    <!-- Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
-            <li><a href="/new-application" class="nav-link">New Application</a></li>
-            <li><a href="/networking" class="nav-link active">Network Dash</a></li>
-            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
-            <li><a href="/templates" class="nav-link">Templates</a></li>
-            <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/reports" class="nav-link">Reports</a></li>
-            <li><a href="/analytics" class="nav-link">Analytics</a></li>
-            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
-        </ul>
-    </div>
-
     <!-- Main Content -->
     <div class="container">
         <div class="header">
-            <h1>Networking Contacts</h1>
-            <p>Manage your professional networking pipeline</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <div>
+                    <h1>Networking Contacts</h1>
+                    <p>Manage your professional networking pipeline</p>
+                </div>
+                <a href="/new-networking-contact" class="header-link-action">New Contact</a>
+            </div>
         </div>
         
         <!-- Stats -->
