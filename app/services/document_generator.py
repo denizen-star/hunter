@@ -3928,14 +3928,17 @@ Format this as a professional research document that demonstrates thorough prepa
             <h3>Hunter</h3>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/new-application">New Application</a></li>
-            <li><a href="/reports">Reports</a></li>
-            <li><a href="/analytics">Analytics</a></li>
-            <li><a href="/templates">Templates</a></li>
-            <li><a href="/progress">Progress</a></li>
-            <li><a href="/daily-activities">Daily Activities</a></li>
-            <li><a href="/new-application?resume=true">Manage Resume</a></li>
+            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
+            <li><a href="/new-application" class="nav-link">New Application</a></li>
+            <li><a href="/networking" class="nav-link">Network Dash</a></li>
+            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
+            <li><a href="/templates" class="nav-link">Templates</a></li>
+            <li><a href="/progress" class="nav-link">Progress</a></li>
+            <li><a href="/reports" class="nav-link">Reports</a></li>
+            <li><a href="/analytics" class="nav-link">Analytics</a></li>
+            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
+            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
+            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
         </ul>
     </div>
     
@@ -4025,14 +4028,16 @@ Format this as a professional research document that demonstrates thorough prepa
             <!-- Tabs Section -->
             <div class="tabs-container">
                 <div class="tabs-header">
-            <button type="button" class="tab active" onclick="showTab(this, 'job-desc')">Job Description</button>
+            <button type="button" class="tab active" onclick="showTab(this, 'job-desc')">JD</button>
             {self._generate_tab_button('raw-entry', 'Raw Entry', application.raw_job_description_path)}
             {self._generate_tab_button('skills', 'Skills', application.qualifications_path)}
             {self._generate_tab_button('research', 'Research', application.research_path or application.hiring_manager_intros_path)}
-            {self._generate_tab_button('qualifications', 'Qualifications Analysis', application.qualifications_path)}
+            {self._generate_tab_button('qualifications', 'Qualifications', application.qualifications_path)}
             {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path)}
-            <button type="button" class="tab" onclick="showTab(this, 'resume')">Customized Resume</button>
-            <button type="button" class="tab" onclick="showTab(this, 'updates')">Updates & Notes</button>
+            <button type="button" class="tab" onclick="showTab(this, 'resume')">Custom Resume</button>
+            <button type="button" class="tab" onclick="showTab(this, 'networking')">Networking</button>
+            <button type="button" class="tab" onclick="showTab(this, 'updates')">Updates</button>
+            <button type="button" class="tab" onclick="showTab(this, 'timeline')">Timeline</button>
         </div>
         
         <div id="job-desc" class="tab-content active">
@@ -4161,8 +4166,10 @@ Format this as a professional research document that demonstrates thorough prepa
         
         {self._generate_resume_tab_html(application, resume)}
         
+        {self._generate_networking_tab_html(application)}
+        
         <div id="updates" class="tab-content">
-            <h2>Updates & Notes</h2>
+            <h2>Updates</h2>
             
             <!-- Update Status Form -->
             <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
@@ -4230,10 +4237,6 @@ Format this as a professional research document that demonstrates thorough prepa
                 
                 <div id="status-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
             </div>
-            
-            <div class="timeline">
-                {self._generate_updates_timeline(application)}
-            </div>
                 </div>
             </div>
             
@@ -4247,15 +4250,10 @@ Format this as a professional research document that demonstrates thorough prepa
                     {self._generate_qualifications_summary_html(qualifications)}
                 </div>
                 
-                <!-- Application Timeline -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Application Timeline</h2>
-                    </div>
-                    {self._generate_timeline_html_for_summary(application)}
-                </div>
             </div>
         </div>
+        
+        {self._generate_timeline_tab_html(application)}
     </div>
     
     <script>
@@ -5137,6 +5135,15 @@ Format this as a professional research document that demonstrates thorough prepa
                 updatePercentageBar();
             }}
         }});
+        async function showAIStatus() {{
+            try {{
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                alert(`AI Status: ${{data.connected ? 'Connected' : 'Not Connected'}}\\nModel: ${{data.current_model || 'N/A'}}`);
+            }} catch (error) {{
+                console.error('AI Status Error:', error);
+            }}
+        }}
     </script>
 </body>
 </html>"""
@@ -5308,7 +5315,9 @@ Format this as a professional research document that demonstrates thorough prepa
             'display_date': format_for_display(application.created_at),
             'status': 'Application Created',
             'notes': None,
-            'update_file': None
+            'update_file': None,
+            'update_type': 'application',
+            'contact_name': None
         })
         
         # Add status updates with datetime objects
@@ -5327,7 +5336,9 @@ Format this as a professional research document that demonstrates thorough prepa
                     'display_date': update['display_timestamp'],
                     'status': update['status'],
                     'notes': None,  # Will extract if needed
-                    'update_file': update['file']
+                    'update_file': update['file'],
+                    'update_type': update.get('type', 'application'),
+                    'contact_name': update.get('contact_name')
                 })
             except Exception as e:
                 print(f"Warning: Could not parse timestamp for update {update.get('file', 'unknown')}: {e}")
@@ -5356,8 +5367,16 @@ Format this as a professional research document that demonstrates thorough prepa
             else:
                 tag_class = "tag-blue"
             
+            # Determine icon based on update type
+            update_type = item.get('update_type', 'application')
+            icon = '🤝' if update_type == 'networking' else '💼'
+            contact_name = item.get('contact_name')
+            status_display = item['status']
+            if contact_name and update_type == 'networking':
+                status_display = f"{contact_name} - {status_display}"
+            
             # Build status pill
-            status_pill = f'<span class="tag {tag_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{item["status"]}</span>'
+            status_pill = f'<span class="tag {tag_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{icon} {status_display}</span>'
             
             timeline_html += f'''
                         <div class="timeline-item">
@@ -5386,7 +5405,9 @@ Format this as a professional research document that demonstrates thorough prepa
             'datetime': application.created_at,
             'display_date': format_for_display(application.created_at),
             'status': 'Application Created',
-            'update_file': None
+            'update_file': None,
+            'update_type': 'application',
+            'contact_name': None
         })
         
         # Add status updates with datetime objects
@@ -5404,7 +5425,9 @@ Format this as a professional research document that demonstrates thorough prepa
                     'datetime': dt,
                     'display_date': update['display_timestamp'],
                     'status': update['status'],
-                    'update_file': update['file']
+                    'update_file': update['file'],
+                    'update_type': update.get('type', 'application'),
+                    'contact_name': update.get('contact_name')
                 })
             except Exception as e:
                 print(f"Warning: Could not parse timestamp for update {update.get('file', 'unknown')}: {e}")
@@ -5423,10 +5446,56 @@ Format this as a professional research document that demonstrates thorough prepa
                 try:
                     if Path(item['update_file']).exists():
                         html_content = read_text_file(Path(item['update_file']))
-                        notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
-                        if notes_match:
-                            notes_text = notes_match.group(1).strip()
-                            # Don't clean up HTML content - preserve images and formatting
+                        # Extract notes - handle both networking and regular updates
+                        # Try new structure first (notes-text), then fallback to old structure (notes)
+                        start_pattern = r'<div class="notes-text">'
+                        start_match = re.search(start_pattern, html_content)
+                        if not start_match:
+                            # Fallback: try old networking structure with class="notes"
+                            start_pattern = r'<div class="notes">'
+                            start_match = re.search(start_pattern, html_content)
+                        if start_match:
+                            start_pos = start_match.end()
+                            # Find the matching closing </div> by counting div depth
+                            pos = start_pos
+                            depth = 1
+                            end_pos = None
+                            
+                            while pos < len(html_content):
+                                # Find next <div or </div>
+                                next_div_open = html_content.find('<div', pos)
+                                next_div_close = html_content.find('</div>', pos)
+                                
+                                if next_div_close == -1:
+                                    break
+                                
+                                # Check which comes first
+                                if next_div_open != -1 and next_div_open < next_div_close:
+                                    # Found opening div
+                                    depth += 1
+                                    pos = next_div_open + 4
+                                else:
+                                    # Found closing div
+                                    depth -= 1
+                                    if depth == 0:
+                                        end_pos = next_div_close
+                                        break
+                                    pos = next_div_close + 6
+                            
+                            if end_pos:
+                                notes_text = html_content[start_pos:end_pos].strip()
+                            else:
+                                # Fallback to simple regex
+                                notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
+                                if notes_match:
+                                    notes_text = notes_match.group(1).strip()
+                        else:
+                            # Fallback: try simple pattern
+                            notes_match = re.search(r'<div class="notes-text">(.*?)</div>', html_content, re.DOTALL)
+                            if notes_match:
+                                notes_text = notes_match.group(1).strip()
+                        
+                        # Don't clean up HTML content - preserve images and formatting
                 except Exception as e:
                     print(f"Warning: Could not extract content from {item['update_file']}: {e}")
             
@@ -5443,8 +5512,16 @@ Format this as a professional research document that demonstrates thorough prepa
             else:
                 tag_class = "tag-blue"
             
+            # Determine icon based on update type
+            update_type = item.get('update_type', 'application')
+            icon = '🤝' if update_type == 'networking' else '💼'
+            contact_name = item.get('contact_name')
+            status_display = item['status']
+            if contact_name and update_type == 'networking':
+                status_display = f"{contact_name} - {status_display}"
+            
             # Build status pill HTML (rendered once)
-            status_pill = f'<span class="tag {tag_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{item["status"]}</span>'
+            status_pill = f'<span class="tag {tag_class}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{icon} {status_display}</span>'
             
             # Build notes section
             notes_html = ""
@@ -5617,5 +5694,365 @@ Format this as a professional research document that demonstrates thorough prepa
         </div>'''
         except Exception:
             return ''
+    
+    def _generate_networking_tab_html(self, application: Application) -> str:
+        """Generate the Networking tab HTML showing contacts matching the company"""
+        from urllib.parse import quote
+        company_encoded = quote(application.company)
+        return f'''<div id="networking" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Networking Contacts</h2>
+                <button id="create-contact-btn" onclick="showCreateContactForm()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">Create New Contact</button>
+            </div>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Contacts at {application.company}:</p>
+            <div id="networking-contacts-grid" class="contacts-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                <div style="text-align: center; padding: 40px; color: #6b7280;">Loading contacts...</div>
+            </div>
+            <div id="networking-summary-container" style="display: none; position: fixed; top: 0; left: 180px; right: 0; bottom: 0; background: white; z-index: 1000; flex-direction: column; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid #e5e7eb; flex-shrink: 0; background: white;">
+                    <h3 id="networking-summary-title" style="margin: 0;">Contact Summary</h3>
+                    <button onclick="closeNetworkingSummary()" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Close Summary</button>
+                </div>
+                <div id="networking-summary-content" style="flex: 1; overflow: hidden; min-height: 0; position: relative;">
+                    <div style="text-align: center; padding: 40px; color: #6b7280;">Loading summary...</div>
+                </div>
+            </div>
+            <style>
+                .contact-tile {{
+                    background: white;
+                    border-radius: 14px;
+                    padding: 24px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 2px solid transparent;
+                    position: relative;
+                }}
+                .contact-tile:hover {{
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+                    transform: translateY(-4px);
+                    border-color: rgba(59, 130, 246, 0.2);
+                }}
+                .contact-tile.timing-white {{ border-left: 4px solid #e5e7eb; }}
+                .contact-tile.timing-green {{ border-left: 4px solid #10b981; }}
+                .contact-tile.timing-yellow {{ border-left: 4px solid #f59e0b; }}
+                .contact-tile.timing-red {{ border-left: 4px solid #ef4444; }}
+                .contact-tile.timing-blue {{ border-left: 4px solid #3b82f6; }}
+                .contact-tile.timing-gray {{ border-left: 4px solid #6b7280; }}
+                .contact-header {{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 12px;
+                }}
+                .contact-name {{
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #1f2937;
+                    margin: 0;
+                }}
+                .match-score {{
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #10b981;
+                }}
+                .contact-company {{
+                    font-size: 15px;
+                    color: #6b7280;
+                    margin: 4px 0;
+                    font-weight: 500;
+                }}
+                .contact-title {{
+                    font-size: 14px;
+                    color: #9ca3af;
+                    margin: 4px 0;
+                }}
+                .status-badge {{
+                    display: inline-block;
+                    padding: 4px 12px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border-radius: 6px;
+                    margin-top: 8px;
+                    background: #f9fafb;
+                    color: #6b7280;
+                }}
+                .next-step-section {{
+                    margin-top: 16px;
+                    padding: 12px;
+                    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                    border-radius: 10px;
+                    border-left: 4px solid #3b82f6;
+                }}
+                .next-step-label {{
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    color: #1e40af;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 6px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }}
+                .next-step-label::before {{
+                    content: '→';
+                    font-size: 14px;
+                    font-weight: 700;
+                }}
+                .next-step-text {{
+                    font-size: 12px;
+                    color: #1e3a8a;
+                    line-height: 1.5;
+                    font-weight: 500;
+                }}
+                .contact-dates {{
+                    margin-top: 14px;
+                    font-size: 13px;
+                    color: #9ca3af;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }}
+                .date-row {{
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }}
+                .view-btn {{
+                    width: 100%;
+                    margin-top: 16px;
+                    padding: 10px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    border: 1px solid #e5e7eb;
+                    background: white;
+                    color: #1f2937;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                }}
+                .view-btn:hover {{
+                    background: #f9fafb;
+                    border-color: #3b82f6;
+                    color: #3b82f6;
+                }}
+            </style>
+            <script>
+                async function loadNetworkingContacts() {{
+                    try {{
+                        const response = await fetch(`/api/applications/{application.id}/networking-contacts`);
+                        const data = await response.json();
+                        
+                        const grid = document.getElementById('networking-contacts-grid');
+                        if (!data.success || !data.contacts || data.contacts.length === 0) {{
+                            grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280; grid-column: 1 / -1;">No networking contacts found for {application.company}.</div>';
+                            return;
+                        }}
+                        
+                        grid.innerHTML = data.contacts.map(contact => {{
+                            const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
+                            const flagIcon = contact.flagged ? '⚐' : '⚑';
+                            const flagClass = contact.flagged ? 'flagged' : '';
+                            const nextStep = contact.next_step || 'Review contact status and determine next action';
+                            const timingColor = contact.timing_color || 'white';
+                            
+                            return `
+                                <div class="contact-tile timing-${{timingColor}}">
+                                    <div class="contact-header">
+                                        <h3 class="contact-name">${{escapeHtml(contact.person_name)}}</h3>
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <span class="match-score">${{matchScore}}%</span>
+                                            <span class="flag ${{flagClass}}" onclick="toggleContactFlag('${{contact.id}}', ${{!contact.flagged}})" style="cursor: pointer; font-size: 18px; opacity: ${{contact.flagged ? '1' : '0.3'}}; transition: opacity 0.15s ease;">${{flagIcon}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="contact-company">${{escapeHtml(contact.company_name)}}</div>
+                                    ${{contact.job_title ? `<div class="contact-title">${{escapeHtml(contact.job_title)}}</div>` : ''}}
+                                    <div class="status-badge">${{escapeHtml(contact.status)}}</div>
+                                    <div class="next-step-section">
+                                        <div class="next-step-label">Next Step</div>
+                                        <div class="next-step-text">${{escapeHtml(nextStep)}}</div>
+                                    </div>
+                                    <div class="contact-dates">
+                                        <div class="date-row">
+                                            <span>📅</span>
+                                            <span>Connected: ${{formatDate(contact.created_at)}}</span>
+                                        </div>
+                                        <div class="date-row">
+                                            <span>🔄</span>
+                                            <span>Updated: ${{formatDate(contact.status_updated_at || contact.created_at)}}</span>
+                                        </div>
+                                        ${{contact.days_since_update !== undefined ? `<div class="date-row"><span>⏰</span><span>${{contact.days_since_update}} days ago</span></div>` : ''}}
+                                    </div>
+                                    <button class="view-btn" onclick="viewContactSummary('${{contact.id}}', '${{escapeHtml(contact.person_name)}}')">View Summary</button>
+                                </div>
+                            `;
+                        }}).join('');
+                    }} catch (error) {{
+                        console.error('Error loading networking contacts:', error);
+                        document.getElementById('networking-contacts-grid').innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444; grid-column: 1 / -1;">Error loading contacts. Please refresh the page.</div>';
+                    }}
+                }}
+                
+                function escapeHtml(text) {{
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }}
+                
+                function formatDate(isoString) {{
+                    if (!isoString) return 'N/A';
+                    const date = new Date(isoString);
+                    return date.toLocaleDateString('en-US', {{ 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric'
+                    }});
+                }}
+                
+                let currentViewState = 'contacts'; // 'contacts', 'summary', or 'create'
+                
+                async function viewContactSummary(contactId, contactName) {{
+                    try {{
+                        const response = await fetch(`/api/networking/contacts/${{contactId}}`);
+                        const data = await response.json();
+                        
+                        if (data.success && data.contact) {{
+                            const contact = data.contact;
+                            const folderName = `${{contact.person_name.replace(/\\s+/g, '-')}}-${{contact.company_name.replace(/\\s+/g, '-')}}`;
+                            const summaryFilename = `${{contact.person_name.replace(/\\s+/g, '-')}}-summary.html`;
+                            const summaryUrl = `/networking/${{folderName}}/${{summaryFilename}}`;
+                            
+                            // Hide contacts grid and show summary container
+                            document.getElementById('networking-contacts-grid').style.display = 'none';
+                            document.getElementById('networking-summary-container').style.display = 'flex';
+                            document.getElementById('networking-summary-title').textContent = `${{contactName}} - Summary`;
+                            
+                            // Update button state
+                            const createBtn = document.getElementById('create-contact-btn');
+                            createBtn.textContent = 'Create New Contact';
+                            createBtn.onclick = showCreateContactForm;
+                            
+                            // Load summary content via iframe
+                            const summaryContent = document.getElementById('networking-summary-content');
+                            // Clear any existing content immediately (including "Loading summary...")
+                            summaryContent.innerHTML = '';
+                            // Then set iframe - this ensures no flash of old content
+                            const iframe = document.createElement('iframe');
+                            iframe.src = `${{summaryUrl}}`;
+                            iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;';
+                            summaryContent.appendChild(iframe);
+                            
+                            currentViewState = 'summary';
+                        }} else {{
+                            alert('Could not load contact summary');
+                        }}
+                    }} catch (error) {{
+                        console.error('Error loading contact summary:', error);
+                        alert('Error loading contact summary');
+                    }}
+                }}
+                
+                function showCreateContactForm() {{
+                    // Hide contacts grid and show summary container
+                    document.getElementById('networking-contacts-grid').style.display = 'none';
+                    document.getElementById('networking-summary-container').style.display = 'flex';
+                    document.getElementById('networking-summary-title').textContent = 'Create New Contact';
+                    
+                    // Update button state
+                    const createBtn = document.getElementById('create-contact-btn');
+                    createBtn.textContent = 'Back to Contacts';
+                    createBtn.onclick = showContactsGrid;
+                    
+                    // Load create form via iframe with company pre-filled
+                    const summaryContent = document.getElementById('networking-summary-content');
+                    // Clear any existing content immediately (including "Loading summary...")
+                    summaryContent.innerHTML = '';
+                    // Then create and append iframe - this ensures no flash of old content
+                    const iframe = document.createElement('iframe');
+                    iframe.src = '/new-networking-contact?company={company_encoded}';
+                    iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;';
+                    summaryContent.appendChild(iframe);
+                    
+                    currentViewState = 'create';
+                }}
+                
+                function showContactsGrid() {{
+                    // Show contacts grid and hide summary container
+                    document.getElementById('networking-contacts-grid').style.display = 'grid';
+                    document.getElementById('networking-summary-container').style.display = 'none';
+                    
+                    // Update button state
+                    const createBtn = document.getElementById('create-contact-btn');
+                    createBtn.textContent = 'Create New Contact';
+                    createBtn.onclick = showCreateContactForm;
+                    
+                    currentViewState = 'contacts';
+                }}
+                
+                function closeNetworkingSummary() {{
+                    showContactsGrid();
+                }}
+                
+                // Listen for messages from iframe (e.g., when contact is created)
+                window.addEventListener('message', function(event) {{
+                    if (event.data && event.data.type === 'networking-contact-created') {{
+                        // Contact was created in the iframe
+                        // Reload contacts to show the new one
+                        loadNetworkingContacts();
+                        
+                        // Optionally show the new contact's summary
+                        if (event.data.summary_url) {{
+                            setTimeout(() => {{
+                                // Find the contact in the list and show its summary
+                                // For now, just reload contacts and show success message
+                                alert(`Contact ${{event.data.person_name}} at ${{event.data.company_name}} created successfully!`);
+                            }}, 500);
+                        }}
+                    }}
+                }});
+                
+                async function toggleContactFlag(contactId, flagged) {{
+                    try {{
+                        const response = await fetch(`/api/networking/contacts/${{contactId}}/flag`, {{
+                            method: 'PUT',
+                            headers: {{ 'Content-Type': 'application/json' }},
+                            body: JSON.stringify({{ flagged: flagged }})
+                        }});
+                        
+                        if (response.ok) {{
+                            loadNetworkingContacts();
+                        }}
+                    }} catch (error) {{
+                        console.error('Error toggling flag:', error);
+                    }}
+                }}
+                
+                // Load contacts when tab is shown
+                document.addEventListener('DOMContentLoaded', function() {{
+                    // Load immediately
+                    loadNetworkingContacts();
+                    
+                    // Also load when networking tab is clicked
+                    const networkingTab = document.querySelector('[onclick*="networking"]');
+                    if (networkingTab) {{
+                        networkingTab.addEventListener('click', function() {{
+                            setTimeout(loadNetworkingContacts, 100);
+                        }});
+                    }}
+                }});
+            </script>
+        </div>'''
+    
+    def _generate_timeline_tab_html(self, application: Application) -> str:
+        """Generate the Timeline tab HTML showing all timeline entries with full formatting"""
+        timeline_html = self._generate_updates_timeline(application)
+        return f'''<div id="timeline" class="tab-content">
+            <h2>Application Timeline</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Complete history of this application:</p>
+            <div class="timeline">
+                {timeline_html}
+            </div>
+        </div>'''
 
 

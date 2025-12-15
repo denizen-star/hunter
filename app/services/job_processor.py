@@ -520,39 +520,251 @@ class JobProcessor:
         # Regenerate summary to include the new update
         self._regenerate_summary(application)
     
+    def create_networking_timeline_entry(
+        self,
+        application: Application,
+        contact_name: str,
+        status: str,
+        notes: Optional[str] = None
+    ) -> None:
+        """Create a timeline entry in an application for a networking contact status update"""
+        if not application.folder_path:
+            return
+        
+        updates_dir = application.folder_path / "updates"
+        ensure_dir_exists(updates_dir)
+        
+        timestamp = format_datetime_for_filename()
+        # Format: YYYYMMDDHHMMSS-networking-ContactName-Status.html
+        # Replace spaces in contact name and status with dashes for filename
+        contact_name_clean = contact_name.replace(' ', '-')
+        status_clean = status.replace(' ', '-')
+        update_filename = f"{timestamp}-networking-{contact_name_clean}-{status_clean}.html"
+        update_path = updates_dir / update_filename
+        
+        # Format timestamp for display
+        display_timestamp = get_est_now().strftime('%B %d, %Y %I:%M %p EST')
+        
+        # Create HTML content matching the structure of regular application updates
+        # This ensures the notes extraction in _generate_updates_timeline works correctly
+        html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking Update: {contact_name} - {status} - {application.company}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }}
+        .status-badge {{
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }}
+        .timestamp {{
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 10px;
+        }}
+        .notes-section {{
+            margin-top: 20px;
+        }}
+        .notes-content {{
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #10b981;
+            margin-top: 15px;
+        }}
+        .contact-info {{
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 15px 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤝 Networking Update: {status}</h1>
+            <span class="status-badge">{status}</span>
+            <div class="timestamp">{display_timestamp}</div>
+        </div>
+        
+        <div class="contact-info">
+            Contact: {contact_name}
+        </div>
+        
+        <div class="application-info">
+            <h3>📋 Application Information</h3>
+            <div class="info-content">
+                <div class="info-item">
+                    <strong>Company:</strong> {application.company}
+                </div>
+                <div class="info-item">
+                    <strong>Position:</strong> {application.job_title}
+                </div>
+            </div>
+        </div>
+        
+        <div class="notes-section">
+            <h3>📝 Update Details</h3>
+            <div class="notes-content">
+                <div class="notes-text">{notes if notes else 'No additional notes'}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>"""
+        write_text_file(html_content, update_path)
+    
     def get_application_updates(self, application: Application) -> List[dict]:
-        """Get all status updates for an application"""
+        """Get all status updates for an application, including networking contact updates"""
         updates = []
         updates_dir = application.folder_path / "updates"
         
-        if not updates_dir.exists():
-            return updates
+        # Get updates from application's updates folder
+        if updates_dir.exists():
+            for update_file in sorted(updates_dir.iterdir()):
+                if update_file.is_file() and update_file.suffix == '.html':
+                    # Extract timestamp and status from filename
+                    # Format: YYYYMMDDHHMMSS-Status.html or YYYYMMDDHHMMSS-networking-ContactName-Status.html
+                    filename_parts = update_file.stem.split('-', 1)
+                    if len(filename_parts) == 2:
+                        timestamp_str = filename_parts[0]
+                        rest = filename_parts[1]
+                        
+                        # Check if this is a networking update
+                        if rest.startswith('networking-'):
+                            # Format: networking-ContactName-Status
+                            networking_parts = rest.split('-', 2)
+                            if len(networking_parts) >= 3:
+                                contact_name = networking_parts[1]
+                                status = '-'.join(networking_parts[2:])  # Status may contain dashes
+                                update_type = 'networking'
+                            else:
+                                status = rest
+                                contact_name = None
+                                update_type = 'networking'
+                        else:
+                            # Regular application update
+                            status = rest
+                            contact_name = None
+                            update_type = 'application'
+                        
+                        # Format timestamp for display
+                        try:
+                            # Convert filename timestamp to datetime
+                            from datetime import datetime
+                            dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                            display_timestamp = dt.strftime('%B %d, %Y %I:%M %p EST')
+                        except:
+                            display_timestamp = timestamp_str
+                        
+                        update_entry = {
+                            'timestamp': timestamp_str,
+                            'display_timestamp': display_timestamp,
+                            'status': status,
+                            'file': str(update_file),
+                            'relative_url': f"/applications/{application.folder_path.name}/updates/{update_file.name}",
+                            'type': update_type
+                        }
+                        
+                        if contact_name:
+                            update_entry['contact_name'] = contact_name
+                        
+                        updates.append(update_entry)
         
-        for update_file in sorted(updates_dir.iterdir()):
-            if update_file.is_file() and update_file.suffix == '.html':
-                # Extract timestamp and status from filename
-                # Format: YYYYMMDDHHMMSS-Status.html
-                filename_parts = update_file.stem.split('-', 1)
-                if len(filename_parts) == 2:
-                    timestamp_str = filename_parts[0]
-                    status = filename_parts[1]
+        # Also get updates from matching networking contacts
+        try:
+            from app.services.networking_processor import NetworkingProcessor
+            from app.utils.file_utils import get_data_path
+            import re
+            
+            networking_processor = NetworkingProcessor()
+            networking_dir = get_data_path('networking')
+            
+            if networking_dir.exists():
+                # Find all networking contacts that match this application's company
+                for contact_folder in networking_dir.iterdir():
+                    if not contact_folder.is_dir():
+                        continue
                     
-                    # Format timestamp for display
+                    # Try to load contact metadata
                     try:
-                        # Convert filename timestamp to datetime
-                        from datetime import datetime
-                        dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
-                        display_timestamp = dt.strftime('%B %d, %Y %I:%M %p EST')
-                    except:
-                        display_timestamp = timestamp_str
-                    
-                    updates.append({
-                        'timestamp': timestamp_str,
-                        'display_timestamp': display_timestamp,
-                        'status': status,
-                        'file': str(update_file),
-                        'relative_url': f"/applications/{application.folder_path.name}/updates/{update_file.name}"
-                    })
+                        metadata_path = contact_folder / 'metadata.yaml'
+                        if metadata_path.exists():
+                            from app.utils.file_utils import load_yaml
+                            contact_meta = load_yaml(metadata_path)
+                            contact_company = contact_meta.get('company_name', '')
+                            
+                            # Check if company matches (case-insensitive)
+                            if contact_company.lower().strip() == application.company.lower().strip():
+                                contact_name = contact_meta.get('person_name', '')
+                                
+                                # Get updates from this contact's updates folder
+                                contact_updates_dir = contact_folder / 'updates'
+                                if contact_updates_dir.exists():
+                                    for update_file in sorted(contact_updates_dir.iterdir()):
+                                        if update_file.is_file() and update_file.suffix == '.html':
+                                            # Parse networking contact update file
+                                            # Format: YYYYMMDDHHMMSS-Status.html
+                                            filename_parts = update_file.stem.split('-', 1)
+                                            if len(filename_parts) == 2:
+                                                timestamp_str = filename_parts[0]
+                                                status = filename_parts[1].replace('-', ' ')
+                                                
+                                                # Format timestamp for display
+                                                try:
+                                                    from datetime import datetime
+                                                    dt = datetime.strptime(timestamp_str, '%Y%m%d%H%M%S')
+                                                    display_timestamp = dt.strftime('%B %d, %Y %I:%M %p EST')
+                                                except:
+                                                    display_timestamp = timestamp_str
+                                                
+                                                # Create update entry for networking contact update
+                                                update_entry = {
+                                                    'timestamp': timestamp_str,
+                                                    'display_timestamp': display_timestamp,
+                                                    'status': status,
+                                                    'file': str(update_file),
+                                                    'relative_url': f"/networking/{contact_folder.name}/updates/{update_file.name}",
+                                                    'type': 'networking',
+                                                    'contact_name': contact_name
+                                                }
+                                                
+                                                updates.append(update_entry)
+                    except Exception as e:
+                        # Skip contacts that can't be loaded
+                        continue
+        except Exception as e:
+            # Don't fail if networking updates can't be loaded
+            print(f"Warning: Could not load networking updates: {e}")
         
         return updates
     
