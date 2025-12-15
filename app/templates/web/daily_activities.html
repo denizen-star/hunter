@@ -74,9 +74,41 @@
         
         .hero-header-top {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: space-between;
             align-items: flex-start;
             gap: 8px;
+        }
+        
+        .hero-header-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .print-button {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-family);
+        }
+        
+        .print-button:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .print-button:active {
+            transform: translateY(1px);
         }
         
         .back-link {
@@ -512,20 +544,70 @@
             background: #d1fae5;
             color: #065f46;
         }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar,
+            .page-footer,
+            .hero-header-search-row,
+            .print-button {
+                display: none !important;
+            }
+            
+            body {
+                margin-left: 0 !important;
+            }
+            
+            .hero-header {
+                position: relative !important;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .main-wrapper {
+                padding: 0;
+            }
+            
+            .activities-container {
+                box-shadow: none;
+                border: none;
+            }
+            
+            .day-header {
+                cursor: default;
+            }
+            
+            .day-content {
+                max-height: none !important;
+            }
+            
+            .day-content.collapsed {
+                max-height: none !important;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
-            <a href="/dashboard" class="back-link">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <div class="hero-header-content">
+                <a href="/dashboard" class="back-link">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Dashboard
+                </a>
+                <h1>Daily Activities</h1>
+                <p class="hero-header-subtitle">This is what you actually did.</p>
+            </div>
+            <button class="print-button" onclick="window.print()" title="Print this page">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                 </svg>
-                Back to Dashboard
-            </a>
-            <h1>Daily Activities</h1>
-            <p class="hero-header-subtitle">This is what you actually did.</p>
+                Print
+            </button>
         </div>
         <div class="hero-header-search-row">
             <div class="search-filter-container" style="position: relative; min-width: 250px;">
