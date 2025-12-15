@@ -856,24 +856,19 @@
                 if (data.success && data.contact) {
                     const contact = data.contact;
                     
-                    // Check if contact has a summary page (full AI processing)
+                    // Always use summary_path if it exists (works for both simple and full contacts)
                     if (contact.summary_path) {
                         // Extract folder name and summary filename from summary_path
+                        // summary_path format: data/networking/FolderName/filename-summary.html
+                        const pathParts = contact.summary_path.split('/');
+                        const folderName = pathParts[pathParts.length - 2]; // Second to last part
+                        const summaryFilename = pathParts[pathParts.length - 1]; // Last part
+                        window.location.href = `/networking/${folderName}/${summaryFilename}`;
+                    } else {
+                        // Fallback: construct path manually (for very old contacts)
                         const folderName = `${contact.person_name.replace(/\s+/g, '-')}-${contact.company_name.replace(/\s+/g, '-')}`;
                         const summaryFilename = `${contact.person_name.replace(/\s+/g, '-')}-summary.html`;
                         window.location.href = `/networking/${folderName}/${summaryFilename}`;
-                    } else {
-                        // Simple contact - show message and offer to view messages file instead
-                        const folderName = `${contact.person_name.replace(/\s+/g, '-')}-${contact.company_name.replace(/\s+/g, '-')}`;
-                        if (contact.messages_path) {
-                            const messagesFilename = contact.messages_path.split('/').pop();
-                            const confirmed = confirm(`This is a simple contact without a full summary page.\n\nWould you like to view the intro message instead?`);
-                            if (confirmed) {
-                                window.location.href = `/networking/${folderName}/${messagesFilename}`;
-                            }
-                        } else {
-                            alert('This is a simple contact. No summary page or messages are available yet.');
-                        }
                     }
                 } else {
                     alert('Could not load contact summary');

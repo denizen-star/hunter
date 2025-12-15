@@ -208,6 +208,174 @@
                 border-color: #3b82f6;
             }
         }
+        
+        /* Transition Screen Styles */
+        .transition-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .transition-screen.hidden {
+            display: none;
+        }
+        
+        .transition-screen:not(.hidden) {
+            opacity: 1;
+        }
+        
+        .transition-content {
+            background: white;
+            border-radius: 16px;
+            padding: 48px 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            animation: slideUp 0.4s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .transition-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 32px 0;
+        }
+        
+        .contact-details {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .match-score-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .processing-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .processing-badge.full {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .processing-badge.simple {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .transition-loading {
+            margin: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loading-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        #goToDashboardBtn {
+            margin-top: 16px;
+        }
     </style>
 </head>
 <body>
@@ -347,10 +515,92 @@ You can use Markdown formatting:
         </div>
     </div>
 
+    <!-- Transition Screen -->
+    <div id="transitionScreen" class="transition-screen hidden">
+        <div class="transition-content">
+            <div class="success-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h2 class="transition-title">Contact Created Successfully!</h2>
+            <div class="contact-details">
+                <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value" id="transitionPersonName">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Company:</span>
+                    <span class="detail-value" id="transitionCompanyName">-</span>
+                </div>
+                <div class="detail-item" id="transitionMatchScoreContainer">
+                    <span class="detail-label">Match Score:</span>
+                    <span class="detail-value match-score-value" id="transitionMatchScore">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Processing Type:</span>
+                    <span class="detail-value processing-badge" id="transitionProcessingType">-</span>
+                </div>
+            </div>
+            <div class="transition-loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Redirecting to dashboard...</p>
+            </div>
+            <button class="btn btn-primary" id="goToDashboardBtn" onclick="window.location.href='/networking'">
+                Go to Dashboard
+            </button>
+        </div>
+    </div>
+
     <script>
         const form = document.getElementById('networkingForm');
         const submitBtn = document.getElementById('submitBtn');
         const statusMessage = document.getElementById('statusMessage');
+        const transitionScreen = document.getElementById('transitionScreen');
+        const transitionPersonName = document.getElementById('transitionPersonName');
+        const transitionCompanyName = document.getElementById('transitionCompanyName');
+        const transitionMatchScore = document.getElementById('transitionMatchScore');
+        const transitionMatchScoreContainer = document.getElementById('transitionMatchScoreContainer');
+        const transitionProcessingType = document.getElementById('transitionProcessingType');
+
+        function showTransitionScreen(data) {
+            // Hide form
+            document.querySelector('.container').style.display = 'none';
+            
+            // Populate transition screen with contact details
+            transitionPersonName.textContent = data.person_name || '-';
+            transitionCompanyName.textContent = data.company_name || '-';
+            
+            // Show match score if available (only for full AI processing)
+            if (data.match_score !== null && data.match_score !== undefined) {
+                const matchScore = Math.round(data.match_score);
+                transitionMatchScore.textContent = `${matchScore}%`;
+                transitionMatchScoreContainer.style.display = 'flex';
+            } else {
+                transitionMatchScoreContainer.style.display = 'none';
+            }
+            
+            // Set processing type badge
+            const processingType = data.requires_ai_processing ? 'full' : 'simple';
+            transitionProcessingType.textContent = processingType === 'full' ? 'Full AI Processing' : 'Simple Contact';
+            transitionProcessingType.className = 'detail-value processing-badge ' + processingType;
+            
+            // Show transition screen
+            transitionScreen.classList.remove('hidden');
+        }
+
+        function redirectToDashboard() {
+            // If we're in an iframe, notify parent window
+            if (window.self !== window.top) {
+                window.parent.postMessage({
+                    type: 'networking-contact-created',
+                    redirect: '/networking'
+                }, '*');
+            } else {
+                // Not in iframe, redirect to dashboard
+                window.location.href = '/networking';
+            }
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -390,39 +640,13 @@ You can use Markdown formatting:
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Show success message with match score
-                    const matchScore = data.match_score ? Math.round(data.match_score) : 0;
-                    statusMessage.textContent = `Contact created! ${data.person_name} at ${data.company_name} - Match Score: ${matchScore}%`;
-                    statusMessage.classList.add('show', 'success');
+                    // Show transition screen
+                    showTransitionScreen(data);
                     
-                    // Reset form
-                    form.reset();
-                    
-                    // If we're in an iframe, notify parent window instead of redirecting
-                    if (window.self !== window.top) {
-                        // Notify parent window that contact was created
-                        window.parent.postMessage({
-                            type: 'networking-contact-created',
-                            contact_id: data.contact_id,
-                            summary_url: data.summary_url,
-                            person_name: data.person_name,
-                            company_name: data.company_name
-                        }, '*');
-                        
-                        // Optionally reload parent's networking contacts
-                        setTimeout(() => {
-                            // Parent window should handle reloading contacts
-                        }, 2000);
-                    } else {
-                        // Not in iframe, redirect normally
-                        setTimeout(() => {
-                            if (data.summary_url) {
-                                window.location.href = data.summary_url;
-                            } else {
-                                window.location.href = '/networking';
-                            }
-                        }, 2000);
-                    }
+                    // Redirect to dashboard after 2.5 seconds
+                    setTimeout(() => {
+                        redirectToDashboard();
+                    }, 2500);
                 } else {
                     // Show error message
                     statusMessage.textContent = `Error: ${data.error}`;

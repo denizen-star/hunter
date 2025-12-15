@@ -4043,6 +4043,14 @@ Format this as a professional research document that demonstrates thorough prepa
         <div id="job-desc" class="tab-content active">
             <h2>Job Description</h2>
             {job_desc_html}
+            
+            <!-- Qualifications Summary -->
+            <div class="content-section" style="margin-top: 40px;">
+                <div class="section-header">
+                    <h2 class="section-title">Qualifications Summary</h2>
+                </div>
+                {self._generate_qualifications_summary_html(qualifications)}
+            </div>
         </div>
         
         {self._generate_tab_content('raw-entry', 'Raw Entry', f'''
@@ -4238,18 +4246,6 @@ Format this as a professional research document that demonstrates thorough prepa
                 <div id="status-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
             </div>
                 </div>
-            </div>
-            
-            <!-- Two Column Layout - After Tabs -->
-            <div class="two-column">
-                <!-- Qualifications Summary -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Qualifications Summary</h2>
-                    </div>
-                    {self._generate_qualifications_summary_html(qualifications)}
-                </div>
-                
             </div>
         </div>
         

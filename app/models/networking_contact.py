@@ -100,6 +100,11 @@ class NetworkingContact:
     
     def to_dict(self) -> dict:
         """Convert NetworkingContact instance to dictionary"""
+        # Ensure checklist_items is a simple dict or None (not a complex nested structure)
+        checklist_items = self.checklist_items
+        if checklist_items is not None and not isinstance(checklist_items, dict):
+            checklist_items = None
+        
         return {
             'id': self.id,
             'person_name': self.person_name,
@@ -125,7 +130,7 @@ class NetworkingContact:
             'contact_count': self.contact_count,
             'flagged': self.flagged,
             'requires_ai_processing': self.requires_ai_processing,
-            'checklist_items': self.checklist_items
+            'checklist_items': checklist_items
         }
     
     def get_folder_name(self) -> str:

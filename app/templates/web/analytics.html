@@ -54,14 +54,14 @@
             color: var(--text-primary);
         }
         
-        .container {
-            width: calc(100vw - 180px);
+        .main-wrapper {
+            width: 100%;
             margin: 0;
             padding: var(--space-lg);
-            margin-left: 180px;
             box-sizing: border-box;
             position: relative;
             z-index: 1;
+            padding-bottom: 10px; /* Space for fixed footer */
         }
         
         /* Hero Header - Full Width */
@@ -72,8 +72,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            width: calc(100% - 180px);
-            margin-left: 180px;
+            width: 100%;
             box-sizing: border-box;
             display: flex;
             justify-content: space-between;
@@ -128,8 +127,7 @@
             background: #ffffff;
             border-top: 1px solid #e5e7eb;
             padding: 20px 32px;
-            width: calc(100% - 180px);
-            margin-left: 180px;
+            width: 100%;
             box-sizing: border-box;
             position: fixed;
             bottom: 0;
@@ -171,10 +169,6 @@
         .footer-btn-primary:hover {
             background: #2563eb;
             border-color: #2563eb;
-        }
-        
-        .container {
-            padding-bottom: 10px; /* Space for fixed footer */
         }
         
         /* Responsive Design */
@@ -681,25 +675,6 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
-            <li><a href="/new-application" class="nav-link">New Application</a></li>
-            <li><a href="/networking" class="nav-link">Network Dash</a></li>
-            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
-            <li><a href="/templates" class="nav-link">Templates</a></li>
-            <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/reports" class="nav-link">Reports</a></li>
-            <li><a href="/analytics" class="nav-link active">Analytics</a></li>
-            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
-        </ul>
-    </div>
-    
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
@@ -721,7 +696,7 @@
         </div>
     </div>
     
-    <div class="container">
+    <div class="main-wrapper">
         <div class="tabs-container">
             <div class="tabs-header">
                 <button class="tab active" data-tab="trend" onclick="switchTab('trend')">Trend Analysis</button>
@@ -2191,6 +2166,9 @@
             }
         }
     </script>
+    
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
     
     <!-- Footer -->
     <div class="page-footer">

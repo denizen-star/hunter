@@ -1015,8 +1015,8 @@ def create_networking_contact():
             # Full AI processing (current behavior)
             networking_doc_generator.generate_all_documents(contact, resume.content)
         else:
-            # Simple contact - just generate basic intro message
-            networking_doc_generator.generate_simple_intro_message(contact, resume.content)
+            # Simple contact - generate lightweight summary page (no AI)
+            networking_doc_generator.generate_simple_summary_page(contact)
         
         # Save updated metadata with paths and match score
         networking_processor._save_contact_metadata(contact)
@@ -1153,6 +1153,8 @@ def get_networking_contact(contact_id):
                 'location': contact.location,
                 'flagged': contact.flagged,
                 'next_step': contact.get_next_step(),
+                'summary_path': str(contact.summary_path) if contact.summary_path else None,
+                'messages_path': str(contact.messages_path) if contact.messages_path else None,
                 'updates': updates
             }
         })
@@ -1248,8 +1250,11 @@ def update_networking_details(contact_id):
             # Reload contact to get fresh data from YAML
             contact = networking_processor.get_contact_by_id(contact_id)
             
-            # Check if we have the required files to regenerate summary
-            if contact.summary_path:
+            # If we don't have a summary yet, nothing to regenerate
+            if not contact or not contact.summary_path:
+                pass
+            # For full AI contacts, regenerate the rich summary page
+            elif contact.requires_ai_processing:
                 from app.utils.file_utils import read_text_file
                 
                 # Read existing match analysis and messages if available
@@ -1296,13 +1301,16 @@ def update_networking_details(contact_id):
                 if contact.research_path and contact.research_path.exists():
                     research_content = read_text_file(contact.research_path)
                 
-                # Regenerate summary page with updated contact data
+                # Regenerate summary page with updated contact data (full AI layout)
                 networking_doc_generator.generate_summary_page(
                     contact,
                     match_analysis,
                     messages,
                     research_content
                 )
+            else:
+                # Simple contacts: keep the lightweight layout and just regenerate that page
+                networking_doc_generator.generate_simple_summary_page(contact)
         except Exception as e:
             print(f"Warning: Could not regenerate summary page after update: {e}")
             import traceback

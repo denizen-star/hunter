@@ -21,68 +21,8 @@
             background: #fafafa;
             color: #1f2937;
             line-height: 1.6;
-            margin-left: 180px;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e5e7eb;
-            z-index: 1000;
-            padding: 20px 0;
-            overflow-y: auto;
-        }
-        
-        .sidebar-header {
-            padding: 0 16px 16px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 12px;
-        }
-        
-        .sidebar-header h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
             margin: 0;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
             padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
-            display: block;
-            padding: 10px 16px;
-            color: #6b7280;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar-menu a:hover {
-            background: #f9fafb;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-        }
-        
-        .sidebar-menu a.active {
-            background: #f3f4f6;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-            font-weight: 600;
         }
         
         .header {
@@ -211,9 +151,8 @@
         }
         
         .content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px;
+            margin: 0 32px;
+            padding: 0;
             padding-top: 0;
         }
         
@@ -234,6 +173,7 @@
             border: 1px solid #e5e7eb;
             border-top: none;
             overflow: hidden;
+            width: 100%;
         }
         
         .section-header {
@@ -563,26 +503,6 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard">App Dash</a></li>
-            <li><a href="/new-application">New Application</a></li>
-            <li><a href="/networking" class="active">Network Dash</a></li>
-            <li><a href="/new-networking-contact">New Contact</a></li>
-            <li><a href="/templates">Templates</a></li>
-            <li><a href="/progress">Progress</a></li>
-            <li><a href="/reports">Reports</a></li>
-            <li><a href="/analytics">Analytics</a></li>
-            <li><a href="/daily-activities">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true">Manage Resume</a></li>
-        </ul>
-    </div>
-    
     <!-- Main Content -->
     <div class="header">
         <a href="/networking" class="back-link">Back to Network Dash</a>
@@ -592,7 +512,7 @@
                 <div class="subtitle">Zocdoc • Director of Recruiting</div>
             </div>
             <div style="display: flex; gap: 12px;">
-                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Meaghan+Fenton&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Meaghan+Fenton%0A%0ACompany%3A+Zocdoc%0ATitle%3A+Director+of+Recruiting%0AStatus%3A+To+Research%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Ffentonmeaghan%2F%0AEmail%3A+Not+available%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FMeaghan-Fenton-Zocdoc%2FMeaghan-Fenton-summary.html%0A&location=Zocdoc&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Meaghan+Fenton&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Meaghan+Fenton%0A%0ACompany%3A+Zocdoc%0ATitle%3A+Director+of+Recruiting%0AStatus%3A+Contacted+-+Sent%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Ffentonmeaghan%2F%0AEmail%3A+leacock.kervin%40gmail.com%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FMeaghan-Fenton-Zocdoc%2FMeaghan-Fenton-summary.html%0A&location=Zocdoc&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
                         📅 Add to GCal
                     </a>
                     <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
@@ -619,17 +539,17 @@
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> Dec 12, 2025 04:56 PM EST</span>
+                <span><strong>Updated:</strong> Dec 14, 2025 09:03 PM EST</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> To Research</span>
+                <span><strong>Status:</strong> Contacted - Sent</span>
             </div>
             <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/fentonmeaghan/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
             <div class="meta-item" id="emailMetaItem">
                 <span>📧</span>
-                <span id="emailDisplay" style="cursor: pointer; color: #3b82f6; text-decoration: underline;" onclick="editEmailInline()">Add Email</span>
-                <input type="email" id="emailInput" value="" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
+                <span id="emailDisplay" style="cursor: pointer; text-decoration: underline; text-decoration-style: dotted;" onclick="editEmailInline()" title="Click to edit">leacock.kervin@gmail.com</span>
+                <input type="email" id="emailInput" value="leacock.kervin@gmail.com" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
             </div>
         </div>
     </div>
@@ -655,7 +575,7 @@
                 <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
-                        <input type="email" id="contactEmail" name="email" value="" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        <input type="email" id="contactEmail" name="email" value="leacock.kervin@gmail.com" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
@@ -832,9 +752,9 @@ Note that these talking points are based solely on the provided profile data and
                         <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
                     </h3>
                     <div id="connection-message">Here is a LinkedIn connection request message that meets the requirements:
-
-"Love your insights on fintech trends and product management! As Director of Recruiting at Zocdoc, I'm always looking for innovative approaches to talent acquisition. What's the most exciting fintech development you've se...</div>
-                    <div class="char-count">300 characters</div>
+"Love your insights on fintech trends and product management! As Director of Recruiting at Zocdoc, I'm always looking for innovative approaches to talent acquisition. What's the most exciting fintech development you've se...
+Character count: 300</div>
+                    <div class="char-count">320 characters</div>
                 </div>
                 
                 <div class="message-box">
@@ -843,19 +763,12 @@ Note that these talking points are based solely on the provided profile data and
                         <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
                     </h3>
                     <div id="meeting-message">Here's a message inviting them to a 1:1 meet & greet:
-
 Subject: Let's Grab Virtual Coffee!
-
 Hi [First Name],
-
 I wanted to reach out and thank you for accepting my connection on LinkedIn! I'm Meaghan Fenton, Product Manager at Zocdoc, and I came across your profile because of our shared interest in fintech.
-
 As a fellow enthusiast of the industry, I'd love to pick your brain about some of the latest trends we've seen in fintech. What are some key trends you've noticed, and how do you think they'll impact data analytics? I'm also curious to hear more about your approach to product management in this rapidly changing landscape.
-
 If you're game, let's grab virtual coffee for 15-20 minutes and chat more about these topics (and anything else that comes up). No agenda, just a casual conversation to learn from each other. Would love to catch up and explore potential opportunities for collaboration or mutual learning.
-
 Looking forward to hearing back from you!
-
 Best,
 Meaghan Fenton</div>
                 </div>
@@ -866,17 +779,11 @@ Meaghan Fenton</div>
                         <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
                     </h3>
                     <div id="thankyou-message">Here's a thank you message:
-
 Subject: Thanks for chatting with me today, [Name]!
-
 Hi [Name],
-
 I wanted to take a moment to express my gratitude for taking the time to meet with me today at Zocdoc. I truly appreciated our conversation about [topic discussed], and I'm excited to learn more about [another topic discussed]. Your insights on [specific takeaway or idea gained] really resonated with me, and I'm looking forward to exploring how we can implement it in our strategy.
-
 I feel like we had a great foundation laid for further discussion, and I'm eager to continue the conversation. If there's anything specific you'd like me to follow up on or any additional information you need from me, please don't hesitate to reach out.
-
 It was great meeting you, and I hope to stay in touch as our paths continue to intersect in the healthcare technology space. Let's keep each other updated on our respective projects and initiatives!
-
 Best regards,
 Meaghan Fenton</div>
                 </div>
@@ -887,21 +794,13 @@ Meaghan Fenton</div>
                         <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
                     </h3>
                     <div id="consulting-message">Here is a professional message offering consulting services:
-
 Subject: Expert Consulting Services for Your Organization's Success
-
 Dear [Recipient],
-
 I hope this message finds you well. As we've had the pleasure of connecting, I wanted to reach out and explore how my expertise can support your organization's goals. At Zocdoc, I understand that you're constantly seeking innovative ways to streamline operations, improve patient experiences, and drive business growth.
-
 As a seasoned data engineer with experience in analytics, AI/ML implementation, and technical leadership, I've had the privilege of working with organizations similar to yours, tackling challenges such as optimizing workflows, predicting patient behavior, and enhancing clinical decision-making. I'd love to leverage my expertise to help you achieve similar successes.
-
 If you're interested in exploring how my consulting services can benefit your organization, I'd be happy to schedule a brief discovery call. During this 30-minute conversation, we can discuss your current pain points, goals, and aspirations. This will enable me to better understand your needs and provide tailored recommendations for improving your operations, increasing efficiency, or driving innovation.
-
 Please let me know if you're open to discussing further. I respect your time and look forward to the possibility of collaborating with Zocdoc.
-
 Best regards,
-
 Meaghan Fenton
 Data Engineering & Analytics Consultant
 Zocdoc</div>
@@ -926,9 +825,9 @@ Zocdoc</div>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
                             <optgroup label="Research & Contact">
-                                <option value="To Research" selected>To Research</option>
+                                <option value="To Research" >To Research</option>
                                 <option value="Ready to Contact" >Ready to Contact</option>
-                                <option value="Contacted - Sent" >Contacted - Sent</option>
+                                <option value="Contacted - Sent" selected>Contacted - Sent</option>
                                 <option value="Contacted - Replied" >Contacted - Replied</option>
                                 <option value="Contacted - No Response" >Contacted - No Response</option>
                                 <option value="Cold/Archive" >Cold/Archive</option>

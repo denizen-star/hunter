@@ -1,4 +1,5 @@
 """Document generation service for networking contacts"""
+import json
 from pathlib import Path
 from typing import Dict, Optional
 from datetime import datetime, timedelta
@@ -171,6 +172,1346 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         contact.messages_path = messages_path
         
         print("  ✓ Simple intro message generated")
+    
+    def _get_standard_networking_messages(self) -> list:
+        """Return the 4 standard networking message templates"""
+        return [
+            "Data/BI/Analytics Leader, with experience in FInancial services from Self Financiat to BoNY and RBC. I applied for POSITION (XX% match) on your site. Passionate about credit building and enabling financial success at COMPANY. Eager to discuss my experience!",
+            "Hi XXX I am a Product/ Data/ Strategy Leader with 18+ years driving strategy, data analysis, and unprecedented growth. Applied to the [Target Role/Area]. Let's connect.",
+            "Hello NAME! Your banner caught my eye.\nI'm Kervin, a Data Product Leader, and I applied for the POSITION role at COMPANY. I emailed you my resume & cover for reference. My experience is a great match. I hope to connect!\nCheers",
+            "I am a hands on experienced Data Analytics and BI leader. I turn disparate data into strategic solutions and automation. Proficient in BI, Cloud, SQL, and Data tools. Always open to high-impact roles in [Target Industry]"
+        ]
+    
+    def _replace_message_placeholders(self, message: str, contact: NetworkingContact) -> str:
+        """Replace placeholders in message templates with contact data"""
+        # Extract first name
+        first_name = contact.person_name.split()[0] if contact.person_name else "there"
+        
+        # Replace placeholders
+        message = message.replace("NAME", first_name)
+        message = message.replace("XXX", first_name)
+        message = message.replace("COMPANY", contact.company_name or "the company")
+        message = message.replace("POSITION", contact.job_title or "a role")
+        message = message.replace("[Target Role/Area]", contact.job_title or "[Target Role/Area]")
+        # Leave [Target Industry] as-is if not set (user can edit manually)
+        
+        return message
+    
+    def _get_next_step_recommendation(self, contact: NetworkingContact) -> str:
+        """Get rule-based next step recommendation based on status and days since update"""
+        status = contact.status or "To Research"
+        days_since = contact.get_days_since_update()
+        
+        if status == "To Research":
+            return "Review profile and find 1-2 warm intro angles"
+        elif status in ["Contacted", "Contacted - Sent"]:
+            if days_since < 7:
+                return "Wait 5-7 days, then consider a follow-up"
+            elif days_since < 14:
+                return "Consider sending a polite follow-up message"
+            else:
+                return "Overdue follow-up - send a brief check-in"
+        elif status == "In Conversation":
+            return "Continue engagement and explore mutual interests"
+        elif status == "Meeting Scheduled":
+            return "Prep agenda and talking points for the meeting"
+        elif status == "Meeting Completed":
+            return "Send thank you note and follow up on action items"
+        elif status in ["Cold/Archive", "Inactive/Dormant"]:
+            return "Consider re-engaging if relevant opportunity arises"
+        else:
+            return "Review status and determine next action"
+    
+    def generate_simple_summary_page(self, contact: NetworkingContact) -> None:
+        """Generate lightweight summary page for simple contacts (no AI processing) - uses same structure as full AI version"""
+        print(f"  → Generating simple summary page for {contact.person_name}...")
+        
+        # Read raw profile
+        raw_profile = ""
+        if contact.raw_profile_path and contact.raw_profile_path.exists():
+            raw_profile = read_text_file(contact.raw_profile_path)
+        
+        # Get standard messages with placeholders replaced
+        standard_messages = self._get_standard_networking_messages()
+        personalized_messages = [self._replace_message_placeholders(msg, contact) for msg in standard_messages]
+        
+        # Get next step recommendation
+        next_step = self._get_next_step_recommendation(contact)
+        
+        # Create messages dict in format expected by Updates tab (same as full AI version)
+        messages_for_updates = {
+            'connection_request': personalized_messages[0] if len(personalized_messages) > 0 else '',
+            'meeting_invitation': personalized_messages[1] if len(personalized_messages) > 1 else '',
+            'thank_you': personalized_messages[2] if len(personalized_messages) > 2 else '',
+            'consulting_offer': personalized_messages[3] if len(personalized_messages) > 3 else ''
+        }
+        
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{contact.person_name} - {contact.company_name}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        
+        body {{
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #1f2937;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }}
+        
+        .header {{
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }}
+        
+        .back-link {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            transition: color 0.2s ease;
+        }}
+        
+        .back-link:hover {{
+            color: #2563eb;
+        }}
+        
+        .back-link::before {{
+            content: '←';
+            font-size: 18px;
+        }}
+        
+        .header h1 {{
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }}
+        
+        .header .subtitle {{
+            font-size: 14px;
+            color: #6b7280;
+        }}
+        
+        /* Application Header Card */
+        .app-header-card {{
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }}
+        
+        .app-meta {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }}
+        
+        .meta-item {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }}
+        
+        .meta-item strong {{
+            color: #374151;
+        }}
+        
+        .status-pill {{
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }}
+        
+        .tag-green {{
+            background: #d1fae5;
+            color: #065f46;
+        }}
+        
+        .tag-blue {{
+            background: #dbeafe;
+            color: #1e40af;
+        }}
+        
+        .tag-gray {{
+            background: #f3f4f6;
+            color: #4b5563;
+        }}
+        
+        .tabs {{
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0;
+            display: flex;
+            gap: 0;
+            margin: 0 32px;
+        }}
+        
+        .tab {{
+            padding: 16px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 400;
+            color: #6b7280;
+            transition: all 0.15s ease;
+            position: relative;
+        }}
+        
+        .tab:hover {{
+            color: #374151;
+            background: #f9fafb;
+        }}
+        
+        .tab.active {{
+            color: #1f2937;
+            border-bottom-color: #3b82f6;
+            font-weight: 500;
+        }}
+        
+        .tab.hidden {{
+            display: none;
+        }}
+        
+        .content {{
+            margin: 0 32px;
+            padding: 0;
+            padding-top: 0;
+        }}
+        
+        .tab-content {{
+            display: none;
+        }}
+        
+        .tab-content.active {{
+            display: block;
+        }}
+        
+        .section {{
+            background: white;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+            width: 100%;
+        }}
+        
+        .section.collapsed .section-content {{
+            display: none;
+        }}
+        
+        .section-header {{
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: 0;
+        }}
+
+        .section-header.clickable {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }}
+
+        .section-toggle-indicator {{
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }}
+
+        .section:not(.collapsed) .section-toggle-indicator {{
+            transform: rotate(90deg);
+            color: #4b5563;
+        }}
+        
+        .section h2 {{
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
+            color: #1f2937;
+            padding: 0;
+            border-bottom: none;
+        }}
+        
+        .section-content {{
+            padding: 28px;
+        }}
+        
+        .section-content h3 {{
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+            color: #374151;
+        }}
+        
+        .section-content h3:first-child {{
+            margin-top: 0;
+        }}
+        
+        .info-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }}
+        
+        .info-card {{
+            background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+        }}
+        
+        .info-card-label {{
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }}
+        
+        .info-card-value {{
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }}
+        
+        .analysis-section {{
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }}
+        
+        .analysis-section h4 {{
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .analysis-text {{
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }}
+        
+        .message-box {{
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            position: relative;
+        }}
+        
+        .message-box h3 {{
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+        
+        .form-group {{
+            margin-bottom: 20px;
+        }}
+        
+        .form-group label {{
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }}
+        
+        .form-group select,
+        .form-group textarea {{
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            transition: all 0.15s ease;
+        }}
+        
+        .form-group select:focus,
+        .form-group textarea:focus {{
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }}
+        
+        .form-group textarea {{
+            min-height: 100px;
+            resize: vertical;
+        }}
+        
+        .btn {{
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }}
+        
+        .btn-primary {{
+            background: #3b82f6;
+            color: white;
+        }}
+        
+        .btn-primary:hover {{
+            background: #2563eb;
+        }}
+        
+        .btn-primary:disabled {{
+            background: #9ca3af;
+            cursor: not-allowed;
+        }}
+        
+        .timeline {{
+            margin-top: 32px;
+        }}
+        
+        .timeline-item {{
+            padding: 20px;
+            border-left: 3px solid #e5e7eb;
+            margin-bottom: 20px;
+            background: #f9fafb;
+            border-radius: 0 8px 8px 0;
+        }}
+        
+        .timeline-item.latest {{
+            border-left-color: #3b82f6;
+            background: #f0f9ff;
+        }}
+        
+        .timeline-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }}
+        
+        .timeline-status {{
+            display: inline-block;
+            padding: 6px 12px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+        }}
+        
+        .timeline-date {{
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }}
+        
+        .timeline-notes-label {{
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }}
+        
+        .timeline-notes {{
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.6;
+        }}
+        
+        .alert {{
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }}
+        
+        .alert.success {{
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }}
+        
+        .alert.error {{
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }}
+        
+        .alert.show {{
+            display: block;
+        }}
+        
+        .action-buttons {{
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }}
+        
+        .btn-secondary {{
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }}
+        
+        .btn-secondary:hover {{
+            background: #f9fafb;
+        }}
+        
+        .copy-btn {{
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }}
+        
+        .copy-btn:hover {{
+            background: #f3f4f6;
+        }}
+        
+        .char-count {{
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }}
+        
+        .template-btn {{
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }}
+        
+        .template-btn:hover {{
+            background: #f3f4f6;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }}
+        
+        /* Quill Editor Styles */
+        .ql-editor {{
+            min-height: 150px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+        }}
+        
+        .ql-toolbar.ql-snow {{
+            border: 1px solid #d1d5db;
+            border-radius: 8px 8px 0 0;
+            background: #f9fafb;
+        }}
+        
+        .ql-container.ql-snow {{
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }}
+        
+        pre {{
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+        }}
+        
+        .relationship-card {{
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }}
+        
+        .relationship-card h3 {{
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #1e40af;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }}
+        
+        .relationship-card .status {{
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }}
+        
+        .relationship-card .next-step {{
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
+        }}
+        
+        .upgrade-banner {{
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }}
+        
+        .upgrade-banner-text {{
+            flex: 1;
+            font-size: 14px;
+            color: #92400e;
+        }}
+        
+        .upgrade-banner strong {{
+            font-weight: 600;
+        }}
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="header">
+        <a href="/networking" class="back-link">Back to Network Dash</a>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1>{contact.person_name}</h1>
+                <div class="subtitle">{contact.company_name}{f' • {contact.job_title}' if contact.job_title else ''}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hero Card with Metadata -->
+    <div class="app-header-card">
+        <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
+            <span class="status-pill tag tag-blue">{contact.status or 'To Research'}</span>
+        </div>
+        <div class="app-meta">
+            <div class="meta-item">
+                <span>📍</span>
+                <span>{contact.location or 'N/A'}</span>
+            </div>
+            <div class="meta-item">
+                <span>📅</span>
+                <span><strong>Connected:</strong> {format_for_display(contact.created_at)}</span>
+            </div>
+            <div class="meta-item">
+                <span>🔄</span>
+                <span><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
+            </div>
+            <div class="meta-item">
+                <span>📊</span>
+                <span><strong>Status:</strong> {contact.status or 'To Research'}</span>
+            </div>
+            {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
+            <div class="meta-item" id="emailMetaItem">
+                <span>📧</span>
+                {f'<span id="emailDisplay" style="cursor: pointer; text-decoration: underline; text-decoration-style: dotted;" onclick="editEmailInline()" title="Click to edit">{contact.email}</span>' if contact.email else '<span id="emailDisplay" style="cursor: pointer; color: #3b82f6; text-decoration: underline;" onclick="editEmailInline()">Add Email</span>'}
+                <input type="email" id="emailInput" value="{contact.email or ''}" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('summary')">Summary</div>
+        <div class="tab" onclick="switchTab('raw')">Raw Entry</div>
+        <div class="tab hidden" onclick="switchTab('skills')">Skills</div>
+        <div class="tab hidden" onclick="switchTab('research')">Research</div>
+        <div class="tab" onclick="switchTab('messages')">Messages</div>
+        <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+    </div>
+    
+    <div class="content">
+        <!-- Summary Tab -->
+        <div id="summary" class="tab-content active">
+            <!-- Contact Details Section -->
+            <div class="section">
+                <div class="section-header clickable" onclick="toggleSection(this)">
+                    <h2>Contact Details</h2>
+                    <span class="section-toggle-indicator">▶</span>
+                </div>
+                <div class="section-content">
+                <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                        <input type="email" id="contactEmail" name="email" value="{contact.email or ''}" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                        <input type="text" id="contactLocation" name="location" value="{contact.location or ''}" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                        <input type="text" id="contactJobTitle" name="job_title" value="{contact.job_title or ''}" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                    </div>
+                </form>
+                <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
+            </div>
+            
+            <!-- Relationship / Next Step Card -->
+            <div class="relationship-card">
+                <h3>Relationship Status</h3>
+                <div class="status">Current Status: {contact.status or 'To Research'}</div>
+                <div class="next-step">Next Step: {next_step}</div>
+            </div>
+        </div>
+        
+        <!-- Raw Tab -->
+        <div id="raw" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Raw Profile Details</h2>
+                </div>
+                <div class="section-content">
+                <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">{raw_profile or 'No raw profile available'}</pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Networking Messages</h2>
+                </div>
+                <div class="section-content">
+                <div class="message-box">
+                    <h3>
+                        <span>1. Initial Connection Request (LinkedIn)</span>
+                        <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
+                    </h3>
+                    <div id="connection-message">{messages_for_updates.get('connection_request', 'N/A')}</div>
+                    <div class="char-count">{len(messages_for_updates.get('connection_request', ''))} characters</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>2. Meeting Invitation</span>
+                        <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
+                    </h3>
+                    <div id="meeting-message">{messages_for_updates.get('meeting_invitation', 'N/A')}</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>3. Thank You Message</span>
+                        <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
+                    </h3>
+                    <div id="thankyou-message">{messages_for_updates.get('thank_you', 'N/A')}</div>
+                </div>
+                
+                <div class="message-box">
+                    <h3>
+                        <span>4. Consulting Services Offer</span>
+                        <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
+                    </h3>
+                    <div id="consulting-message">{messages_for_updates.get('consulting_offer', 'N/A')}</div>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Updates & Notes Tab -->
+        <div id="updates" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Status</h2>
+                </div>
+                <div class="section-content">
+                
+                <div id="updateAlert" class="alert"></div>
+                
+                <form id="statusUpdateForm">
+                    <div class="form-group">
+                        <label for="status">Select Status</label>
+                        <select id="status" name="status" required>
+                            <option value="">-- Select Status --</option>
+                            <optgroup label="Research & Contact">
+                                <option value="To Research" {"selected" if contact.status == "To Research" else ""}>To Research</option>
+                                <option value="Ready to Contact" {"selected" if contact.status == "Ready to Contact" else ""}>Ready to Contact</option>
+                                <option value="Contacted - Sent" {"selected" if contact.status == "Contacted - Sent" else ""}>Contacted - Sent</option>
+                                <option value="Contacted - Replied" {"selected" if contact.status == "Contacted - Replied" else ""}>Contacted - Replied</option>
+                                <option value="Contacted - No Response" {"selected" if contact.status == "Contacted - No Response" else ""}>Contacted - No Response</option>
+                                <option value="Cold/Archive" {"selected" if contact.status == "Cold/Archive" else ""}>Cold/Archive</option>
+                            </optgroup>
+                            <optgroup label="Engagement">
+                                <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
+                                <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
+                                <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
+                                <option value="Action Pending - You" {"selected" if contact.status == "Action Pending - You" else ""}>Action Pending - You</option>
+                                <option value="Action Pending - Them" {"selected" if contact.status == "Action Pending - Them" else ""}>Action Pending - Them</option>
+                            </optgroup>
+                            <optgroup label="Relationship">
+                                <option value="New Connection" {"selected" if contact.status == "New Connection" else ""}>New Connection</option>
+                                <option value="Nurture (1-3 Mo.)" {"selected" if contact.status == "Nurture (1-3 Mo.)" else ""}>Nurture (1-3 Mo.)</option>
+                                <option value="Nurture (4-6 Mo.)" {"selected" if contact.status == "Nurture (4-6 Mo.)" else ""}>Nurture (4-6 Mo.)</option>
+                                <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
+                                <option value="Inactive/Dormant" {"selected" if contact.status == "Inactive/Dormant" else ""}>Inactive/Dormant</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Notes</span>
+                            <button type="button" onclick="copyEditorContent()" class="copy-btn" style="padding: 6px 12px; font-size: 12px;">Copy Notes</button>
+                        </label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <button type="button" class="template-btn" onclick="insertTemplate('connection')">Connection Request</button>
+                            <button type="button" class="template-btn" onclick="insertTemplate('followup')">Follow-up</button>
+                            <button type="button" class="template-btn" onclick="insertTemplate('meeting')">Meeting Notes</button>
+                            <button type="button" class="template-btn" onclick="insertTemplate('thankyou')">Thank You</button>
+                        </div>
+                        <div id="editor" style="background: white; min-height: 150px;"></div>
+                        <input type="hidden" id="notes" name="notes">
+                        
+                        <!-- Message Templates Dropdown -->
+                        <div style="margin-top: 16px; display: flex; gap: 12px; align-items: center;">
+                            <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
+                            <select id="messageTemplate" onchange="loadMessageIntoEditor()" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-width: 250px; flex: 1;">
+                                <option value="">-- Select a Message Template --</option>
+                                <option value="connection">1. Connection Request</option>
+                                <option value="meeting">2. Meeting Invitation</option>
+                                <option value="thankyou">3. Thank You Message</option>
+                                <option value="consulting">4. Consulting Services Offer</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
+                </form>
+                
+                <div class="timeline" id="timeline">
+                    <h2>Status History</h2>
+                    <div id="timelineContent">
+                        <p style="color: #6b7280;">Loading timeline...</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upgrade Banner at Bottom -->
+    <div class="upgrade-banner">
+        <div class="upgrade-banner-text">
+            <strong>Simple Contact</strong> - This is a lightweight contact without full AI analysis. For match scoring, research, and advanced messaging, click below to upgrade.
+        </div>
+        <button onclick="upgradeToFullAI()" class="btn btn-primary">Upgrade to Full AI</button>
+    </div>
+    </div>
+    
+    <script>
+        const contactId = '{contact.id}';
+        let quill;
+        
+        // Load timeline on page load
+        document.addEventListener('DOMContentLoaded', () => {{
+            loadTimeline();
+            initializeEditor();
+        }});
+        
+        // Initialize Quill Rich Text Editor
+        function initializeEditor() {{
+            quill = new Quill('#editor', {{
+                theme: 'snow',
+                modules: {{
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{{ 'list': 'ordered' }}, {{ 'list': 'bullet' }}],
+                        ['link'],
+                        ['clean']
+                    ]
+                }},
+                placeholder: 'Add notes about this status update...'
+            }});
+        }}
+        
+        // Template insertion
+        function insertTemplate(type) {{
+            if (!quill) return;
+            
+            const templates = {{
+                'connection': '<p><strong>Connection Request Sent</strong></p><p>Sent LinkedIn connection request with personalized message.</p><p>Next step: Follow up in 5-7 business days if no response.</p>',
+                'followup': '<p><strong>Follow-up</strong></p><p>Following up on previous outreach.</p><p>Key points discussed:</p><ul><li>Point 1</li><li>Point 2</li></ul>',
+                'meeting': '<p><strong>Meeting Notes</strong></p><p>Date: [Date]</p><p>Duration: [Duration]</p><p>Discussion Topics:</p><ul><li>Topic 1</li><li>Topic 2</li></ul><p>Action Items:</p><ul><li>Action 1</li><li>Action 2</li></ul><p>Next Steps: [Next Steps]</p>',
+                'thankyou': '<p><strong>Thank You Note Sent</strong></p><p>Thanked {contact.person_name} for their time and insights.</p><p>Key takeaways:</p><ul><li>Takeaway 1</li><li>Takeaway 2</li></ul><p>Next step: [Next Step]</p>'
+            }};
+            
+            const template = templates[type] || '';
+            quill.root.innerHTML = template;
+        }}
+
+        function toggleSection(sectionId) {{
+            const section = typeof sectionId === 'string' ? document.getElementById(sectionId) : sectionId.closest('.section');
+            if (!section) {{
+                return;
+            }}
+            section.classList.toggle('collapsed');
+        }}
+        
+        function switchTab(tabName) {{
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {{
+                content.classList.remove('active');
+            }});
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {{
+                tab.classList.remove('active');
+            }});
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Mark selected tab as active
+            event.target.classList.add('active');
+            
+            // Load timeline if updates tab is selected
+            if (tabName === 'updates') {{
+                loadTimeline();
+            }}
+        }}
+        
+        // Load message template into editor
+        function loadMessageIntoEditor() {{
+            if (!quill) return;
+            
+            const select = document.getElementById('messageTemplate');
+            const selectedValue = select.value;
+            
+            if (!selectedValue) {{
+                return;
+            }}
+            
+            // Get message from Messages tab
+            const messageElement = document.getElementById(selectedValue + '-message');
+            if (!messageElement) {{
+                console.error('Message element not found:', selectedValue);
+                return;
+            }}
+            
+            const text = messageElement.textContent.trim();
+            
+            // Convert plain text to HTML paragraphs for Quill
+            const paragraphs = text.split('\\n\\n').filter(p => p.trim());
+            const htmlContent = paragraphs.map(p => `<p>${{p.trim().replace(/\\n/g, '<br>')}}</p>`).join('');
+            
+            // Set the editor content
+            quill.root.innerHTML = htmlContent || `<p>${{text}}</p>`;
+        }}
+        
+        // Copy editor content to clipboard
+        function copyEditorContent() {{
+            if (!quill) {{
+                alert('Editor not initialized');
+                return;
+            }}
+            
+            // Get plain text from Quill editor
+            const text = quill.getText();
+            
+            if (!text.trim()) {{
+                alert('Notes box is empty');
+                return;
+            }}
+            
+            navigator.clipboard.writeText(text).then(() => {{
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                
+                setTimeout(() => {{
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }}, 2000);
+            }}).catch(err => {{
+                console.error('Failed to copy:', err);
+                alert('Failed to copy notes to clipboard');
+            }});
+        }}
+        
+        function copyMessage(messageType) {{
+            const messageElement = document.getElementById(messageType + '-message');
+            const text = messageElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {{
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {{
+                    btn.textContent = originalText;
+                }}, 2000);
+            }});
+        }}
+        
+        // Handle status update form submission
+        document.getElementById('statusUpdateForm').addEventListener('submit', async (e) => {{
+            e.preventDefault();
+            
+            const updateBtn = document.getElementById('updateBtn');
+            const updateAlert = document.getElementById('updateAlert');
+            const status = document.getElementById('status').value;
+            
+            // Get HTML content from Quill editor
+            const notes = quill.root.innerHTML;
+            
+            // Disable button
+            updateBtn.disabled = true;
+            updateBtn.textContent = 'Updating...';
+            
+            // Hide previous alerts
+            updateAlert.classList.remove('show', 'success', 'error');
+            
+            try {{
+                const response = await fetch(`/api/networking/contacts/${{contactId}}/status`, {{
+                    method: 'PUT',
+                    headers: {{
+                        'Content-Type': 'application/json'
+                    }},
+                    body: JSON.stringify({{ status, notes }})
+                }});
+                
+                const data = await response.json();
+                
+                if (data.success) {{
+                    // Show success message
+                    updateAlert.textContent = `Status updated to "${{status}}"`;
+                    updateAlert.classList.add('show', 'success');
+                    
+                    // Clear editor
+                    quill.root.innerHTML = '';
+                    
+                    // Reload timeline
+                    await loadTimeline();
+                    
+                    // Update page metadata if needed
+                    setTimeout(() => {{
+                        location.reload();
+                    }}, 2000);
+                }} else {{
+                    // Show error message
+                    updateAlert.textContent = `Error: ${{data.error}}`;
+                    updateAlert.classList.add('show', 'error');
+                }}
+            }} catch (error) {{
+                console.error('Error updating status:', error);
+                updateAlert.textContent = `Error: ${{error.message}}`;
+                updateAlert.classList.add('show', 'error');
+            }} finally {{
+                // Re-enable button
+                updateBtn.disabled = false;
+                updateBtn.textContent = 'Update Status';
+            }}
+        }});
+        
+        async function loadTimeline() {{
+            const timelineContent = document.getElementById('timelineContent');
+            
+            try {{
+                const response = await fetch(`/api/networking/contacts/${{contactId}}`);
+                const data = await response.json();
+                
+                if (data.success && data.contact.updates) {{
+                    const updates = data.contact.updates;
+                    
+                    if (updates.length === 0) {{
+                        timelineContent.innerHTML = '<p style="color: #6b7280;">No status updates yet.</p>';
+                        return;
+                    }}
+                    
+                    // Render timeline items (already sorted newest first from API)
+                    timelineContent.innerHTML = updates.map((update, index) => {{
+                        const isLatest = index === 0;
+                        const timestamp = update.timestamp;
+                        const date = new Date(
+                            parseInt(timestamp.substring(0, 4)),
+                            parseInt(timestamp.substring(4, 6)) - 1,
+                            parseInt(timestamp.substring(6, 8)),
+                            parseInt(timestamp.substring(8, 10)),
+                            parseInt(timestamp.substring(10, 12)),
+                            parseInt(timestamp.substring(12, 14))
+                        );
+                        
+                        const dateStr = date.toLocaleDateString('en-US', {{ 
+                            month: 'long', 
+                            day: 'numeric', 
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        }}) + ' EST';
+                        
+                        return `
+                            <div class="timeline-item ${{isLatest ? 'latest' : ''}}">
+                                <div class="timeline-header">
+                                    <span class="timeline-status">${{update.status}}</span>
+                                    <span class="timeline-date">${{dateStr}}</span>
+                                </div>
+                                ${{update.notes ? `
+                                    <div class="timeline-notes-label">Notes:</div>
+                                    <div class="timeline-notes">${{update.notes}}</div>
+                                ` : ''}}
+                            </div>
+                        `;
+                    }}).join('');
+                }} else {{
+                    timelineContent.innerHTML = '<p style="color: #6b7280;">Error loading timeline.</p>';
+                }}
+            }} catch (error) {{
+                console.error('Error loading timeline:', error);
+                timelineContent.innerHTML = '<p style="color: #ef4444;">Error loading timeline.</p>';
+            }}
+        }}
+        
+        async function upgradeToFullAI() {{
+            if (!confirm('Upgrade this contact to Full AI processing? This will take 5-6 minutes and generate match scoring, research, and advanced messaging.')) {{
+                return;
+            }}
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Upgrading...';
+            
+            try {{
+                const response = await fetch(`/api/networking/contacts/${{contactId}}/regenerate`, {{
+                    method: 'POST'
+                }});
+                
+                const data = await response.json();
+                
+                if (data.success) {{
+                    alert('Contact upgraded successfully! Reloading page...');
+                    window.location.reload();
+                }} else {{
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                    btn.disabled = false;
+                    btn.textContent = 'Upgrade to Full AI';
+                }}
+            }} catch (error) {{
+                console.error('Error upgrading contact:', error);
+                alert('Error upgrading contact: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = 'Upgrade to Full AI';
+            }}
+        }}
+        
+        async function saveContactDetails() {{
+            const btn = document.getElementById('saveDetailsBtn');
+            const alert = document.getElementById('detailsAlert');
+            const email = document.getElementById('contactEmail').value.trim() || null;
+            const location = document.getElementById('contactLocation').value.trim() || null;
+            const jobTitle = document.getElementById('contactJobTitle').value.trim() || null;
+            
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            alert.style.display = 'none';
+            
+            try {{
+                const response = await fetch(`/api/networking/contacts/${{contactId}}/details`, {{
+                    method: 'PUT',
+                    headers: {{
+                        'Content-Type': 'application/json'
+                    }},
+                    body: JSON.stringify({{ email, location, job_title: jobTitle }})
+                }});
+                
+                const data = await response.json();
+                
+                if (data.success) {{
+                    alert.style.display = 'block';
+                    alert.style.background = '#d1fae5';
+                    alert.style.color = '#065f46';
+                    alert.style.border = '1px solid #10b981';
+                    alert.textContent = 'Contact details updated successfully!';
+                    
+                    setTimeout(() => {{
+                        location.reload();
+                    }}, 1000);
+                }} else {{
+                    alert.style.display = 'block';
+                    alert.style.background = '#fee2e2';
+                    alert.style.color = '#991b1b';
+                    alert.style.border = '1px solid #ef4444';
+                    alert.textContent = 'Failed to update: ' + (data.error || 'Unknown error');
+                }}
+            }} catch (error) {{
+                console.error('Error updating contact details:', error);
+                alert.style.display = 'block';
+                alert.style.background = '#fee2e2';
+                alert.style.color = '#991b1b';
+                alert.style.border = '1px solid #ef4444';
+                alert.textContent = 'Error updating contact details: ' + error.message;
+            }} finally {{
+                btn.disabled = false;
+                btn.textContent = 'Save Contact Details';
+            }}
+        }}
+        
+        // Inline email editing in hero card
+        function editEmailInline() {{
+            const emailDisplay = document.getElementById('emailDisplay');
+            const emailInput = document.getElementById('emailInput');
+            
+            if (emailDisplay && emailInput) {{
+                emailDisplay.style.display = 'none';
+                emailInput.style.display = 'inline-block';
+                emailInput.focus();
+                emailInput.select();
+            }}
+        }}
+        
+        async function saveEmailInline() {{
+            const emailDisplay = document.getElementById('emailDisplay');
+            const emailInput = document.getElementById('emailInput');
+            
+            if (!emailInput) return;
+            
+            const newEmail = emailInput.value.trim();
+            
+            // Hide input, show display
+            emailInput.style.display = 'none';
+            
+            try {{
+                const response = await fetch(`/api/networking/contacts/${{contactId}}/details`, {{
+                    method: 'PUT',
+                    headers: {{
+                        'Content-Type': 'application/json'
+                    }},
+                    body: JSON.stringify({{ email: newEmail || null }})
+                }});
+                
+                const data = await response.json();
+                
+                if (data.success) {{
+                    // Update display
+                    if (emailDisplay) {{
+                        if (newEmail) {{
+                            emailDisplay.textContent = newEmail;
+                            emailDisplay.style.color = '';
+                            emailDisplay.style.textDecoration = 'underline';
+                            emailDisplay.style.textDecorationStyle = 'dotted';
+                            emailDisplay.title = 'Click to edit';
+                        }} else {{
+                            emailDisplay.textContent = 'Add Email';
+                            emailDisplay.style.color = '#3b82f6';
+                            emailDisplay.style.textDecoration = 'underline';
+                            emailDisplay.style.textDecorationStyle = 'solid';
+                            emailDisplay.title = '';
+                        }}
+                        emailDisplay.style.display = 'inline';
+                    }}
+                    // Update input value
+                    emailInput.value = newEmail;
+                    
+                    // Update contact details form
+                    const contactEmailField = document.getElementById('contactEmail');
+                    if (contactEmailField) {{
+                        contactEmailField.value = newEmail;
+                    }}
+                    
+                    // Show success feedback
+                    showInlineSuccess(emailDisplay);
+                    
+                    // Reload page after short delay to sync all fields
+                    setTimeout(() => {{
+                        location.reload();
+                    }}, 1000);
+                }} else {{
+                    // Show error
+                    alert('Failed to update email: ' + (data.error || 'Unknown error'));
+                    if (emailDisplay) emailDisplay.style.display = 'inline';
+                }}
+            }} catch (error) {{
+                console.error('Error updating email:', error);
+                alert('Error updating email: ' + error.message);
+                if (emailDisplay) emailDisplay.style.display = 'inline';
+            }}
+        }}
+        
+        function showInlineSuccess(element) {{
+            if (!element) return;
+            const originalBg = element.style.backgroundColor;
+            element.style.backgroundColor = '#d1fae5';
+            setTimeout(() => {{
+                element.style.backgroundColor = originalBg;
+            }}, 2000);
+        }}
+        
+    </script>
+</body>
+</html>"""
+        
+        # Save summary page
+        summary_filename = f"{contact.person_name.replace(' ', '-')}-summary.html"
+        summary_path = contact.folder_path / summary_filename
+        write_text_file(html, summary_path)
+        contact.summary_path = summary_path
+        
+        print("  ✓ Simple summary page generated")
     
     def generate_networking_messages(
         self,
@@ -772,11 +2113,33 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             width: 100%;
         }}
         
+        .section.collapsed .section-content {{
+            display: none;
+        }}
+        
         .section-header {{
             background: #f9fafb;
             border-bottom: 1px solid #e5e7eb;
             padding: 16px 24px;
             margin: 0;
+        }}
+
+        .section-header.clickable {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }}
+
+        .section-toggle-indicator {{
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }}
+
+        .section:not(.collapsed) .section-toggle-indicator {{
+            transform: rotate(90deg);
+            color: #4b5563;
         }}
         
         .section h2 {{
@@ -1159,13 +2522,14 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
     </div>
     
-    <div class="content">
+        <div class="content">
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
-            <!-- Contact Details Section -->
-            <div class="section">
-                <div class="section-header">
+            <!-- Contact Details Section (collapsible, starts collapsed) -->
+            <div class="section collapsed" id="contact-details-section">
+                <div class="section-header clickable" onclick="toggleSection('contact-details-section')">
                     <h2>Contact Details</h2>
+                    <span class="section-toggle-indicator">▶</span>
                 </div>
                 <div class="section-content">
                 <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
@@ -1435,6 +2799,14 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             
             const template = templates[type] || '';
             quill.root.innerHTML = template;
+        }}
+
+        function toggleSection(sectionId) {{
+            const section = document.getElementById(sectionId);
+            if (!section) {{
+                return;
+            }}
+            section.classList.toggle('collapsed');
         }}
         
         function switchTab(tabName) {{

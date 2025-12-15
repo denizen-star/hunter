@@ -59,26 +59,12 @@
             color: var(--text-primary);
         }
         
-        .container {
-            width: calc(100vw - 180px);
+        .main-wrapper {
+            width: 100%;
             margin: 0;
             padding: var(--space-lg);
-            margin-left: 180px;
             box-sizing: border-box;
             padding-bottom: 100px; /* Space for fixed footer */
-        }
-        
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border-primary);
-            z-index: 1000;
-            padding: var(--space-md) 0;
-            overflow-y: auto;
         }
         
         .sidebar-header {
@@ -141,8 +127,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            width: calc(100% - 180px);
-            margin-left: 180px;
+            width: 100%;
             box-sizing: border-box;
         }
         
@@ -188,8 +173,7 @@
             background: #ffffff;
             border-top: 1px solid #e5e7eb;
             padding: 10px 32px;
-            width: calc(100% - 180px);
-            margin-left: 180px;
+            width: 100%;
             box-sizing: border-box;
             position: fixed;
             bottom: 0;
@@ -678,25 +662,6 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard" class="nav-link">App Dash</a></li>
-            <li><a href="/new-application" class="nav-link active">New Application</a></li>
-            <li><a href="/networking" class="nav-link">Network Dash</a></li>
-            <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
-            <li><a href="/templates" class="nav-link">Templates</a></li>
-            <li><a href="/progress" class="nav-link">Progress</a></li>
-            <li><a href="/reports" class="nav-link">Reports</a></li>
-            <li><a href="/analytics" class="nav-link">Analytics</a></li>
-            <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>
-            <li><a href="#" onclick="checkOllama(); return false;" class="nav-link">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true" class="nav-link">Manage Resume</a></li>
-        </ul>
-    </div>
-    
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
@@ -710,7 +675,7 @@
         </div>
     </div>
     
-    <div class="container">
+    <div class="main-wrapper">
         
         <div id="status-banner" class="status-banner hidden"></div>
         
@@ -1726,6 +1691,9 @@
             }
         });
     </script>
+    
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
     
     <!-- Footer -->
     <div class="page-footer">

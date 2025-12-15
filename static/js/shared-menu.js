@@ -180,12 +180,6 @@
         // Add class to body for margin adjustment (fallback)
         document.body.classList.add('with-sidebar');
 
-        // Adjust main content wrapper if it exists
-        const mainWrapper = document.querySelector('.main-wrapper');
-        if (mainWrapper && !mainWrapper.style.marginLeft) {
-            mainWrapper.style.marginLeft = '180px';
-        }
-
         // Handle showAIStatus function if it doesn't exist
         if (typeof showAIStatus === 'undefined') {
             window.showAIStatus = async function() {
