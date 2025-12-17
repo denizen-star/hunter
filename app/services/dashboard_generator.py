@@ -1251,7 +1251,7 @@ class DashboardGenerator:
                     headers: {{
                         'Content-Type': 'application/json'
                     }},
-                    body: JSON.stringify({{{{ flagged: newFlagged }}}})
+                    body: JSON.stringify({{ flagged: newFlagged }})
                 }});
                 
                 const data = await response.json();
