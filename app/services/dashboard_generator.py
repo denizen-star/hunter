@@ -927,10 +927,12 @@ class DashboardGenerator:
                 
                 if (data.connected) {{
                     statusDiv.style.background = '#28a745';
+                    const modelName = data.current_model || 'N/A';
+                    const availableModels = data.available_models ? data.available_models.join(', ') : 'N/A';
                     statusDiv.innerHTML = `
                         <strong>AI Status: Connected</strong><br>
-                        Model: ${{data.current_model}}<br>
-                        Available: ${{data.available_models.join(', ')}}
+                        Model: ${{modelName}}<br>
+                        Available: ${{availableModels}}
                     `;
                 }} else {{
                     statusDiv.style.background = '#dc3545';
