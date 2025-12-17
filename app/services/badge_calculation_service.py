@@ -281,11 +281,15 @@ class BadgeCalculationService:
                 phase = badge_def['phase']
                 points = badge_def['points']
                 
-                # For recurring badges, count each contact
+                # For recurring badges, add points for each contact
+                # For non-recurring badges, only add points once (when first contact earns it)
                 if badge_def.get('recurring', False):
+                    # Recurring: add points for each contact
                     points_by_category[phase] += points
                 else:
-                    points_by_category[phase] += points
+                    # Non-recurring: only add points once when first contact earns the badge
+                    if badge_counts[badge_id]['count'] == 1:
+                        points_by_category[phase] += points
         
         # Calculate total points and mark badges as earned
         total_points = sum(points_by_category.values())
