@@ -1245,7 +1245,8 @@ class DashboardGenerator:
         async function toggleFlag(appId, currentFlagged) {{
             try {{
                 const newFlagged = !currentFlagged;
-                const response = await fetch(`/api/applications/${{appId}}/flag`, {{
+                const url = '/api/applications/' + appId + '/flag';
+                const response = await fetch(url, {{
                     method: 'PUT',
                     headers: {{
                         'Content-Type': 'application/json'
@@ -1257,15 +1258,18 @@ class DashboardGenerator:
                 
                 if (data.success) {{
                     // Find the card by looking for the button with matching onclick attribute
-                    const flagBtn = Array.from(document.querySelectorAll('.flag-btn')).find(btn => 
-                        btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${{appId}}'`)
-                    );
+                    const flagBtn = Array.from(document.querySelectorAll('.flag-btn')).find(btn => {{
+                        const onclick = btn.getAttribute('onclick');
+                        return onclick && onclick.includes("'" + appId + "'");
+                    }});
                     
                     if (flagBtn) {{
                         flagBtn.textContent = newFlagged ? '🚩' : '⚐';
-                        flagBtn.className = `flag-btn ${{newFlagged ? 'flagged' : 'unflagged'}}`;
+                        const flagClass = newFlagged ? 'flagged' : 'unflagged';
+                        flagBtn.className = 'flag-btn ' + flagClass;
                         flagBtn.title = newFlagged ? 'Unflag this job' : 'Flag this job';
-                        flagBtn.setAttribute('onclick', `toggleFlag('${{appId}}', ${{String(newFlagged).toLowerCase()}})`);
+                        const onclickValue = 'toggleFlag(' + "'" + appId + "'" + ', ' + String(newFlagged).toLowerCase() + ')';
+                        flagBtn.setAttribute('onclick', onclickValue);
                         
                         // Update the card's data-flagged attribute
                         const card = flagBtn.closest('.card');
