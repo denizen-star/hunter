@@ -13,7 +13,7 @@ from pathlib import Path
 import sys
 
 # Add the app directory to the Python path
-sys.path.append('/Users/kervinleacock/Documents/Development/hunter')
+sys.path.append('')
 
 from app.services.document_generator import DocumentGenerator
 from app.services.ai_analyzer import AIAnalyzer
@@ -39,7 +39,7 @@ def generate_missing_intro_messages(application, ai_analyzer):
     """Generate missing intro message files"""
     try:
         # Check if intro message files exist
-        name_clean = "KervinLeacock"  # Assuming this is the candidate name
+        name_clean = "Rhetta_Chappell"  # Assuming this is the candidate name
         company_clean = application.company.replace(' ', '-')
         job_title_clean = application.job_title.replace(' ', '-')
         
@@ -202,7 +202,7 @@ def main():
         return
     
     # Get all application folders
-    applications_dir = Path("/Users/kervinleacock/Documents/Development/hunter/data/applications")
+    applications_dir = Path("data/applications")
     if not applications_dir.exists():
         print(f"❌ Applications directory not found: {applications_dir}")
         return

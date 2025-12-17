@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 # Add the app directory to the Python path
-sys.path.append('/Users/kervinleacock/Documents/Development/hunter')
+sys.path.append('')
 
 from app.utils.file_utils import load_yaml, save_yaml
 
@@ -55,7 +55,7 @@ def main():
     print("🚀 Starting simple migration to add new file path fields...")
     
     # Get all application folders
-    applications_dir = Path("/Users/kervinleacock/Documents/Development/hunter/data/applications")
+    applications_dir = Path("data/applications")
     if not applications_dir.exists():
         print(f"❌ Applications directory not found: {applications_dir}")
         return

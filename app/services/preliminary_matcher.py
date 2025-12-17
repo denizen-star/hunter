@@ -15,8 +15,8 @@ class PreliminaryMatcher:
     """Preliminary matching system to reduce AI load"""
     
     def __init__(self):
-        self.skills_yaml_path = Path("/Users/kervinleacock/Documents/Development/hunter/data/resumes/skills.yaml")
-        self.job_skills_path = Path("/Users/kervinleacock/Documents/Development/hunter/Jobdescr-General Skils.md")
+        self.skills_yaml_path = Path("data/resumes/skills.yaml")
+        self.job_skills_path = Path("Jobdescr-General Skils.md")
         self.candidate_skills = {}
         self.job_skills = {}
         # Performance optimization: Cache normalized candidate skills

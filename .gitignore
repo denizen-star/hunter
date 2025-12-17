@@ -52,3 +52,4 @@ data/output/*.html
 # Logs
 *.log
 
+.Rproj.user

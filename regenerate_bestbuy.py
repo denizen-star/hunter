@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 # Add the app directory to the Python path
-sys.path.append('/Users/kervinleacock/Documents/Development/hunter')
+sys.path.append('')
 
 from app.services.document_generator import DocumentGenerator
 from app.models.application import Application
@@ -26,7 +26,7 @@ def regenerate_bestbuy():
         return False
     
     # Find Best Buy application folder
-    applications_dir = Path("/Users/kervinleacock/Documents/Development/hunter/data/applications")
+    applications_dir = Path("data/applications")
     bestbuy_folder = applications_dir / "Best-Buy-Director-of-Product-Management---Data-AI-Enablement-team"
     
     if not bestbuy_folder.exists():

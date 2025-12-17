@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 # Add the app directory to the Python path
-sys.path.append('/Users/kervinleacock/Documents/Development/hunter')
+sys.path.append('')
 
 from app.services.document_generator import DocumentGenerator
 from app.models.application import Application
@@ -108,7 +108,7 @@ def fix_application(application_folder):
             print(f"  ✅ Generated recruiter intros: {len(recruiter_intros)} chars")
             
             # Save intro messages
-            name_clean = "KervinLeacock"
+            name_clean = "Rhetta_Chappell"
             company_clean = application.company.replace(' ', '-')
             job_title_clean = application.job_title.replace(' ', '-')
             
@@ -144,7 +144,7 @@ def main():
     print("🚀 Starting fix for research data and intro messages...")
     
     # Get all application folders
-    applications_dir = Path("/Users/kervinleacock/Documents/Development/hunter/data/applications")
+    applications_dir = Path("data/applications")
     if not applications_dir.exists():
         print(f"❌ Applications directory not found: {applications_dir}")
         return

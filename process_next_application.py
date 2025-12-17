@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # Add the project root to Python path
-sys.path.insert(0, '/Users/kervinleacock/Documents/Development/hunter')
+# sys.path.insert not needed with relative paths)
 
 from app.services.ai_analyzer import AIAnalyzer
 from app.services.job_processor import JobProcessor
@@ -201,7 +201,7 @@ def process_application(app_id, company, job_title, job_url=None):
             return False
         
         # Save hiring manager intro messages
-        hiring_manager_filename = f"KervinLeacock-{company.replace(' ', '-')}-{job_title.replace(' ', '-')}-hiring-manager-intros.md"
+        hiring_manager_filename = f"RhettaChappell-{company.replace(' ', '-')}-{job_title.replace(' ', '-')}-hiring-manager-intros.md"
         hiring_manager_path = application.folder_path / hiring_manager_filename
         write_text_file(hiring_manager_intros, hiring_manager_path)
         
@@ -233,7 +233,7 @@ def process_application(app_id, company, job_title, job_url=None):
         )
         
         # Save recruiter intro messages
-        recruiter_filename = f"KervinLeacock-{company.replace(' ', '-')}-{job_title.replace(' ', '-')}-recruiter-intros.md"
+        recruiter_filename = f"RhettaChappell-{company.replace(' ', '-')}-{job_title.replace(' ', '-')}-recruiter-intros.md"
         recruiter_path = application.folder_path / recruiter_filename
         write_text_file(recruiter_intros, recruiter_path)
         

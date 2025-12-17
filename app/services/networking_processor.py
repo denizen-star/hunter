@@ -17,7 +17,7 @@ class NetworkingProcessor:
         # #region agent log
         # Debug logging disabled - .cursor directory has special protections
         # import json
-        # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+        # with open('.cursor/debug.log', 'a') as f:
         #     f.write(json.dumps({"location":"networking_processor.py:__init__","message":"NetworkingProcessor initializing","data":{},"timestamp":__import__('time').time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"B"}) + '\n')
         # #endregion
         
@@ -27,7 +27,7 @@ class NetworkingProcessor:
         
         # #region agent log
         # Debug logging disabled - .cursor directory has special protections
-        # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+        # with open('.cursor/debug.log', 'a') as f:
         #     f.write(json.dumps({"location":"networking_processor.py:__init__","message":"Networking directory path","data":{"path":str(self.networking_dir)},"timestamp":__import__('time').time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"B"}) + '\n')
         # #endregion
         
@@ -35,7 +35,7 @@ class NetworkingProcessor:
         
         # #region agent log
         # Debug logging disabled - .cursor directory has special protections
-        # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+        # with open('.cursor/debug.log', 'a') as f:
         #     f.write(json.dumps({"location":"networking_processor.py:__init__","message":"NetworkingProcessor initialized successfully","data":{},"timestamp":__import__('time').time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"B"}) + '\n')
         # #endregion
     

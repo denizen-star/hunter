@@ -33,7 +33,7 @@ CORS(app)
 import json
 import time
 # Debug logging disabled - .cursor directory has special protections
-# with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+# with open('.cursor/debug.log', 'a') as f:
 #     f.write(json.dumps({"location":"web.py:init","message":"Starting service initialization","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
 # #endregion
 
@@ -48,7 +48,7 @@ analytics_generator = AnalyticsGenerator()
 
 # #region agent log
 # Debug logging disabled - .cursor directory has special protections
-# with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+# with open('.cursor/debug.log', 'a') as f:
 #     f.write(json.dumps({"location":"web.py:init","message":"About to initialize NetworkingProcessor","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
 # #endregion
 
@@ -57,7 +57,7 @@ networking_doc_generator = NetworkingDocumentGenerator()
 
 # #region agent log
 # Debug logging disabled - .cursor directory has special protections
-# with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+# with open('.cursor/debug.log', 'a') as f:
 #     f.write(json.dumps({"location":"web.py:init","message":"All services initialized successfully","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
 # #endregion
 
@@ -2671,7 +2671,7 @@ def internal_error(error):
 if __name__ == '__main__':
     # #region agent log
     # Debug logging disabled - .cursor directory has special protections
-    # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+    # with open('.cursor/debug.log', 'a') as f:
     #     f.write(json.dumps({"location":"web.py:main","message":"Starting main execution","data":{},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"A"}) + '\n')
     # #endregion
     
@@ -2680,7 +2680,7 @@ if __name__ == '__main__':
     
     # #region agent log
     # Debug logging disabled - .cursor directory has special protections
-    # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+    # with open('.cursor/debug.log', 'a') as f:
     #     f.write(json.dumps({"location":"web.py:main","message":"Port configured","data":{"port":port},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"C"}) + '\n')
     # #endregion
     
@@ -2707,7 +2707,7 @@ if __name__ == '__main__':
     
     # #region agent log
     # Debug logging disabled - .cursor directory has special protections
-    # with open('/Users/kervinleacock/Documents/Development/hunter/.cursor/debug.log', 'a') as f:
+    # with open('.cursor/debug.log', 'a') as f:
     #     f.write(json.dumps({"location":"web.py:main","message":"About to start Flask app","data":{"port":port,"host":"0.0.0.0","debug":True},"timestamp":time.time()*1000,"sessionId":"debug-session","runId":"startup","hypothesisId":"A"}) + '\n')
     # #endregion
     
