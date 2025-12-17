@@ -483,19 +483,27 @@
         }
         
         .sort-select {
-            padding: 10px 16px;
-            border: 1px solid var(--border-primary);
+            padding: 4px 8px;
+            border: none;
             border-radius: var(--radius-sm);
-            font-size: 14px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-size: 11px;
+            background: transparent;
+            color: var(--text-secondary);
             font-family: var(--font-family);
             cursor: pointer;
+            opacity: 0.7;
+            box-shadow: none;
         }
         
         .sort-select:focus {
             outline: none;
-            border-color: var(--accent-blue);
+            border: none;
+            box-shadow: none;
+            opacity: 1;
+        }
+        
+        .sort-select:hover {
+            opacity: 1;
         }
         
         /* Unified Grid */

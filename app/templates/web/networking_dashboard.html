@@ -136,23 +136,13 @@
         .stat-card {
             background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
             border-radius: 16px;
-            padding: 28px 24px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 12px 20px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(59, 130, 246, 0.1);
             cursor: pointer;
         }
         
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.06);
-        }
-        
         .stat-card.active {
-            border: 2px solid var(--accent-blue);
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2), 0 4px 8px rgba(0, 0, 0, 0.06);
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
         }
         
@@ -174,7 +164,7 @@
         .stat-card .label {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 12px;
+            margin-bottom: 0;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 400;
@@ -190,14 +180,11 @@
         }
         
         .stat-card .value {
-            font-size: 42px;
-            font-weight: 400;
+            font-size: 14px;
+            font-weight: 600;
             color: var(--text-primary);
             line-height: 1;
-            background: linear-gradient(135deg, #1f2937 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-left: 8px;
         }
         
         .filters {
@@ -218,6 +205,12 @@
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+        
+        .filter-group#statusFilters,
+        .filter-group#timingFilters {
+            flex-direction: column;
+            align-items: flex-start;
         }
         
         .filters h3 {
@@ -241,10 +234,40 @@
             border-radius: 2px;
         }
         
+        .filter-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .filter-toggle:hover {
+            color: var(--text-primary);
+        }
+        
+        .toggle-icon {
+            font-size: 10px;
+            transition: transform 0.2s ease;
+            margin-left: auto;
+        }
+        
+        .filter-group.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        
         .filter-buttons {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+            max-height: 200px;
+            opacity: 1;
+        }
+        
+        .filter-group.collapsed .filter-buttons {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
         }
         
         .filter-btn {
@@ -519,29 +542,25 @@
         <!-- Stats -->
         <div class="stats-row" id="stats">
             <div class="stat-card" data-stat-filter="all" id="stat-all">
-                <div class="label">Total Contacts</div>
-                <div class="value" id="totalContacts">-</div>
+                <div class="label">Total Contacts <span class="value" id="totalContacts">-</span></div>
             </div>
             <div class="stat-card active" data-stat-filter="active" id="stat-active">
-                <div class="label">Active</div>
-                <div class="value" id="activeContacts">-</div>
+                <div class="label">Active <span class="value" id="activeContacts">-</span></div>
             </div>
             <div class="stat-card" data-stat-filter="meetings" id="stat-meetings">
-                <div class="label">Meetings Scheduled</div>
-                <div class="value" id="meetingsScheduled">-</div>
+                <div class="label">Meetings Scheduled <span class="value" id="meetingsScheduled">-</span></div>
             </div>
             <div class="stat-card" data-stat-filter="partners" id="stat-partners">
-                <div class="label">Referral Partners</div>
-                <div class="value" id="referralPartners">-</div>
+                <div class="label">Referral Partners <span class="value" id="referralPartners">-</span></div>
             </div>
         </div>
         
         <!-- Combined Filters -->
         <div class="filters">
             <!-- Status Filters -->
-            <div class="filter-group" id="statusFilters">
-                <h3>Status Filters</h3>
-                <div class="filter-buttons">
+            <div class="filter-group collapsed" id="statusFilters">
+                <h3 class="filter-toggle" data-target="statusFilters">Status Filters <span class="toggle-icon">▼</span></h3>
+                <div class="filter-buttons" id="statusFilters-buttons">
                     <button class="filter-btn active" data-filter-type="status" data-filter="all">
                         All <span class="count" id="count-all">0</span>
                     </button>
@@ -567,9 +586,9 @@
             </div>
             
             <!-- Timing Filters -->
-            <div class="filter-group" id="timingFilters">
-                <h3>Activity Timing</h3>
-                <div class="filter-buttons">
+            <div class="filter-group collapsed" id="timingFilters">
+                <h3 class="filter-toggle" data-target="timingFilters">Activity Timing <span class="toggle-icon">▼</span></h3>
+                <div class="filter-buttons" id="timingFilters-buttons">
                     <button class="filter-btn active" data-filter-type="timing" data-timing="all">
                         All <span class="count" id="count-timing-all">0</span>
                     </button>
@@ -610,6 +629,7 @@
             loadContacts();
             setupFilters();
             setupStatFilters();
+            setupFilterToggles();
         });
 
         async function loadContacts() {
@@ -735,6 +755,34 @@
                     
                     // Re-render contacts
                     renderContacts();
+                });
+            });
+        }
+        
+        function setupFilterToggles() {
+            document.querySelectorAll('.filter-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    // Toggle both filter groups together
+                    const statusFiltersGroup = document.getElementById('statusFilters');
+                    const statusFiltersButtons = document.getElementById('statusFilters-buttons');
+                    const timingFiltersGroup = document.getElementById('timingFilters');
+                    const timingFiltersButtons = document.getElementById('timingFilters-buttons');
+                    
+                    // Determine new state based on status filters (they should be in sync)
+                    const isCurrentlyCollapsed = statusFiltersGroup.classList.contains('collapsed');
+                    
+                    // Toggle both groups to the same state
+                    if (isCurrentlyCollapsed) {
+                        statusFiltersGroup.classList.remove('collapsed');
+                        statusFiltersButtons.classList.remove('collapsed');
+                        timingFiltersGroup.classList.remove('collapsed');
+                        timingFiltersButtons.classList.remove('collapsed');
+                    } else {
+                        statusFiltersGroup.classList.add('collapsed');
+                        statusFiltersButtons.classList.add('collapsed');
+                        timingFiltersGroup.classList.add('collapsed');
+                        timingFiltersButtons.classList.add('collapsed');
+                    }
                 });
             });
         }

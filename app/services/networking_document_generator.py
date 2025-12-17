@@ -1,5 +1,6 @@
 """Document generation service for networking contacts"""
 import json
+import html
 from pathlib import Path
 from typing import Dict, Optional
 from datetime import datetime, timedelta
@@ -3344,8 +3345,16 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 points_color = '#10b981' if is_earned else '#9ca3af'
                 icon = '✓' if is_earned else '○'
                 
+                # Build tooltip with requirements
+                tooltip_parts = [badge_def['description']]
+                if 'trigger_status' in badge_def:
+                    tooltip_parts.append(f"Trigger: {badge_def['trigger_status']}")
+                tooltip_text = " | ".join(tooltip_parts)
+                # Escape HTML entities for title attribute
+                tooltip_text = html.escape(tooltip_text)
+                
                 all_badges_html.append(f'''
-                    <div style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;" title="{badge_def['description']}">
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;" title="{tooltip_text}">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <div style="width: 24px; height: 24px; font-size: 16px; color: {icon_color}; display: flex; align-items: center; justify-content: center; font-weight: bold;">
                                 {icon}
