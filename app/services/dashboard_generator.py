@@ -163,6 +163,9 @@ class DashboardGenerator:
                     case 'match_asc':
                         return parseFloat(a.dataset.matchScore || 0) - parseFloat(b.dataset.matchScore || 0);
                     """
+        
+        # Convert Python boolean to JavaScript boolean string (without quotes)
+        js_is_archived = "true" if is_archived else "false"
 
         # Generate stat cards and filter interface
         dashboard_html = self._create_dashboard_with_stats(applications, status_counts, is_archived=is_archived)
@@ -978,7 +981,7 @@ class DashboardGenerator:
             if (!grid) return;
             
             const cards = Array.from(grid.querySelectorAll('.card'));
-            const isArchived = {str(is_archived).lower()};
+            const isArchived = {js_is_archived};
             
             // Filter cards based on status and company
             cards.forEach(card => {{
@@ -1046,7 +1049,7 @@ class DashboardGenerator:
             if (!grid) return;
             
             const cards = Array.from(grid.querySelectorAll('.card:not([style*="display: none"])'));
-            const isArchived = {str(is_archived).lower()};
+            const isArchived = {js_is_archived};
             
             cards.sort((a, b) => {{
                 switch(sortBy) {{
@@ -1096,7 +1099,7 @@ class DashboardGenerator:
             }});
             
             // Initialize with "all" filter active (for archived dashboard) or "active" (for main dashboard)
-            const isArchived = {str(is_archived).lower()};
+            const isArchived = {js_is_archived};
             const defaultFilter = isArchived ? 'all' : 'active';
             filterApplications(defaultFilter);
             
