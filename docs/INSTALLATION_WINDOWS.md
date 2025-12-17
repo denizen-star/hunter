@@ -174,6 +174,15 @@ Run:
 python fix_all_paths.py
 ```
 
+Since these file path clean up scripts are only needed once at set up
+Optional cleanup: You can delete fix_all_paths.py and fix_paths.py from the repository since they're just one-time fix scripts:
+``` 
+powershellgit rm fix_all_paths.py fix_paths.py
+git commit -m "Remove temporary fix scripts"
+git push
+
+```
+
 ---
 
 ## Step 6: Set Up Python Environment
