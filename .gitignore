@@ -42,13 +42,20 @@ Thumbs.db
 data/resumes/*.md
 data/resumes/*.yaml
 !data/resumes/.gitkeep
-data/applications/*/
+data/applications/
 !data/applications/.gitkeep
 data/networking/*/
 !data/networking/.gitkeep
 data/output/*.html
 !data/output/.gitkeep
 
+# Cache and temporary files
+data/output/*.json
+data/backups/
+data/applications_archived/
+data/templates/*.html
+!data/templates/.gitkeep
+migration_report_*.json
+
 # Logs
 *.log
-
