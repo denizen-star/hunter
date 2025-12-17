@@ -1241,7 +1241,7 @@ class DashboardGenerator:
             return div.innerHTML;
         }}
         
-        {'' if is_archived else '''// Toggle flag for an application
+        {'' if is_archived else f'''// Toggle flag for an application
         async function toggleFlag(appId, currentFlagged) {{
             try {{
                 const newFlagged = !currentFlagged;
@@ -1251,7 +1251,7 @@ class DashboardGenerator:
                     headers: {{
                         'Content-Type': 'application/json'
                     }},
-                    body: JSON.stringify({{ flagged: newFlagged }})
+                    body: JSON.stringify({{{{ flagged: newFlagged }}}})
                 }});
                 
                 const data = await response.json();
