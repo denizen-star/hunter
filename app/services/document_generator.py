@@ -2797,6 +2797,338 @@ Format this as a professional research document that demonstrates thorough prepa
         </div>
         '''
     
+    def _generate_badge_display(self, application: Application) -> str:
+        """Generate badge display HTML for application hero section"""
+        try:
+            from app.services.badge_calculation_service import BadgeCalculationService
+            
+            badge_service = BadgeCalculationService()
+            badge_data = badge_service.calculate_badges_for_application(
+                application.id,
+                application.company
+            )
+            
+            # Define status progression order (for determining highest badge)
+            status_progression = [
+                'Ready to Connect',      # Deep Diver (+10)
+                'Pending Reply',         # Profile Magnet (+3)
+                'Connected - Initial',   # Qualified Lead (+15)
+                'In Conversation',       # Conversation Starter (+20)
+                'Meeting Scheduled',     # Scheduler Master (+30)
+                'Meeting Complete',      # Rapport Builder (+50)
+                'Strong Connection',     # Relationship Manager (+2, recurring)
+                'Referral Partner'       # Super Connector (+100)
+            ]
+            
+            # Status to badge mapping for progression
+            status_to_badge_progression = {
+                'Ready to Connect': 'deep_diver',
+                'Pending Reply': 'profile_magnet',
+                'Connected - Initial': 'qualified_lead',
+                'In Conversation': 'conversation_starter',
+                'Meeting Scheduled': 'scheduler_master',
+                'Meeting Complete': 'rapport_builder',
+                'Strong Connection': 'relationship_manager',
+                'Referral Partner': 'super_connector'
+            }
+            
+            # Get badge definitions for display (needed for both branches)
+            badge_definitions = badge_service.badge_definitions
+            
+            if badge_data['contacts_count'] == 0:
+                # No contacts - show the first badge to earn (Deep Diver)
+                first_badge_id = 'deep_diver'
+                first_badge_def = badge_definitions[first_badge_id]
+                next_badge_item = {
+                    'badge_id': first_badge_id,
+                    'badge_def': first_badge_def,
+                    'earned': False,
+                    'count': 0,
+                    'required': 1,
+                    'points': first_badge_def['points'],
+                    'progress': 0
+                }
+                next_badge_html = self._generate_badge_item_html(next_badge_item, False)
+                earned_badges_html = []
+                total_points = 0
+            else:
+                # Has contacts - find the highest badge achieved across all contacts
+                from app.services.networking_processor import NetworkingProcessor
+                networking_processor = NetworkingProcessor()
+                all_contacts = networking_processor.list_all_contacts()
+                
+                # Filter contacts matching this application's company
+                matched_contacts = [
+                    c for c in all_contacts
+                    if c.company_name.lower().strip() == application.company.lower().strip()
+                ]
+                
+                # Status mapping for legacy statuses
+                status_mapping = {
+                    'Ready to Contact': 'Ready to Connect',
+                    'Contacted - Sent': 'Pending Reply',
+                    'Contacted - No Response': 'Pending Reply',
+                    'Contacted - Replied': 'Connected - Initial',
+                    'New Connection': 'Connected - Initial',
+                    'Cold/Archive': 'Cold/Inactive',
+                    'Action Pending - You': 'In Conversation',
+                    'Action Pending - Them': 'In Conversation',
+                    'Nurture (1-3 Mo.)': 'Strong Connection',
+                    'Nurture (4-6 Mo.)': 'Strong Connection',
+                    'Inactive/Dormant': 'Dormant'
+                }
+                
+                # Find highest status across all contacts
+                highest_status_index = -1
+                highest_status = None
+                
+                for contact in matched_contacts:
+                    normalized_status = status_mapping.get(contact.status, contact.status)
+                    if normalized_status in status_progression:
+                        status_index = status_progression.index(normalized_status)
+                        if status_index > highest_status_index:
+                            highest_status_index = status_index
+                            highest_status = normalized_status
+                
+                # Get the highest badge achieved
+                max_badge_html = ''
+                if highest_status and highest_status in status_to_badge_progression:
+                    max_badge_id = status_to_badge_progression[highest_status]
+                    max_badge_def = badge_definitions[max_badge_id]
+                    
+                    # Calculate cumulative points up to this status
+                    cumulative_points = 0
+                    for i in range(highest_status_index + 1):
+                        status_in_progression = status_progression[i]
+                        badge_id_for_status = status_to_badge_progression.get(status_in_progression)
+                        if badge_id_for_status:
+                            badge_def_for_status = badge_definitions[badge_id_for_status]
+                            cumulative_points += badge_def_for_status['points']
+                    
+                    max_badge_item = {
+                        'badge_id': max_badge_id,
+                        'badge_def': max_badge_def,
+                        'earned': True,
+                        'count': len([c for c in matched_contacts if status_mapping.get(c.status, c.status) == highest_status]),
+                        'required': 1,
+                        'points': max_badge_def['points'],
+                        'progress': 100
+                    }
+                    max_badge_html = self._generate_badge_item_html(max_badge_item, True)
+                    total_points = cumulative_points
+                
+                # Find next badge to earn (next in progression after highest)
+                next_badge_html = ''
+                if highest_status_index >= 0 and highest_status_index < len(status_progression) - 1:
+                    next_status = status_progression[highest_status_index + 1]
+                    next_badge_id = status_to_badge_progression.get(next_status)
+                    if next_badge_id:
+                        next_badge_def = badge_definitions[next_badge_id]
+                        next_badge_item = {
+                            'badge_id': next_badge_id,
+                            'badge_def': next_badge_def,
+                            'earned': False,
+                            'count': 0,
+                            'required': 1,
+                            'points': next_badge_def['points'],
+                            'progress': 0
+                        }
+                        next_badge_html = self._generate_badge_item_html(next_badge_item, False)
+                elif highest_status_index == -1:
+                    # No contacts have reached any badge status, show first badge
+                    first_badge_id = 'deep_diver'
+                    first_badge_def = badge_definitions[first_badge_id]
+                    next_badge_item = {
+                        'badge_id': first_badge_id,
+                        'badge_def': first_badge_def,
+                        'earned': False,
+                        'count': 0,
+                        'required': 1,
+                        'points': first_badge_def['points'],
+                        'progress': 0
+                    }
+                    next_badge_html = self._generate_badge_item_html(next_badge_item, False)
+                
+                earned_badges_html = [max_badge_html] if max_badge_html else []
+                
+            # Complete badge section HTML - horizontal layout: earned badges on left, next badge on right
+            return f'''
+            <div class="badge-section" style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; cursor: pointer;" onclick="toggleBadgeSection()">
+                    <h3 style="margin: 0; font-size: 13px; font-weight: 600; color: #1f2937;">Networking Rewards</h3>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="font-size: 16px; font-weight: 700; color: #3b82f6; margin-left: 16px;">{total_points} pts</div>
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div id="badge-grid-content" style="display: flex; gap: 12px; align-items: flex-start; max-height: 300px; overflow-y: auto;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; flex: 1;">
+                        {''.join(earned_badges_html)}
+                    </div>
+                    {f'<div style="flex-shrink: 0;">{next_badge_html}</div>' if next_badge_html else ''}
+                </div>
+                <script>
+                    let badgeSectionExpanded = true;
+                    function toggleBadgeSection() {{
+                        const content = document.getElementById('badge-grid-content');
+                        const icon = document.getElementById('badge-toggle-icon');
+                        if (!badgeSectionExpanded) {{
+                            content.style.display = 'flex';
+                            icon.style.transform = 'rotate(0deg)';
+                            badgeSectionExpanded = true;
+                        }} else {{
+                            content.style.display = 'none';
+                            icon.style.transform = 'rotate(180deg)';
+                            badgeSectionExpanded = false;
+                        }}
+                    }}
+                </script>
+            </div>
+            '''
+        except Exception as e:
+            print(f"Warning: Could not generate badge display: {e}")
+            return ''
+    
+    def _generate_rewards_by_category_html(self, application: Application) -> str:
+        """Generate rewards by category HTML for Rewards tab"""
+        try:
+            from app.services.badge_calculation_service import BadgeCalculationService
+            
+            badge_service = BadgeCalculationService()
+            badge_data = badge_service.calculate_badges_for_application(
+                application.id,
+                application.company
+            )
+            
+            if badge_data['contacts_count'] == 0:
+                return '<p style="color: #6b7280; padding: 20px;">No networking contacts linked to this application yet.</p>'
+            
+            points_by_category = badge_data.get('points_by_category', {})
+            total_points = badge_data['total_points']
+            badges = badge_data['badges']
+            
+            # Group badges by category
+            category_badges = {
+                'prospecting': [],
+                'outreach': [],
+                'engagement': [],
+                'nurture': []
+            }
+            
+            for badge_id, badge_info in badges.items():
+                if badge_id not in badge_service.badge_definitions:
+                    continue
+                
+                badge_def = badge_service.badge_definitions[badge_id]
+                phase = badge_def['phase']
+                
+                if badge_info['count'] > 0:
+                    category_badges[phase].append({
+                        'badge_id': badge_id,
+                        'badge_def': badge_def,
+                        'count': badge_info['count'],
+                        'points': badge_info['points'],
+                        'total_points': badge_info['points'] * badge_info['count'] if badge_def.get('recurring', False) else badge_info['points']
+                    })
+            
+            # Category display names
+            category_names = {
+                'prospecting': 'Prospecting',
+                'outreach': 'Outreach',
+                'engagement': 'Engagement',
+                'nurture': 'Nurture'
+            }
+            
+            # Category colors
+            category_colors = {
+                'prospecting': {'color': '#3b82f6', 'bg_color': '#dbeafe'},
+                'outreach': {'color': '#10b981', 'bg_color': '#d1fae5'},
+                'engagement': {'color': '#f59e0b', 'bg_color': '#fef3c7'},
+                'nurture': {'color': '#8b5cf6', 'bg_color': '#ede9fe'}
+            }
+            
+            # Generate card HTML for each category
+            category_cards = []
+            for phase in ['prospecting', 'outreach', 'engagement', 'nurture']:
+                category_points = points_by_category.get(phase, 0)
+                phase_badges = category_badges[phase]
+                badges_count = len(phase_badges)
+                
+                cat_colors = category_colors.get(phase, {'color': '#6b7280', 'bg_color': '#f3f4f6'})
+                
+                category_cards.append(f'''
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: {cat_colors['color']};"></div>
+                        <div style="font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">{category_names[phase]}</div>
+                        <div style="font-size: 24px; font-weight: 700; color: {cat_colors['color']}; margin-bottom: 8px;">{category_points}</div>
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">points</div>
+                        <div style="height: 1px; background: #e5e7eb; margin: 8px 0;"></div>
+                        <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">{badges_count}</div>
+                    </div>
+                ''')
+            
+            return f'''
+            <div style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">Networking Rewards by Category</h2>
+                    <div style="font-size: 18px; font-weight: 700; color: #3b82f6;">{total_points} pts</div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    {''.join(category_cards)}
+                </div>
+            </div>
+            '''
+        except Exception as e:
+            print(f"Warning: Could not generate rewards by category: {e}")
+            return f'<p style="color: #ef4444;">Error loading rewards: {str(e)}</p>'
+    
+    def _generate_badge_item_html(self, badge_data_item: dict, earned: bool) -> str:
+        """Generate HTML for a single badge item"""
+        badge_def = badge_data_item['badge_def']
+        count = badge_data_item['count']
+        required = badge_data_item['required']
+        points = badge_data_item['points']
+        progress = badge_data_item['progress']
+        
+        # Build tooltip with requirements
+        tooltip_parts = [badge_def['description']]
+        if 'trigger_status' in badge_def:
+            tooltip_parts.append(f"Trigger: {badge_def['trigger_status']}")
+        if required > 1:
+            if 'time_window' in badge_def:
+                tooltip_parts.append(f"Requires: {required} {badge_def['time_window']}s")
+            else:
+                tooltip_parts.append(f"Requires: {required} contacts")
+        tooltip_text = " | ".join(tooltip_parts)
+        
+        badge_class = 'badge-unlocked' if earned else 'badge-locked'
+        border_color = '#3b82f6' if earned else '#d1d5db'
+        icon_color = '#3b82f6' if earned else '#9ca3af'
+        points_color = '#10b981' if earned else '#9ca3af'
+        
+        return f'''
+            <div class="badge-item {badge_class}" title="{tooltip_text}" style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="badge-icon" style="width: 24px; height: 24px; font-size: 16px; color: {icon_color}; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        {'✓' if earned else '○'}
+                    </div>
+                    <div class="badge-info" style="flex: 1; min-width: 0;">
+                        <div class="badge-name" style="font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1f2937;">{badge_def['name']}</div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div class="badge-progress" style="flex: 1; height: 6px; min-width: 50px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                <div class="badge-progress-fill" style="width: {progress}%; height: 100%; background: {'linear-gradient(90deg, #3b82f6, #10b981)' if earned else '#d1d5db'}; transition: width 0.3s ease;"></div>
+                            </div>
+                            <div class="badge-count" style="font-size: 11px; color: #6b7280; white-space: nowrap; font-weight: 500;">{count} contact{'s' if count != 1 else ''}</div>
+                        </div>
+                    </div>
+                    <div class="badge-points" style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{points}</div>
+                </div>
+            </div>
+        '''
+    
     def _create_summary_html(
         self,
         application: Application,
@@ -3343,6 +3675,114 @@ Format this as a professional research document that demonstrates thorough prepa
         .checklist-header:hover {{
             color: var(--text-primary);
         }}
+        
+        /* Badge Display Styles */
+        .badge-section {{
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }}
+        
+        .badge-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+        }}
+        
+        .badge-item {{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            min-height: auto;
+        }}
+        
+        .badge-item:hover {{
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }}
+        
+        .badge-locked {{
+            opacity: 0.6;
+        }}
+        
+        .badge-unlocked {{
+            opacity: 1;
+            border-color: #3b82f6;
+        }}
+        
+        .badge-icon {{
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3b82f6;
+            flex-shrink: 0;
+        }}
+        
+        .badge-locked .badge-icon {{
+            color: #9ca3af;
+        }}
+        
+        .badge-info {{
+            flex: 1;
+            min-width: 0;
+        }}
+        
+        .badge-name {{
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }}
+        
+        .badge-progress {{
+            flex: 1;
+            height: 4px;
+            min-width: 40px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }}
+        
+        .badge-progress-fill {{
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }}
+        
+        .badge-locked .badge-progress-fill {{
+            background: #d1d5db;
+        }}
+        
+        .badge-count {{
+            font-size: 10px;
+            color: #6b7280;
+            white-space: nowrap;
+        }}
+        
+        .badge-points {{
+            font-size: 12px;
+            font-weight: 700;
+            color: #10b981;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }}
+        
+        .badge-locked .badge-points {{
+            color: #9ca3af;
+        }}
+        
         .checklist-title {{ 
             font-size: var(--font-sm); 
             font-weight: var(--font-semibold); 
@@ -3952,7 +4392,9 @@ Format this as a professional research document that demonstrates thorough prepa
                         <button class="btn btn-primary" onclick="const tabs = Array.from(document.querySelectorAll('.tab')); const updatesTab = tabs.find(t => t.textContent.includes('Updates') || t.textContent.includes('updates')); if (updatesTab) {{ showTab(updatesTab, 'updates'); }}">Update Status</button>
             </div>
                     
-                {self._generate_checklist_html(application)}
+                <div style="margin-top: 16px; width: 100%;">
+                    {self._generate_badge_display(application)}
+                </div>
             </div>
         </div>
             </div>
@@ -4020,6 +4462,7 @@ Format this as a professional research document that demonstrates thorough prepa
             {self._generate_tab_button('cover-letter', 'Cover Letter', application.cover_letter_path)}
             <button type="button" class="tab" onclick="showTab(this, 'resume')">Custom Resume</button>
             <button type="button" class="tab" onclick="showTab(this, 'networking')">Networking</button>
+            <button type="button" class="tab" onclick="showTab(this, 'rewards')">Rewards</button>
             <button type="button" class="tab" onclick="showTab(this, 'updates')">Updates</button>
             <button type="button" class="tab" onclick="showTab(this, 'timeline')">Timeline</button>
         </div>
@@ -5681,7 +6124,12 @@ Format this as a professional research document that demonstrates thorough prepa
         """Generate the Networking tab HTML showing contacts matching the company"""
         from urllib.parse import quote
         company_encoded = quote(application.company)
-        return f'''<div id="networking" class="tab-content">
+        return f'''<div id="rewards" class="tab-content">
+            <h2>Networking Rewards by Category</h2>
+            {self._generate_rewards_by_category_html(application)}
+        </div>
+        
+        <div id="networking" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="margin: 0;">Networking Contacts</h2>
                 <button id="create-contact-btn" onclick="showCreateContactForm()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">Create New Contact</button>
