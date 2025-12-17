@@ -125,27 +125,47 @@ class DashboardGenerator:
     
     def _create_dashboard_html(self, applications: List[Application], is_archived: bool = False) -> str:
         """Create the HTML dashboard"""
-        # Calculate stats for all possible statuses
-        def count_status(*labels):
-            return len([a for a in applications if self._status_matches(a.status, *labels)])
+        # For archived dashboard, only calculate 'all' and 'rejected' counts
+        if is_archived:
+            status_counts = {
+                'rejected': len([a for a in applications if self._status_matches(a.status, 'rejected')])
+            }
+        else:
+            # Calculate stats for all possible statuses
+            def count_status(*labels):
+                return len([a for a in applications if self._status_matches(a.status, *labels)])
 
-        status_counts = {
-            'pending': count_status('pending'),
-            'applied': count_status('applied'),
-            'contacted someone': count_status('contacted someone'),
-            'company response': count_status('company response', 'contacted hiring manager'),
-            'scheduled interview': count_status('scheduled interview'),
-            'interview notes': count_status('interview notes', 'interviewed'),
-            'interview - follow up': count_status('interview - follow up'),
-            'offered': count_status('offered'),
-            'rejected': count_status('rejected'),
-            'accepted': count_status('accepted')
-        }
+            status_counts = {
+                'pending': count_status('pending'),
+                'applied': count_status('applied'),
+                'contacted someone': count_status('contacted someone'),
+                'company response': count_status('company response', 'contacted hiring manager'),
+                'scheduled interview': count_status('scheduled interview'),
+                'interview notes': count_status('interview notes', 'interviewed'),
+                'interview - follow up': count_status('interview - follow up'),
+                'offered': count_status('offered'),
+                'rejected': count_status('rejected'),
+                'accepted': count_status('accepted')
+            }
         
         total = len(applications)
+        
+        # Build additional sort cases for JavaScript (only for main dashboard)
+        # This needs to be defined here so it's available in the JavaScript f-string below
+        additional_sort_cases = ""
+        if not is_archived:
+            additional_sort_cases = """case 'job_posted_desc':
+                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                    case 'job_posted_asc':
+                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
+                    case 'match_desc':
+                        return parseFloat(b.dataset.matchScore || 0) - parseFloat(a.dataset.matchScore || 0);
+                    case 'match_asc':
+                        return parseFloat(a.dataset.matchScore || 0) - parseFloat(b.dataset.matchScore || 0);
+                    """
 
         # Generate stat cards and filter interface
-        dashboard_html = self._create_dashboard_with_stats(applications, status_counts)
+        dashboard_html = self._create_dashboard_with_stats(applications, status_counts, is_archived=is_archived)
         
         # Set title and header text based on dashboard type
         if is_archived:
@@ -875,7 +895,7 @@ class DashboardGenerator:
     {dashboard_html}
     
     <script>
-        // AI Status Check Function - Show message on screen
+        {'' if is_archived else '''// AI Status Check Function - Show message on screen
         async function showAIStatus() {{
             try {{
                 const response = await fetch('/api/check-ollama');
@@ -938,6 +958,7 @@ class DashboardGenerator:
             // Open new application page where resume manager is located
             window.location.href = '/new-application';
         }}
+        '''}
         
         // Filter applications by status
         function filterApplications(filterStatus) {{
@@ -957,43 +978,57 @@ class DashboardGenerator:
             if (!grid) return;
             
             const cards = Array.from(grid.querySelectorAll('.card'));
+            const isArchived = {str(is_archived).lower()};
             
             // Filter cards based on status and company
             cards.forEach(card => {{
                 let show = false;
-                const statusElement = card.querySelector('.card-status');
-                const statusText = statusElement?.textContent.toLowerCase() || '';
-                const statusClass = statusElement?.className || '';
-                const isFlagged = card.dataset.flagged === 'true';
                 const companyElement = card.querySelector('.card-company');
                 const companyName = companyElement?.textContent.trim() || '';
                 
-                // Status filtering
-                if (filterStatus === 'all') {{
-                    show = true;
-                }} else if (filterStatus === 'active') {{
-                    // Show all non-rejected and non-accepted
-                    show = !statusText.includes('rejected') && !statusText.includes('accepted');
-                }} else if (filterStatus === 'flagged') {{
-                    show = isFlagged;
-                }} else if (filterStatus === 'pending') {{
-                    show = statusText.includes('pending');
-                }} else if (filterStatus === 'applied') {{
-                    show = statusText.includes('applied') && !statusText.includes('company') && !statusClass.includes('company');
-                }} else if (filterStatus === 'contacted') {{
-                    show = statusText.includes('contacted') || statusClass.includes('contacted');
-                }} else if (filterStatus === 'company') {{
-                    show = statusText.includes('company') || statusClass.includes('company-response');
-                }} else if (filterStatus === 'scheduled') {{
-                    show = statusText.includes('scheduled') || statusClass.includes('scheduled');
-                }} else if (filterStatus === 'follow-up') {{
-                    show = statusText.includes('follow') || statusClass.includes('follow');
-                }} else if (filterStatus === 'offered') {{
-                    show = statusText.includes('offered') || statusClass.includes('offered');
-                }} else if (filterStatus === 'rejected') {{
-                    show = statusText.includes('rejected') || statusClass.includes('rejected');
-                }} else if (filterStatus === 'accepted') {{
-                    show = statusText.includes('accepted') || statusClass.includes('accepted');
+                // Simplified filtering for archived dashboard
+                if (isArchived) {{
+                    // Only 'all' and 'rejected' filters for archived
+                    if (filterStatus === 'all') {{
+                        show = true;
+                    }} else if (filterStatus === 'rejected') {{
+                        const statusElement = card.querySelector('.card-status');
+                        const statusText = statusElement?.textContent.toLowerCase() || '';
+                        const statusClass = statusElement?.className || '';
+                        show = statusText.includes('rejected') || statusClass.includes('rejected');
+                    }}
+                }} else {{
+                    // Full filtering logic for main dashboard
+                    const statusElement = card.querySelector('.card-status');
+                    const statusText = statusElement?.textContent.toLowerCase() || '';
+                    const statusClass = statusElement?.className || '';
+                    const isFlagged = card.dataset.flagged === 'true';
+                    
+                    if (filterStatus === 'all') {{
+                        show = true;
+                    }} else if (filterStatus === 'active') {{
+                        show = !statusText.includes('rejected') && !statusText.includes('accepted');
+                    }} else if (filterStatus === 'flagged') {{
+                        show = isFlagged;
+                    }} else if (filterStatus === 'pending') {{
+                        show = statusText.includes('pending');
+                    }} else if (filterStatus === 'applied') {{
+                        show = statusText.includes('applied') && !statusText.includes('company') && !statusClass.includes('company');
+                    }} else if (filterStatus === 'contacted') {{
+                        show = statusText.includes('contacted') || statusClass.includes('contacted');
+                    }} else if (filterStatus === 'company') {{
+                        show = statusText.includes('company') || statusClass.includes('company-response');
+                    }} else if (filterStatus === 'scheduled') {{
+                        show = statusText.includes('scheduled') || statusClass.includes('scheduled');
+                    }} else if (filterStatus === 'follow-up') {{
+                        show = statusText.includes('follow') || statusClass.includes('follow');
+                    }} else if (filterStatus === 'offered') {{
+                        show = statusText.includes('offered') || statusClass.includes('offered');
+                    }} else if (filterStatus === 'rejected') {{
+                        show = statusText.includes('rejected') || statusClass.includes('rejected');
+                    }} else if (filterStatus === 'accepted') {{
+                        show = statusText.includes('accepted') || statusClass.includes('accepted');
+                    }}
                 }}
                 
                 // Company filtering (if company filter is active)
@@ -1011,6 +1046,7 @@ class DashboardGenerator:
             if (!grid) return;
             
             const cards = Array.from(grid.querySelectorAll('.card:not([style*="display: none"])'));
+            const isArchived = {str(is_archived).lower()};
             
             cards.sort((a, b) => {{
                 switch(sortBy) {{
@@ -1022,14 +1058,15 @@ class DashboardGenerator:
                         return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
                     case 'applied_asc':
                         return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
-                    case 'job_posted_desc':
-                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
-                    case 'job_posted_asc':
-                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
-                    case 'match_desc':
-                        return parseFloat(b.dataset.matchScore || 0) - parseFloat(a.dataset.matchScore || 0);
-                    case 'match_asc':
-                        return parseFloat(a.dataset.matchScore || 0) - parseFloat(b.dataset.matchScore || 0);
+                    case 'company_asc':
+                        const companyA = a.querySelector('.card-company')?.textContent.trim() || '';
+                        const companyB = b.querySelector('.card-company')?.textContent.trim() || '';
+                        return companyA.localeCompare(companyB);
+                    case 'company_desc':
+                        const companyA2 = a.querySelector('.card-company')?.textContent.trim() || '';
+                        const companyB2 = b.querySelector('.card-company')?.textContent.trim() || '';
+                        return companyB2.localeCompare(companyA2);
+                    {additional_sort_cases}
                     default:
                         return 0;
                 }}
@@ -1064,8 +1101,10 @@ class DashboardGenerator:
             filterApplications(defaultFilter);
             
             // Initialize company search if archived
-            if ({str(is_archived).lower()} && typeof allCompanies !== 'undefined' && typeof updateSelectedCompaniesDisplay === 'function') {{
-                updateSelectedCompaniesDisplay();
+            if (isArchived && typeof allCompanies !== 'undefined') {{
+                if (typeof updateSelectedCompaniesDisplay === 'function') {{
+                    updateSelectedCompaniesDisplay();
+                }}
             }}
             
             // Activate 'all' stat card if archived
@@ -1197,7 +1236,7 @@ class DashboardGenerator:
             return div.innerHTML;
         }}
         
-        // Toggle flag for an application
+        {'' if is_archived else '''// Toggle flag for an application
         async function toggleFlag(appId, currentFlagged) {{
             try {{
                 const newFlagged = !currentFlagged;
@@ -1242,6 +1281,7 @@ class DashboardGenerator:
                 alert('Error updating flag. Please try again.');
             }}
         }}
+        '''}
         
     </script>
     <!-- Shared Sidebar Menu -->
@@ -1323,11 +1363,29 @@ class DashboardGenerator:
         
         sorted_apps = sorted(applications, key=safe_datetime_sort_key, reverse=True)
         for app in sorted_apps:
-            cards_html += self._create_application_card(app)
+            if is_archived:
+                cards_html += self._create_archived_application_card(app)
+            else:
+                cards_html += self._create_application_card(app)
         
         # Get unique company names for search
         company_names = sorted(list(set([app.company for app in applications if app.company])))
         company_names_json = ', '.join([f'"{name}"' for name in company_names])
+        
+        # Build sort options based on dashboard type
+        sort_options = """<option value="updated_desc">Updated (Newest First)</option>
+                    <option value="updated_asc">Updated (Oldest First)</option>
+                    <option value="applied_desc">Applied (Newest First)</option>
+                    <option value="applied_asc">Applied (Oldest First)</option>"""
+        if not is_archived:
+            sort_options += """
+                    <option value="job_posted_desc">Job Posted (Newest First)</option>
+                    <option value="job_posted_asc">Job Posted (Oldest First)</option>
+                    <option value="match_desc">Match % (Highest First)</option>
+                    <option value="match_asc">Match % (Lowest First)</option>"""
+        sort_options += """
+                    <option value="company_asc">Company (A-Z)</option>
+                    <option value="company_desc">Company (Z-A)</option>"""
         
         # Add company search HTML if archived dashboard
         company_search_html = ""
@@ -1362,14 +1420,7 @@ class DashboardGenerator:
                 <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">Applications</h3>
                 {company_search_html}
                 <select id="sort-select" class="sort-select" onchange="handleSortChange()" style="margin-left: auto;">
-                    <option value="updated_desc">Updated (Newest First)</option>
-                    <option value="updated_asc">Updated (Oldest First)</option>
-                    <option value="applied_desc">Applied (Newest First)</option>
-                    <option value="applied_asc">Applied (Oldest First)</option>
-                    <option value="job_posted_desc">Job Posted (Newest First)</option>
-                    <option value="job_posted_asc">Job Posted (Oldest First)</option>
-                    <option value="match_desc">Match % (Highest First)</option>
-                    <option value="match_asc">Match % (Lowest First)</option>
+                    {sort_options}
                 </select>
             </div>
             <div class="applications-grid" id="applications-grid">
@@ -1609,6 +1660,68 @@ class DashboardGenerator:
             </div>
             <div class="card-meta">
                 📋 Posted: {app.posted_date if app.posted_date else 'N/A'}
+            </div>
+            <div class="card-meta">
+                🔄 Updated: {format_for_display(app.status_updated_at)}
+            </div>
+            {notes_html}
+            <div class="card-actions">
+                <a href="{summary_link}" class="card-btn">View Summary →</a>
+            </div>
+        </div>
+        """
+    
+    def _create_archived_application_card(self, app: Application) -> str:
+        """Create HTML for a single archived application card (simplified - no flags, match scores, progress pills, posted dates)"""
+        # Generate summary link - simplified for archived (all should have summaries)
+        summary_link = "#"
+        if app.folder_path and app.folder_path.exists():
+            folder_name = app.folder_path.name
+            
+            # Find summary file in folder
+            summary_file = None
+            if app.summary_path and Path(app.summary_path).exists():
+                summary_file = Path(app.summary_path)
+            elif app.folder_path.is_dir():
+                for file_path in app.folder_path.iterdir():
+                    if file_path.is_file() and file_path.name.startswith("20") and "-Summary-" in file_path.name and file_path.suffix == ".html":
+                        summary_file = file_path
+                        break
+            
+            if summary_file:
+                summary_link = f"/applications/{folder_name}/{summary_file.name}"
+        
+        # Create data attributes for sorting (no match score, no flagged)
+        updated_at = app.status_updated_at or app.created_at
+        applied_at = app.created_at
+        
+        # Get rejected notes
+        notes_html = ""
+        notes = self._get_latest_status_notes(app)
+        if notes:
+            display_notes = notes[:200] + "..." if len(notes) > 200 else notes
+            notes_html = f"""
+            <div class="card-notes">
+                <div class="card-notes-label">Rejection Notes:</div>
+                <div class="card-notes-text" title="{notes}">{display_notes}</div>
+            </div>
+            """
+        
+        return f"""
+        <div class="card" 
+             data-updated-at="{updated_at.isoformat()}" 
+             data-applied-at="{applied_at.isoformat()}">
+            <div class="card-header">
+                <div class="card-company">
+                    {app.company}
+                </div>
+            </div>
+            <div class="card-title">{app.job_title}</div>
+            <div class="card-status-container">
+                <span class="card-status status-{self._status_to_class(app.status)}">{app.status}</span>
+            </div>
+            <div class="card-meta">
+                📅 Applied: {format_for_display(app.created_at)}
             </div>
             <div class="card-meta">
                 🔄 Updated: {format_for_display(app.status_updated_at)}
