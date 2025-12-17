@@ -548,8 +548,14 @@
                     <button class="filter-btn" data-filter-type="status" data-filter="To Research">
                         To Research <span class="count" id="count-research">0</span>
                     </button>
-                    <button class="filter-btn" data-filter-type="status" data-filter="Contacted">
-                        Contacted <span class="count" id="count-contacted">0</span>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Ready to Connect">
+                        Ready to Connect <span class="count" id="count-ready">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Pending Reply">
+                        Pending Reply <span class="count" id="count-pending">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Connected - Initial">
+                        Connected <span class="count" id="count-connected">0</span>
                     </button>
                     <button class="filter-btn" data-filter-type="status" data-filter="In Conversation">
                         In Conversation <span class="count" id="count-conversation">0</span>
@@ -629,8 +635,9 @@
         function updateStats() {
             document.getElementById('totalContacts').textContent = allContacts.length;
             
+            // Updated for new status system
             const active = allContacts.filter(c => 
-                !['Cold/Archive', 'Inactive/Dormant'].includes(c.status)
+                !['Cold/Inactive', 'Dormant', 'Cold/Archive', 'Inactive/Dormant'].includes(c.status)
             ).length;
             document.getElementById('activeContacts').textContent = active;
             
@@ -646,14 +653,20 @@
         }
 
         function updateFilterCounts() {
-            // Status counts
+            // Status counts - updated for new status system
             document.getElementById('count-all').textContent = allContacts.length;
             
             const research = allContacts.filter(c => c.status === 'To Research').length;
             document.getElementById('count-research').textContent = research;
             
-            const contacted = allContacts.filter(c => c.status.includes('Contacted')).length;
-            document.getElementById('count-contacted').textContent = contacted;
+            const ready = allContacts.filter(c => c.status === 'Ready to Connect').length;
+            document.getElementById('count-ready').textContent = ready;
+            
+            const pending = allContacts.filter(c => c.status === 'Pending Reply').length;
+            document.getElementById('count-pending').textContent = pending;
+            
+            const connected = allContacts.filter(c => c.status === 'Connected - Initial').length;
+            document.getElementById('count-connected').textContent = connected;
             
             const conversation = allContacts.filter(c => c.status === 'In Conversation').length;
             document.getElementById('count-conversation').textContent = conversation;
@@ -732,10 +745,10 @@
             // Start with all contacts
             let filtered = allContacts;
             
-            // Apply stat filter first
+            // Apply stat filter first - updated for new status system
             if (currentStatFilter === 'active') {
                 filtered = filtered.filter(c => 
-                    !['Cold/Archive', 'Inactive/Dormant'].includes(c.status)
+                    !['Cold/Inactive', 'Dormant', 'Cold/Archive', 'Inactive/Dormant'].includes(c.status)
                 );
             } else if (currentStatFilter === 'meetings') {
                 filtered = filtered.filter(c => c.status === 'Meeting Scheduled');

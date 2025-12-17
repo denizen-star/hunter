@@ -2,6 +2,7 @@
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
+import shutil
 from app.models.application import Application
 from app.utils.file_utils import (
     get_data_path, ensure_dir_exists,
@@ -251,6 +252,32 @@ class JobProcessor:
         applications.sort(key=lambda x: x.created_at, reverse=True)
         return applications
     
+    def list_archived_applications(self) -> List[Application]:
+        """List all archived job applications"""
+        applications = []
+        archived_dir = get_data_path('applications_archived')
+        
+        if not archived_dir.exists():
+            return applications
+        
+        for folder_path in archived_dir.iterdir():
+            if folder_path.is_dir():
+                metadata_path = folder_path / "application.yaml"
+                if metadata_path.exists():
+                    try:
+                        metadata = load_yaml(metadata_path)
+                        metadata['folder_path'] = str(folder_path)
+                        application = Application.from_dict(metadata)
+                        # Calculate and set contact count
+                        application.contact_count = application.calculate_contact_count()
+                        applications.append(application)
+                    except Exception as e:
+                        print(f"Error loading archived application from {folder_path}: {e}")
+        
+        # Sort by created_at descending
+        applications.sort(key=lambda x: x.created_at, reverse=True)
+        return applications
+    
     def get_application_by_id(self, app_id: str) -> Optional[Application]:
         """Get an application by ID"""
         applications = self.list_all_applications()
@@ -271,9 +298,10 @@ class JobProcessor:
         application.status = status
         application.status_updated_at = get_est_now()
         
-        # If status is rejected, clean up unnecessary files
+        # If status is rejected, clean up unnecessary files and move to archived folder
         if status.lower() == 'rejected':
             self._cleanup_rejected_application_files(application)
+            self._archive_rejected_application(application)
         
         # Always create status update file (even without notes)
         timestamp = format_datetime_for_filename()
@@ -1008,4 +1036,81 @@ class JobProcessor:
         print(f"  ✓ Cleanup complete: {deleted_count} files deleted")
         print(f"  ✓ Kept essential files: job description, application metadata, and updates")
         print(f"  ✓ Summary page regenerated with remaining content")
+    
+    def _archive_rejected_application(self, application: Application) -> None:
+        """Move rejected application to archived folder"""
+        if not application.folder_path or not application.folder_path.exists():
+            return
+        
+        # Check if already in archived folder
+        archived_dir = get_data_path('applications_archived')
+        if str(application.folder_path).startswith(str(archived_dir)):
+            # Already archived, skip
+            return
+        
+        ensure_dir_exists(archived_dir)
+        
+        # Get the folder name
+        folder_name = application.folder_path.name
+        target_path = archived_dir / folder_name
+        
+        # Check if target already exists
+        if target_path.exists():
+            print(f"  ⚠ Archive folder already exists: {target_path}")
+            return
+        
+        try:
+            # Store old folder path for path updates
+            old_folder_path = application.folder_path
+            
+            # Move the folder
+            shutil.move(str(application.folder_path), str(target_path))
+            application.folder_path = target_path
+            
+            # Update all file paths to reflect new location
+            if application.job_description_path:
+                # Update relative to new folder
+                rel_path = application.job_description_path.relative_to(old_folder_path)
+                application.job_description_path = target_path / rel_path
+            
+            if application.raw_job_description_path:
+                rel_path = application.raw_job_description_path.relative_to(old_folder_path)
+                application.raw_job_description_path = target_path / rel_path
+            
+            if application.summary_path:
+                rel_path = application.summary_path.relative_to(old_folder_path)
+                application.summary_path = target_path / rel_path
+            
+            if application.qualifications_path:
+                rel_path = application.qualifications_path.relative_to(old_folder_path)
+                application.qualifications_path = target_path / rel_path
+            
+            if application.cover_letter_path:
+                rel_path = application.cover_letter_path.relative_to(old_folder_path)
+                application.cover_letter_path = target_path / rel_path
+            
+            if application.custom_resume_path:
+                rel_path = application.custom_resume_path.relative_to(old_folder_path)
+                application.custom_resume_path = target_path / rel_path
+            
+            if application.hiring_manager_intros_path:
+                rel_path = application.hiring_manager_intros_path.relative_to(old_folder_path)
+                application.hiring_manager_intros_path = target_path / rel_path
+            
+            if application.recruiter_intros_path:
+                rel_path = application.recruiter_intros_path.relative_to(old_folder_path)
+                application.recruiter_intros_path = target_path / rel_path
+            
+            if application.research_path:
+                rel_path = application.research_path.relative_to(old_folder_path)
+                application.research_path = target_path / rel_path
+            
+            # Save updated metadata with new paths
+            self._save_application_metadata(application)
+            
+            print(f"  ✓ Application archived to: {target_path}")
+        except Exception as e:
+            print(f"  ⚠ Could not archive application: {e}")
+            import traceback
+            traceback.print_exc()
 

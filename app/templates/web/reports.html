@@ -875,6 +875,24 @@
             </div>
         </div>
         
+        <!-- Networking Rewards by Category Report -->
+        <div class="reports-grid" style="margin-top: var(--space-lg);">
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Networking Rewards by Category</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div id="networking-rewards-category" style="padding: 20px;">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading networking rewards...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="followup-flagged-container">
             <div class="report-card">
                 <div class="report-card-header" onclick="toggleCollapse(this)">
@@ -949,6 +967,9 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, Chart.js available:', typeof Chart !== 'undefined');
+            
+            // Load networking rewards by category
+            loadNetworkingRewardsByCategory();
             
             // Wait a bit for Chart.js to fully initialize
             setTimeout(() => {
@@ -1621,6 +1642,87 @@
                             <p style="font-size: 14px; color: #999; margin-top: 10px;">
                                 Please refresh the page to try again.
                             </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Load and display networking rewards by category
+        async function loadNetworkingRewardsByCategory() {
+            try {
+                const response = await fetch('/api/networking/rewards/category');
+                const data = await response.json();
+                
+                const container = document.getElementById('networking-rewards-category');
+                if (!container) {
+                    console.error('Networking rewards container not found');
+                    return;
+                }
+                
+                if (!data.success) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading networking rewards</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">${data.error || 'Unknown error'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const pointsByCategory = data.points_by_category || {};
+                const totalPoints = data.total_points || 0;
+                const badgesByCategory = data.badges_by_category || {};
+                
+                const categories = [
+                    { id: 'prospecting', name: 'Prospecting', color: '#3b82f6' },
+                    { id: 'outreach', name: 'Outreach', color: '#10b981' },
+                    { id: 'engagement', name: 'Engagement', color: '#f59e0b' },
+                    { id: 'nurture', name: 'Nurture', color: '#8b5cf6' }
+                ];
+                
+                const categoryCards = categories.map(cat => {
+                    const points = pointsByCategory[cat.id] || 0;
+                    const badges = badgesByCategory[cat.id] || { badges: [] };
+                    const badgeCount = badges.badges ? badges.badges.filter(b => b.earned).length : 0;
+                    
+                    return `
+                        <div class="category-card" style="background: white; border-radius: 8px; padding: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                <div style="width: 4px; height: 32px; background: ${cat.color}; border-radius: 2px;"></div>
+                                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">${cat.name}</h3>
+                            </div>
+                            <div style="font-size: 32px; font-weight: 700; color: ${cat.color}; margin-bottom: 8px;">${points}</div>
+                            <div style="font-size: 14px; color: #6b7280;">points</div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                                <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                                <div style="font-size: 20px; font-weight: 600; color: #1f2937;">${badgeCount}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; font-size: 24px; font-weight: 600; color: #1f2937;">Total Points</h2>
+                            <div style="font-size: 48px; font-weight: 700; color: #3b82f6;">${totalPoints}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        ${categoryCards}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading networking rewards:', error);
+                const container = document.getElementById('networking-rewards-category');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading networking rewards</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">Please refresh the page to try again.</p>
                         </div>
                     `;
                 }

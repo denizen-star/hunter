@@ -24,6 +24,7 @@
     const adminItems = [
         { href: '/templates', label: 'Templates' },
         { href: '#', label: 'Check AI Status', onclick: 'showAIStatus(); return false;' },
+        { href: '/archived', label: 'Archive Dash' },
         { href: '/new-application?resume=true', label: 'Manage Resume' }
     ];
 

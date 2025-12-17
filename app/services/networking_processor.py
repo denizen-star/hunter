@@ -210,13 +210,168 @@ class NetworkingProcessor:
         status: str,
         notes: Optional[str] = None
     ) -> None:
-        """Update contact status (timeline entry is created separately in application folder)"""
+        """Update contact status and create status update HTML file"""
         old_status = contact.status
         contact.status = status
         contact.status_updated_at = get_est_now()
         
         # Save updated metadata
         self._save_contact_metadata(contact)
+        
+        # Create status update HTML file (similar to application updates)
+        if contact.folder_path:
+            timestamp = format_datetime_for_filename()
+            updates_dir = contact.folder_path / "updates"
+            ensure_dir_exists(updates_dir)
+            
+            # Create HTML status update file
+            # Sanitize status for filename
+            status_filename = status.replace("/", "-").replace(" ", "-")
+            status_filename = f"{timestamp}-{status_filename}.html"
+            status_path = updates_dir / status_filename
+            
+            # Format the timestamp for display
+            from app.utils.datetime_utils import format_for_display
+            display_timestamp = format_for_display(contact.status_updated_at)
+            
+            # Create HTML content (notes are HTML formatted from rich text editor)
+            status_class = (
+                status.strip()
+                .lower()
+                .replace("&", "and")
+                .replace("/", "-")
+                .replace("(", "")
+                .replace(")", "")
+                .replace("'", "")
+                .replace(".", "")
+                .replace(",", "")
+                .replace(" - ", "-")
+                .replace(" ", "-")
+            )
+            
+            notes_html = ""
+            if notes and notes.strip():
+                notes_html = f"""
+                <div class="notes">
+                    <h3>Notes:</h3>
+                    <div class="notes-text">{notes}</div>
+                </div>
+                """
+            
+            html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Update: {status} - {contact.person_name}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }}
+        .header h1 {{
+            margin: 0 0 10px 0;
+            color: #1f2937;
+        }}
+        .status-badge {{
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            background: #3b82f6;
+            color: white;
+        }}
+        .timestamp {{
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 10px;
+        }}
+        .contact-info {{
+            margin-bottom: 20px;
+        }}
+        .info-item {{
+            margin-bottom: 10px;
+        }}
+        .info-item strong {{
+            color: #1f2937;
+        }}
+        .notes {{
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }}
+        .notes h3 {{
+            margin: 0 0 10px 0;
+            color: #1f2937;
+        }}
+        .notes-text {{
+            color: #4b5563;
+            line-height: 1.8;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Status Update: {status}</h1>
+            <span class="status-badge status-{status_class}">{status}</span>
+            <div class="timestamp">{display_timestamp}</div>
+        </div>
+        
+        <div class="contact-info">
+            <h3>📋 Contact Information</h3>
+            <div class="info-item">
+                <strong>Name:</strong> {contact.person_name}
+            </div>
+            <div class="info-item">
+                <strong>Company:</strong> {contact.company_name}
+            </div>
+            <div class="info-item">
+                <strong>Job Title:</strong> {contact.job_title or 'N/A'}
+            </div>
+            <div class="info-item">
+                <strong>Previous Status:</strong> {old_status or 'N/A'}
+            </div>
+            <div class="info-item">
+                <strong>New Status:</strong> {status}
+            </div>
+        </div>
+        {notes_html}
+    </div>
+</body>
+</html>
+"""
+            write_text_file(html_content, status_path)
+            print(f"✓ Created status update file: {status_path}")
+        
+        # Trigger badge calculation
+        try:
+            from app.services.badge_calculation_service import BadgeCalculationService
+            badge_service = BadgeCalculationService()
+            badge_service.update_badge_cache(
+                contact.id,
+                old_status,
+                status
+            )
+        except Exception as e:
+            print(f"Warning: Could not update badge cache: {e}")
         
         # Log activity
         try:
@@ -282,9 +437,14 @@ class NetworkingProcessor:
                     # Read file content for notes
                     try:
                         content = read_text_file(update_file)
-                        # Extract notes if present (simple parsing)
+                        # Extract notes if present (improved parsing)
                         notes = None
-                        if '<div class="notes">' in content:
+                        if '<div class="notes-text">' in content:
+                            start = content.find('<div class="notes-text">') + len('<div class="notes-text">')
+                            end = content.find('</div>', start)
+                            notes = content[start:end].strip()
+                        elif '<div class="notes">' in content:
+                            # Fallback for old format
                             start = content.find('<div class="notes">') + len('<div class="notes">')
                             end = content.find('</div>', start)
                             notes = content[start:end].strip()

@@ -32,6 +32,10 @@ class DashboardGenerator:
         """Get the filesystem path to the main dashboard HTML file."""
         return self.output_dir / 'index.html'
     
+    def get_archived_dashboard_path(self) -> Path:
+        """Get the filesystem path to the archived dashboard HTML file."""
+        return self.output_dir / 'archived.html'
+    
     def is_dashboard_stale(self, ttl_seconds: int = 300) -> bool:
         """
         Return True if the dashboard HTML should be regenerated.
@@ -97,6 +101,17 @@ class DashboardGenerator:
         
         print(f"Dashboard generated: {dashboard_path}")
     
+    def generate_archived_dashboard(self) -> None:
+        """Generate the archived applications dashboard HTML page."""
+        applications = self.job_processor.list_archived_applications()
+        
+        html = self._create_dashboard_html(applications, is_archived=True)
+        
+        dashboard_path = self.get_archived_dashboard_path()
+        write_text_file(html, dashboard_path)
+        
+        print(f"Archived dashboard generated: {dashboard_path}")
+    
     def generate_progress_dashboard(self) -> None:
         """Generate the progress dashboard HTML page"""
         applications = self.job_processor.list_all_applications()
@@ -108,7 +123,7 @@ class DashboardGenerator:
         
         print(f"Progress dashboard generated: {dashboard_path}")
     
-    def _create_dashboard_html(self, applications: List[Application]) -> str:
+    def _create_dashboard_html(self, applications: List[Application], is_archived: bool = False) -> str:
         """Create the HTML dashboard"""
         # Calculate stats for all possible statuses
         def count_status(*labels):
@@ -132,12 +147,28 @@ class DashboardGenerator:
         # Generate stat cards and filter interface
         dashboard_html = self._create_dashboard_with_stats(applications, status_counts)
         
+        # Set title and header text based on dashboard type
+        if is_archived:
+            page_title = "Archived Applications Dashboard"
+            header_title = f"Archived Applications Dashboard - {total}"
+            header_subtitle = "Overview of archived (rejected) applications"
+            nav_link_text = "App Dash"
+            nav_link_url = "/"
+            new_app_link = ""
+        else:
+            page_title = "Job Application Dashboard"
+            header_title = f"Job Application Dashboard - {total}"
+            header_subtitle = "Overview of your job search pipeline"
+            nav_link_text = "Archived Dash"
+            nav_link_url = "/archived"
+            new_app_link = '<a href="/new-application" class="hero-header-action-link">New Application</a>'
+        
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Application Dashboard</title>
+    <title>{page_title}</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <!-- Google Fonts - Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -773,6 +804,55 @@ class DashboardGenerator:
                 grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             }}
         }}
+        
+        /* Company Search Styles */
+        .company-suggestions {{
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: var(--shadow-md);
+        }}
+        
+        .company-suggestion-item {{
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }}
+        
+        .company-suggestion-item:hover {{
+            background: var(--bg-hover);
+        }}
+        
+        .company-suggestion-item.selected {{
+            background: var(--accent-blue-light);
+        }}
+        
+        .company-tag {{
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--accent-blue-light);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--accent-blue);
+        }}
+        
+        .company-tag-remove {{
+            cursor: pointer;
+            font-weight: bold;
+        }}
     </style>
 </head>
 <body>
@@ -782,10 +862,13 @@ class DashboardGenerator:
     <div class="hero-header">
         <div class="hero-header-top">
             <div>
-                <h1>Job Application Dashboard - {total}</h1>
-                <p class="hero-header-subtitle">Overview of your job search pipeline</p>
+                <h1>{header_title}</h1>
+                <p class="hero-header-subtitle">{header_subtitle}</p>
             </div>
-            <a href="/new-application" class="hero-header-action-link">New Application</a>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="{nav_link_url}" class="hero-header-action-link">{nav_link_text}</a>
+                {new_app_link}
+            </div>
         </div>
     </div>
         
@@ -875,14 +958,17 @@ class DashboardGenerator:
             
             const cards = Array.from(grid.querySelectorAll('.card'));
             
-            // Filter cards based on status
+            // Filter cards based on status and company
             cards.forEach(card => {{
                 let show = false;
                 const statusElement = card.querySelector('.card-status');
                 const statusText = statusElement?.textContent.toLowerCase() || '';
                 const statusClass = statusElement?.className || '';
                 const isFlagged = card.dataset.flagged === 'true';
+                const companyElement = card.querySelector('.card-company');
+                const companyName = companyElement?.textContent.trim() || '';
                 
+                // Status filtering
                 if (filterStatus === 'all') {{
                     show = true;
                 }} else if (filterStatus === 'active') {{
@@ -908,6 +994,11 @@ class DashboardGenerator:
                     show = statusText.includes('rejected') || statusClass.includes('rejected');
                 }} else if (filterStatus === 'accepted') {{
                     show = statusText.includes('accepted') || statusClass.includes('accepted');
+                }}
+                
+                // Company filtering (if company filter is active)
+                if (show && typeof currentCompanyFilter !== 'undefined' && currentCompanyFilter.length > 0) {{
+                    show = currentCompanyFilter.includes(companyName);
                 }}
                 
                 card.style.display = show ? '' : 'none';
@@ -967,9 +1058,144 @@ class DashboardGenerator:
                 }});
             }});
             
-            // Initialize with "active" filter active
-            filterApplications('active');
+            // Initialize with "all" filter active (for archived dashboard) or "active" (for main dashboard)
+            const isArchived = {str(is_archived).lower()};
+            const defaultFilter = isArchived ? 'all' : 'active';
+            filterApplications(defaultFilter);
+            
+            // Initialize company search if archived
+            if ({str(is_archived).lower()} && typeof allCompanies !== 'undefined' && typeof updateSelectedCompaniesDisplay === 'function') {{
+                updateSelectedCompaniesDisplay();
+            }}
+            
+            // Activate 'all' stat card if archived
+            if (isArchived) {{
+                const allCard = document.querySelector('.stat-card[data-status="all"]');
+                if (allCard) {{
+                    allCard.classList.add('active');
+                }}
+            }}
         }});
+        
+        // Company search functions (for archived dashboard)
+        function handleCompanySearch(event) {{
+            const input = event.target;
+            const query = input.value.toLowerCase().trim();
+            
+            if (query.length > 0) {{
+                showCompanySuggestions(query);
+            }} else {{
+                showCompanySuggestions('');
+            }}
+        }}
+        
+        function updateSelectedCompaniesDisplay() {{
+            const container = document.getElementById('selectedCompanies');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+            
+            currentCompanyFilter.forEach((company, index) => {{
+                const tag = document.createElement('div');
+                tag.style.cssText = 'display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--accent-blue-light); border-radius: 4px; font-size: 12px; color: var(--accent-blue);';
+                tag.innerHTML = `
+                    <span>${{escapeHtml(company)}}</span>
+                    <span style="cursor: pointer; font-weight: bold;" onclick="removeCompany(${{index}})">×</span>
+                `;
+                container.appendChild(tag);
+            }});
+        }}
+        
+        function removeCompany(index) {{
+            if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+            if (index >= 0 && index < currentCompanyFilter.length) {{
+                currentCompanyFilter.splice(index, 1);
+                updateSelectedCompaniesDisplay();
+                filterApplications(document.querySelector('.stat-card.active')?.dataset.status || 'all');
+            }}
+        }}
+        
+        function showCompanySuggestions(query = '') {{
+            const suggestionsDiv = document.getElementById('companySuggestions');
+            if (!suggestionsDiv || typeof allCompanies === 'undefined') return;
+            
+            const companies = allCompanies || [];
+            let filtered = [];
+            
+            if (!query || query.length === 0) {{
+                filtered = companies.slice(0, 15);
+            }} else {{
+                filtered = companies
+                    .filter(company => company.toLowerCase().includes(query.toLowerCase()))
+                    .slice(0, 15);
+            }}
+            
+            suggestionsDiv.innerHTML = '';
+            
+            if (filtered.length === 0) {{
+                const noResults = document.createElement('div');
+                noResults.style.cssText = 'padding: 12px; color: var(--text-secondary); text-align: center;';
+                noResults.textContent = 'No companies found';
+                suggestionsDiv.appendChild(noResults);
+            }} else {{
+                filtered.forEach(company => {{
+                    if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+                    const isSelected = currentCompanyFilter.includes(company);
+                    const item = document.createElement('div');
+                    item.style.cssText = 'padding: 10px 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light);';
+                    item.innerHTML = `<span>${{escapeHtml(company)}}</span>${{isSelected ? '<span style="color: var(--accent-blue);">✓</span>' : ''}}`;
+                    item.onmouseenter = () => item.style.background = 'var(--bg-hover)';
+                    item.onmouseleave = () => item.style.background = '';
+                    item.onmousedown = (e) => {{
+                        e.preventDefault();
+                        toggleCompany(company);
+                    }};
+                    suggestionsDiv.appendChild(item);
+                }});
+            }}
+            
+            suggestionsDiv.style.display = filtered.length > 0 ? 'block' : 'none';
+        }}
+        
+        function toggleCompany(company) {{
+            if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+            
+            if (currentCompanyFilter.includes(company)) {{
+                currentCompanyFilter = currentCompanyFilter.filter(c => c !== company);
+            }} else {{
+                currentCompanyFilter.push(company);
+            }}
+            
+            const input = document.getElementById('companyFilter');
+            if (input) input.value = '';
+            
+            updateSelectedCompaniesDisplay();
+            showCompanySuggestions('');
+            filterApplications(document.querySelector('.stat-card.active')?.dataset.status || 'all');
+        }}
+        
+        function handleCompanySearchFocus() {{
+            const input = document.getElementById('companyFilter');
+            if (input) {{
+                showCompanySuggestions(input.value);
+            }}
+        }}
+        
+        function hideCompanySuggestions() {{
+            setTimeout(() => {{
+                const suggestionsDiv = document.getElementById('companySuggestions');
+                if (suggestionsDiv) {{
+                    suggestionsDiv.style.display = 'none';
+                }}
+            }}, 200);
+        }}
+        
+        function escapeHtml(text) {{
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }}
         
         // Toggle flag for an application
         async function toggleFlag(appId, currentFlagged) {{
@@ -1024,7 +1250,7 @@ class DashboardGenerator:
 </html>"""
         return html
     
-    def _create_dashboard_with_stats(self, applications: List[Application], status_counts: dict) -> str:
+    def _create_dashboard_with_stats(self, applications: List[Application], status_counts: dict, is_archived: bool = False) -> str:
         """Create dashboard with stat cards and filter buttons"""
         # Calculate counts for each status
         def count_status(*labels):
@@ -1054,7 +1280,12 @@ class DashboardGenerator:
         
         # Create stat cards (two rows, 6 cards per row)
         stat_cards_html = ""
-        status_order = ['active', 'all', 'flagged', 'pending', 'applied', 'contacted', 'company', 'scheduled', 'follow-up', 'offered', 'rejected', 'accepted']
+        if is_archived:
+            # For archived dashboard, only show 'all' and 'rejected'
+            status_order = ['all', 'rejected']
+        else:
+            status_order = ['active', 'all', 'flagged', 'pending', 'applied', 'contacted', 'company', 'scheduled', 'follow-up', 'offered', 'rejected', 'accepted']
+        
         status_labels = {
             'active': 'Active',
             'all': 'All',
@@ -1073,12 +1304,14 @@ class DashboardGenerator:
         for i, status in enumerate(status_order):
             count = stats[status]
             label = status_labels[status]
-            stat_cards_html += f'''
-                <div class="stat-card" data-status="{status}">
-                    <div class="stat-number">{count}</div>
-                    <div class="stat-label">{label}</div>
-                </div>
-            '''
+            # Only show stat card if count > 0 or if it's 'all' or 'rejected' (for archived)
+            if count > 0 or (is_archived and status in ['all', 'rejected']):
+                stat_cards_html += f'''
+                    <div class="stat-card" data-status="{status}">
+                        <div class="stat-number">{count}</div>
+                        <div class="stat-label">{label}</div>
+                    </div>
+                '''
         
         # Create all application cards
         cards_html = ""
@@ -1092,6 +1325,32 @@ class DashboardGenerator:
         for app in sorted_apps:
             cards_html += self._create_application_card(app)
         
+        # Get unique company names for search
+        company_names = sorted(list(set([app.company for app in applications if app.company])))
+        company_names_json = ', '.join([f'"{name}"' for name in company_names])
+        
+        # Add company search HTML if archived dashboard
+        company_search_html = ""
+        if is_archived:
+            company_search_html = f'''
+            <div class="search-filter-container" style="position: relative; min-width: 250px; margin-right: 16px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 4px 36px 4px 4px; border: 1px solid var(--border-primary); border-radius: 6px; background: #fff; min-height: 36px;">
+                    <div id="selectedCompanies" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1;"></div>
+                    <input type="text" 
+                           id="companyFilter" 
+                           class="search-input" 
+                           placeholder="Search companies..." 
+                           oninput="handleCompanySearch(event)"
+                           onfocus="handleCompanySearchFocus()"
+                           onblur="hideCompanySuggestions()"
+                           autocomplete="off"
+                           style="border: none; outline: none; font-size: 14px; flex: 1; min-width: 120px; padding: 4px 0;">
+                </div>
+                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; pointer-events: none; z-index: 1;">🔍</span>
+                <div id="companySuggestions" class="company-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border-primary); border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 1000; margin-top: 4px; box-shadow: var(--shadow-md);"></div>
+            </div>
+            '''
+        
         return f'''
         <div class="dashboard-stats-container">
             <div class="stat-cards-grid">
@@ -1099,9 +1358,10 @@ class DashboardGenerator:
             </div>
         </div>
         <div class="container">
-            <div class="sort-controls">
+            <div class="sort-controls" style="display: flex; align-items: center; gap: 16px;">
                 <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">Applications</h3>
-                <select id="sort-select" class="sort-select" onchange="handleSortChange()">
+                {company_search_html}
+                <select id="sort-select" class="sort-select" onchange="handleSortChange()" style="margin-left: auto;">
                     <option value="updated_desc">Updated (Newest First)</option>
                     <option value="updated_asc">Updated (Oldest First)</option>
                     <option value="applied_desc">Applied (Newest First)</option>
@@ -1116,6 +1376,11 @@ class DashboardGenerator:
                 {cards_html if cards_html else self._create_empty_state('all')}
             </div>
         </div>
+        <script>
+            // Company search data
+            const allCompanies = [{company_names_json}];
+            let currentCompanyFilter = [];
+        </script>
         '''
     
     def _create_tabs_html(self, applications: List[Application], status_counts: dict) -> str:
@@ -1271,17 +1536,25 @@ class DashboardGenerator:
     def _create_application_card(self, app: Application) -> str:
         """Create HTML for a single application card"""
         # Generate proper URLs for summary and folder
-        if app.summary_path:
-            # Check if file actually exists before creating link
-            from pathlib import Path
-            if Path(app.summary_path).exists():
-                folder_name = app.folder_path.name
-                summary_filename = app.summary_path.name
-                summary_link = f"/applications/{folder_name}/{summary_filename}"
+        summary_link = "#"
+        if app.folder_path and app.folder_path.exists():
+            folder_name = app.folder_path.name
+            
+            # Try to find summary file - check stored path first, then search folder
+            summary_file = None
+            if app.summary_path and Path(app.summary_path).exists():
+                summary_file = Path(app.summary_path)
             else:
-                summary_link = "#"
-        else:
-            summary_link = "#"
+                # Search for summary file in the folder
+                if app.folder_path.is_dir():
+                    for file_path in app.folder_path.iterdir():
+                        if file_path.is_file() and file_path.name.startswith("20") and "-Summary-" in file_path.name and file_path.suffix == ".html":
+                            summary_file = file_path
+                            break
+            
+            if summary_file:
+                summary_filename = summary_file.name
+                summary_link = f"/applications/{folder_name}/{summary_filename}"
         
         match_score_html = f'<span class="match-score">{app.match_score:.0f}%</span>' if app.match_score else ''
         
