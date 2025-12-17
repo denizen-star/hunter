@@ -175,15 +175,13 @@ class DashboardGenerator:
             page_title = "Archived Applications Dashboard"
             header_title = f"Archived Applications Dashboard - {total}"
             header_subtitle = "Overview of archived (rejected) applications"
-            nav_link_text = "App Dash"
-            nav_link_url = "/"
+            nav_link_html = '<a href="/" class="hero-header-action-link">App Dash</a>'
             new_app_link = ""
         else:
             page_title = "Job Application Dashboard"
             header_title = f"Job Application Dashboard - {total}"
             header_subtitle = "Overview of your job search pipeline"
-            nav_link_text = "Archived Dash"
-            nav_link_url = "/archived"
+            nav_link_html = ""
             new_app_link = '<a href="/new-application" class="hero-header-action-link">New Application</a>'
         
         html = f"""<!DOCTYPE html>
@@ -889,7 +887,7 @@ class DashboardGenerator:
                 <p class="hero-header-subtitle">{header_subtitle}</p>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
-                <a href="{nav_link_url}" class="hero-header-action-link">{nav_link_text}</a>
+                {nav_link_html}
                 {new_app_link}
             </div>
         </div>
