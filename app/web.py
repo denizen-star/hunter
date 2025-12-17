@@ -125,14 +125,14 @@ def is_networking_status(status: str) -> bool:
 
 def categorize_networking_status(status: str) -> str:
     """
-    Categorize networking statuses into groups for better chart readability.
+    Categorize networking statuses into new pipeline phases.
     
-    Categories (in order):
-    1. Research & Contact: Initial research and outreach activities
-    2. Engagement: Active communication and conversation
-    3. Relationship: Ongoing relationship building
+    New Categories:
+    1. Prospecting: Initial research and preparation
+    2. Outreach: Initial contact and response tracking
+    3. Engagement: Active communication and meetings
+    4. Nurture: Ongoing relationship maintenance
     
-    Uses exact status mappings as specified.
     Returns the category name, or the original status if not a networking status.
     """
     if not status:
@@ -140,10 +140,21 @@ def categorize_networking_status(status: str) -> str:
     
     status_lower = status.lower().strip()
     
-    # Research & Contact category - exact status mappings
-    research_contact_statuses = [
+    # PROSPECTING category - new status system
+    prospecting_statuses = [
         'to research',
-        'ready to contact',
+        'ready to connect',
+        # Legacy support
+        'ready to contact'
+    ]
+    
+    # OUTREACH category - new status system
+    outreach_statuses = [
+        'pending reply',
+        'connected - initial',
+        'cold/inactive',
+        'cold/inactive',
+        # Legacy support
         'contacted - sent',
         'contacted---sent',
         'contacted sent',
@@ -152,14 +163,17 @@ def categorize_networking_status(status: str) -> str:
         'contacted replied',
         'contacted - no response',
         'contacted---no response',
-        'contacted no response'
+        'contacted no response',
+        'new connection',
+        'cold/archive'
     ]
     
-    # Engagement category - exact status mappings
+    # ENGAGEMENT category - new status system
     engagement_statuses = [
         'in conversation',
         'meeting scheduled',
         'meeting complete',
+        # Legacy support
         'action pending - you',
         'action pending---you',
         'action pending you',
@@ -170,50 +184,64 @@ def categorize_networking_status(status: str) -> str:
         'conversation'
     ]
     
-    # Relationship category - exact status mappings
-    relationship_statuses = [
-        'new connection',
+    # NURTURE category - new status system
+    nurture_statuses = [
+        'strong connection',
+        'referral partner',
+        'dormant',
+        # Legacy support
         'nurture (1-3 mo.)',
         'nurture (4-6 mo.)',
         'nurture 1-3 mo',
         'nurture 4-6 mo',
-        'referral partner',
+        'inactive/dormant',
         'referral'
     ]
     
     # Normalize status for comparison (handle variations)
     normalized_for_match = status_lower.replace('  ', ' ').replace('---', ' - ')
     
-    # Check Research & Contact first (most specific)
-    for research_status in research_contact_statuses:
-        if research_status in normalized_for_match or research_status in status_lower:
-            return 'Research & Contact'
+    # Check each category in order
+    for prospecting_status in prospecting_statuses:
+        if prospecting_status in normalized_for_match or prospecting_status in status_lower:
+            return 'Prospecting'
     
-    # Check Engagement second
+    for outreach_status in outreach_statuses:
+        if outreach_status in normalized_for_match or outreach_status in status_lower:
+            return 'Outreach'
+    
     for engagement_status in engagement_statuses:
         if engagement_status in normalized_for_match or engagement_status in status_lower:
             return 'Engagement'
     
-    # Check Relationship third
-    for relationship_status in relationship_statuses:
-        if relationship_status in normalized_for_match or relationship_status in status_lower:
-            return 'Relationship'
+    for nurture_status in nurture_statuses:
+        if nurture_status in normalized_for_match or nurture_status in status_lower:
+            return 'Nurture'
     
     # Fallback: keyword-based matching for variations not in the exact list
     if 'research' in status_lower and 'to' in status_lower:
-        return 'Research & Contact'
-    if 'ready' in status_lower and 'contact' in status_lower:
-        return 'Research & Contact'
-    if 'contacted' in status_lower and ('sent' in status_lower or 'replied' in status_lower or 'no response' in status_lower):
-        return 'Research & Contact'
+        return 'Prospecting'
+    if 'ready' in status_lower and ('connect' in status_lower or 'contact' in status_lower):
+        return 'Prospecting'
+    
+    if 'pending' in status_lower and 'reply' in status_lower:
+        return 'Outreach'
+    if 'connected' in status_lower and 'initial' in status_lower:
+        return 'Outreach'
+    if 'cold' in status_lower or 'inactive' in status_lower:
+        return 'Outreach'
+    if 'contacted' in status_lower:
+        return 'Outreach'
     
     if 'conversation' in status_lower or 'meeting' in status_lower:
         return 'Engagement'
     if 'action pending' in status_lower:
         return 'Engagement'
     
-    if 'new connection' in status_lower or 'nurture' in status_lower or 'referral' in status_lower:
-        return 'Relationship'
+    if 'strong connection' in status_lower or 'nurture' in status_lower:
+        return 'Nurture'
+    if 'referral' in status_lower or 'dormant' in status_lower:
+        return 'Nurture'
     
     # If not a networking status, return original (for job application statuses)
     return status
@@ -1486,6 +1514,40 @@ def toggle_networking_flag(contact_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/networking/rewards/category', methods=['GET'])
+def get_networking_rewards_by_category():
+    """Get networking rewards broken down by category"""
+    try:
+        from app.services.badge_calculation_service import BadgeCalculationService
+        badge_service = BadgeCalculationService()
+        
+        # Get badges by category
+        badges_by_category = badge_service.get_badges_by_category()
+        
+        # Calculate total points
+        total_points = sum(
+            category_data['points'] 
+            for category_data in badges_by_category.values()
+        )
+        
+        # Format points by category
+        points_by_category = {
+            category: data['points']
+            for category, data in badges_by_category.items()
+        }
+        
+        return jsonify({
+            'success': True,
+            'points_by_category': points_by_category,
+            'total_points': total_points,
+            'badges_by_category': badges_by_category
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/networking/contacts/<contact_id>/regenerate', methods=['POST'])
 def regenerate_networking_documents(contact_id):
     """Regenerate AI analysis and messages for a networking contact"""
@@ -2394,6 +2456,21 @@ def view_dashboard():
         )
     return "Dashboard not found", 404
 
+@app.route('/archived')
+def archived_dashboard():
+    """Archived applications dashboard"""
+    from app.utils.file_utils import get_data_path
+    # Always regenerate archived dashboard to ensure it's up to date
+    dashboard_generator.generate_archived_dashboard()
+    dashboard_path = get_data_path('output') / 'archived.html'
+    
+    if dashboard_path.exists():
+        return send_from_directory(
+            dashboard_path.parent,
+            dashboard_path.name
+        )
+    return "Archived dashboard not generated yet.", 404
+
 @app.route('/progress')
 def view_progress_dashboard():
     """View the unified progress dashboard"""
@@ -2728,14 +2805,26 @@ def get_progress_data():
 def serve_application_file(filepath):
     """Serve application files (summaries, documents, etc.)"""
     from app.utils.file_utils import get_data_path
+    # Check both applications and applications_archived folders
     applications_dir = get_data_path('applications')
-    file_path = applications_dir / filepath
+    archived_dir = get_data_path('applications_archived')
     
+    # Try applications folder first
+    file_path = applications_dir / filepath
     if file_path.exists() and file_path.is_file():
         return send_from_directory(
             file_path.parent,
             file_path.name
         )
+    
+    # Try archived folder
+    file_path = archived_dir / filepath
+    if file_path.exists() and file_path.is_file():
+        return send_from_directory(
+            file_path.parent,
+            file_path.name
+        )
+    
     # File not found - redirect to dashboard instead of showing error
     # This handles cases where summary files were deleted (e.g., rejected applications)
     return redirect('/dashboard'), 302

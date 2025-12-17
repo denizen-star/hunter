@@ -848,8 +848,9 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span class="status-pill tag tag-blue">{contact.status or 'To Research'}</span>
+            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'To Research'}</span>
         </div>
+        {self._generate_contact_rewards_cards(contact)}
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -861,11 +862,11 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
+                <span id="statusUpdated"><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> {contact.status or 'To Research'}</span>
+                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'To Research'}</span></span>
             </div>
             {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
             <div class="meta-item" id="emailMetaItem">
@@ -917,7 +918,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             <!-- Relationship / Next Step Card -->
             <div class="relationship-card">
                 <h3>Relationship Status</h3>
-                <div class="status">Current Status: {contact.status or 'To Research'}</div>
+                <div class="status">Current Status: <span id="currentStatusDisplay">{contact.status or 'To Research'}</span></div>
                 <div class="next-step">Next Step: {next_step}</div>
             </div>
         </div>
@@ -992,27 +993,24 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                         <label for="status">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
-                            <optgroup label="Research & Contact">
+                            <optgroup label="Prospecting">
                                 <option value="To Research" {"selected" if contact.status == "To Research" else ""}>To Research</option>
-                                <option value="Ready to Contact" {"selected" if contact.status == "Ready to Contact" else ""}>Ready to Contact</option>
-                                <option value="Contacted - Sent" {"selected" if contact.status == "Contacted - Sent" else ""}>Contacted - Sent</option>
-                                <option value="Contacted - Replied" {"selected" if contact.status == "Contacted - Replied" else ""}>Contacted - Replied</option>
-                                <option value="Contacted - No Response" {"selected" if contact.status == "Contacted - No Response" else ""}>Contacted - No Response</option>
-                                <option value="Cold/Archive" {"selected" if contact.status == "Cold/Archive" else ""}>Cold/Archive</option>
+                                <option value="Ready to Connect" {"selected" if contact.status == "Ready to Connect" else ""}>Ready to Connect</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Pending Reply" {"selected" if contact.status == "Pending Reply" else ""}>Pending Reply</option>
+                                <option value="Connected - Initial" {"selected" if contact.status == "Connected - Initial" else ""}>Connected - Initial</option>
+                                <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
                                 <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
                                 <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
                                 <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
-                                <option value="Action Pending - You" {"selected" if contact.status == "Action Pending - You" else ""}>Action Pending - You</option>
-                                <option value="Action Pending - Them" {"selected" if contact.status == "Action Pending - Them" else ""}>Action Pending - Them</option>
                             </optgroup>
-                            <optgroup label="Relationship">
-                                <option value="New Connection" {"selected" if contact.status == "New Connection" else ""}>New Connection</option>
-                                <option value="Nurture (1-3 Mo.)" {"selected" if contact.status == "Nurture (1-3 Mo.)" else ""}>Nurture (1-3 Mo.)</option>
-                                <option value="Nurture (4-6 Mo.)" {"selected" if contact.status == "Nurture (4-6 Mo.)" else ""}>Nurture (4-6 Mo.)</option>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
                                 <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
-                                <option value="Inactive/Dormant" {"selected" if contact.status == "Inactive/Dormant" else ""}>Inactive/Dormant</option>
+                                <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
                             </optgroup>
                         </select>
                     </div>
@@ -1248,16 +1246,38 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                     updateAlert.textContent = `Status updated to "${{status}}"`;
                     updateAlert.classList.add('show', 'success');
                     
+                    // Update status displays immediately
+                    const statusPill = document.getElementById('statusPill');
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+                    const statusUpdated = document.getElementById('statusUpdated');
+                    
+                    if (statusPill) statusPill.textContent = status;
+                    if (statusDisplay) statusDisplay.textContent = status;
+                    if (currentStatusDisplay) currentStatusDisplay.textContent = status;
+                    if (statusUpdated) {{
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', {{ month: 'short', day: 'numeric', year: 'numeric' }});
+                        const timeStr = now.toLocaleTimeString('en-US', {{ hour: 'numeric', minute: '2-digit', hour12: true }});
+                        statusUpdated.innerHTML = `<strong>Updated:</strong> ${{dateStr}} ${{timeStr}}`;
+                    }}
+                    
+                    // Update dropdown selection
+                    const statusSelect = document.getElementById('status');
+                    if (statusSelect) {{
+                        statusSelect.value = status;
+                    }}
+                    
                     // Clear editor
                     quill.root.innerHTML = '';
                     
                     // Reload timeline
                     await loadTimeline();
                     
-                    // Update page metadata if needed
+                    // Update page metadata if needed - wait longer to ensure save completes
                     setTimeout(() => {{
                         location.reload();
-                    }}, 2000);
+                    }}, 3000);
                 }} else {{
                     // Show error message
                     updateAlert.textContent = `Error: ${{data.error}}`;
@@ -2489,9 +2509,10 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span class="status-pill tag tag-blue">Connected</span>
-            <span class="status-pill tag tag-green">{contact.match_score:.0f}% Match</span>
+            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'To Research'}</span>
+            {f'<span class="status-pill tag tag-green">{contact.match_score:.0f}% Match</span>' if contact.match_score is not None else ''}
         </div>
+        {self._generate_contact_rewards_cards(contact)}
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -2503,11 +2524,11 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
+                <span id="statusUpdated"><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> {contact.status}</span>
+                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'To Research'}</span></span>
             </div>
             {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
             <div class="meta-item" id="emailMetaItem">
@@ -2699,27 +2720,24 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                         <label for="status">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
-                            <optgroup label="Research & Contact">
+                            <optgroup label="Prospecting">
                                 <option value="To Research" {"selected" if contact.status == "To Research" else ""}>To Research</option>
-                                <option value="Ready to Contact" {"selected" if contact.status == "Ready to Contact" else ""}>Ready to Contact</option>
-                                <option value="Contacted - Sent" {"selected" if contact.status == "Contacted - Sent" else ""}>Contacted - Sent</option>
-                                <option value="Contacted - Replied" {"selected" if contact.status == "Contacted - Replied" else ""}>Contacted - Replied</option>
-                                <option value="Contacted - No Response" {"selected" if contact.status == "Contacted - No Response" else ""}>Contacted - No Response</option>
-                                <option value="Cold/Archive" {"selected" if contact.status == "Cold/Archive" else ""}>Cold/Archive</option>
+                                <option value="Ready to Connect" {"selected" if contact.status == "Ready to Connect" else ""}>Ready to Connect</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Pending Reply" {"selected" if contact.status == "Pending Reply" else ""}>Pending Reply</option>
+                                <option value="Connected - Initial" {"selected" if contact.status == "Connected - Initial" else ""}>Connected - Initial</option>
+                                <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
                                 <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
                                 <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
                                 <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
-                                <option value="Action Pending - You" {"selected" if contact.status == "Action Pending - You" else ""}>Action Pending - You</option>
-                                <option value="Action Pending - Them" {"selected" if contact.status == "Action Pending - Them" else ""}>Action Pending - Them</option>
                             </optgroup>
-                            <optgroup label="Relationship">
-                                <option value="New Connection" {"selected" if contact.status == "New Connection" else ""}>New Connection</option>
-                                <option value="Nurture (1-3 Mo.)" {"selected" if contact.status == "Nurture (1-3 Mo.)" else ""}>Nurture (1-3 Mo.)</option>
-                                <option value="Nurture (4-6 Mo.)" {"selected" if contact.status == "Nurture (4-6 Mo.)" else ""}>Nurture (4-6 Mo.)</option>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
                                 <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
-                                <option value="Inactive/Dormant" {"selected" if contact.status == "Inactive/Dormant" else ""}>Inactive/Dormant</option>
+                                <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
                             </optgroup>
                         </select>
                     </div>
@@ -2946,16 +2964,38 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     updateAlert.textContent = `Status updated to "${{status}}"`;
                     updateAlert.classList.add('show', 'success');
                     
+                    // Update status displays immediately
+                    const statusPill = document.getElementById('statusPill');
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+                    const statusUpdated = document.getElementById('statusUpdated');
+                    
+                    if (statusPill) statusPill.textContent = status;
+                    if (statusDisplay) statusDisplay.textContent = status;
+                    if (currentStatusDisplay) currentStatusDisplay.textContent = status;
+                    if (statusUpdated) {{
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', {{ month: 'short', day: 'numeric', year: 'numeric' }});
+                        const timeStr = now.toLocaleTimeString('en-US', {{ hour: 'numeric', minute: '2-digit', hour12: true }});
+                        statusUpdated.innerHTML = `<strong>Updated:</strong> ${{dateStr}} ${{timeStr}}`;
+                    }}
+                    
+                    // Update dropdown selection
+                    const statusSelect = document.getElementById('status');
+                    if (statusSelect) {{
+                        statusSelect.value = status;
+                    }}
+                    
                     // Clear editor
                     quill.root.innerHTML = '';
                     
                     // Reload timeline
                     await loadTimeline();
                     
-                    // Update page metadata if needed
+                    // Update page metadata if needed - wait longer to ensure save completes
                     setTimeout(() => {{
                         location.reload();
-                    }}, 2000);
+                    }}, 3000);
                 }} else {{
                     // Show error message
                     updateAlert.textContent = `Error: ${{data.error}}`;
@@ -3234,3 +3274,129 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         summary_path = contact.folder_path / f"{contact.person_name.replace(' ', '-')}-summary.html"
         write_text_file(html, summary_path)
         contact.summary_path = summary_path
+    
+    def _generate_contact_rewards_cards(self, contact: NetworkingContact) -> str:
+        """Generate all 8 badges for a single contact with cumulative points"""
+        try:
+            from app.services.badge_calculation_service import BadgeCalculationService
+            
+            badge_service = BadgeCalculationService()
+            
+            # Status mapping for legacy statuses
+            status_mapping = {
+                'Ready to Contact': 'Ready to Connect',
+                'Contacted - Sent': 'Pending Reply',
+                'Contacted - No Response': 'Pending Reply',
+                'Contacted - Replied': 'Connected - Initial',
+                'New Connection': 'Connected - Initial',
+                'Cold/Archive': 'Cold/Inactive',
+                'Action Pending - You': 'In Conversation',
+                'Action Pending - Them': 'In Conversation',
+                'Nurture (1-3 Mo.)': 'Strong Connection',
+                'Nurture (4-6 Mo.)': 'Strong Connection',
+                'Inactive/Dormant': 'Dormant'
+            }
+            
+            # Normalize status
+            normalized_status = status_mapping.get(contact.status, contact.status)
+            
+            # Define status progression order (for cumulative points)
+            # Each status awards points for all badges up to and including that status
+            status_progression = [
+                'Ready to Connect',      # Deep Diver (+10)
+                'Pending Reply',         # Profile Magnet (+3)
+                'Connected - Initial',   # Qualified Lead (+15)
+                'In Conversation',       # Conversation Starter (+20)
+                'Meeting Scheduled',     # Scheduler Master (+30)
+                'Meeting Complete',      # Rapport Builder (+50)
+                'Strong Connection',     # Relationship Manager (+2, recurring)
+                'Referral Partner'       # Super Connector (+100)
+            ]
+            
+            # Calculate cumulative points - get all badges up to current status
+            earned_badge_ids = set()
+            total_points = 0
+            
+            # Find current status position in progression
+            current_index = -1
+            for i, status in enumerate(status_progression):
+                if normalized_status == status:
+                    current_index = i
+                    break
+            
+            # If status is in progression, award all badges up to and including it
+            if current_index >= 0:
+                for i in range(current_index + 1):
+                    status_in_progression = status_progression[i]
+                    badge_id = badge_service.status_to_badge.get(status_in_progression)
+                    if badge_id:
+                        earned_badge_ids.add(badge_id)
+                        badge_def = badge_service.badge_definitions[badge_id]
+                        total_points += badge_def['points']
+            
+            # Generate all 8 badges (earned and unearned)
+            all_badges_html = []
+            for badge_id, badge_def in badge_service.badge_definitions.items():
+                is_earned = badge_id in earned_badge_ids
+                
+                border_color = '#3b82f6' if is_earned else '#d1d5db'
+                icon_color = '#3b82f6' if is_earned else '#9ca3af'
+                points_color = '#10b981' if is_earned else '#9ca3af'
+                icon = '✓' if is_earned else '○'
+                
+                all_badges_html.append(f'''
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;" title="{badge_def['description']}">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 24px; height: 24px; font-size: 16px; color: {icon_color}; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                {icon}
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1f2937;">{badge_def['name']}</div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <div style="flex: 1; height: 6px; min-width: 50px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                        <div style="width: {'100' if is_earned else '0'}%; height: 100%; background: {'linear-gradient(90deg, #3b82f6, #10b981)' if is_earned else '#d1d5db'}; transition: width 0.3s ease;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{badge_def['points']}</div>
+                        </div>
+                    </div>
+                ''')
+            
+            return f'''
+            <div style="margin: 20px 0;">
+                <!-- All 8 Badges -->
+                <div style="padding: 16px; background: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleBadgeSection()">
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #1f2937;">Networking Rewards ({total_points} pts)</h3>
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="badge-grid-content" style="display: flex; gap: 8px; flex-wrap: wrap; max-height: 300px; overflow-y: auto;">
+                        {''.join(all_badges_html)}
+                    </div>
+                    <script>
+                        let badgeSectionExpanded = true;
+                        function toggleBadgeSection() {{
+                            const content = document.getElementById('badge-grid-content');
+                            const icon = document.getElementById('badge-toggle-icon');
+                            if (!badgeSectionExpanded) {{
+                                content.style.display = 'flex';
+                                icon.style.transform = 'rotate(0deg)';
+                                badgeSectionExpanded = true;
+                            }} else {{
+                                content.style.display = 'none';
+                                icon.style.transform = 'rotate(180deg)';
+                                badgeSectionExpanded = false;
+                            }}
+                        }}
+                    </script>
+                </div>
+            </div>
+            '''
+        except Exception as e:
+            print(f"Warning: Could not generate contact rewards cards: {e}")
+            import traceback
+            traceback.print_exc()
+            return ''
