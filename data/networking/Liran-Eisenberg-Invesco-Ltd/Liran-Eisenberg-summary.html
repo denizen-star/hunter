@@ -21,68 +21,8 @@
             background: #fafafa;
             color: #1f2937;
             line-height: 1.6;
-            margin-left: 180px;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e5e7eb;
-            z-index: 1000;
-            padding: 20px 0;
-            overflow-y: auto;
-        }
-        
-        .sidebar-header {
-            padding: 0 16px 16px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 12px;
-        }
-        
-        .sidebar-header h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
             margin: 0;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
             padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
-            display: block;
-            padding: 10px 16px;
-            color: #6b7280;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar-menu a:hover {
-            background: #f9fafb;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-        }
-        
-        .sidebar-menu a.active {
-            background: #f3f4f6;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-            font-weight: 600;
         }
         
         .header {
@@ -183,33 +123,37 @@
         .tabs {
             background: white;
             border-bottom: 1px solid #e5e7eb;
-            padding: 0 32px;
+            padding: 0;
             display: flex;
-            gap: 8px;
+            gap: 0;
+            margin: 0 32px;
         }
         
         .tab {
             padding: 16px 24px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            font-weight: 400;
             color: #6b7280;
             transition: all 0.15s ease;
+            position: relative;
         }
         
         .tab:hover {
             color: #374151;
+            background: #f9fafb;
         }
         
         .tab.active {
-            color: #3b82f6;
+            color: #1f2937;
             border-bottom-color: #3b82f6;
+            font-weight: 500;
         }
         
         .content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px;
+            margin: 0 32px;
+            padding: 0;
+            padding-top: 0;
         }
         
         .tab-content {
@@ -222,27 +166,67 @@
         
         .section {
             background: white;
-            border-radius: 12px;
-            padding: 28px;
+            border-radius: 0;
+            padding: 0;
             margin-bottom: 24px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-            border: 1px solid #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .section.collapsed .section-content {
+            display: none;
+        }
+        
+        .section-header {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: 0;
+        }
+
+        .section-header.clickable {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .section-toggle-indicator {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .section:not(.collapsed) .section-toggle-indicator {
+            transform: rotate(90deg);
+            color: #4b5563;
         }
         
         .section h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
             color: #1f2937;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f3f4f6;
+            padding: 0;
+            border-bottom: none;
         }
         
-        .section h3 {
+        .section-content {
+            padding: 28px;
+        }
+        
+        .section-content h3 {
             font-size: 16px;
             font-weight: 600;
             margin: 20px 0 12px 0;
             color: #374151;
+        }
+        
+        .section-content h3:first-child {
+            margin-top: 0;
         }
         
         .info-grid {
@@ -541,29 +525,8 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard">App Dash</a></li>
-            <li><a href="/new-application">New Application</a></li>
-            <li><a href="/networking" class="active">Network Dash</a></li>
-            <li><a href="/new-networking-contact">New Contact</a></li>
-            <li><a href="/templates">Templates</a></li>
-            <li><a href="/progress">Progress</a></li>
-            <li><a href="/reports">Reports</a></li>
-            <li><a href="/analytics">Analytics</a></li>
-            <li><a href="/daily-activities">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true">Manage Resume</a></li>
-        </ul>
-    </div>
-    
     <!-- Main Content -->
     <div class="header">
-        <a href="/networking" class="back-link">Back to Network Dash</a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1>Liran Eisenberg</h1>
@@ -583,9 +546,106 @@
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span class="status-pill tag tag-blue">Connected</span>
+            <span id="statusPill" class="status-pill tag tag-blue">Contacted - Sent</span>
             <span class="status-pill tag tag-green">85% Match</span>
         </div>
+        
+            <div style="margin: 20px 0;">
+                <!-- All 8 Badges -->
+                <div style="padding: 16px; background: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleBadgeSection()">
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #1f2937;">Networking Rewards (13 pts)</h3>
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="badge-grid-content" style="display: flex; gap: 8px; flex-wrap: wrap; max-height: 300px; overflow-y: auto;">
+                        
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #3b82f6; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Sent LinkedIn Connection&quot; status | Badges tracking: Deep Research Complete (Steps 1.1-1.3). Specific personalization hook is defined. | Trigger: Sent LinkedIn Connection">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #3b82f6; font-weight: bold;">✓</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Deep Diver</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #10b981; white-space: nowrap;">+10</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #3b82f6; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Sent Email&quot; status | Badges tracking: Personalized LinkedIn Message Sent (Step 2.1). Awaiting connection acceptance or response. | Trigger: Sent Email">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #3b82f6; font-weight: bold;">✓</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Profile Magnet</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #10b981; white-space: nowrap;">+3</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Connection Accepted&quot; status | Badges tracking: Contact Viewed Profile (2.3) OR Connection Accepted (2.4) OR Email Reply Received (3.4). Any positive sign of engagement. | Trigger: Connection Accepted">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Qualified Lead</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+15</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;In Conversation&quot; status | Badges tracking: Value-Driven Email Sent (3.3) and Contact is Actively Responding. You are exchanging messages to set a meeting. | Trigger: In Conversation">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Conversation Starter</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+20</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Meeting Scheduled&quot; status | Badges tracking: Call/Meeting Confirmed on Calendar (Step 8). A specific date/time is set. | Trigger: Meeting Scheduled">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Scheduler Master</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+30</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Meeting Complete&quot; status | Badges tracking: Meeting Occurred and Debrief is Done (Step 9). Informational interview or call is complete. | Trigger: Meeting Complete">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Rapport Builder</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+50</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Strong Connection&quot; status | Badges tracking: Next Check-in Scheduled (Step 4.1) or Maintenance Check-in Sent (Step 4.2). Relationship is established and active. | Trigger: Strong Connection">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Relationship Manager</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+2</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Referral Partner&quot; status | Badges tracking: Contact Provides Referral/Opportunity OR Explicitly Offers Advocacy. Confirmed as a high-value relationship. | Trigger: Referral Partner">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Super Connector</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+100</span>
+                        </div>
+                    </div>
+                
+                    </div>
+                    <script>
+                        let badgeSectionExpanded = true;
+                        function toggleBadgeSection() {
+                            const content = document.getElementById('badge-grid-content');
+                            const icon = document.getElementById('badge-toggle-icon');
+                            if (!badgeSectionExpanded) {
+                                content.style.display = 'flex';
+                                icon.style.transform = 'rotate(0deg)';
+                                badgeSectionExpanded = true;
+                            } else {
+                                content.style.display = 'none';
+                                icon.style.transform = 'rotate(180deg)';
+                                badgeSectionExpanded = false;
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+            
+        
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -597,11 +657,11 @@
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> Dec 12, 2025 04:36 PM EST</span>
+                <span id="statusUpdated"><strong>Updated:</strong> Dec 12, 2025 04:42 PM EST</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> Contacted - Sent</span>
+                <span><strong>Status:</strong> <span id="statusDisplay">Contacted - Sent</span></span>
             </div>
             <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/liraneisenberg/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
             <div class="meta-item" id="emailMetaItem">
@@ -619,35 +679,18 @@
         <div class="tab" onclick="switchTab('research')">Research</div>
         <div class="tab" onclick="switchTab('messages')">Messages</div>
         <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+        <div class="tab" onclick="switchTab('update-contact')">Update Contact</div>
     </div>
     
-    <div class="content">
+        <div class="content">
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
-            <!-- Contact Details Section -->
-            <div class="section">
-                <h2>Contact Details</h2>
-                <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
-                        <input type="email" id="contactEmail" name="email" value="liran.eisenberg@invesco.us" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
-                        <input type="text" id="contactLocation" name="location" value="New York, NY" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
-                        <input type="text" id="contactJobTitle" name="job_title" value="VP Data Analytics" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                </form>
-                <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
-                <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
-            </div>
-            
             <!-- Match Analysis Section -->
             <div class="section">
-                <h2>Match Analysis</h2>
+                <div class="section-header">
+                    <h2>Match Analysis</h2>
+                </div>
+                <div class="section-content">
                 <div class="analysis-section">
                     <div class="analysis-text">MATCH SCORE: 85
 
@@ -689,11 +732,15 @@ To approach Liran, start by highlighting your own expertise in AI/ML application
 
 Overall, Liran's connection is an excellent opportunity to expand your professional network and gain insights from someone with extensive experience in AI/ML applications and data engineering.</div>
                 </div>
+                </div>
             </div>
             
             <!-- Key Strengths & Talking Points -->
             <div class="section">
-                <h2>Key Strengths & Talking Points</h2>
+                <div class="section-header">
+                    <h2>Key Strengths & Talking Points</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px;">
                     <ul style="margin: 0; padding-left: 20px; color: #166534; line-height: 1.8;">
     <li>CAREER SIMILARITY: Medium</li>
@@ -702,13 +749,17 @@ Overall, Liran's connection is an excellent opportunity to expand your professio
     <li>Overall, Liran's connection is an excellent opportunity to expand your professional network and gain insights from someone with extensive experience in AI/ML applications and data engineering.</li>
 </ul>
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Raw Entry Tab -->
         <div id="raw" class="tab-content">
             <div class="section">
-                <h2>Raw Profile Details</h2>
+                <div class="section-header">
+                    <h2>Raw Profile Details</h2>
+                </div>
+                <div class="section-content">
                 <pre>Liran Eisenberg 
  Lee  1st degree connection1st
 VP Data Engineering & Analytics | Cloud & AI Transformation Leader | GCP, Snowflake, Python | $100M+ Value Created | Ex-Macy’s, IBM
@@ -967,13 +1018,17 @@ Atos
 2,504,439 followers2,504,439 followers
 
 Follow</pre>
+                </div>
             </div>
         </div>
         
         <!-- Skills Tab -->
         <div id="skills" class="tab-content">
             <div class="section">
-                <h2>Skills Analysis</h2>
+                <div class="section-header">
+                    <h2>Skills Analysis</h2>
+                </div>
+                <div class="section-content">
                 <p style="color: #6b7280; margin-bottom: 16px;">
                     Comparison of your skills with Liran Eisenberg's profile.
                 </p>
@@ -992,13 +1047,17 @@ Follow</pre>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px;">Their unique skills will be highlighted in future updates</span>
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Research Tab -->
         <div id="research" class="tab-content">
             <div class="section">
-                <h2>AI-Generated Research & Background</h2>
+                <div class="section-header">
+                    <h2>AI-Generated Research & Background</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                     <p style="color: #1e40af; font-size: 14px; margin-bottom: 12px;">
                         <strong>Note:</strong> This research was automatically generated from the LinkedIn profile data and available information.
@@ -1038,22 +1097,51 @@ Based on Liran Eisenberg's profile, some potential conversation topics could inc
 2. AI/ML enablement and hands-on technical leadership in real-world applications
 3. Scalable architecture and end-to-end cloud modernization initiatives
                 </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="liran.eisenberg@invesco.us" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="New York, NY" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="VP Data Analytics" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
             </div>
         </div>
         
         <!-- Messages Tab -->
         <div id="messages" class="tab-content">
             <div class="section">
-                <h2>Networking Messages</h2>
-                
+                <div class="section-header">
+                    <h2>Networking Messages</h2>
+                </div>
+                <div class="section-content">
                 <div class="message-box">
                     <h3>
                         <span>1. Initial Connection Request (LinkedIn)</span>
                         <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
                     </h3>
-                    <div id="connection-message">"Liran, great to see your thoughts on innovative AI applications and legacy system migrations! As someone who's driven by data insights at Invesco Ltd., I'm excited to learn more about your team's approach to harnessing AI for business value. Let's explore how we can leverage analytics to drive d...
-Character count: 300</div>
-                    <div class="char-count">321 characters</div>
+                    <div id="connection-message">Data/BI/Analytics Leader, with experience in FInancial services from Self Financiat to BoNY and RBC. I applied for VP Data Analytics (XX% match) on your site. Passionate about credit building and enabling financial success at Invesco Ltd. Eager to discuss my experience!</div>
+                    <div class="char-count">270 characters</div>
                 </div>
                 
                 <div class="message-box">
@@ -1061,16 +1149,7 @@ Character count: 300</div>
                         <span>2. Meeting Invitation</span>
                         <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
                     </h3>
-                    <div id="meeting-message">Here's a friendly invitation for a 1:1 meet & greet:
-Subject: Let's Connect and Explore Some Tech Topics!
-Hi Liran,
-I wanted to personally thank you for accepting my connection request on LinkedIn! I'm excited to have the opportunity to expand our professional network.
-As we both work in the financial industry, I thought it would be great to connect with someone who shares similar interests. I came across your profile and was impressed by Invesco Ltd.'s innovative approach to investment solutions.
-I'd love to grab a virtual coffee (15-20 minutes) and chat about some of the latest tech trends that fascinate me. I'm curious to know: what's the most innovative AI application you've seen recently? How do you approach migrating legacy systems to cloud-based infrastructure? And, have you had any experience using ChatGPT for data analysis?
-No pressure, just a casual conversation to share ideas and learn from each other. Let me know if you're interested, and we can schedule a time that suits you best.
-Looking forward to hearing back from you!
-Best regards,
-[Your Name]</div>
+                    <div id="meeting-message">Hi Liran I am a Product/ Data/ Strategy Leader with 18+ years driving strategy, data analysis, and unprecedented growth. Applied to the VP Data Analytics. Let's connect.</div>
                 </div>
                 
                 <div class="message-box">
@@ -1078,14 +1157,9 @@ Best regards,
                         <span>3. Thank You Message</span>
                         <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
                     </h3>
-                    <div id="thankyou-message">Here's a sample thank-you message:
-Subject: Thank you for meeting with me, Liran!
-Dear Liran,
-I wanted to take a moment to express my gratitude for taking the time to meet with me today at Invesco Ltd. I truly appreciated our conversation about [topic discussed] and learning more about your work in [specific area of interest]. Your insights were incredibly valuable, and I'm excited to continue exploring ways to leverage them.
-One specific takeaway from our discussion was [insight gained], which has given me a lot to think about as we move forward. I'm looking forward to putting this into practice and seeing the impact it can have.
-Once again, thank you for your time and expertise today. It was an absolute pleasure meeting with you, and I'd love to stay in touch. If there's anything I can do to help or if you're willing to continue our conversation, please don't hesitate to reach out.
-Best regards,
-[Your Name]</div>
+                    <div id="thankyou-message">Hello Liran! Your banner caught my eye.
+I'm Kervin, a Data Product Leader, and I applied for the VP Data Analytics role at Invesco Ltd. I emailed you my resume & cover for reference. My experience is a great match. I hope to connect!
+Cheers</div>
                 </div>
                 
                 <div class="message-box">
@@ -1093,17 +1167,8 @@ Best regards,
                         <span>4. Consulting Services Offer</span>
                         <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
                     </h3>
-                    <div id="consulting-message">Subject: Leveraging Data Engineering Expertise for Your Organization's Growth
-Dear [Recipient],
-I hope this message finds you well. I wanted to take a moment to express my appreciation for the opportunity to connect with you at [Event/Meeting]. It was great discussing [Shared Interest or Topic] and learning more about your organization's innovative approach to [Industry/Field].
-As someone who has spent years building data engineering, analytics, AI/ML implementation, and technical leadership expertise, I've had the privilege of helping numerous companies like yours unlock new opportunities for growth. I couldn't help but notice that [Company X] is facing similar challenges in [Specific Area], such as optimizing operational efficiency or enhancing customer experiences through data-driven insights.
-As a neutral third-party expert, I believe my consulting services could provide valuable guidance on how to address these challenges and drive meaningful results. If you're open to exploring potential solutions, I'd be happy to set up a brief discovery call (30 minutes) to discuss your specific needs and goals. This would allow us to identify potential areas where we could collaborate to achieve positive outcomes.
-Please let me know if this is something that interests you, and we can schedule the call at your convenience. I'm confident that my expertise in data engineering and analytics could bring significant value to your organization. I look forward to the possibility of working together.
-Best regards,
-Liran Eisenberg
-Data Engineering Expert & Consultant
-Invesco Ltd.
-[Contact Information]</div>
+                    <div id="consulting-message">I am a hands on experienced Data Analytics and BI leader. I turn disparate data into strategic solutions and automation. Proficient in BI, Cloud, SQL, and Data tools. Always open to high-impact roles in [Target Industry]</div>
+                </div>
                 </div>
             </div>
         </div>
@@ -1111,7 +1176,10 @@ Invesco Ltd.
         <!-- Updates & Notes Tab -->
         <div id="updates" class="tab-content">
             <div class="section">
-                <h2>Update Status</h2>
+                <div class="section-header">
+                    <h2>Update Status</h2>
+                </div>
+                <div class="section-content">
                 
                 <div id="updateAlert" class="alert"></div>
                 
@@ -1120,27 +1188,24 @@ Invesco Ltd.
                         <label for="status">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
-                            <optgroup label="Research & Contact">
-                                <option value="To Research" >To Research</option>
-                                <option value="Ready to Contact" >Ready to Contact</option>
-                                <option value="Contacted - Sent" selected>Contacted - Sent</option>
-                                <option value="Contacted - Replied" >Contacted - Replied</option>
-                                <option value="Contacted - No Response" >Contacted - No Response</option>
-                                <option value="Cold/Archive" >Cold/Archive</option>
+                            <optgroup label="Prospecting">
+                                <option value="Found Contact" >Found Contact</option>
+                                <option value="Sent LinkedIn Connection" >Sent LinkedIn Connection</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Sent Email" >Sent Email</option>
+                                <option value="Connection Accepted" >Connection Accepted</option>
+                                <option value="Cold/Inactive" >Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
                                 <option value="In Conversation" >In Conversation</option>
                                 <option value="Meeting Scheduled" >Meeting Scheduled</option>
                                 <option value="Meeting Complete" >Meeting Complete</option>
-                                <option value="Action Pending - You" >Action Pending - You</option>
-                                <option value="Action Pending - Them" >Action Pending - Them</option>
                             </optgroup>
-                            <optgroup label="Relationship">
-                                <option value="New Connection" >New Connection</option>
-                                <option value="Nurture (1-3 Mo.)" >Nurture (1-3 Mo.)</option>
-                                <option value="Nurture (4-6 Mo.)" >Nurture (4-6 Mo.)</option>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" >Strong Connection</option>
                                 <option value="Referral Partner" >Referral Partner</option>
-                                <option value="Inactive/Dormant" >Inactive/Dormant</option>
+                                <option value="Dormant" >Dormant</option>
                             </optgroup>
                         </select>
                     </div>
@@ -1180,6 +1245,34 @@ Invesco Ltd.
                     <div id="timelineContent">
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="liran.eisenberg@invesco.us" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="New York, NY" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="VP Data Analytics" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
                 </div>
             </div>
         </div>
@@ -1224,6 +1317,14 @@ Invesco Ltd.
             
             const template = templates[type] || '';
             quill.root.innerHTML = template;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) {
+                return;
+            }
+            section.classList.toggle('collapsed');
         }
         
         function switchTab(tabName) {
@@ -1358,16 +1459,38 @@ Invesco Ltd.
                     updateAlert.textContent = `Status updated to "${status}"`;
                     updateAlert.classList.add('show', 'success');
                     
+                    // Update status displays immediately
+                    const statusPill = document.getElementById('statusPill');
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+                    const statusUpdated = document.getElementById('statusUpdated');
+                    
+                    if (statusPill) statusPill.textContent = status;
+                    if (statusDisplay) statusDisplay.textContent = status;
+                    if (currentStatusDisplay) currentStatusDisplay.textContent = status;
+                    if (statusUpdated) {
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                        statusUpdated.innerHTML = `<strong>Updated:</strong> ${dateStr} ${timeStr}`;
+                    }
+                    
+                    // Update dropdown selection
+                    const statusSelect = document.getElementById('status');
+                    if (statusSelect) {
+                        statusSelect.value = status;
+                    }
+                    
                     // Clear editor
                     quill.root.innerHTML = '';
                     
                     // Reload timeline
                     await loadTimeline();
                     
-                    // Update page metadata if needed
+                    // Update page metadata if needed - wait longer to ensure save completes
                     setTimeout(() => {
                         location.reload();
-                    }, 2000);
+                    }, 3000);
                 } else {
                     // Show error message
                     updateAlert.textContent = `Error: ${data.error}`;
@@ -1639,5 +1762,6 @@ Invesco Ltd.
         }
         
     </script>
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>

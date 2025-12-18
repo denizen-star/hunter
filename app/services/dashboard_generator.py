@@ -530,19 +530,18 @@ class DashboardGenerator:
             font-weight: var(--font-semibold);
         }}
         .sort-select {{
-            padding: 10px 16px;
-            border: 1px solid var(--border-primary);
-            border-radius: var(--radius-sm);
-            font-size: var(--font-sm);
-            background: var(--bg-primary);
+            padding: 4px 8px;
+            border: none;
+            border-radius: 0;
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            background: transparent;
             color: var(--text-primary);
             font-family: var(--font-family);
             cursor: pointer;
         }}
         .sort-select:focus {{
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }}
         .applications-grid {{
             display: grid;
@@ -994,11 +993,6 @@ class DashboardGenerator:
                     // Only 'all' and 'rejected' filters for archived
                     if (filterStatus === 'all') {{
                         show = true;
-                    }} else if (filterStatus === 'rejected') {{
-                        const statusElement = card.querySelector('.card-status');
-                        const statusText = statusElement?.textContent.toLowerCase() || '';
-                        const statusClass = statusElement?.className || '';
-                        show = statusText.includes('rejected') || statusClass.includes('rejected');
                     }}
                 }} else {{
                     // Full filtering logic for main dashboard
@@ -1007,9 +1001,7 @@ class DashboardGenerator:
                     const statusClass = statusElement?.className || '';
                     const isFlagged = card.dataset.flagged === 'true';
                     
-                    if (filterStatus === 'all') {{
-                        show = true;
-                    }} else if (filterStatus === 'active') {{
+                    if (filterStatus === 'active') {{
                         show = !statusText.includes('rejected') && !statusText.includes('accepted');
                     }} else if (filterStatus === 'flagged') {{
                         show = isFlagged;
@@ -1027,8 +1019,6 @@ class DashboardGenerator:
                         show = statusText.includes('follow') || statusClass.includes('follow');
                     }} else if (filterStatus === 'offered') {{
                         show = statusText.includes('offered') || statusClass.includes('offered');
-                    }} else if (filterStatus === 'rejected') {{
-                        show = statusText.includes('rejected') || statusClass.includes('rejected');
                     }} else if (filterStatus === 'accepted') {{
                         show = statusText.includes('accepted') || statusClass.includes('accepted');
                     }}
@@ -1100,7 +1090,7 @@ class DashboardGenerator:
             
             // Initialize with "all" filter active (for archived dashboard) or "active" (for main dashboard)
             const isArchived = {js_is_archived};
-            const defaultFilter = isArchived ? 'all' : 'active';
+            const defaultFilter = 'active';
             filterApplications(defaultFilter);
             
             // Initialize company search if archived
@@ -1110,11 +1100,11 @@ class DashboardGenerator:
                 }}
             }}
             
-            // Activate 'all' stat card if archived
-            if (isArchived) {{
-                const allCard = document.querySelector('.stat-card[data-status="all"]');
-                if (allCard) {{
-                    allCard.classList.add('active');
+            // Activate 'active' stat card by default (if not archived)
+            if (!isArchived) {{
+                const activeCard = document.querySelector('.stat-card[data-status="active"]');
+                if (activeCard) {{
+                    activeCard.classList.add('active');
                 }}
             }}
         }});
@@ -1328,14 +1318,13 @@ class DashboardGenerator:
         # Create stat cards (two rows, 6 cards per row)
         stat_cards_html = ""
         if is_archived:
-            # For archived dashboard, only show 'all' and 'rejected'
-            status_order = ['all', 'rejected']
+            # For archived dashboard, no filter cards
+            status_order = []
         else:
-            status_order = ['active', 'all', 'flagged', 'pending', 'applied', 'contacted', 'company', 'scheduled', 'follow-up', 'offered', 'rejected', 'accepted']
+            status_order = ['active', 'flagged', 'pending', 'applied', 'contacted', 'company', 'scheduled', 'follow-up', 'offered', 'accepted']
         
         status_labels = {
             'active': 'Active',
-            'all': 'All',
             'flagged': 'Flagged',
             'pending': 'Pending',
             'applied': 'Applied',
@@ -1344,15 +1333,14 @@ class DashboardGenerator:
             'scheduled': 'Scheduled',
             'follow-up': 'Follow Up',
             'offered': 'Offered',
-            'rejected': 'Rejected',
             'accepted': 'Accepted'
         }
         
         for i, status in enumerate(status_order):
             count = stats[status]
             label = status_labels[status]
-            # Only show stat card if count > 0 or if it's 'all' or 'rejected' (for archived)
-            if count > 0 or (is_archived and status in ['all', 'rejected']):
+            # Only show stat card if count > 0
+            if count > 0:
                 stat_cards_html += f'''
                     <div class="stat-card" data-status="{status}">
                         <div class="stat-number">{count}</div>
@@ -2199,17 +2187,19 @@ class DashboardGenerator:
             padding: 10px 16px;
             border: 1px solid var(--border-primary);
             border-radius: var(--radius-sm);
-            font-size: var(--font-sm);
-            background: var(--bg-primary);
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            background: transparent;
             color: var(--text-primary);
             font-family: var(--font-family);
             cursor: pointer;
+            border: none;
+            border-radius: 0;
+            padding: 4px 8px;
         }}
         
         .sort-select:focus {{
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px var(--accent-blue-light);
         }}
         
         .applications-grid {{

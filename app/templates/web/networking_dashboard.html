@@ -432,6 +432,68 @@
             font-weight: 500;
         }
         
+        /* Company Search Autocomplete */
+        .company-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+        
+        .company-suggestion-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-primary);
+            transition: background-color 0.2s ease;
+        }
+        
+        .company-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .company-suggestion-item:hover,
+        .company-suggestion-item.highlighted {
+            background-color: var(--bg-hover);
+        }
+        
+        .company-suggestion-item.selected {
+            background-color: var(--accent-blue-light);
+            font-weight: 500;
+        }
+        
+        .company-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--accent-blue-light);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--accent-blue);
+        }
+        
+        .company-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+            color: var(--accent-blue);
+        }
+        
+        .company-tag-remove:hover {
+            color: var(--accent-blue-hover);
+        }
+        
         .contact-dates {
             margin-top: 14px;
             font-size: 13px;
@@ -531,9 +593,52 @@
     <div class="container">
         <div class="header">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-                <div>
+                <div style="flex: 1;">
                     <h1>Networking Contacts</h1>
                     <p>Manage your professional networking pipeline</p>
+                    
+                    <!-- Search Fields -->
+                    <div style="display: flex; gap: 12px; margin-top: 16px; align-items: center; flex-wrap: wrap;">
+                        <!-- Search Contact -->
+                        <div style="position: relative; min-width: 200px; flex: 1;">
+                            <input type="text" 
+                                   id="contactSearch" 
+                                   placeholder="Search Contact..." 
+                                   oninput="handleContactSearch(event)"
+                                   style="width: 100%; padding: 8px 12px 8px 36px; font-size: 14px; border: 1px solid var(--border-primary); border-radius: 6px; background: #fff;">
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; pointer-events: none; z-index: 1;">🔍</span>
+                        </div>
+                        
+                        <!-- Search Companies -->
+                        <div class="search-filter-container" style="position: relative; min-width: 250px; flex: 1;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 4px 36px 4px 4px; border: 1px solid var(--border-primary); border-radius: 6px; background: #fff; min-height: 36px;">
+                                <div id="selectedCompanies" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1;"></div>
+                                <input type="text" 
+                                       id="companyFilter" 
+                                       class="search-input" 
+                                       placeholder="Search companies..." 
+                                       oninput="handleCompanySearch(event)"
+                                       onfocus="handleCompanySearchFocus()"
+                                       onblur="hideCompanySuggestions()"
+                                       autocomplete="off"
+                                       style="border: none; outline: none; font-size: 14px; flex: 1; min-width: 120px; padding: 4px 0;">
+                            </div>
+                            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; pointer-events: none; z-index: 1;">🔍</span>
+                            <div id="companySuggestions" class="company-suggestions" style="display: none;"></div>
+                        </div>
+                        
+                        <!-- Sort Dropdown -->
+                        <select id="sortSelect" class="sort-select" onchange="handleSortChange()" style="border: none; background: transparent; font-size: var(--font-lg); font-weight: var(--font-semibold); color: var(--text-primary); padding: 4px 8px; cursor: pointer; outline: none;">
+                            <option value="updated_desc">Updated (Newest First)</option>
+                            <option value="updated_asc">Updated (Oldest First)</option>
+                            <option value="name_asc">Name (A-Z)</option>
+                            <option value="name_desc">Name (Z-A)</option>
+                            <option value="company_asc">Company (A-Z)</option>
+                            <option value="company_desc">Company (Z-A)</option>
+                            <option value="status_asc">Status (A-Z)</option>
+                            <option value="status_desc">Status (Z-A)</option>
+                        </select>
+                    </div>
                 </div>
                 <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
             </div>
@@ -564,17 +669,17 @@
                     <button class="filter-btn active" data-filter-type="status" data-filter="all">
                         All <span class="count" id="count-all">0</span>
                     </button>
-                    <button class="filter-btn" data-filter-type="status" data-filter="To Research">
-                        To Research <span class="count" id="count-research">0</span>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Found Contact">
+                        Found Contact <span class="count" id="count-found-contact">0</span>
                     </button>
-                    <button class="filter-btn" data-filter-type="status" data-filter="Ready to Connect">
-                        Ready to Connect <span class="count" id="count-ready">0</span>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Sent LinkedIn Connection">
+                        Sent LinkedIn Connection <span class="count" id="count-sent-linkedin">0</span>
                     </button>
-                    <button class="filter-btn" data-filter-type="status" data-filter="Pending Reply">
-                        Pending Reply <span class="count" id="count-pending">0</span>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Sent Email">
+                        Sent Email <span class="count" id="count-sent-email">0</span>
                     </button>
-                    <button class="filter-btn" data-filter-type="status" data-filter="Connected - Initial">
-                        Connected <span class="count" id="count-connected">0</span>
+                    <button class="filter-btn" data-filter-type="status" data-filter="Connection Accepted">
+                        Connection Accepted <span class="count" id="count-connection-accepted">0</span>
                     </button>
                     <button class="filter-btn" data-filter-type="status" data-filter="In Conversation">
                         In Conversation <span class="count" id="count-conversation">0</span>
@@ -623,6 +728,10 @@
         let currentStatusFilter = 'all';
         let currentTimingFilter = null;
         let currentStatFilter = 'active'; // Default to "Active"
+        let currentSort = 'updated_desc'; // Default to "Updated (Newest First)"
+        let currentContactSearch = '';
+        let currentCompanyFilter = [];
+        let allCompanies = [];
 
         // Load contacts on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -639,6 +748,8 @@
                 
                 if (data.success) {
                     allContacts = data.contacts;
+                    // Extract unique company names for search
+                    allCompanies = [...new Set(allContacts.map(c => c.company_name).filter(Boolean))].sort();
                     updateStats();
                     updateFilterCounts();
                     // Set "Active" stat card as active on load
@@ -676,17 +787,17 @@
             // Status counts - updated for new status system
             document.getElementById('count-all').textContent = allContacts.length;
             
-            const research = allContacts.filter(c => c.status === 'To Research').length;
-            document.getElementById('count-research').textContent = research;
+            const foundContact = allContacts.filter(c => c.status === 'Found Contact' || c.status === 'To Research').length;
+            document.getElementById('count-found-contact').textContent = foundContact;
             
-            const ready = allContacts.filter(c => c.status === 'Ready to Connect').length;
-            document.getElementById('count-ready').textContent = ready;
+            const sentLinkedIn = allContacts.filter(c => c.status === 'Sent LinkedIn Connection' || c.status === 'Ready to Connect').length;
+            document.getElementById('count-sent-linkedin').textContent = sentLinkedIn;
             
-            const pending = allContacts.filter(c => c.status === 'Pending Reply').length;
-            document.getElementById('count-pending').textContent = pending;
+            const sentEmail = allContacts.filter(c => c.status === 'Sent Email' || c.status === 'Pending Reply').length;
+            document.getElementById('count-sent-email').textContent = sentEmail;
             
-            const connected = allContacts.filter(c => c.status === 'Connected - Initial').length;
-            document.getElementById('count-connected').textContent = connected;
+            const connectionAccepted = allContacts.filter(c => c.status === 'Connection Accepted' || c.status === 'Connected - Initial').length;
+            document.getElementById('count-connection-accepted').textContent = connectionAccepted;
             
             const conversation = allContacts.filter(c => c.status === 'In Conversation').length;
             document.getElementById('count-conversation').textContent = conversation;
@@ -805,15 +916,74 @@
             }
             // 'all' stat filter shows all contacts
             
-            // Then filter by status filter buttons
+            // Then filter by status filter buttons (with backward compatibility)
             if (currentStatusFilter !== 'all') {
-                filtered = filtered.filter(c => c.status === currentStatusFilter || c.status.includes(currentStatusFilter));
+                filtered = filtered.filter(c => {
+                    // Check exact match
+                    if (c.status === currentStatusFilter) return true;
+                    // Check if status includes filter (for partial matches)
+                    if (c.status && c.status.includes(currentStatusFilter)) return true;
+                    // Backward compatibility: map old status names to new ones
+                    const statusMap = {
+                        'Found Contact': ['To Research'],
+                        'Sent LinkedIn Connection': ['Ready to Connect'],
+                        'Sent Email': ['Pending Reply'],
+                        'Connection Accepted': ['Connected - Initial']
+                    };
+                    if (statusMap[currentStatusFilter]) {
+                        return statusMap[currentStatusFilter].includes(c.status);
+                    }
+                    return false;
+                });
             }
             
             // Further filter by timing if selected (null means "all")
             if (currentTimingFilter !== null) {
                 filtered = filtered.filter(c => c.timing_color === currentTimingFilter);
             }
+            
+            // Filter by contact name search
+            if (currentContactSearch && currentContactSearch.trim()) {
+                const searchTerm = currentContactSearch.toLowerCase().trim();
+                filtered = filtered.filter(c => 
+                    (c.person_name || '').toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by selected companies
+            if (currentCompanyFilter.length > 0) {
+                filtered = filtered.filter(c => 
+                    currentCompanyFilter.includes(c.company_name)
+                );
+            }
+            
+            // Apply sorting
+            filtered.sort((a, b) => {
+                switch(currentSort) {
+                    case 'updated_desc':
+                        const aUpdated = a.status_updated_at || a.created_at;
+                        const bUpdated = b.status_updated_at || b.created_at;
+                        return new Date(bUpdated) - new Date(aUpdated);
+                    case 'updated_asc':
+                        const aUpdatedAsc = a.status_updated_at || a.created_at;
+                        const bUpdatedAsc = b.status_updated_at || b.created_at;
+                        return new Date(aUpdatedAsc) - new Date(bUpdatedAsc);
+                    case 'name_asc':
+                        return (a.person_name || '').localeCompare(b.person_name || '');
+                    case 'name_desc':
+                        return (b.person_name || '').localeCompare(a.person_name || '');
+                    case 'company_asc':
+                        return (a.company_name || '').localeCompare(b.company_name || '');
+                    case 'company_desc':
+                        return (b.company_name || '').localeCompare(a.company_name || '');
+                    case 'status_asc':
+                        return (a.status || '').localeCompare(b.status || '');
+                    case 'status_desc':
+                        return (b.status || '').localeCompare(a.status || '');
+                    default:
+                        return 0;
+                }
+            });
             
             // Render
             if (filtered.length === 0) {
@@ -887,6 +1057,149 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+        
+        // Search and Sort Functions
+        function handleContactSearch(event) {
+            currentContactSearch = event.target.value;
+            renderContacts();
+        }
+        
+        function handleCompanySearch(event) {
+            const input = event.target;
+            const query = input.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                showCompanySuggestions(query);
+            } else {
+                showCompanySuggestions('');
+            }
+        }
+        
+        function handleCompanySearchFocus() {
+            const input = document.getElementById('companyFilter');
+            const query = input.value;
+            showCompanySuggestions(query);
+        }
+        
+        function hideCompanySuggestions() {
+            setTimeout(() => {
+                const suggestionsDiv = document.getElementById('companySuggestions');
+                if (suggestionsDiv) {
+                    suggestionsDiv.style.display = 'none';
+                }
+            }, 200);
+        }
+        
+        function showCompanySuggestions(query = '') {
+            const suggestionsDiv = document.getElementById('companySuggestions');
+            if (!suggestionsDiv || !allCompanies) return;
+            
+            const companies = allCompanies || [];
+            let filtered = [];
+            
+            if (!query || query.length === 0) {
+                filtered = companies.slice(0, 15);
+            } else {
+                filtered = companies
+                    .filter(company => company.toLowerCase().includes(query.toLowerCase()))
+                    .slice(0, 15);
+            }
+            
+            renderSuggestions(filtered, suggestionsDiv);
+            
+            if (suggestionsDiv.children.length > 0) {
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        }
+        
+        function renderSuggestions(companies, container) {
+            container.innerHTML = '';
+            
+            if (companies.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'company-suggestion-item';
+                noResults.textContent = 'No companies found';
+                noResults.style.color = 'var(--text-secondary)';
+                noResults.style.cursor = 'default';
+                container.appendChild(noResults);
+                return;
+            }
+            
+            companies.forEach(company => {
+                const isSelected = currentCompanyFilter.includes(company);
+                const item = document.createElement('div');
+                item.className = 'company-suggestion-item' + (isSelected ? ' selected' : '');
+                item.innerHTML = `
+                    <span>${escapeHtml(company)}</span>
+                    ${isSelected ? '<span style="margin-left: auto; color: var(--accent-blue);">✓</span>' : ''}
+                `;
+                item.onmousedown = (e) => {
+                    e.preventDefault();
+                    toggleCompany(company);
+                };
+                item.onmouseenter = () => {
+                    container.querySelectorAll('.company-suggestion-item').forEach(el => {
+                        el.classList.remove('highlighted');
+                    });
+                    item.classList.add('highlighted');
+                };
+                container.appendChild(item);
+            });
+        }
+        
+        function toggleCompany(company) {
+            if (currentCompanyFilter.includes(company)) {
+                currentCompanyFilter = currentCompanyFilter.filter(c => c !== company);
+            } else {
+                currentCompanyFilter.push(company);
+            }
+            
+            const input = document.getElementById('companyFilter');
+            input.value = '';
+            
+            updateSelectedCompaniesDisplay();
+            showCompanySuggestions('');
+            renderContacts();
+        }
+        
+        function updateSelectedCompaniesDisplay() {
+            const container = document.getElementById('selectedCompanies');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            currentCompanyFilter.forEach((company, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'company-tag';
+                tag.innerHTML = `
+                    <span>${escapeHtml(company)}</span>
+                    <span class="company-tag-remove" data-company-index="${index}" title="Remove">×</span>
+                `;
+                const removeBtn = tag.querySelector('.company-tag-remove');
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeCompany(index);
+                };
+                container.appendChild(tag);
+            });
+        }
+        
+        function removeCompany(index) {
+            if (index >= 0 && index < currentCompanyFilter.length) {
+                currentCompanyFilter.splice(index, 1);
+                updateSelectedCompaniesDisplay();
+                renderContacts();
+            }
+        }
+        
+        function handleSortChange() {
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                currentSort = sortSelect.value;
+                renderContacts();
+            }
         }
 
         async function toggleFlag(contactId, flagged) {

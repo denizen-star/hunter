@@ -198,12 +198,88 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         
         return message
     
+    def _generate_company_positions_html(self, contact: NetworkingContact) -> str:
+        """Generate HTML for company positions list in networking contact hero section"""
+        try:
+            import html
+            from app.services.job_processor import JobProcessor
+            job_processor = JobProcessor()
+            
+            # Get all applications
+            all_applications = job_processor.list_all_applications()
+            
+            # Filter by company (case-insensitive)
+            company_apps = [
+                app for app in all_applications
+                if app.company.lower().strip() == contact.company_name.lower().strip()
+                and app.summary_path and app.summary_path.exists()
+            ]
+            
+            if not company_apps:
+                return ''
+            
+            # Sort by status_updated_at (most recent first)
+            company_apps.sort(key=lambda x: x.status_updated_at or x.created_at, reverse=True)
+            
+            # Generate HTML for each position (one line per position)
+            positions_html = []
+            for app in company_apps:
+                # Get status tags for this application
+                from app.services.document_generator import DocumentGenerator
+                doc_gen = DocumentGenerator()
+                status_tags = doc_gen._get_status_tags(app)
+                status_pill_html = ''
+                if status_tags:
+                    tag_name, tag_class = status_tags[0]  # Get first status tag
+                    status_pill_html = f'<span class="status-pill tag {tag_class}">{tag_name}</span>'
+                
+                # No link - just display text
+                positions_html.append(f'''
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="flex: 1; font-size: 14px; font-weight: 500; color: #1f2937;">{html.escape(app.job_title)}</span>
+                        {status_pill_html}
+                    </div>
+                ''')
+            
+            return f'''
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleCompanyPositions()">
+                        <h3 style="font-size: 14px; font-weight: 600; color: #6b7280; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Positions at {html.escape(contact.company_name)}</h3>
+                        <svg id="positions-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="company-positions-content" style="max-height: 200px; overflow-y: auto;">
+                        {''.join(positions_html)}
+                    </div>
+                    <script>
+                        let companyPositionsExpanded = true;
+                        function toggleCompanyPositions() {{
+                            const content = document.getElementById('company-positions-content');
+                            const icon = document.getElementById('positions-toggle-icon');
+                            if (!companyPositionsExpanded) {{
+                                content.style.display = 'block';
+                                icon.style.transform = 'rotate(0deg)';
+                                companyPositionsExpanded = true;
+                            }} else {{
+                                content.style.display = 'none';
+                                icon.style.transform = 'rotate(180deg)';
+                                companyPositionsExpanded = false;
+                            }}
+                        }}
+                    </script>
+                </div>
+            '''
+        except Exception as e:
+            print(f"Warning: Could not generate company positions list: {e}")
+            return ''
+    
     def _get_next_step_recommendation(self, contact: NetworkingContact) -> str:
         """Get rule-based next step recommendation based on status and days since update"""
-        status = contact.status or "To Research"
+        status = contact.status or "Found Contact"
         days_since = contact.get_days_since_update()
         
-        if status == "To Research":
+        if status in ["To Research", "Found Contact"]:
             return "Review profile and find 1-2 warm intro angles"
         elif status in ["Contacted", "Contacted - Sent"]:
             if days_since < 7:
@@ -832,7 +908,6 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
 <body>
     <!-- Main Content -->
     <div class="header">
-        <a href="/networking" class="back-link">Back to Network Dash</a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1>{contact.person_name}</h1>
@@ -849,9 +924,10 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'To Research'}</span>
+            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'Found Contact'}</span>
         </div>
         {self._generate_contact_rewards_cards(contact)}
+        {self._generate_company_positions_html(contact)}
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -867,7 +943,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'To Research'}</span></span>
+                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'Found Contact'}</span></span>
             </div>
             {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
             <div class="meta-item" id="emailMetaItem">
@@ -885,41 +961,16 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         <div class="tab hidden" onclick="switchTab('research')">Research</div>
         <div class="tab" onclick="switchTab('messages')">Messages</div>
         <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+        <div class="tab" onclick="switchTab('update-contact')">Update Contact</div>
     </div>
     
     <div class="content">
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
-            <!-- Contact Details Section -->
-            <div class="section collapsed" id="contact-details-section">
-                <div class="section-header clickable" onclick="toggleSection('contact-details-section')">
-                    <h2>Contact Details</h2>
-                    <span class="section-toggle-indicator">▶</span>
-                </div>
-                <div class="section-content">
-                <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
-                        <input type="email" id="contactEmail" name="email" value="{contact.email or ''}" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
-                        <input type="text" id="contactLocation" name="location" value="{contact.location or ''}" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
-                        <input type="text" id="contactJobTitle" name="job_title" value="{contact.job_title or ''}" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                </form>
-                <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
-                <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
-                </div>
-            </div>
-            
             <!-- Relationship / Next Step Card -->
             <div class="relationship-card">
                 <h3>Relationship Status</h3>
-                <div class="status">Current Status: <span id="currentStatusDisplay">{contact.status or 'To Research'}</span></div>
+                <div class="status">Current Status: <span id="currentStatusDisplay">{contact.status or 'Found Contact'}</span></div>
                 <div class="next-step">Next Step: {next_step}</div>
             </div>
         </div>
@@ -995,12 +1046,12 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
                             <optgroup label="Prospecting">
-                                <option value="To Research" {"selected" if contact.status == "To Research" else ""}>To Research</option>
-                                <option value="Ready to Connect" {"selected" if contact.status == "Ready to Connect" else ""}>Ready to Connect</option>
+                                <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
+                                <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
                             </optgroup>
                             <optgroup label="Outreach">
-                                <option value="Pending Reply" {"selected" if contact.status == "Pending Reply" else ""}>Pending Reply</option>
-                                <option value="Connected - Initial" {"selected" if contact.status == "Connected - Initial" else ""}>Connected - Initial</option>
+                                <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
+                                <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
                                 <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
@@ -1052,6 +1103,33 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
                 </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="{contact.email or ''}" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="{contact.location or ''}" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="{contact.job_title or ''}" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
                 </div>
             </div>
         </div>
@@ -1528,6 +1606,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         }}
         
     </script>
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>"""
         
@@ -2490,7 +2569,6 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
 <body>
     <!-- Main Content -->
     <div class="header">
-        <a href="/networking" class="back-link">Back to Network Dash</a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1>{contact.person_name}</h1>
@@ -2510,10 +2588,11 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'To Research'}</span>
+            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'Found Contact'}</span>
             {f'<span class="status-pill tag tag-green">{contact.match_score:.0f}% Match</span>' if contact.match_score is not None else ''}
         </div>
         {self._generate_contact_rewards_cards(contact)}
+        {self._generate_company_positions_html(contact)}
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -2529,7 +2608,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'To Research'}</span></span>
+                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'Found Contact'}</span></span>
             </div>
             {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
             <div class="meta-item" id="emailMetaItem">
@@ -2547,37 +2626,12 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         <div class="tab" onclick="switchTab('research')">Research</div>
         <div class="tab" onclick="switchTab('messages')">Messages</div>
         <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+        <div class="tab" onclick="switchTab('update-contact')">Update Contact</div>
     </div>
     
         <div class="content">
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
-            <!-- Contact Details Section (collapsible, starts collapsed) -->
-            <div class="section collapsed" id="contact-details-section">
-                <div class="section-header clickable" onclick="toggleSection('contact-details-section')">
-                    <h2>Contact Details</h2>
-                    <span class="section-toggle-indicator">▶</span>
-                </div>
-                <div class="section-content">
-                <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
-                        <input type="email" id="contactEmail" name="email" value="{contact.email or ''}" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
-                        <input type="text" id="contactLocation" name="location" value="{contact.location or ''}" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
-                        <input type="text" id="contactJobTitle" name="job_title" value="{contact.job_title or ''}" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                </form>
-                <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
-                <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
-                </div>
-            </div>
-            
             <!-- Match Analysis Section -->
             <div class="section">
                 <div class="section-header">
@@ -2663,6 +2717,33 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             </div>
         </div>
         
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="{contact.email or ''}" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="{contact.location or ''}" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="{contact.job_title or ''}" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Messages Tab -->
         <div id="messages" class="tab-content">
             <div class="section">
@@ -2722,12 +2803,12 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
                             <optgroup label="Prospecting">
-                                <option value="To Research" {"selected" if contact.status == "To Research" else ""}>To Research</option>
-                                <option value="Ready to Connect" {"selected" if contact.status == "Ready to Connect" else ""}>Ready to Connect</option>
+                                <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
+                                <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
                             </optgroup>
                             <optgroup label="Outreach">
-                                <option value="Pending Reply" {"selected" if contact.status == "Pending Reply" else ""}>Pending Reply</option>
-                                <option value="Connected - Initial" {"selected" if contact.status == "Connected - Initial" else ""}>Connected - Initial</option>
+                                <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
+                                <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
                                 <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
@@ -2779,6 +2860,33 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
                 </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="{contact.email or ''}" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="{contact.location or ''}" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="{contact.job_title or ''}" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
                 </div>
             </div>
         </div>
@@ -3268,6 +3376,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         }}
         
     </script>
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>"""
         
@@ -3283,13 +3392,17 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             
             badge_service = BadgeCalculationService()
             
-            # Status mapping for legacy statuses
+            # Status mapping for legacy statuses (maps to new status names)
             status_mapping = {
-                'Ready to Contact': 'Ready to Connect',
-                'Contacted - Sent': 'Pending Reply',
-                'Contacted - No Response': 'Pending Reply',
-                'Contacted - Replied': 'Connected - Initial',
-                'New Connection': 'Connected - Initial',
+                'Ready to Contact': 'Sent LinkedIn Connection',
+                'Ready to Connect': 'Sent LinkedIn Connection',  # Old name
+                'Contacted - Sent': 'Sent Email',
+                'Contacted - No Response': 'Sent Email',
+                'Contacted - Replied': 'Connection Accepted',
+                'New Connection': 'Connection Accepted',
+                'To Research': 'Found Contact',  # Old name
+                'Pending Reply': 'Sent Email',  # Old name
+                'Connected - Initial': 'Connection Accepted',  # Old name
                 'Cold/Archive': 'Cold/Inactive',
                 'Action Pending - You': 'In Conversation',
                 'Action Pending - Them': 'In Conversation',
@@ -3304,9 +3417,13 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             # Define status progression order (for cumulative points)
             # Each status awards points for all badges up to and including that status
             status_progression = [
-                'Ready to Connect',      # Deep Diver (+10)
-                'Pending Reply',         # Profile Magnet (+3)
-                'Connected - Initial',   # Qualified Lead (+15)
+                'Sent LinkedIn Connection',  # Deep Diver (+10)
+                'Sent Email',                 # Profile Magnet (+3)
+                'Connection Accepted',         # Qualified Lead (+15)
+                # Legacy statuses (backward compatibility)
+                'Ready to Connect',           # Deep Diver (+10)
+                'Pending Reply',              # Profile Magnet (+3)
+                'Connected - Initial',        # Qualified Lead (+15)
                 'In Conversation',       # Conversation Starter (+20)
                 'Meeting Scheduled',     # Scheduler Master (+30)
                 'Meeting Complete',      # Rapport Builder (+50)
@@ -3345,8 +3462,10 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 points_color = '#10b981' if is_earned else '#9ca3af'
                 icon = '✓' if is_earned else '○'
                 
-                # Build tooltip with requirements
+                # Build tooltip with badges tracking description
                 tooltip_parts = [badge_def['description']]
+                if 'badges_tracking' in badge_def and badge_def['badges_tracking']:
+                    tooltip_parts.append(f"Badges tracking: {badge_def['badges_tracking']}")
                 if 'trigger_status' in badge_def:
                     tooltip_parts.append(f"Trigger: {badge_def['trigger_status']}")
                 tooltip_text = " | ".join(tooltip_parts)
@@ -3356,18 +3475,9 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 all_badges_html.append(f'''
                     <div style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;" title="{tooltip_text}">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="width: 24px; height: 24px; font-size: 16px; color: {icon_color}; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                                {icon}
-                            </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1f2937;">{badge_def['name']}</div>
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <div style="flex: 1; height: 6px; min-width: 50px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
-                                        <div style="width: {'100' if is_earned else '0'}%; height: 100%; background: {'linear-gradient(90deg, #3b82f6, #10b981)' if is_earned else '#d1d5db'}; transition: width 0.3s ease;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{badge_def['points']}</div>
+                            <span style="font-size: 16px; color: {icon_color}; font-weight: bold;">{icon}</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">{badge_def['name']}</span>
+                            <span style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{badge_def['points']}</span>
                         </div>
                     </div>
                 ''')

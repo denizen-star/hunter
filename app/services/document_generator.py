@@ -1,5 +1,6 @@
 """Document generation service"""
 import re
+import html
 from pathlib import Path
 from app.models.application import Application
 from app.models.qualification import QualificationAnalysis
@@ -2810,9 +2811,13 @@ Format this as a professional research document that demonstrates thorough prepa
             
             # Define status progression order (for determining highest badge)
             status_progression = [
-                'Ready to Connect',      # Deep Diver (+10)
-                'Pending Reply',         # Profile Magnet (+3)
-                'Connected - Initial',   # Qualified Lead (+15)
+                'Sent LinkedIn Connection',  # Deep Diver (+10)
+                'Sent Email',                 # Profile Magnet (+3)
+                'Connection Accepted',         # Qualified Lead (+15)
+                # Legacy statuses (backward compatibility)
+                'Ready to Connect',           # Deep Diver (+10)
+                'Pending Reply',              # Profile Magnet (+3)
+                'Connected - Initial',        # Qualified Lead (+15)
                 'In Conversation',       # Conversation Starter (+20)
                 'Meeting Scheduled',     # Scheduler Master (+30)
                 'Meeting Complete',      # Rapport Builder (+50)
@@ -2820,8 +2825,12 @@ Format this as a professional research document that demonstrates thorough prepa
                 'Referral Partner'       # Super Connector (+100)
             ]
             
-            # Status to badge mapping for progression
+            # Status to badge mapping for progression (with backward compatibility)
             status_to_badge_progression = {
+                'Sent LinkedIn Connection': 'deep_diver',
+                'Sent Email': 'profile_magnet',
+                'Connection Accepted': 'qualified_lead',
+                # Legacy statuses (backward compatibility)
                 'Ready to Connect': 'deep_diver',
                 'Pending Reply': 'profile_magnet',
                 'Connected - Initial': 'qualified_lead',
@@ -2835,6 +2844,7 @@ Format this as a professional research document that demonstrates thorough prepa
             # Get badge definitions for display (needed for both branches)
             badge_definitions = badge_service.badge_definitions
             
+            total_points = 0  # Initialize total_points
             if badge_data['contacts_count'] == 0:
                 # No contacts - show the first badge to earn (Deep Diver)
                 first_badge_id = 'deep_diver'
@@ -2863,13 +2873,17 @@ Format this as a professional research document that demonstrates thorough prepa
                     if c.company_name.lower().strip() == application.company.lower().strip()
                 ]
                 
-                # Status mapping for legacy statuses
+                # Status mapping for legacy statuses (maps to new status names)
                 status_mapping = {
-                    'Ready to Contact': 'Ready to Connect',
-                    'Contacted - Sent': 'Pending Reply',
-                    'Contacted - No Response': 'Pending Reply',
-                    'Contacted - Replied': 'Connected - Initial',
-                    'New Connection': 'Connected - Initial',
+                    'Ready to Contact': 'Sent LinkedIn Connection',
+                    'Ready to Connect': 'Sent LinkedIn Connection',  # Old name
+                    'Contacted - Sent': 'Sent Email',
+                    'Contacted - No Response': 'Sent Email',
+                    'Contacted - Replied': 'Connection Accepted',
+                    'New Connection': 'Connection Accepted',
+                    'To Research': 'Found Contact',  # Old name
+                    'Pending Reply': 'Sent Email',  # Old name
+                    'Connected - Initial': 'Connection Accepted',  # Old name
                     'Cold/Archive': 'Cold/Inactive',
                     'Action Pending - You': 'In Conversation',
                     'Action Pending - Them': 'In Conversation',
@@ -3093,8 +3107,10 @@ Format this as a professional research document that demonstrates thorough prepa
         points = badge_data_item['points']
         progress = badge_data_item['progress']
         
-        # Build tooltip with requirements
+        # Build tooltip with badges tracking description
         tooltip_parts = [badge_def['description']]
+        if 'badges_tracking' in badge_def and badge_def['badges_tracking']:
+            tooltip_parts.append(f"Badges tracking: {badge_def['badges_tracking']}")
         if 'trigger_status' in badge_def:
             tooltip_parts.append(f"Trigger: {badge_def['trigger_status']}")
         if required > 1:
@@ -3110,21 +3126,11 @@ Format this as a professional research document that demonstrates thorough prepa
         points_color = '#10b981' if earned else '#9ca3af'
         
         return f'''
-            <div class="badge-item {badge_class}" title="{tooltip_text}" style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;">
+            <div class="badge-item {badge_class}" title="{html.escape(tooltip_text)}" style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help; position: relative;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <div class="badge-icon" style="width: 24px; height: 24px; font-size: 16px; color: {icon_color}; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                        {'✓' if earned else '○'}
-                    </div>
-                    <div class="badge-info" style="flex: 1; min-width: 0;">
-                        <div class="badge-name" style="font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1f2937;">{badge_def['name']}</div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <div class="badge-progress" style="flex: 1; height: 6px; min-width: 50px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
-                                <div class="badge-progress-fill" style="width: {progress}%; height: 100%; background: {'linear-gradient(90deg, #3b82f6, #10b981)' if earned else '#d1d5db'}; transition: width 0.3s ease;"></div>
-                            </div>
-                            <div class="badge-count" style="font-size: 11px; color: #6b7280; white-space: nowrap; font-weight: 500;">{count} contact{'s' if count != 1 else ''}</div>
-                        </div>
-                    </div>
-                    <div class="badge-points" style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{points}</div>
+                    <span style="font-size: 16px; color: {icon_color}; font-weight: bold;">{'✓' if earned else '○'}</span>
+                    <span class="badge-name" style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">{badge_def['name']}</span>
+                    <span class="badge-points" style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{points}</span>
                 </div>
             </div>
         '''

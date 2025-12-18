@@ -176,11 +176,33 @@
             width: 100%;
         }
         
+        .section.collapsed .section-content {
+            display: none;
+        }
+        
         .section-header {
             background: #f9fafb;
             border-bottom: 1px solid #e5e7eb;
             padding: 16px 24px;
             margin: 0;
+        }
+
+        .section-header.clickable {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .section-toggle-indicator {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .section:not(.collapsed) .section-toggle-indicator {
+            transform: rotate(90deg);
+            color: #4b5563;
         }
         
         .section h2 {
@@ -505,14 +527,13 @@
 <body>
     <!-- Main Content -->
     <div class="header">
-        <a href="/networking" class="back-link">Back to Network Dash</a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1>Meaghan Fenton</h1>
                 <div class="subtitle">Zocdoc • Director of Recruiting</div>
             </div>
             <div style="display: flex; gap: 12px;">
-                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Meaghan+Fenton&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Meaghan+Fenton%0A%0ACompany%3A+Zocdoc%0ATitle%3A+Director+of+Recruiting%0AStatus%3A+Contacted+-+Sent%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Ffentonmeaghan%2F%0AEmail%3A+leacock.kervin%40gmail.com%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FMeaghan-Fenton-Zocdoc%2FMeaghan-Fenton-summary.html%0A&location=Zocdoc&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Meaghan+Fenton&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Meaghan+Fenton%0A%0ACompany%3A+Zocdoc%0ATitle%3A+Director+of+Recruiting%0AStatus%3A+Ready+to+Contact%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Ffentonmeaghan%2F%0AEmail%3A+leacock.kervin%40gmail.com%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FMeaghan-Fenton-Zocdoc%2FMeaghan-Fenton-summary.html%0A&location=Zocdoc&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
                         📅 Add to GCal
                     </a>
                     <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
@@ -525,9 +546,144 @@
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span class="status-pill tag tag-blue">Connected</span>
+            <span id="statusPill" class="status-pill tag tag-blue">Ready to Contact</span>
             <span class="status-pill tag tag-green">85% Match</span>
         </div>
+        
+            <div style="margin: 20px 0;">
+                <!-- All 8 Badges -->
+                <div style="padding: 16px; background: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleBadgeSection()">
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #1f2937;">Networking Rewards (10 pts)</h3>
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="badge-grid-content" style="display: flex; gap: 8px; flex-wrap: wrap; max-height: 300px; overflow-y: auto;">
+                        
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #3b82f6; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Sent LinkedIn Connection&quot; status | Badges tracking: Deep Research Complete (Steps 1.1-1.3). Specific personalization hook is defined. | Trigger: Sent LinkedIn Connection">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #3b82f6; font-weight: bold;">✓</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Deep Diver</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #10b981; white-space: nowrap;">+10</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Sent Email&quot; status | Badges tracking: Personalized LinkedIn Message Sent (Step 2.1). Awaiting connection acceptance or response. | Trigger: Sent Email">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Profile Magnet</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+3</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Connection Accepted&quot; status | Badges tracking: Contact Viewed Profile (2.3) OR Connection Accepted (2.4) OR Email Reply Received (3.4). Any positive sign of engagement. | Trigger: Connection Accepted">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Qualified Lead</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+15</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;In Conversation&quot; status | Badges tracking: Value-Driven Email Sent (3.3) and Contact is Actively Responding. You are exchanging messages to set a meeting. | Trigger: In Conversation">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Conversation Starter</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+20</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Meeting Scheduled&quot; status | Badges tracking: Call/Meeting Confirmed on Calendar (Step 8). A specific date/time is set. | Trigger: Meeting Scheduled">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Scheduler Master</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+30</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Meeting Complete&quot; status | Badges tracking: Meeting Occurred and Debrief is Done (Step 9). Informational interview or call is complete. | Trigger: Meeting Complete">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Rapport Builder</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+50</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Strong Connection&quot; status | Badges tracking: Next Check-in Scheduled (Step 4.1) or Maintenance Check-in Sent (Step 4.2). Relationship is established and active. | Trigger: Strong Connection">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Relationship Manager</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+2</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Referral Partner&quot; status | Badges tracking: Contact Provides Referral/Opportunity OR Explicitly Offers Advocacy. Confirmed as a high-value relationship. | Trigger: Referral Partner">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Super Connector</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+100</span>
+                        </div>
+                    </div>
+                
+                    </div>
+                    <script>
+                        let badgeSectionExpanded = true;
+                        function toggleBadgeSection() {
+                            const content = document.getElementById('badge-grid-content');
+                            const icon = document.getElementById('badge-toggle-icon');
+                            if (!badgeSectionExpanded) {
+                                content.style.display = 'flex';
+                                icon.style.transform = 'rotate(0deg)';
+                                badgeSectionExpanded = true;
+                            } else {
+                                content.style.display = 'none';
+                                icon.style.transform = 'rotate(180deg)';
+                                badgeSectionExpanded = false;
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+            
+        
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleCompanyPositions()">
+                        <h3 style="font-size: 14px; font-weight: 600; color: #6b7280; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Positions at Zocdoc</h3>
+                        <svg id="positions-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="company-positions-content" style="max-height: 200px; overflow-y: auto;">
+                        
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="flex: 1; font-size: 14px; font-weight: 500; color: #1f2937;">Senior Manager, Product Analytics</span>
+                        <span class="status-pill tag tag-blue">Company Response</span>
+                    </div>
+                
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span style="flex: 1; font-size: 14px; font-weight: 500; color: #1f2937;">Lead Product Analyst</span>
+                        <span class="status-pill tag tag-gray">Pending</span>
+                    </div>
+                
+                    </div>
+                    <script>
+                        let companyPositionsExpanded = true;
+                        function toggleCompanyPositions() {
+                            const content = document.getElementById('company-positions-content');
+                            const icon = document.getElementById('positions-toggle-icon');
+                            if (!companyPositionsExpanded) {
+                                content.style.display = 'block';
+                                icon.style.transform = 'rotate(0deg)';
+                                companyPositionsExpanded = true;
+                            } else {
+                                content.style.display = 'none';
+                                icon.style.transform = 'rotate(180deg)';
+                                companyPositionsExpanded = false;
+                            }
+                        }
+                    </script>
+                </div>
+            
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -539,11 +695,11 @@
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> Dec 14, 2025 09:03 PM EST</span>
+                <span id="statusUpdated"><strong>Updated:</strong> Dec 14, 2025 09:03 PM EST</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> Contacted - Sent</span>
+                <span><strong>Status:</strong> <span id="statusDisplay">Ready to Contact</span></span>
             </div>
             <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/fentonmeaghan/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
             <div class="meta-item" id="emailMetaItem">
@@ -561,36 +717,12 @@
         <div class="tab" onclick="switchTab('research')">Research</div>
         <div class="tab" onclick="switchTab('messages')">Messages</div>
         <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+        <div class="tab" onclick="switchTab('update-contact')">Update Contact</div>
     </div>
     
-    <div class="content">
+        <div class="content">
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
-            <!-- Contact Details Section -->
-            <div class="section">
-                <div class="section-header">
-                    <h2>Contact Details</h2>
-                </div>
-                <div class="section-content">
-                <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
-                        <input type="email" id="contactEmail" name="email" value="leacock.kervin@gmail.com" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
-                        <input type="text" id="contactLocation" name="location" value="" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
-                        <input type="text" id="contactJobTitle" name="job_title" value="Director of Recruiting" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
-                    </div>
-                </form>
-                <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
-                <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
-                </div>
-            </div>
-            
             <!-- Match Analysis Section -->
             <div class="section">
                 <div class="section-header">
@@ -739,6 +871,33 @@ Note that these talking points are based solely on the provided profile data and
             </div>
         </div>
         
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="leacock.kervin@gmail.com" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="Director of Recruiting" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Messages Tab -->
         <div id="messages" class="tab-content">
             <div class="section">
@@ -751,10 +910,8 @@ Note that these talking points are based solely on the provided profile data and
                         <span>1. Initial Connection Request (LinkedIn)</span>
                         <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
                     </h3>
-                    <div id="connection-message">Here is a LinkedIn connection request message that meets the requirements:
-"Love your insights on fintech trends and product management! As Director of Recruiting at Zocdoc, I'm always looking for innovative approaches to talent acquisition. What's the most exciting fintech development you've se...
-Character count: 300</div>
-                    <div class="char-count">320 characters</div>
+                    <div id="connection-message">Data/BI/Analytics Leader, with experience in FInancial services from Self Financiat to BoNY and RBC. I applied for Director of Recruiting (XX% match) on your site. Passionate about credit building and enabling financial success at Zocdoc. Eager to discuss my experience!</div>
+                    <div class="char-count">270 characters</div>
                 </div>
                 
                 <div class="message-box">
@@ -762,15 +919,7 @@ Character count: 300</div>
                         <span>2. Meeting Invitation</span>
                         <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
                     </h3>
-                    <div id="meeting-message">Here's a message inviting them to a 1:1 meet & greet:
-Subject: Let's Grab Virtual Coffee!
-Hi [First Name],
-I wanted to reach out and thank you for accepting my connection on LinkedIn! I'm Meaghan Fenton, Product Manager at Zocdoc, and I came across your profile because of our shared interest in fintech.
-As a fellow enthusiast of the industry, I'd love to pick your brain about some of the latest trends we've seen in fintech. What are some key trends you've noticed, and how do you think they'll impact data analytics? I'm also curious to hear more about your approach to product management in this rapidly changing landscape.
-If you're game, let's grab virtual coffee for 15-20 minutes and chat more about these topics (and anything else that comes up). No agenda, just a casual conversation to learn from each other. Would love to catch up and explore potential opportunities for collaboration or mutual learning.
-Looking forward to hearing back from you!
-Best,
-Meaghan Fenton</div>
+                    <div id="meeting-message">Hi Meaghan I am a Product/ Data/ Strategy Leader with 18+ years driving strategy, data analysis, and unprecedented growth. Applied to the Director of Recruiting. Let's connect.</div>
                 </div>
                 
                 <div class="message-box">
@@ -778,14 +927,9 @@ Meaghan Fenton</div>
                         <span>3. Thank You Message</span>
                         <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
                     </h3>
-                    <div id="thankyou-message">Here's a thank you message:
-Subject: Thanks for chatting with me today, [Name]!
-Hi [Name],
-I wanted to take a moment to express my gratitude for taking the time to meet with me today at Zocdoc. I truly appreciated our conversation about [topic discussed], and I'm excited to learn more about [another topic discussed]. Your insights on [specific takeaway or idea gained] really resonated with me, and I'm looking forward to exploring how we can implement it in our strategy.
-I feel like we had a great foundation laid for further discussion, and I'm eager to continue the conversation. If there's anything specific you'd like me to follow up on or any additional information you need from me, please don't hesitate to reach out.
-It was great meeting you, and I hope to stay in touch as our paths continue to intersect in the healthcare technology space. Let's keep each other updated on our respective projects and initiatives!
-Best regards,
-Meaghan Fenton</div>
+                    <div id="thankyou-message">Hello Meaghan! Your banner caught my eye.
+I'm Kervin, a Data Product Leader, and I applied for the Director of Recruiting role at Zocdoc. I emailed you my resume & cover for reference. My experience is a great match. I hope to connect!
+Cheers</div>
                 </div>
                 
                 <div class="message-box">
@@ -793,17 +937,7 @@ Meaghan Fenton</div>
                         <span>4. Consulting Services Offer</span>
                         <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
                     </h3>
-                    <div id="consulting-message">Here is a professional message offering consulting services:
-Subject: Expert Consulting Services for Your Organization's Success
-Dear [Recipient],
-I hope this message finds you well. As we've had the pleasure of connecting, I wanted to reach out and explore how my expertise can support your organization's goals. At Zocdoc, I understand that you're constantly seeking innovative ways to streamline operations, improve patient experiences, and drive business growth.
-As a seasoned data engineer with experience in analytics, AI/ML implementation, and technical leadership, I've had the privilege of working with organizations similar to yours, tackling challenges such as optimizing workflows, predicting patient behavior, and enhancing clinical decision-making. I'd love to leverage my expertise to help you achieve similar successes.
-If you're interested in exploring how my consulting services can benefit your organization, I'd be happy to schedule a brief discovery call. During this 30-minute conversation, we can discuss your current pain points, goals, and aspirations. This will enable me to better understand your needs and provide tailored recommendations for improving your operations, increasing efficiency, or driving innovation.
-Please let me know if you're open to discussing further. I respect your time and look forward to the possibility of collaborating with Zocdoc.
-Best regards,
-Meaghan Fenton
-Data Engineering & Analytics Consultant
-Zocdoc</div>
+                    <div id="consulting-message">I am a hands on experienced Data Analytics and BI leader. I turn disparate data into strategic solutions and automation. Proficient in BI, Cloud, SQL, and Data tools. Always open to high-impact roles in [Target Industry]</div>
                 </div>
                 </div>
             </div>
@@ -824,27 +958,24 @@ Zocdoc</div>
                         <label for="status">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
-                            <optgroup label="Research & Contact">
-                                <option value="To Research" >To Research</option>
-                                <option value="Ready to Contact" >Ready to Contact</option>
-                                <option value="Contacted - Sent" selected>Contacted - Sent</option>
-                                <option value="Contacted - Replied" >Contacted - Replied</option>
-                                <option value="Contacted - No Response" >Contacted - No Response</option>
-                                <option value="Cold/Archive" >Cold/Archive</option>
+                            <optgroup label="Prospecting">
+                                <option value="Found Contact" >Found Contact</option>
+                                <option value="Sent LinkedIn Connection" >Sent LinkedIn Connection</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Sent Email" >Sent Email</option>
+                                <option value="Connection Accepted" >Connection Accepted</option>
+                                <option value="Cold/Inactive" >Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
                                 <option value="In Conversation" >In Conversation</option>
                                 <option value="Meeting Scheduled" >Meeting Scheduled</option>
                                 <option value="Meeting Complete" >Meeting Complete</option>
-                                <option value="Action Pending - You" >Action Pending - You</option>
-                                <option value="Action Pending - Them" >Action Pending - Them</option>
                             </optgroup>
-                            <optgroup label="Relationship">
-                                <option value="New Connection" >New Connection</option>
-                                <option value="Nurture (1-3 Mo.)" >Nurture (1-3 Mo.)</option>
-                                <option value="Nurture (4-6 Mo.)" >Nurture (4-6 Mo.)</option>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" >Strong Connection</option>
                                 <option value="Referral Partner" >Referral Partner</option>
-                                <option value="Inactive/Dormant" >Inactive/Dormant</option>
+                                <option value="Dormant" >Dormant</option>
                             </optgroup>
                         </select>
                     </div>
@@ -885,6 +1016,33 @@ Zocdoc</div>
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
                 </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="leacock.kervin@gmail.com" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="Director of Recruiting" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
                 </div>
             </div>
         </div>
@@ -929,6 +1087,14 @@ Zocdoc</div>
             
             const template = templates[type] || '';
             quill.root.innerHTML = template;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) {
+                return;
+            }
+            section.classList.toggle('collapsed');
         }
         
         function switchTab(tabName) {
@@ -1063,16 +1229,38 @@ Zocdoc</div>
                     updateAlert.textContent = `Status updated to "${status}"`;
                     updateAlert.classList.add('show', 'success');
                     
+                    // Update status displays immediately
+                    const statusPill = document.getElementById('statusPill');
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+                    const statusUpdated = document.getElementById('statusUpdated');
+                    
+                    if (statusPill) statusPill.textContent = status;
+                    if (statusDisplay) statusDisplay.textContent = status;
+                    if (currentStatusDisplay) currentStatusDisplay.textContent = status;
+                    if (statusUpdated) {
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                        statusUpdated.innerHTML = `<strong>Updated:</strong> ${dateStr} ${timeStr}`;
+                    }
+                    
+                    // Update dropdown selection
+                    const statusSelect = document.getElementById('status');
+                    if (statusSelect) {
+                        statusSelect.value = status;
+                    }
+                    
                     // Clear editor
                     quill.root.innerHTML = '';
                     
                     // Reload timeline
                     await loadTimeline();
                     
-                    // Update page metadata if needed
+                    // Update page metadata if needed - wait longer to ensure save completes
                     setTimeout(() => {
                         location.reload();
-                    }, 2000);
+                    }, 3000);
                 } else {
                     // Show error message
                     updateAlert.textContent = `Error: ${data.error}`;
@@ -1344,5 +1532,6 @@ Zocdoc</div>
         }
         
     </script>
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>

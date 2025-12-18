@@ -127,7 +127,7 @@ class NetworkingProcessor:
             job_title=job_title,
             linkedin_url=linkedin_url,
             created_at=get_est_now(),
-            status="To Research",
+            status="Found Contact",
             status_updated_at=get_est_now(),
             requires_ai_processing=requires_ai_processing
         )

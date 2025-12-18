@@ -92,7 +92,8 @@ def is_networking_status(status: str) -> bool:
     
     # Clear networking status indicators (these are definitely networking)
     clear_networking_indicators = [
-        'contacted sent', 'contacted---sent', 'ready to contact', 'to research',
+        'contacted sent', 'contacted---sent', 'ready to contact', 'to research', 'found contact',
+        'sent linkedin connection', 'sent email', 'connection accepted',
         'in conversation', 'conversation', 'action pending', 'new connection',
         'cold', 'archive', 'dormant', 'inactive', 'research', 'sent'
     ]
@@ -142,17 +143,20 @@ def categorize_networking_status(status: str) -> str:
     
     # PROSPECTING category - new status system
     prospecting_statuses = [
-        'to research',
-        'ready to connect',
+        'found contact',  # New name
+        'sent linkedin connection',  # New name
+        'to research',  # Old name (backward compatibility)
+        'ready to connect',  # Old name (backward compatibility)
         # Legacy support
         'ready to contact'
     ]
     
     # OUTREACH category - new status system
     outreach_statuses = [
-        'pending reply',
-        'connected - initial',
-        'cold/inactive',
+        'sent email',  # New name
+        'connection accepted',  # New name
+        'pending reply',  # Old name (backward compatibility)
+        'connected - initial',  # Old name (backward compatibility)
         'cold/inactive',
         # Legacy support
         'contacted - sent',
@@ -2742,8 +2746,9 @@ def get_progress_data():
                            if (c.status or '') == 'Meeting Scheduled']),
             'partners': len([c for c in all_contacts_for_stats 
                             if (c.status or '') == 'Referral Partner']),
-            # Networking status counts
-            'to_research': len([c for c in all_contacts_for_stats if (c.status or '') == 'To Research']),
+            # Networking status counts (with backward compatibility)
+            'to_research': len([c for c in all_contacts_for_stats if (c.status or '') in ['To Research', 'Found Contact']]),
+            'found_contact': len([c for c in all_contacts_for_stats if (c.status or '') == 'Found Contact']),
             'contacted': len([c for c in all_contacts_for_stats if 'Contacted' in (c.status or '')]),
             'in_conversation': len([c for c in all_contacts_for_stats if (c.status or '') == 'In Conversation']),
             'inactive': len([c for c in all_contacts_for_stats if (c.status or '') == 'Inactive/Dormant']),

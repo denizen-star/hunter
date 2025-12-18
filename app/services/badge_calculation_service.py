@@ -18,10 +18,10 @@ class BadgeCalculationService:
         
         # Badge definitions - each contact gets ONE badge based on their current status
         # Status to badge mapping:
-        # 1. To Research → None
-        # 2. Ready to Connect → Deep Diver (+10)
-        # 3. Pending Reply → Profile Magnet (+3)
-        # 4. Connected - Initial → Profile Magnet (+3)
+        # 1. Found Contact → None
+        # 2. Sent LinkedIn Connection → Deep Diver (+10)
+        # 3. Sent Email → Profile Magnet (+3)
+        # 4. Connection Accepted → Qualified Lead (+15)
         # 5. Cold/Inactive → None
         # 6. In Conversation → Conversation Starter (+20)
         # 7. Meeting Scheduled → Scheduler Master (+30)
@@ -33,25 +33,28 @@ class BadgeCalculationService:
             'deep_diver': {
                 'name': 'Deep Diver',
                 'points': 10,
-                'trigger_status': 'Ready to Connect',
+                'trigger_status': 'Sent LinkedIn Connection',
                 'phase': 'prospecting',
-                'description': 'Contact reached "Ready to Connect" status',
+                'description': 'Contact reached "Sent LinkedIn Connection" status',
+                'badges_tracking': 'Deep Research Complete (Steps 1.1-1.3). Specific personalization hook is defined.',
                 'requires_count': 1
             },
             'profile_magnet': {
                 'name': 'Profile Magnet',
                 'points': 3,
-                'trigger_status': 'Pending Reply',
+                'trigger_status': 'Sent Email',
                 'phase': 'outreach',
-                'description': 'Contact reached "Pending Reply" status',
+                'description': 'Contact reached "Sent Email" status',
+                'badges_tracking': 'Personalized LinkedIn Message Sent (Step 2.1). Awaiting connection acceptance or response.',
                 'requires_count': 1
             },
             'qualified_lead': {
                 'name': 'Qualified Lead',
                 'points': 15,
-                'trigger_status': 'Connected - Initial',
+                'trigger_status': 'Connection Accepted',
                 'phase': 'outreach',
-                'description': 'Contact reached "Connected - Initial" status',
+                'description': 'Contact reached "Connection Accepted" status',
+                'badges_tracking': 'Contact Viewed Profile (2.3) OR Connection Accepted (2.4) OR Email Reply Received (3.4). Any positive sign of engagement.',
                 'requires_count': 1
             },
             'conversation_starter': {
@@ -60,6 +63,7 @@ class BadgeCalculationService:
                 'trigger_status': 'In Conversation',
                 'phase': 'engagement',
                 'description': 'Contact reached "In Conversation" status',
+                'badges_tracking': 'Value-Driven Email Sent (3.3) and Contact is Actively Responding. You are exchanging messages to set a meeting.',
                 'requires_count': 1
             },
             'scheduler_master': {
@@ -68,6 +72,7 @@ class BadgeCalculationService:
                 'trigger_status': 'Meeting Scheduled',
                 'phase': 'engagement',
                 'description': 'Contact reached "Meeting Scheduled" status',
+                'badges_tracking': 'Call/Meeting Confirmed on Calendar (Step 8). A specific date/time is set.',
                 'requires_count': 1
             },
             'rapport_builder': {
@@ -76,6 +81,7 @@ class BadgeCalculationService:
                 'trigger_status': 'Meeting Complete',
                 'phase': 'engagement',
                 'description': 'Contact reached "Meeting Complete" status',
+                'badges_tracking': 'Meeting Occurred and Debrief is Done (Step 9). Informational interview or call is complete.',
                 'requires_count': 1
             },
             'relationship_manager': {
@@ -84,6 +90,7 @@ class BadgeCalculationService:
                 'trigger_status': 'Strong Connection',
                 'phase': 'nurture',
                 'description': 'Contact reached "Strong Connection" status',
+                'badges_tracking': 'Next Check-in Scheduled (Step 4.1) or Maintenance Check-in Sent (Step 4.2). Relationship is established and active.',
                 'requires_count': 1,
                 'recurring': True
             },
@@ -93,12 +100,20 @@ class BadgeCalculationService:
                 'trigger_status': 'Referral Partner',
                 'phase': 'nurture',
                 'description': 'Contact reached "Referral Partner" status',
+                'badges_tracking': 'Contact Provides Referral/Opportunity OR Explicitly Offers Advocacy. Confirmed as a high-value relationship.',
                 'requires_count': 1
             }
         }
         
         # Status to badge mapping (for quick lookup)
+        # Includes both new and old status names for backward compatibility
         self.status_to_badge = {
+            # New status names
+            'Found Contact': None,
+            'Sent LinkedIn Connection': 'deep_diver',
+            'Sent Email': 'profile_magnet',
+            'Connection Accepted': 'qualified_lead',
+            # Old status names (backward compatibility)
             'To Research': None,
             'Ready to Connect': 'deep_diver',
             'Pending Reply': 'profile_magnet',
@@ -227,13 +242,17 @@ class BadgeCalculationService:
                 }
             }
         
-        # Status mapping for legacy statuses
+        # Status mapping for legacy statuses (maps to new status names)
         status_mapping = {
-            'Ready to Contact': 'Ready to Connect',
-            'Contacted - Sent': 'Pending Reply',
-            'Contacted - No Response': 'Pending Reply',
-            'Contacted - Replied': 'Connected - Initial',
-            'New Connection': 'Connected - Initial',
+            'Ready to Contact': 'Sent LinkedIn Connection',
+            'Ready to Connect': 'Sent LinkedIn Connection',  # Old name
+            'Contacted - Sent': 'Sent Email',
+            'Contacted - No Response': 'Sent Email',
+            'Contacted - Replied': 'Connection Accepted',
+            'New Connection': 'Connection Accepted',
+            'To Research': 'Found Contact',  # Old name
+            'Pending Reply': 'Sent Email',  # Old name
+            'Connected - Initial': 'Connection Accepted',  # Old name
             'Cold/Archive': 'Cold/Inactive',
             'Action Pending - You': 'In Conversation',
             'Action Pending - Them': 'In Conversation',

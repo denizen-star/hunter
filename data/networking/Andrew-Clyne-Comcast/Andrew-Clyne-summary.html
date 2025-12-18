@@ -21,68 +21,8 @@
             background: #fafafa;
             color: #1f2937;
             line-height: 1.6;
-            margin-left: 180px;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 180px;
-            height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e5e7eb;
-            z-index: 1000;
-            padding: 20px 0;
-            overflow-y: auto;
-        }
-        
-        .sidebar-header {
-            padding: 0 16px 16px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 12px;
-        }
-        
-        .sidebar-header h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
             margin: 0;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
             padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
-            display: block;
-            padding: 10px 16px;
-            color: #6b7280;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar-menu a:hover {
-            background: #f9fafb;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-        }
-        
-        .sidebar-menu a.active {
-            background: #f3f4f6;
-            color: #1f2937;
-            border-left-color: #3b82f6;
-            font-weight: 600;
         }
         
         .header {
@@ -183,33 +123,37 @@
         .tabs {
             background: white;
             border-bottom: 1px solid #e5e7eb;
-            padding: 0 32px;
+            padding: 0;
             display: flex;
-            gap: 8px;
+            gap: 0;
+            margin: 0 32px;
         }
         
         .tab {
             padding: 16px 24px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            font-weight: 400;
             color: #6b7280;
             transition: all 0.15s ease;
+            position: relative;
         }
         
         .tab:hover {
             color: #374151;
+            background: #f9fafb;
         }
         
         .tab.active {
-            color: #3b82f6;
+            color: #1f2937;
             border-bottom-color: #3b82f6;
+            font-weight: 500;
         }
         
         .content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px;
+            margin: 0 32px;
+            padding: 0;
+            padding-top: 0;
         }
         
         .tab-content {
@@ -222,27 +166,67 @@
         
         .section {
             background: white;
-            border-radius: 12px;
-            padding: 28px;
+            border-radius: 0;
+            padding: 0;
             margin-bottom: 24px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
-            border: 1px solid #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .section.collapsed .section-content {
+            display: none;
+        }
+        
+        .section-header {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: 0;
+        }
+
+        .section-header.clickable {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .section-toggle-indicator {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .section:not(.collapsed) .section-toggle-indicator {
+            transform: rotate(90deg);
+            color: #4b5563;
         }
         
         .section h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
             color: #1f2937;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f3f4f6;
+            padding: 0;
+            border-bottom: none;
         }
         
-        .section h3 {
+        .section-content {
+            padding: 28px;
+        }
+        
+        .section-content h3 {
             font-size: 16px;
             font-weight: 600;
             margin: 20px 0 12px 0;
             color: #374151;
+        }
+        
+        .section-content h3:first-child {
+            margin-top: 0;
         }
         
         .info-grid {
@@ -541,36 +525,15 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Hunter</h3>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="/dashboard">App Dash</a></li>
-            <li><a href="/new-application">New Application</a></li>
-            <li><a href="/networking" class="active">Network Dash</a></li>
-            <li><a href="/new-networking-contact">New Contact</a></li>
-            <li><a href="/templates">Templates</a></li>
-            <li><a href="/progress">Progress</a></li>
-            <li><a href="/reports">Reports</a></li>
-            <li><a href="/analytics">Analytics</a></li>
-            <li><a href="/daily-activities">Daily Activities</a></li>
-            <li><a href="#" onclick="showAIStatus(); return false;">Check AI Status</a></li>
-            <li><a href="/new-application?resume=true">Manage Resume</a></li>
-        </ul>
-    </div>
-    
     <!-- Main Content -->
     <div class="header">
-        <a href="/networking" class="back-link">Back to Network Dash</a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1>Andrew Clyne</h1>
                 <div class="subtitle">Comcast • Chief Data Officer</div>
             </div>
             <div style="display: flex; gap: 12px;">
-                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Andrew+Clyne&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Andrew+Clyne%0A%0ACompany%3A+Comcast%0ATitle%3A+Chief+Data+Officer%0AStatus%3A+To+Research%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Fandrew-clyne-1679584%2F%0AEmail%3A+Not+available%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FAndrew-Clyne-Comcast%2FAndrew-Clyne-summary.html%0A&location=Comcast&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Follow+up%3A+Andrew+Clyne&dates=20251223%2F20251223&details=Follow-up+for+LinkedIn+connection+with+Andrew+Clyne%0A%0ACompany%3A+Comcast%0ATitle%3A+Chief+Data+Officer%0AStatus%3A+Contacted+-+Sent%0A%0ALinkedIn%3A+https%3A%2F%2Fwww.linkedin.com%2Fin%2Fandrew-clyne-1679584%2F%0AEmail%3A+Not+available%0A%0ASuggested+Actions%3A%0A-+Check+if+they+accepted+your+connection+request%0A-+Send+meeting+invitation+if+they+accepted%0A-+Review+their+recent+LinkedIn+activity%0A-+Send+polite+follow-up+if+no+response%0A%0AView+Profile%3A+http%3A%2F%2Flocalhost%3A51003%2Fnetworking%2FAndrew-Clyne-Comcast%2FAndrew-Clyne-summary.html%0A&location=Comcast&sf=true&output=xml" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
                         📅 Add to GCal
                     </a>
                     <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
@@ -583,9 +546,106 @@
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
         <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span class="status-pill tag tag-blue">Connected</span>
+            <span id="statusPill" class="status-pill tag tag-blue">Contacted - Sent</span>
             <span class="status-pill tag tag-green">87% Match</span>
         </div>
+        
+            <div style="margin: 20px 0;">
+                <!-- All 8 Badges -->
+                <div style="padding: 16px; background: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleBadgeSection()">
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #1f2937;">Networking Rewards (13 pts)</h3>
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div id="badge-grid-content" style="display: flex; gap: 8px; flex-wrap: wrap; max-height: 300px; overflow-y: auto;">
+                        
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #3b82f6; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Sent LinkedIn Connection&quot; status | Badges tracking: Deep Research Complete (Steps 1.1-1.3). Specific personalization hook is defined. | Trigger: Sent LinkedIn Connection">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #3b82f6; font-weight: bold;">✓</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Deep Diver</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #10b981; white-space: nowrap;">+10</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #3b82f6; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Sent Email&quot; status | Badges tracking: Personalized LinkedIn Message Sent (Step 2.1). Awaiting connection acceptance or response. | Trigger: Sent Email">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #3b82f6; font-weight: bold;">✓</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Profile Magnet</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #10b981; white-space: nowrap;">+3</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Connection Accepted&quot; status | Badges tracking: Contact Viewed Profile (2.3) OR Connection Accepted (2.4) OR Email Reply Received (3.4). Any positive sign of engagement. | Trigger: Connection Accepted">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Qualified Lead</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+15</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;In Conversation&quot; status | Badges tracking: Value-Driven Email Sent (3.3) and Contact is Actively Responding. You are exchanging messages to set a meeting. | Trigger: In Conversation">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Conversation Starter</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+20</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Meeting Scheduled&quot; status | Badges tracking: Call/Meeting Confirmed on Calendar (Step 8). A specific date/time is set. | Trigger: Meeting Scheduled">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Scheduler Master</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+30</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Meeting Complete&quot; status | Badges tracking: Meeting Occurred and Debrief is Done (Step 9). Informational interview or call is complete. | Trigger: Meeting Complete">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Rapport Builder</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+50</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Strong Connection&quot; status | Badges tracking: Next Check-in Scheduled (Step 4.1) or Maintenance Check-in Sent (Step 4.2). Relationship is established and active. | Trigger: Strong Connection">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Relationship Manager</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+2</span>
+                        </div>
+                    </div>
+                
+                    <div style="padding: 10px; min-width: 160px; border: 2px solid #d1d5db; border-radius: 8px; background: white; cursor: help;" title="Contact reached &quot;Referral Partner&quot; status | Badges tracking: Contact Provides Referral/Opportunity OR Explicitly Offers Advocacy. Confirmed as a high-value relationship. | Trigger: Referral Partner">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px; color: #9ca3af; font-weight: bold;">○</span>
+                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">Super Connector</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #9ca3af; white-space: nowrap;">+100</span>
+                        </div>
+                    </div>
+                
+                    </div>
+                    <script>
+                        let badgeSectionExpanded = true;
+                        function toggleBadgeSection() {
+                            const content = document.getElementById('badge-grid-content');
+                            const icon = document.getElementById('badge-toggle-icon');
+                            if (!badgeSectionExpanded) {
+                                content.style.display = 'flex';
+                                icon.style.transform = 'rotate(0deg)';
+                                badgeSectionExpanded = true;
+                            } else {
+                                content.style.display = 'none';
+                                icon.style.transform = 'rotate(180deg)';
+                                badgeSectionExpanded = false;
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+            
+        
         <div class="app-meta">
             <div class="meta-item">
                 <span>📍</span>
@@ -597,14 +657,18 @@
             </div>
             <div class="meta-item">
                 <span>🔄</span>
-                <span><strong>Updated:</strong> Dec 12, 2025 02:10 PM EST</span>
+                <span id="statusUpdated"><strong>Updated:</strong> Dec 12, 2025 04:07 PM EST</span>
             </div>
             <div class="meta-item">
                 <span>📊</span>
-                <span><strong>Status:</strong> To Research</span>
+                <span><strong>Status:</strong> <span id="statusDisplay">Contacted - Sent</span></span>
             </div>
             <div class="meta-item"><span>🔗</span><a href="https://www.linkedin.com/in/andrew-clyne-1679584/" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>
-            
+            <div class="meta-item" id="emailMetaItem">
+                <span>📧</span>
+                <span id="emailDisplay" style="cursor: pointer; color: #3b82f6; text-decoration: underline;" onclick="editEmailInline()">Add Email</span>
+                <input type="email" id="emailInput" value="" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
+            </div>
         </div>
     </div>
     
@@ -615,14 +679,18 @@
         <div class="tab" onclick="switchTab('research')">Research</div>
         <div class="tab" onclick="switchTab('messages')">Messages</div>
         <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+        <div class="tab" onclick="switchTab('update-contact')">Update Contact</div>
     </div>
     
-    <div class="content">
+        <div class="content">
         <!-- Summary Tab -->
         <div id="summary" class="tab-content active">
             <!-- Match Analysis Section -->
             <div class="section">
-                <h2>Match Analysis</h2>
+                <div class="section-header">
+                    <h2>Match Analysis</h2>
+                </div>
+                <div class="section-content">
                 <div class="analysis-section">
                     <div class="analysis-text">MATCH SCORE: 87
 
@@ -662,11 +730,15 @@ CONVERSATION TOPICS:
 SYNTHESIS:
 This connection is valuable because both individuals share a deep understanding of data warehousing, business intelligence, and big data analytics. Their shared experience as Chief Data Officers at Comcast and Visa provides a strong foundation for collaboration on data-related projects. By leveraging their expertise in developing enterprise data strategies and implementing data platforms, they can explore new opportunities for innovation and growth. To approach them effectively, it's essential to demonstrate a genuine interest in their work and experiences, while also highlighting your own skills and accomplishments in the field. By doing so, you'll be well-positioned to build a strong connection that can lead to mutually beneficial collaborations and professional development.</div>
                 </div>
+                </div>
             </div>
             
             <!-- Key Strengths & Talking Points -->
             <div class="section">
-                <h2>Key Strengths & Talking Points</h2>
+                <div class="section-header">
+                    <h2>Key Strengths & Talking Points</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px;">
                     <ul style="margin: 0; padding-left: 20px; color: #166534; line-height: 1.8;">
     <li>CAREER SIMILARITY: Medium</li>
@@ -676,13 +748,17 @@ This connection is valuable because both individuals share a deep understanding 
     <li>This connection is valuable because both individuals share a deep understanding of data warehousing, business intelligence, and big data analytics. Their shared experience as Chief Data Officers at Comcast and Visa provides a strong foundation for collaboration on data-related projects. By leveraging their expertise in developing enterprise data strategies and implementing data platforms, they can explore new opportunities for innovation and growth. To approach them effectively, it's essential to demonstrate a genuine interest in their work and experiences, while also highlighting your own skills and accomplishments in the field. By doing so, you'll be well-positioned to build a strong connection that can lead to mutually beneficial collaborations and professional development.</li>
 </ul>
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Raw Entry Tab -->
         <div id="raw" class="tab-content">
             <div class="section">
-                <h2>Raw Profile Details</h2>
+                <div class="section-header">
+                    <h2>Raw Profile Details</h2>
+                </div>
+                <div class="section-content">
                 <pre>Andrew Clyne
   1st degree connection1st
 Chief Data Officer
@@ -897,13 +973,17 @@ My latest project: MarshallGoldsmith.ai Ask me any question. Everything I know i
 1,596,022 followers1,596,022 followers
 
 Follow</pre>
+                </div>
             </div>
         </div>
         
         <!-- Skills Tab -->
         <div id="skills" class="tab-content">
             <div class="section">
-                <h2>Skills Analysis</h2>
+                <div class="section-header">
+                    <h2>Skills Analysis</h2>
+                </div>
+                <div class="section-content">
                 <p style="color: #6b7280; margin-bottom: 16px;">
                     Comparison of your skills with Andrew Clyne's profile.
                 </p>
@@ -922,13 +1002,17 @@ Follow</pre>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                     <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px;">Their unique skills will be highlighted in future updates</span>
                 </div>
+                </div>
             </div>
         </div>
         
         <!-- Research Tab -->
         <div id="research" class="tab-content">
             <div class="section">
-                <h2>AI-Generated Research & Background</h2>
+                <div class="section-header">
+                    <h2>AI-Generated Research & Background</h2>
+                </div>
+                <div class="section-content">
                 <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                     <p style="color: #1e40af; font-size: 14px; margin-bottom: 12px;">
                         <strong>Note:</strong> This research was automatically generated from the LinkedIn profile data and available information.
@@ -972,23 +1056,51 @@ Based on Andrew Clyne's profile and recent activity, potential topics for discus
 2. Leadership strategies for effective data-driven decision-making
 3. The role of data platforms in driving business growth and innovation
                 </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="Chief Data Officer" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
+                </div>
             </div>
         </div>
         
         <!-- Messages Tab -->
         <div id="messages" class="tab-content">
             <div class="section">
-                <h2>Networking Messages</h2>
-                
+                <div class="section-header">
+                    <h2>Networking Messages</h2>
+                </div>
+                <div class="section-content">
                 <div class="message-box">
                     <h3>
                         <span>1. Initial Connection Request (LinkedIn)</span>
                         <button class="copy-btn" onclick="copyMessage('connection')">Copy</button>
                     </h3>
-                    <div id="connection-message">Here's a LinkedIn connection request message that meets all requirements:
-
-"As a fellow data enthusiast, I'm intrigued by Comcast's innovative approach. How do you think your expertise in crafting effective data strategies can be applied to other industries? I'd love to hear about your most signi...</div>
-                    <div class="char-count">300 characters</div>
+                    <div id="connection-message">Data/BI/Analytics Leader, with experience in FInancial services from Self Financiat to BoNY and RBC. I applied for Chief Data Officer (XX% match) on your site. Passionate about credit building and enabling financial success at Comcast. Eager to discuss my experience!</div>
+                    <div class="char-count">267 characters</div>
                 </div>
                 
                 <div class="message-box">
@@ -996,23 +1108,7 @@ Based on Andrew Clyne's profile and recent activity, potential topics for discus
                         <span>2. Meeting Invitation</span>
                         <button class="copy-btn" onclick="copyMessage('meeting')">Copy</button>
                     </h3>
-                    <div id="meeting-message">Here's a sample message:
-
-Subject: Let's Catch Up!
-
-Hi Andrew,
-
-I just wanted to say thank you for accepting my invitation to connect on LinkedIn! I'm excited to learn more about your experiences and insights, especially in the field of data strategy.
-
-As someone who works closely with Comcast (and has even been impressed by their innovative approach to data management), I'd love to hear your thoughts on how their data strategy can be applied to other industries. What are some potential challenges you foresee? I'm always looking for new perspectives and ideas, and I think our conversation could be really valuable.
-
-If you're open to it, I was thinking we could grab a virtual coffee (15-20 minutes) to chat more about your experiences as Chief Data Officer at Visa. What were some of the most significant lessons you learned during that tenure? And can you share an example of how you've used data analytics to drive business decisions in a previous role?
-
-No pressure, just a casual conversation! Let me know if you're interested and we can schedule a time that works for you.
-
-Looking forward to hearing from you,
-
-[Your Name]</div>
+                    <div id="meeting-message">Hi Andrew I am a Product/ Data/ Strategy Leader with 18+ years driving strategy, data analysis, and unprecedented growth. Applied to the Chief Data Officer. Let's connect.</div>
                 </div>
                 
                 <div class="message-box">
@@ -1020,20 +1116,9 @@ Looking forward to hearing from you,
                         <span>3. Thank You Message</span>
                         <button class="copy-btn" onclick="copyMessage('thankyou')">Copy</button>
                     </h3>
-                    <div id="thankyou-message">Here is a sample thank-you message:
-
-Subject: Thank you for meeting with me, Andrew!
-
-Andrew,
-
-I wanted to take a moment to express my gratitude for taking the time to meet with me today at Comcast. I truly appreciated our conversation about [topic discussed] and how it relates to our shared goals. Your insights on [specific point made during the discussion] were particularly valuable to me.
-
-As we wrapped up, one key takeaway that stuck with me was [insight gained or action item]. I'm excited to explore this further and see how it can benefit our organization.
-
-Thank you again for your time and expertise, Andrew. It's been a pleasure connecting with you. If there's anything I can do to follow up on our discussion or provide any additional information, please don't hesitate to reach out. I look forward to staying in touch and potentially collaborating in the future.
-
-Best regards,
-[Your Name]</div>
+                    <div id="thankyou-message">Hello Andrew! Your banner caught my eye.
+I'm Kervin, a Data Product Leader, and I applied for the Chief Data Officer role at Comcast. I emailed you my resume & cover for reference. My experience is a great match. I hope to connect!
+Cheers</div>
                 </div>
                 
                 <div class="message-box">
@@ -1041,24 +1126,8 @@ Best regards,
                         <span>4. Consulting Services Offer</span>
                         <button class="copy-btn" onclick="copyMessage('consulting')">Copy</button>
                     </h3>
-                    <div id="consulting-message">Here is a professional message offering consulting services:
-
-Subject: Consulting Services - Help Your Organization Unlock the Power of Data
-
-Dear [First Name],
-
-I hope this message finds you well. As we've had the pleasure of connecting, I wanted to follow up and introduce myself as Andrew Clyne from Comcast. With my background in data engineering, analytics, AI/ML implementation, and technical leadership, I'm excited to share that I'm now offering consulting services to help organizations like yours unlock the full potential of their data.
-
-As we discussed, your company is likely facing challenges in leveraging data to drive informed decision-making and staying ahead of the competition. In today's fast-paced digital landscape, having a solid grasp on data can be the difference between success and stagnation. I believe my expertise could be a valuable asset in helping you bridge this gap.
-
-If you're interested in exploring how we might work together, I'd love to schedule a brief discovery call to discuss your organization's specific needs and goals. This informal conversation will allow us to identify potential areas where my consulting services can provide value. No obligation, no pressure - just an opportunity for us to chat about how I might be able to help.
-
-Let me know if you're available for a 15-minute call at your convenience. I'm looking forward to the possibility of working together and exploring ways to drive success for your organization.
-
-Best regards,
-
-Andrew Clyne
-Comcast</div>
+                    <div id="consulting-message">I am a hands on experienced Data Analytics and BI leader. I turn disparate data into strategic solutions and automation. Proficient in BI, Cloud, SQL, and Data tools. Always open to high-impact roles in [Target Industry]</div>
+                </div>
                 </div>
             </div>
         </div>
@@ -1066,7 +1135,10 @@ Comcast</div>
         <!-- Updates & Notes Tab -->
         <div id="updates" class="tab-content">
             <div class="section">
-                <h2>Update Status</h2>
+                <div class="section-header">
+                    <h2>Update Status</h2>
+                </div>
+                <div class="section-content">
                 
                 <div id="updateAlert" class="alert"></div>
                 
@@ -1075,27 +1147,24 @@ Comcast</div>
                         <label for="status">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
-                            <optgroup label="Research & Contact">
-                                <option value="To Research" selected>To Research</option>
-                                <option value="Ready to Contact" >Ready to Contact</option>
-                                <option value="Contacted - Sent" >Contacted - Sent</option>
-                                <option value="Contacted - Replied" >Contacted - Replied</option>
-                                <option value="Contacted - No Response" >Contacted - No Response</option>
-                                <option value="Cold/Archive" >Cold/Archive</option>
+                            <optgroup label="Prospecting">
+                                <option value="Found Contact" >Found Contact</option>
+                                <option value="Sent LinkedIn Connection" >Sent LinkedIn Connection</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Sent Email" >Sent Email</option>
+                                <option value="Connection Accepted" >Connection Accepted</option>
+                                <option value="Cold/Inactive" >Cold/Inactive</option>
                             </optgroup>
                             <optgroup label="Engagement">
                                 <option value="In Conversation" >In Conversation</option>
                                 <option value="Meeting Scheduled" >Meeting Scheduled</option>
                                 <option value="Meeting Complete" >Meeting Complete</option>
-                                <option value="Action Pending - You" >Action Pending - You</option>
-                                <option value="Action Pending - Them" >Action Pending - Them</option>
                             </optgroup>
-                            <optgroup label="Relationship">
-                                <option value="New Connection" >New Connection</option>
-                                <option value="Nurture (1-3 Mo.)" >Nurture (1-3 Mo.)</option>
-                                <option value="Nurture (4-6 Mo.)" >Nurture (4-6 Mo.)</option>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" >Strong Connection</option>
                                 <option value="Referral Partner" >Referral Partner</option>
-                                <option value="Inactive/Dormant" >Inactive/Dormant</option>
+                                <option value="Dormant" >Dormant</option>
                             </optgroup>
                         </select>
                     </div>
@@ -1135,6 +1204,34 @@ Comcast</div>
                     <div id="timelineContent">
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Contact Tab -->
+        <div id="update-contact" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Contact</h2>
+                </div>
+                <div class="section-content">
+                    <form id="contactDetailsForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactEmail" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" value="" placeholder="email@example.com" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactLocation" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Location</label>
+                            <input type="text" id="contactLocation" name="location" value="" placeholder="City, State/Country" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="contactJobTitle" style="font-weight: 600; color: #374151; margin-bottom: 8px; display: block;">Job Title</label>
+                            <input type="text" id="contactJobTitle" name="job_title" value="Chief Data Officer" placeholder="Job Title" style="width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.15s ease;">
+                        </div>
+                    </form>
+                    <button onclick="saveContactDetails()" class="btn btn-primary" style="margin-top: 16px;" id="saveDetailsBtn">Save Contact Details</button>
+                    <div id="detailsAlert" style="margin-top: 12px; display: none; padding: 12px; border-radius: 6px; font-size: 14px;"></div>
                 </div>
             </div>
         </div>
@@ -1179,6 +1276,14 @@ Comcast</div>
             
             const template = templates[type] || '';
             quill.root.innerHTML = template;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) {
+                return;
+            }
+            section.classList.toggle('collapsed');
         }
         
         function switchTab(tabName) {
@@ -1313,16 +1418,38 @@ Comcast</div>
                     updateAlert.textContent = `Status updated to "${status}"`;
                     updateAlert.classList.add('show', 'success');
                     
+                    // Update status displays immediately
+                    const statusPill = document.getElementById('statusPill');
+                    const statusDisplay = document.getElementById('statusDisplay');
+                    const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+                    const statusUpdated = document.getElementById('statusUpdated');
+                    
+                    if (statusPill) statusPill.textContent = status;
+                    if (statusDisplay) statusDisplay.textContent = status;
+                    if (currentStatusDisplay) currentStatusDisplay.textContent = status;
+                    if (statusUpdated) {
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                        statusUpdated.innerHTML = `<strong>Updated:</strong> ${dateStr} ${timeStr}`;
+                    }
+                    
+                    // Update dropdown selection
+                    const statusSelect = document.getElementById('status');
+                    if (statusSelect) {
+                        statusSelect.value = status;
+                    }
+                    
                     // Clear editor
                     quill.root.innerHTML = '';
                     
                     // Reload timeline
                     await loadTimeline();
                     
-                    // Update page metadata if needed
+                    // Update page metadata if needed - wait longer to ensure save completes
                     setTimeout(() => {
                         location.reload();
-                    }, 2000);
+                    }, 3000);
                 } else {
                     // Show error message
                     updateAlert.textContent = `Error: ${data.error}`;
@@ -1425,10 +1552,175 @@ Comcast</div>
             } catch (error) {
                 alert(`Error: ${error.message}`);
                 regenerateBtn.disabled = false;
-                regenerateBtn.textContent = '🔄 Regenerate Documents';
+                regenerateBtn.textContent = '🔄 Regen';
+            }
+        }
+        
+        // Inline email editing in hero card
+        function editEmailInline() {
+            const emailDisplay = document.getElementById('emailDisplay');
+            const emailInput = document.getElementById('emailInput');
+            
+            if (emailDisplay && emailInput) {
+                emailDisplay.style.display = 'none';
+                emailInput.style.display = 'inline-block';
+                emailInput.focus();
+                emailInput.select();
+            }
+        }
+        
+        async function saveEmailInline() {
+            const emailDisplay = document.getElementById('emailDisplay');
+            const emailInput = document.getElementById('emailInput');
+            
+            if (!emailInput) return;
+            
+            const newEmail = emailInput.value.trim();
+            
+            // Hide input, show display
+            emailInput.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/details`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: newEmail || null })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update display
+                    if (emailDisplay) {
+                        if (newEmail) {
+                            emailDisplay.textContent = newEmail;
+                            emailDisplay.style.color = '';
+                            emailDisplay.style.textDecoration = 'underline';
+                            emailDisplay.style.textDecorationStyle = 'dotted';
+                            emailDisplay.title = 'Click to edit';
+                        } else {
+                            emailDisplay.textContent = 'Add Email';
+                            emailDisplay.style.color = '#3b82f6';
+                            emailDisplay.style.textDecoration = 'underline';
+                            emailDisplay.style.textDecorationStyle = 'solid';
+                            emailDisplay.title = '';
+                        }
+                        emailDisplay.style.display = 'inline';
+                    }
+                    // Update input value
+                    emailInput.value = newEmail;
+                    
+                    // Update contact details form
+                    const contactEmailField = document.getElementById('contactEmail');
+                    if (contactEmailField) {
+                        contactEmailField.value = newEmail;
+                    }
+                    
+                    // Show success feedback
+                    showInlineSuccess(emailDisplay);
+                    
+                    // Reload page after short delay to sync all fields
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    // Show error
+                    alert('Failed to update email: ' + (data.error || 'Unknown error'));
+                    if (emailDisplay) emailDisplay.style.display = 'inline';
+                }
+            } catch (error) {
+                console.error('Error updating email:', error);
+                alert('Error updating email: ' + error.message);
+                if (emailDisplay) emailDisplay.style.display = 'inline';
+            }
+        }
+        
+        function showInlineSuccess(element) {
+            if (!element) return;
+            const originalBg = element.style.backgroundColor;
+            element.style.backgroundColor = '#d1fae5';
+            setTimeout(() => {
+                element.style.backgroundColor = originalBg;
+            }, 2000);
+        }
+        
+        // Save contact details from Summary tab form
+        async function saveContactDetails() {
+            const btn = document.getElementById('saveDetailsBtn');
+            const alert = document.getElementById('detailsAlert');
+            const email = document.getElementById('contactEmail').value.trim() || null;
+            const location = document.getElementById('contactLocation').value.trim() || null;
+            const jobTitle = document.getElementById('contactJobTitle').value.trim() || null;
+            
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            alert.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/networking/contacts/${contactId}/details`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, location, job_title: jobTitle })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert.style.display = 'block';
+                    alert.style.background = '#d1fae5';
+                    alert.style.color = '#065f46';
+                    alert.style.border = '1px solid #10b981';
+                    alert.textContent = 'Contact details updated successfully!';
+                    
+                    // Update hero card email display if email changed
+                    const emailDisplay = document.getElementById('emailDisplay');
+                    const emailInput = document.getElementById('emailInput');
+                    if (emailDisplay && emailInput) {
+                        if (email) {
+                            emailDisplay.textContent = email;
+                            emailDisplay.style.color = '';
+                            emailDisplay.style.textDecoration = 'underline';
+                            emailDisplay.style.textDecorationStyle = 'dotted';
+                            emailDisplay.title = 'Click to edit';
+                        } else {
+                            emailDisplay.textContent = 'Add Email';
+                            emailDisplay.style.color = '#3b82f6';
+                            emailDisplay.style.textDecoration = 'underline';
+                            emailDisplay.style.textDecorationStyle = 'solid';
+                            emailDisplay.title = '';
+                        }
+                        emailInput.value = email || '';
+                    }
+                    
+                    // Reload page after 1 second to update all fields
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    alert.style.display = 'block';
+                    alert.style.background = '#fee2e2';
+                    alert.style.color = '#991b1b';
+                    alert.style.border = '1px solid #ef4444';
+                    alert.textContent = 'Failed to update: ' + (data.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error updating contact details:', error);
+                alert.style.display = 'block';
+                alert.style.background = '#fee2e2';
+                alert.style.color = '#991b1b';
+                alert.style.border = '1px solid #ef4444';
+                alert.textContent = 'Error updating contact details: ' + error.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Contact Details';
             }
         }
         
     </script>
+    <script src="/static/js/shared-menu.js"></script>
 </body>
 </html>

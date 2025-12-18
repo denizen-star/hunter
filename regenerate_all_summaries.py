@@ -30,43 +30,68 @@ def main():
         return
     
     print(f"Found {len(applications)} applications to regenerate.\n")
+    print("Processing in batches of 10...\n")
     
     success_count = 0
     error_count = 0
     
-    for i, app in enumerate(applications, 1):
-        try:
-            print(f"[{i}/{len(applications)}] Processing: {app.company} - {app.job_title}")
-            
-            # Use the document generator's internal method to load qualifications
-            # This handles both JSON and text file formats
-            if not app.qualifications_path or not app.qualifications_path.exists():
-                print(f"  ⚠️  Skipping: No qualification analysis found")
-                continue
-            
-            # Load qualifications using the document generator's method
-            qualifications = doc_generator._load_qualifications(app)
-            
-            # Regenerate summary page (this will now include badge display)
-            doc_generator.generate_summary_page(app, qualifications)
-            
-            print(f"  ✓ Successfully regenerated summary with badges")
-            success_count += 1
-            
-        except Exception as e:
-            import traceback
-            print(f"  ✗ Error: {e}")
-            traceback.print_exc()
-            error_count += 1
+    # Process all applications in batches of 10
+    batch_size = 10
+    total_batches = (len(applications) + batch_size - 1) // batch_size
+    
+    for batch_num in range(total_batches):
+        start_idx = batch_num * batch_size
+        end_idx = min(start_idx + batch_size, len(applications))
+        batch_apps = applications[start_idx:end_idx]
+        
+        print(f"\n{'='*80}")
+        print(f"Batch {batch_num + 1}/{total_batches} (Processing applications {start_idx + 1}-{end_idx})")
+        print(f"{'='*80}\n")
+        
+        batch_success = 0
+        batch_error = 0
+        
+        for i, app in enumerate(batch_apps, start_idx + 1):
+            try:
+                print(f"[{i}/{len(applications)}] Processing: {app.company} - {app.job_title}")
+                
+                # Use the document generator's internal method to load qualifications
+                # This handles both JSON and text file formats
+                if not app.qualifications_path or not app.qualifications_path.exists():
+                    print(f"  ⚠️  Skipping: No qualification analysis found")
+                    continue
+                
+                # Load qualifications using the document generator's method
+                qualifications = doc_generator._load_qualifications(app)
+                
+                # Regenerate summary page (this will now include badge display)
+                doc_generator.generate_summary_page(app, qualifications)
+                
+                print(f"  ✓ Successfully regenerated summary with badges")
+                success_count += 1
+                batch_success += 1
+                
+            except Exception as e:
+                import traceback
+                print(f"  ✗ Error: {e}")
+                traceback.print_exc()
+                error_count += 1
+                batch_error += 1
+        
+        # Batch summary
+        print(f"\nBatch {batch_num + 1} Summary: {batch_success} successful, {batch_error} errors")
+        success_count += batch_success
+        error_count += batch_error
     
     # Regenerate dashboard
-    print("\nRegenerating dashboard...")
+    print("\n" + "=" * 80)
+    print("Regenerating dashboard...")
     dashboard_generator.generate_index_page()
     print("  ✓ Dashboard regenerated")
     
     print()
     print("=" * 80)
-    print(f"Summary: {success_count} successful, {error_count} errors")
+    print(f"FINAL SUMMARY: {success_count} successful, {error_count} errors")
     print("=" * 80)
     print()
     print("Note: Badge display will only appear for applications that have")

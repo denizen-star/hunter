@@ -875,8 +875,8 @@
                         <button class="filter-btn active" data-filter-type="networking-status" data-filter="all" id="networking-status-all">
                             All <span class="count" id="count-networking-all">0</span>
                         </button>
-                        <button class="filter-btn" data-filter-type="networking-status" data-filter="To Research" id="networking-status-to-research">
-                            To Research <span class="count" id="count-networking-research">0</span>
+                        <button class="filter-btn" data-filter-type="networking-status" data-filter="Found Contact" id="networking-status-found-contact">
+                            Found Contact <span class="count" id="count-networking-found-contact">0</span>
                         </button>
                         <button class="filter-btn" data-filter-type="networking-status" data-filter="Contacted" id="networking-status-contacted">
                             Contacted <span class="count" id="count-networking-contacted">0</span>
@@ -1198,7 +1198,7 @@
                 if (allData.contacts && allData.contacts.length > 0) {
                     const networkingCounts = {
                         'networking-all': allData.contacts.length,
-                        'networking-research': allData.contacts.filter(c => c.status === 'To Research').length,
+                        'networking-found-contact': allData.contacts.filter(c => c.status === 'Found Contact' || c.status === 'To Research').length,
                         'networking-contacted': allData.contacts.filter(c => c.status && c.status.includes('Contacted')).length,
                         'networking-conversation': allData.contacts.filter(c => c.status === 'In Conversation').length,
                         'networking-meetings': allData.contacts.filter(c => c.status === 'Meeting Scheduled').length,

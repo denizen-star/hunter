@@ -13,7 +13,7 @@ class NetworkingContact:
     person_name: str
     company_name: str
     created_at: datetime
-    status: str = "To Research"
+    status: str = "Found Contact"
     
     # Optional fields
     job_title: Optional[str] = None
@@ -75,7 +75,7 @@ class NetworkingContact:
             person_name=data['person_name'],
             company_name=data['company_name'],
             created_at=data['created_at'],
-            status=data.get('status', 'To Research'),
+            status=data.get('status', 'Found Contact'),
             job_title=data.get('job_title'),
             linkedin_url=data.get('linkedin_url'),
             email=data.get('email'),
@@ -153,10 +153,12 @@ class NetworkingContact:
             return 0
         
         contact_count = 0
-        # Updated status names for new system
+        # Updated status names for new system (with backward compatibility)
         contact_statuses = [
-            'Pending Reply',
-            'Connected - Initial',
+            'Sent Email',  # New name
+            'Connection Accepted',  # New name
+            'Pending Reply',  # Old name (backward compatibility)
+            'Connected - Initial',  # Old name (backward compatibility)
             'In Conversation',
             'Meeting Scheduled',
             'Meeting Complete',
@@ -241,12 +243,18 @@ class NetworkingContact:
         # Workflow mapping: status -> next action (new status system)
         next_steps = {
             # PROSPECTING phase
-            'To Research': 'Research their background, company, or recent activity to personalize your message',
-            'Ready to Connect': 'Send the initial connection request or message',
+            'Found Contact': 'Complete Deep Research (Steps 1.1-1.3). Find a high-value hook.',
+            'Sent LinkedIn Connection': 'Send Personalized LinkedIn Message (Step 2.1). Get an acceptance.',
+            # Legacy status support
+            'To Research': 'Complete Deep Research (Steps 1.1-1.3). Find a high-value hook.',
+            'Ready to Connect': 'Send Personalized LinkedIn Message (Step 2.1). Get an acceptance.',
             
             # OUTREACH phase
-            'Pending Reply': 'Set a follow-up reminder. Wait 5-7 business days for a response',
-            'Connected - Initial': 'Log the reply, craft a response, and propose a specific next step',
+            'Sent Email': 'Monitor for Reply/Connection (Steps 2.3-2.4). Get a reply/connection to qualify intent.',
+            'Connection Accepted': 'Transition to Email Outreach (Steps 3.1-3.3). Log reply/connection, craft value-driven email.',
+            # Legacy status support
+            'Pending Reply': 'Monitor for Reply/Connection (Steps 2.3-2.4). Get a reply/connection to qualify intent.',
+            'Connected - Initial': 'Transition to Email Outreach (Steps 3.1-3.3). Log reply/connection, craft value-driven email.',
             'Cold/Inactive': 'Move to Cold list for occasional contact (3-6 months)',
             
             # ENGAGEMENT phase
