@@ -6360,9 +6360,22 @@ Format this as a professional research document that demonstrates thorough prepa
                         
                         if (data.success && data.contact) {{
                             const contact = data.contact;
-                            const folderName = `${{contact.person_name.replace(/\\s+/g, '-')}}-${{contact.company_name.replace(/\\s+/g, '-')}}`;
-                            const summaryFilename = `${{contact.person_name.replace(/\\s+/g, '-')}}-summary.html`;
-                            const summaryUrl = `/networking/${{folderName}}/${{summaryFilename}}`;
+                            
+                            // Always use summary_path if it exists (works for both simple and full contacts)
+                            let summaryUrl;
+                            if (contact.summary_path) {{
+                                // Extract folder name and summary filename from summary_path
+                                // summary_path format: data/networking/FolderName/filename-summary.html
+                                const pathParts = contact.summary_path.split('/');
+                                const folderName = pathParts[pathParts.length - 2]; // Second to last part
+                                const summaryFilename = pathParts[pathParts.length - 1]; // Last part
+                                summaryUrl = `/networking/${{folderName}}/${{summaryFilename}}`;
+                            }} else {{
+                                // Fallback: construct path manually (for very old contacts)
+                                const folderName = `${{contact.person_name.replace(/\\s+/g, '-')}}-${{contact.company_name.replace(/\\s+/g, '-')}}`;
+                                const summaryFilename = `${{contact.person_name.replace(/\\s+/g, '-')}}-summary.html`;
+                                summaryUrl = `/networking/${{folderName}}/${{summaryFilename}}`;
+                            }}
                             
                             // Hide contacts grid and show summary container
                             document.getElementById('networking-contacts-grid').style.display = 'none';
@@ -6380,7 +6393,7 @@ Format this as a professional research document that demonstrates thorough prepa
                             summaryContent.innerHTML = '';
                             // Then set iframe - this ensures no flash of old content
                             const iframe = document.createElement('iframe');
-                            iframe.src = `${{summaryUrl}}`;
+                            iframe.src = summaryUrl;
                             iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;';
                             summaryContent.appendChild(iframe);
                             

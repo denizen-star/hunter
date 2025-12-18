@@ -23,6 +23,7 @@ from app.services.activity_log_service import ActivityLogService
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root, get_data_path
 from app.utils.cache_utils import is_cache_stale, get_cached_json, save_cached_json
+from app.utils.input_sanitizer import sanitize_text, sanitize_email, sanitize_phone
 
 app = Flask(__name__, 
            template_folder='templates/web',
@@ -426,13 +427,13 @@ def update_resume():
                 content=''
             )
         
-        # Update fields
-        resume.full_name = data.get('full_name', resume.full_name)
-        resume.email = data.get('email', resume.email)
-        resume.phone = data.get('phone', resume.phone)
-        resume.linkedin = data.get('linkedin', resume.linkedin)
-        resume.location = data.get('location', resume.location)
-        resume.content = data.get('content', resume.content)
+        # Update fields with sanitization (exclude linkedin and content)
+        resume.full_name = sanitize_text(data.get('full_name', resume.full_name))
+        resume.email = sanitize_email(data.get('email', resume.email))
+        resume.phone = sanitize_phone(data.get('phone', resume.phone))
+        resume.linkedin = data.get('linkedin', resume.linkedin)  # Exclude from sanitization (URL)
+        resume.location = sanitize_text(data.get('location', resume.location))
+        resume.content = data.get('content', resume.content)  # Exclude from sanitization (rich format)
         
         print(f"Saving resume with content length: {len(resume.content)}")
         
@@ -523,10 +524,11 @@ def create_application():
     """Create a new job application"""
     try:
         data = request.json
-        company = data.get('company')
-        job_title = data.get('job_title')
-        job_description = data.get('job_description')
-        job_url = data.get('job_url')
+        # Sanitize text inputs (trim spaces, remove dangerous chars)
+        company = sanitize_text(data.get('company')) if data.get('company') else None
+        job_title = sanitize_text(data.get('job_title')) if data.get('job_title') else None
+        job_description = data.get('job_description')  # Exclude from sanitization (long-form text)
+        job_url = data.get('job_url')  # Exclude from sanitization (URL)
         
         if not all([company, job_title, job_description]):
             return jsonify({
@@ -1121,11 +1123,12 @@ def create_networking_contact():
     """Create a new networking contact"""
     try:
         data = request.json
-        person_name = data.get('person_name')
-        company_name = data.get('company_name')
-        profile_details = data.get('profile_details')
-        job_title = data.get('job_title')
-        linkedin_url = data.get('linkedin_url')
+        # Sanitize text inputs (trim spaces, remove dangerous chars)
+        person_name = sanitize_text(data.get('person_name')) if data.get('person_name') else None
+        company_name = sanitize_text(data.get('company_name')) if data.get('company_name') else None
+        profile_details = data.get('profile_details')  # Exclude from sanitization (long-form text)
+        job_title = sanitize_text(data.get('job_title')) if data.get('job_title') else None
+        linkedin_url = data.get('linkedin_url')  # Exclude from sanitization (URL)
         requires_ai_processing = data.get('requires_ai_processing', True)  # Default to True for backwards compatibility
         
         if not all([person_name, company_name, profile_details]):
@@ -1370,9 +1373,10 @@ def update_networking_details(contact_id):
     """Update networking contact details"""
     try:
         data = request.json
-        email = data.get('email')
-        location = data.get('location')
-        job_title = data.get('job_title')
+        # Sanitize inputs (trim spaces, remove dangerous chars)
+        email = sanitize_email(data.get('email')) if 'email' in data and data.get('email') else None
+        location = sanitize_text(data.get('location')) if 'location' in data and data.get('location') else None
+        job_title = sanitize_text(data.get('job_title')) if 'job_title' in data and data.get('job_title') else None
         
         # Check which fields were explicitly provided in the request
         email_provided = 'email' in data
