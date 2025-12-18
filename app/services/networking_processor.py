@@ -373,6 +373,55 @@ class NetworkingProcessor:
         except Exception as e:
             print(f"Warning: Could not update badge cache: {e}")
         
+        # Regenerate contact summary to update badges
+        try:
+            from app.services.networking_document_generator import NetworkingDocumentGenerator
+            doc_generator = NetworkingDocumentGenerator()
+            
+            # Always try to regenerate if summary exists, even with minimal data
+            # This ensures badges are updated when status changes
+            if contact.summary_path:
+                # Try to load existing data for regeneration
+                match_analysis = "No match analysis available."
+                messages = {}
+                research_content = ""
+                
+                try:
+                    if contact.match_analysis_path and contact.match_analysis_path.exists():
+                        from app.utils.file_utils import read_text_file
+                        match_analysis = read_text_file(contact.match_analysis_path)
+                except Exception as e:
+                    print(f"  Note: Could not load match analysis: {e}")
+                
+                try:
+                    if contact.messages_path and contact.messages_path.exists():
+                        from app.utils.file_utils import read_text_file
+                        # Messages file exists but we'll use empty dict for now
+                        # The summary page can work without parsed messages
+                        messages = {}
+                except Exception as e:
+                    print(f"  Note: Could not load messages: {e}")
+                
+                try:
+                    if contact.research_path and contact.research_path.exists():
+                        from app.utils.file_utils import read_text_file
+                        research_content = read_text_file(contact.research_path)
+                except Exception as e:
+                    print(f"  Note: Could not load research: {e}")
+                
+                # Regenerate summary with updated badges (works even with minimal data)
+                doc_generator.generate_summary_page(
+                    contact,
+                    match_analysis,
+                    messages,
+                    research_content
+                )
+                print(f"✓ Regenerated contact summary with updated badges")
+        except Exception as e:
+            print(f"Warning: Could not regenerate contact summary: {e}")
+            import traceback
+            traceback.print_exc()
+        
         # Log activity
         try:
             self.activity_log.log_networking_status_changed(

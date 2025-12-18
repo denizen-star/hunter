@@ -5120,6 +5120,11 @@ Format this as a professional research document that demonstrates thorough prepa
         
         function updateChecklistPill() {{
             const pill = document.getElementById('checklistPill');
+            // Return early if pill element doesn't exist (e.g., checklist section not present)
+            if (!pill) {{
+                return;
+            }}
+            
             const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
             const checklistDefinitions = {{
                 'application_submitted': 'Application Submitted',
