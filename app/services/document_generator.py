@@ -2967,24 +2967,24 @@ Format this as a professional research document that demonstrates thorough prepa
                 
             # Complete badge section HTML - horizontal layout: earned badges on left, next badge on right
             return f'''
-            <div class="badge-section" style="padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div class="badge-section" style="padding: 12px; background: transparent; border-radius: 8px; border: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; cursor: pointer;" onclick="toggleBadgeSection()">
                     <h3 style="margin: 0; font-size: 13px; font-weight: 600; color: #1f2937;">Networking Rewards</h3>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="font-size: 16px; font-weight: 700; color: #3b82f6; margin-left: 16px;">{total_points} pts</div>
-                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease; transform: rotate(180deg);">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </div>
                 </div>
-                <div id="badge-grid-content" style="display: flex; gap: 12px; align-items: flex-start; max-height: 300px; overflow-y: auto;">
+                <div id="badge-grid-content" style="display: none; gap: 12px; align-items: flex-start; max-height: 300px; overflow-y: auto;">
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; flex: 1;">
                         {''.join(earned_badges_html)}
                     </div>
                     {f'<div style="flex-shrink: 0;">{next_badge_html}</div>' if next_badge_html else ''}
                 </div>
                 <script>
-                    let badgeSectionExpanded = true;
+                    let badgeSectionExpanded = false;
                     function toggleBadgeSection() {{
                         const content = document.getElementById('badge-grid-content');
                         const icon = document.getElementById('badge-toggle-icon');
@@ -3099,39 +3099,55 @@ Format this as a professional research document that demonstrates thorough prepa
             print(f"Warning: Could not generate rewards by category: {e}")
             return f'<p style="color: #ef4444;">Error loading rewards: {str(e)}</p>'
     
+    def _get_badge_image_path(self, badge_id: str, earned: bool) -> str:
+        """Get the image path for a badge based on ID and earned status"""
+        badge_name_map = {
+            'deep_diver': 'DeepDiver',
+            'profile_magnet': 'ProfileMagnet',
+            'qualified_lead': 'QualifiedLead',
+            'conversation_starter': 'ConversationStarter',
+            'scheduler_master': 'SchedulerMaster',
+            'rapport_builder': 'RapportBuilder',
+            'relationship_manager': 'RelationshipManager',
+            'super_connector': 'SuperConnector'
+        }
+        suffix = 'W' if earned else 'U'
+        badge_name = badge_name_map.get(badge_id, '')
+        # Check which extension exists (.jpg or .jpeg)
+        static_path = Path(__file__).parent.parent.parent / 'static' / 'images' / 'badges'
+        jpg_path = static_path / f'{badge_name}{suffix}.jpg'
+        jpeg_path = static_path / f'{badge_name}{suffix}.jpeg'
+        
+        # Use .jpg if it exists, otherwise .jpeg
+        if jpg_path.exists():
+            extension = '.jpg'
+        elif jpeg_path.exists():
+            extension = '.jpeg'
+        else:
+            # Default to .jpg if neither exists (fallback)
+            extension = '.jpg'
+        return f'/static/images/badges/{badge_name}{suffix}{extension}'
+    
     def _generate_badge_item_html(self, badge_data_item: dict, earned: bool) -> str:
         """Generate HTML for a single badge item"""
         badge_def = badge_data_item['badge_def']
+        badge_id = badge_data_item.get('badge_id', '')
         count = badge_data_item['count']
         required = badge_data_item['required']
         points = badge_data_item['points']
         progress = badge_data_item['progress']
         
-        # Build tooltip with badges tracking description
-        tooltip_parts = [badge_def['description']]
-        if 'badges_tracking' in badge_def and badge_def['badges_tracking']:
-            tooltip_parts.append(f"Badges tracking: {badge_def['badges_tracking']}")
-        if 'trigger_status' in badge_def:
-            tooltip_parts.append(f"Trigger: {badge_def['trigger_status']}")
-        if required > 1:
-            if 'time_window' in badge_def:
-                tooltip_parts.append(f"Requires: {required} {badge_def['time_window']}s")
-            else:
-                tooltip_parts.append(f"Requires: {required} contacts")
-        tooltip_text = " | ".join(tooltip_parts)
+        # Build tooltip with badge name and points only
+        tooltip_text = f"{badge_def['name']} +{points}"
         
         badge_class = 'badge-unlocked' if earned else 'badge-locked'
-        border_color = '#3b82f6' if earned else '#d1d5db'
-        icon_color = '#3b82f6' if earned else '#9ca3af'
-        points_color = '#10b981' if earned else '#9ca3af'
+        
+        # Get badge image path
+        image_path = self._get_badge_image_path(badge_id, earned) if badge_id else ''
         
         return f'''
-            <div class="badge-item {badge_class}" title="{html.escape(tooltip_text)}" style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help; position: relative;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 16px; color: {icon_color}; font-weight: bold;">{'✓' if earned else '○'}</span>
-                    <span class="badge-name" style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">{badge_def['name']}</span>
-                    <span class="badge-points" style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{points}</span>
-                </div>
+            <div class="badge-item {badge_class}" title="{html.escape(tooltip_text)}" style="padding: 10px; border: 2px solid transparent; border-radius: 8px; background: transparent; cursor: help; position: relative; display: flex; align-items: center; justify-content: center;">
+                <img src="{image_path}" alt="{badge_def['name']}" style="width: 70px; height: auto; display: block;" />
             </div>
         '''
     
@@ -3685,9 +3701,9 @@ Format this as a professional research document that demonstrates thorough prepa
         /* Badge Display Styles */
         .badge-section {{
             padding: 12px;
-            background: #f9fafb;
+            background: transparent;
             border-radius: 8px;
-            border: 1px solid #e5e7eb;
+            border: none;
         }}
         
         .badge-grid {{

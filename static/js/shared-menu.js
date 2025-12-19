@@ -28,6 +28,11 @@
         { href: '/new-application?resume=true', label: 'Manage Resume' }
     ];
 
+    const helpItems = [
+        { href: '/how-to-hunter', label: 'How to Hunter?' },
+        { href: '/rewards', label: 'Rewards' }
+    ];
+
     // Determine active menu item based on current path
     function getActiveMenuItem() {
         const path = window.location.pathname;
@@ -35,7 +40,7 @@
         const fullPath = path + search;
 
         // Helper list of all items
-        const allItems = [...mainItems, ...adminItems];
+        const allItems = [...mainItems, ...adminItems, ...helpItems];
 
         // Check for exact matches first
         for (const item of allItems) {
@@ -81,15 +86,47 @@
             `;
         });
 
-        // Admin section
+        // Admin section (collapsible)
         menuHTML += `
             </ul>
             <div class="sidebar-admin-section">
-                <div class="sidebar-section-label">Admin</div>
-                <ul class="sidebar-menu sidebar-menu-admin">
+                <div class="sidebar-section-header" onclick="toggleSection('admin')">
+                    <span class="sidebar-section-label">Admin</span>
+                    <svg class="sidebar-section-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <ul class="sidebar-menu sidebar-menu-admin sidebar-section-collapsed" id="admin-section">
         `;
 
         adminItems.forEach(item => {
+            const isActive = item.href === activePath || 
+                           (item.href !== '#' && window.location.pathname.startsWith(item.href));
+            const activeClass = isActive ? 'active' : '';
+            const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            
+            menuHTML += `
+                <li>
+                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${item.label}</a>
+                </li>
+            `;
+        });
+
+        menuHTML += `
+                </ul>
+            </div>
+            
+            <div class="sidebar-help-section">
+                <div class="sidebar-section-header" onclick="toggleSection('help')">
+                    <span class="sidebar-section-label">Help</span>
+                    <svg class="sidebar-section-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <ul class="sidebar-menu sidebar-menu-help sidebar-section-collapsed" id="help-section">
+        `;
+
+        helpItems.forEach(item => {
             const isActive = item.href === activePath || 
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
@@ -183,11 +220,26 @@
             font-weight: 600;
         }
 
-        .sidebar-admin-section {
+        .sidebar-admin-section,
+        .sidebar-help-section {
             margin-top: auto;
             padding-top: 24px;
             border-top: 1px solid #e5e7eb;
             flex-shrink: 0;
+        }
+
+        .sidebar-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px 8px 24px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar-section-header:hover {
+            opacity: 0.7;
         }
 
         .sidebar-section-label {
@@ -196,7 +248,24 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: #9ca3af;
-            padding: 0 24px 8px 24px;
+        }
+
+        .sidebar-section-chevron {
+            color: #9ca3af;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .sidebar-section-header[data-expanded="true"] .sidebar-section-chevron {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-section-collapsed {
+            display: none;
+        }
+
+        .sidebar-section-expanded {
+            display: block;
         }
         
         /* Adjust body margin if sidebar is injected */
@@ -211,6 +280,29 @@
         </style>
         `;
     }
+
+    // Toggle section visibility
+    function toggleSection(sectionName) {
+        const section = document.getElementById(sectionName + '-section');
+        const header = section.previousElementSibling;
+        
+        if (!section || !header) return;
+
+        const isCollapsed = section.classList.contains('sidebar-section-collapsed');
+        
+        if (isCollapsed) {
+            section.classList.remove('sidebar-section-collapsed');
+            section.classList.add('sidebar-section-expanded');
+            header.setAttribute('data-expanded', 'true');
+        } else {
+            section.classList.remove('sidebar-section-expanded');
+            section.classList.add('sidebar-section-collapsed');
+            header.setAttribute('data-expanded', 'false');
+        }
+    }
+
+    // Make toggleSection available globally
+    window.toggleSection = toggleSection;
 
     // Inject menu into page
     function injectMenu() {
@@ -231,6 +323,17 @@
         
         // Add class to body for margin adjustment (fallback)
         document.body.classList.add('with-sidebar');
+
+        // Set initial collapsed state for sections
+        const adminHeader = document.querySelector('#admin-section').previousElementSibling;
+        const helpHeader = document.querySelector('#help-section').previousElementSibling;
+        
+        if (adminHeader) {
+            adminHeader.setAttribute('data-expanded', 'false');
+        }
+        if (helpHeader) {
+            helpHeader.setAttribute('data-expanded', 'false');
+        }
 
         // Handle showAIStatus function if it doesn't exist
         if (typeof showAIStatus === 'undefined') {

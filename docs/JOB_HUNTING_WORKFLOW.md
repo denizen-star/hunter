@@ -7,378 +7,110 @@ Job hunting—real hunting, not passive searching—is basically a full-time job
 - [Phase I: Application Process](#phase-i-application-process)
 - [Phase II: Company Research & Networking](#phase-ii-company-research--networking)
 - [Phase III: Email Outreach](#phase-iii-email-outreach)
-- [Phase IV: Interview Prep Integration](#phase-iv-interview-prep-integration)
-- [Phase V: Post-Interview Follow-up](#phase-v-post-interview-follow-up)
 
 ---
 
 ## Phase I: Application Process
 
-**Goal**: Find jobs, analyze fit, and submit tailored applications.
+**Goal:** Find jobs, analyze fit, and submit tailored applications.
 
-### Step 1: Search LinkedIn
-Log into LinkedIn (my industry's preferred job board).
-
-### Step 2: Filter Jobs
-Search by area, then filter by:
-- Remote/hybrid/city preferences
-- Pay range
-- Job title
-- Company
-
-### Step 3: Review Matches
-Browse results that match my criteria.
-
-### Step 4: Capture Job Posting
-When I find a match, I copy the entire job posting (screenshot 1) and paste it into a **new application in Hunter**.
-
-### Step 5: Extract Key Info & Start Analysis
-In Hunter, I extract:
-- **Position name** (creates unique ID)
-- **Company name** (creates folder structure)
-- **Job link** (for checking if still open)
-
-Then I hit **"Analyze & Create Application"**. Hunter's analysis takes 3-5 minutes, so it runs in the background while I work on the application form.
-
-### Step 6: Fill Application Form (Parallel to Analysis)
-**Priority: Speed of submission.** While Hunter analyzes, I immediately open the job posting link and fill out the form fields:
-
-**6.1. Contact Info & Basic Fields**
-- Name, email, phone
-- Address/location
-- Basic application questions
-
-**6.2. Resume Upload**
-- If "Connect with LinkedIn" is available, use it (best ATS pass-through)
-- Otherwise, upload my ATS-optimized resume (docx + PDF)
-- Keep a well-formatted version ready for human readers
-
-**6.3. Job History**
-I have an Excel file with columns:
-- Job name
-- Position
-- Start date
-- End date
-- Description
-- Skill highlights (critical for tech roles)
-
-I copy-paste from Excel to fill the work history section quickly.
-
-**6.4. Cover Letter Checkpoint**
-If the form requires a cover letter, I pause here and wait for Hunter's analysis to complete. Otherwise, I continue filling the form.
-
-### Step 7: Review Match Score (When Analysis Completes)
-Once Hunter finishes (usually by the time I'm done with basic fields), I check the **% match** based on AI skills extraction and comparison.
-
-### Step 8: Review Analysis (If Cover Letter Required)
-If I need a cover letter, I click **"View Summary"** and check tabs:
-- Job Description
-- Raw Entry
-- Skills
-- Research
-- Qualifications Analysis
-
-Then jump to **Updates & Notes**.
-
-### Step 9: Get Cover Letter (Only If Required)
-If the application requires a cover letter:
-- Go to Hunter's **Templates** tab
-- Select the **bespoke cover letter**
-- Copy the text and paste into my Google Docs template (designed to stand out)
-- Replace placeholders with position-specific info
-- Remove redundant paragraphs
-- Save as PDF and attach to the job submission
-
-**If no cover letter required**: Skip directly to submission.
-
-### Step 10: Submit Application
-Hit submit on the application form. Speed is the priority—I don't wait for analysis unless a cover letter is mandatory.
-
-### Step 11: Document Submission in Hunter
-After submitting:
-- Go to Hunter's **Updates & Notes** tab
-- Set status to **"Applied"**
-- Copy any cover letter content (if used) into the notes box
-- Save the status
-
-### Step 12: Verify Confirmation
-Check email for:
-- Confirmation receipt
-- Email verification requirements
-- Any additional steps needed
-
-**Note**: By running Hunter's analysis in parallel with form filling, I minimize submission delay. The only pause is when a cover letter is required—then I wait for analysis to complete before crafting it.
+1. **Search LinkedIn:** Log into LinkedIn.
+2. **Filter Jobs:** Search by area and filter by Remote/hybrid preferences, Pay range, Job title, and Company.
+3. **Review Matches:** Browse results that match criteria.
+4. **Capture Job Posting:** Copy the entire job posting and paste it into a new application in Hunter.
+5. **Extract Key Info & Analyze:** Extract Position name, Company name, and Job link. Select "Analyze & Create Application."
+6. **Start Application Form:** Open the job posting link and begin filling out the company's form.
+   * **6.1 Resume Upload:** Use "Connect with LinkedIn" if available; otherwise, upload an ATS-optimized resume (docx/PDF).
+   * **6.2 Job History:** Reference Excel file for dates, descriptions, and skill highlights.
+   * **6.3 Cover Letter Placeholder:** Continue form while Hunter finishes analysis.
+7. **Review Match Score:** Check the Hunter % match based on AI skills extraction.
+8. **Review Analysis:** Check the Summary, Skills, Research, and Qualifications tabs.
+9. **Update Status & Get Cover Letter:** Set status to "Applied" and select the bespoke cover letter from the Templates tab.
+10. **Copy to Google Docs:** Paste the cover letter text into a Google Docs template.
+11. **Customize & Polish:** Replace placeholders and remove redundant paragraphs.
+12. **Save & Attach:** Save as PDF and attach to the job submission.
+13. **Document Submission:** Copy the final cover letter back into Hunter's notes and ensure status is "Applied."
+14. **Verify Confirmation:** Check email for receipts or verification requirements.
 
 ---
 
 ## Phase II: Company Research & Networking
 
-**Goal**: Understand the company, find connections, and reach out to recruiters.
+**Goal:** Understand the company, find connections, and reach out to recruiters.
 
-### Step 1: Research Company on LinkedIn
-Go back to LinkedIn and search for the company.
-
-### Step 2: Check Company Page
-Navigate to the company's LinkedIn page and open the **"People & Insights"** tab.
-
-### Step 3: Analyze Company Data
-Review:
-- Employee count
-- Geographic distribution
-- Hiring trends
-- Growth indicators
-
-### Step 4: Check Connections
-Do I know anyone at this company? Check my network.
-
-### Step 5: Check 2nd Degree Connections
-Look for 2nd degree connections who might provide introductions.
-
-### Step 6: Find Recruiters
-Search for:
-- Recruiters
-- Talent acquisition (tech)
-- Hiring managers
-
-### Step 7: Connect with Recruiter
-Send a connection request with a personalized note.
-
-### Step 8: Update Hunter Status
-In Hunter, go to **Notes & Status** tab and select **"Contacted Someone"**.
-
-### Step 9: Get Message Template
-From Hunter's **Templates**:
-- Select **"Short Messages"** for quick outreach, OR
-- If customization needed, go to **Cover Letter** tab and click **"Create Recruiter or Hiring Manager Intros"**
-
-### Step 10: Select & Copy Message
-Back in **Notes & Status**, select the message that fits, then copy the text from the textbox.
-
-### Step 11: Paste to LinkedIn
-Paste into LinkedIn's message box (max 300 characters).
-
-### Step 12: Personalize
-Clean up and modify:
-- Include person's name
-- Add specific details
-- Ensure it's concise
-
-### Step 13: Save Message in Hunter
-Before sending the connection request, copy the message back into Hunter's **Status & Notes** box.
-
-### Step 14: Document Contact Info
-Copy the recruiter's name and information from LinkedIn into Hunter's **Status & Notes** box. (Hunter supports links—super useful for follow-ups later.)
-
-**Note**: After sending the connection, I look for individual contact information in LinkedIn to see if email is available. Usually it's not...
+1. **Research Company:** Return to LinkedIn to search for the specific company.
+2. **Check Company Page:** Open the "People & Insights" tab.
+3. **Analyze Company Data:** Review employee count, geographic distribution, and hiring trends.
+4. **Check Connections:** Identify 1st-degree connections within the company.
+5. **Check 2nd-Degree Connections:** Look for mutual connections for potential introductions.
+6. **Find Recruiters:** Search for Recruiters, Talent Acquisition, or Hiring Managers.
+7. **Connect with Recruiter:** Send a connection request with a personalized note.
+8. **Update Hunter Status:** In the Notes & Status tab, select "Contacted Someone."
+9. **Get Message Template:** Select "Short Messages" or "Recruiter/Hiring Manager Intros" from Hunter Templates.
+10. **Select & Copy Message:** Choose the best fit and copy the text.
+11. **Paste to LinkedIn:** Paste into the LinkedIn message box (300-character limit).
+12. **Personalize:** Add the recipient's name and specific details.
+13. **Save Message in Hunter:** Copy the final message back into Hunter's Status & Notes box.
+14. **Document Contact Info:** Copy the recruiter's name and LinkedIn link into Hunter.
 
 ---
 
 ## Phase III: Email Outreach
 
-**Goal**: Find email addresses and craft personalized outreach emails using Hunter templates.
+**Goal:** Find email addresses and craft personalized outreach emails.
 
-### Step 1: Find Email Address
-Use email finding tools (Hunter will track this) to locate the recruiter's or hiring manager's email address.
-
-### Step 2: Verify Email
-Confirm the email is valid and active before crafting outreach.
-
-### Step 3: Open Hunter Application
-Go back to the specific application in **Hunter** for this position.
-
-### Step 4: Navigate to Templates
-In Hunter, go to the **Templates** tab to access email templates.
-
-### Step 5: Select Email Template
-Choose the appropriate template:
-- **Recruiter Introduction** for talent acquisition contacts
-- **Hiring Manager Introduction** for direct hiring contacts
-- **Follow-up Email** if this is a second touchpoint
-
-### Step 6: Review Company Research
-Quickly review the **Research** tab in Hunter to refresh on:
-- Company details
-- Recent news
-- Hiring trends
-- Any connections found
-
-### Step 7: Customize Email Template
-In Hunter's template editor:
-- Replace placeholders with recruiter/hiring manager name
-- Add position-specific details
-- Reference company research insights
-- Keep it concise and personalized
-
-### Step 8: Copy Email Content
-Copy the customized email text from Hunter's template box.
-
-### Step 9: Paste to Email Client
-Open your email client (Gmail, Outlook, etc.) and paste the email content.
-
-### Step 10: Final Personalization
-- Add subject line (reference the position)
-- Double-check recipient name and email
-- Add any last-minute personal touches
-- Remove any redundant information
-
-### Step 11: Attach Resume (If Appropriate)
-If the email template suggests it, attach your tailored resume (the one Hunter generated for this application).
-
-### Step 12: Send Email
-Hit send and immediately...
-
-### Step 13: Document in Hunter
-Go back to Hunter's **Status & Notes** tab:
-- Copy the sent email content into the notes box
-- Update status if needed (e.g., "Contacted Someone" or "Follow-up Sent")
-- Add the email address to notes
-- Include timestamp and any relevant context
-
-### Step 14: Track Follow-up
-Set a reminder to follow up if no response in 5-7 days. Hunter's status tracking helps you remember which applications need follow-up.
+1. **Find Email Address:** Use email finding tools to locate the recruiter's or hiring manager's email.
+2. **Verify Email:** Confirm the address is valid.
+3. **Open Hunter Application:** Navigate to the specific job entry in Hunter.
+4. **Navigate to Templates:** Access the Templates tab.
+5. **Select Email Template:** Choose Recruiter Intro, Hiring Manager Intro, or Follow-up.
+6. **Review Company Research:** Refresh on company news and hiring trends via the Research tab.
+7. **Customize Email Template:** Replace placeholders and add specific research insights.
+8. **Copy Email Content:** Copy the customized text from Hunter.
+9. **Paste to Email Client:** Open Gmail/Outlook and paste the content.
+10. **Final Personalization:** Add a subject line and double-check recipient details.
+11. **Attach Resume:** Attach the tailored resume if suggested by the template.
+12. **Send Email:** Send the message.
+13. **Document in Hunter:** Copy the sent email content into the notes, update status, and add the email address with a timestamp.
+14. **Track Follow-up:** Set a reminder to follow up in 5–7 days.
 
 ---
 
-## Phase IV: Interview Prep Integration
+## Quick Reference Checklists
 
-**Goal**: Track interview stages, prepare talking points, and coordinate scheduling.
+### Daily Networking & Outreach Tracker
 
-### Step 1: Update Status to Interview Scheduled
-When you receive an interview invitation, go to Hunter's **Status & Notes** tab and update status to **"Interview Scheduled"**.
+#### Phase I: Quick-Start Application Checklist
 
-### Step 2: Document Interview Details
-In Hunter's **Status & Notes**, capture:
-- **Interview date and time**
-- **Interview format** (phone screen, behavioral, technical, panel, etc.)
-- **Platform** (Zoom, Teams, phone, in-person)
-- **Duration** (30 min, 1 hour, etc.)
+- [ ] LinkedIn Search: Filter by Title, Pay, and Location.
+- [ ] Hunter Capture: Copy/Paste JD into Hunter.
+- [ ] Data Extraction: Input Position, Company, and Link; click Analyze.
+- [ ] Begin Form: Open the job link and start the application.
+- [ ] Resume Upload: Use LinkedIn Connect or upload your ATS-optimized file.
+- [ ] Job History: Copy details from your Excel Master File.
+- [ ] Hunter Review: Check Match Score and "View Summary" tabs.
+- [ ] Cover Letter: Select bespoke template in Hunter and set status to Applied.
+- [ ] External Polish: Copy to Google Docs, customize, and save as PDF.
+- [ ] Final Submit: Attach PDF and send the application.
+- [ ] Archive: Copy final text back to Hunter Notes and verify the email confirmation.
 
-### Step 3: Get Scheduling Template
-If you need to suggest times to the recruiting team:
-- Go to Hunter's **Templates** tab
-- Select **"Interview Scheduling"** template (or create one)
-- Fill in your available time slots
-- Copy and send to coordinator
+#### Phase II: LinkedIn Networking
 
-### Step 4: Document Interviewer Information
-In Hunter's **Status & Notes**, add:
-- **Interviewer names** (one per line)
-- **Their roles/titles** (Hiring Manager, Team Lead, HR, etc.)
-- **LinkedIn profiles** (if available—Hunter supports links)
-- **Any background info** (mutual connections, shared interests, etc.)
+- [ ] **Company Pulse:** Check "People & Insights" for hiring trends/growth.
+- [ ] **Network Scan:** Identify 1st and 2nd-degree connections.
+- [ ] **Lead Identification:** Find 1–2 specific Recruiters or Hiring Managers.
+- [ ] **The "Invite":** Send a personalized LinkedIn connection request (max 300 chars).
+- [ ] **Hunter Update:** Set status to **"Contacted Someone"** and log the name/URL.
+- [ ] **Note Log:** Copy the final message text into Hunter Notes.
 
-### Step 5: Review Company Research
-Before the interview, go to Hunter's **Research** tab and identify key points to mention:
-- Recent company news (e.g., "I saw your recent Q3 growth in the X division...")
-- Company initiatives or projects
-- Industry trends affecting them
-- Any connections or shared interests
+#### Phase III: Direct Email Outreach
 
-### Step 6: Prepare Talking Points
-In Hunter's **Status & Notes**, create a quick reference list:
-- **Key research points** to weave into conversation
-- **Questions to ask** about the role/team
-- **Your relevant experience** to highlight
-- **Specific examples** that match their needs
-
-### Step 7: Review Job Description & Skills
-Quickly review Hunter's **Job Description** and **Skills** tabs to refresh on:
-- Must-have qualifications
-- Technologies they use
-- Your match score and gaps to address
-
-### Step 8: Conduct Interview
-Attend the interview with your prepared talking points and questions.
-
-### Step 9: Take Interview Notes
-During or immediately after the interview, add notes to Hunter's **Status & Notes**:
-- **What was discussed**
-- **Key questions asked** (yours and theirs)
-- **Their responses** to your questions
-- **Your impressions** (culture fit, role clarity, etc.)
-- **Next steps mentioned** (timeline, additional interviews, etc.)
-
-### Step 10: Update Status Post-Interview
-After the interview, update Hunter status:
-- **"Interviewed"** if it's a single interview
-- **"Interview Scheduled"** if more rounds are coming
-- Add timestamp and any follow-up actions needed
-
----
-
-## Phase V: Post-Interview Follow-up
-
-**Goal**: Send personalized thank you emails to each interviewer using Hunter templates.
-
-### Step 1: Open Hunter Application
-Go to the specific application in **Hunter** for this position.
-
-### Step 2: Navigate to Templates
-Go to Hunter's **Templates** tab to access thank you email templates.
-
-### Step 3: Select Thank You Template
-Choose the appropriate template:
-- **Thank You - Interview Coordinator** for the person who scheduled
-- **Thank You - Hiring Manager** for direct hiring contacts
-- **Thank You - Technical Interviewer** for technical interviews
-- **Thank You - General** for other interviewers
-
-### Step 4: Review Interview Notes
-Quickly review the **Status & Notes** tab to recall:
-- What was discussed with each person
-- Their specific questions or interests
-- Any follow-up items mentioned
-
-### Step 5: Customize Template for Coordinator
-For the interview coordinator:
-- Use **"Thank You - Interview Coordinator"** template
-- Personalize with their name
-- Thank them for coordinating the meetings
-- Reference the interview format/platform
-- Keep it brief and professional
-
-### Step 6: Send Coordinator Email
-- Copy the customized template
-- Paste into your email client
-- Add subject line (e.g., "Thank you - [Position] Interview")
-- Send
-
-### Step 7: Document Coordinator Email in Hunter
-In Hunter's **Status & Notes**:
-- Copy the sent email content
-- Note the recipient and timestamp
-- Save
-
-### Step 8: Customize Template for Each Interviewer
-For each interviewer (from Step 4 of Phase IV):
-- Select the appropriate thank you template
-- Personalize with their name and role
-- Reference something specific from your conversation
-- Mention a key point that resonated
-- Keep it concise (2-3 paragraphs max)
-
-### Step 9: Send Individual Thank You Emails
-For each interviewer:
-- Copy the customized template
-- Paste into your email client
-- Add personalized subject line
-- Send within 24 hours of the interview
-
-### Step 10: Document All Thank You Emails
-In Hunter's **Status & Notes**, add:
-- List of all thank you emails sent
-- Recipient names and roles
-- Timestamps
-- Brief note on what you personalized for each
-
-### Step 11: Update Status
-Update Hunter status if needed:
-- Keep as **"Interviewed"** if waiting for response
-- Change to **"Follow-up Sent"** if you want to track that separately
-- Add any next steps or expected timeline
-
-### Step 12: Set Follow-up Reminder
-If no response after 5-7 days, set a reminder to follow up. Hunter's status tracking makes it easy to see which interviews need attention.
+- [ ] **Email Discovery:** Find and verify the professional email address.
+- [ ] **Content Selection:** Choose the appropriate Hunter Template (Intro vs. Follow-up).
+- [ ] **Context Injection:** Add 1 specific "Research" insight from Hunter into the draft.
+- [ ] **The "Send":** Paste into Gmail/Outlook, attach tailored resume, and send.
+- [ ] **Record Keeping:** Copy sent email to Hunter Notes and add the email address.
+- [ ] **Follow-up Trigger:** Set a calendar reminder or Hunter task for **5–7 days** from today.
 
 ---
 
@@ -390,12 +122,5 @@ If no response after 5-7 days, set a reminder to follow up. Hunter's status trac
 - **Generating tailored content**: Cover letters and emails ready to customize
 - **Tracking progress**: Never lose track of where you are in each application
 - **Supporting follow-ups**: Easy to see what needs attention
-- **Interview preparation**: Research and talking points ready when you need them
-- **Post-interview organization**: Templates and tracking for professional follow-ups
 
-The key is **consistency**—using Hunter at every step ensures nothing falls through the cracks and every application gets the attention it deserves, from initial application through interview follow-ups.
-
-
-
-
-
+The key is **consistency**—using Hunter at every step ensures nothing falls through the cracks and every application gets the attention it deserves.

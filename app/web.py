@@ -1720,6 +1720,16 @@ def view_templates():
     """View the templates page"""
     return render_template('templates.html')
 
+@app.route('/rewards')
+def view_rewards():
+    """View the rewards system page"""
+    return render_template('rewards.html')
+
+@app.route('/how-to-hunter')
+def view_how_to_hunter():
+    """View the How to Hunter guide page"""
+    return render_template('how_to_hunter.html')
+
 @app.route('/api/reports', methods=['GET'])
 def get_reports_data():
     """Get reports data for specified period"""

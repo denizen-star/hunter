@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards System - Job Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Menu Script -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-md: 8px;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+        
+        .page-header {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .page-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-primary);
+            padding-bottom: var(--space-md);
+        }
+        
+        .section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+        
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+        
+        .badge-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .badge-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .badge-card .points {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .badge-images {
+            display: flex;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .badge-image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .badge-image-container img {
+            width: 150px;
+            height: auto;
+            border-radius: var(--radius-md);
+        }
+        
+        .badge-image-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-details {
+            width: 100%;
+            text-align: left;
+            margin-top: var(--space-md);
+        }
+        
+        .badge-details h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+            margin-top: var(--space-md);
+        }
+        
+        .badge-details p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .badge-details .detail-item {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .badge-details .detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .phase-prospecting {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .phase-outreach {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .phase-engagement {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .phase-nurture {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            border-radius: var(--radius-md);
+        }
+        
+        .info-box p {
+            margin-bottom: 0;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="page-header">
+            <img src="/static/images/rewards-badges-overview.png" alt="Networking Rewards Badges" style="max-width: 100%; height: auto; margin-bottom: 24px; border-radius: 8px;">
+            <h1>Networking Rewards</h1>
+            <p>
+                The Networking Rewards System gamifies your networking efforts by awarding badges and points 
+                based on your progress with each contact. As you advance contacts through different relationship 
+                stages, you earn badges that reflect your networking achievements. Points are cumulative and 
+                help you track your overall networking success.
+            </p>
+        </div>
+        
+        <div class="section">
+            <h2>How It Works</h2>
+            <div class="info-box">
+                <p><strong>Points are cumulative:</strong> When a contact reaches a specific status, you earn points 
+                for all badges up to and including that status. For example, if a contact reaches "In Conversation", 
+                you earn: Deep Diver (+10) + Profile Magnet (+3) + Qualified Lead (+15) + Conversation Starter (+20) = 48 total points.</p>
+            </div>
+            
+            <h3>Badge Display</h3>
+            <p>Badges appear in two locations:</p>
+            <ul>
+                <li><strong>Networking Contact Profile:</strong> In the header section, showing all 8 badges with earned badges displaying the "W" (won) version and unearned badges showing the "U" (unearned) version.</li>
+                <li><strong>Application Hero Section:</strong> Shows the highest badge achieved and the next badge to earn for contacts linked to that application.</li>
+            </ul>
+            
+            <h3>Badge States</h3>
+            <ul>
+                <li><strong>Earned (W):</strong> Displayed when a contact has reached the required status for that badge. Shows the full-color "W" version of the badge image.</li>
+                <li><strong>Unearned (U):</strong> Displayed when a contact has not yet reached the required status. Shows the grayscale "U" version of the badge image.</li>
+            </ul>
+            
+            <h3>Recurring Badges</h3>
+            <p>Some badges can be earned multiple times. The <strong>Relationship Manager</strong> badge awards points 
+            each time you perform a check-in with a contact who has reached "Strong Connection" status.</p>
+        </div>
+        
+        <div class="section">
+            <h2>All Badges</h2>
+            <div class="badges-grid" id="badgesGrid">
+                <!-- Badges will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Badge definitions
+        const badges = [
+            {
+                id: 'deep_diver',
+                name: 'Deep Diver',
+                points: 10,
+                phase: 'prospecting',
+                phaseLabel: 'Prospecting',
+                triggerStatus: 'Sent LinkedIn Connection',
+                description: 'Contact reached "Sent LinkedIn Connection" status',
+                badgesTracking: 'Deep Research Complete (Steps 1.1-1.3). Specific personalization hook is defined.',
+                displayConditions: 'Earned when you send a LinkedIn connection request to a contact. This indicates you\'ve completed deep research and have a specific personalization angle.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            },
+            {
+                id: 'profile_magnet',
+                name: 'Profile Magnet',
+                points: 3,
+                phase: 'outreach',
+                phaseLabel: 'Outreach',
+                triggerStatus: 'Sent Email',
+                description: 'Contact reached "Sent Email" status',
+                badgesTracking: 'Personalized LinkedIn Message Sent (Step 2.1). Awaiting connection acceptance or response.',
+                displayConditions: 'Earned when you send an email to a contact. This indicates you\'ve sent a personalized message and are awaiting a response.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            },
+            {
+                id: 'qualified_lead',
+                name: 'Qualified Lead',
+                points: 15,
+                phase: 'outreach',
+                phaseLabel: 'Outreach',
+                triggerStatus: 'Connection Accepted',
+                description: 'Contact reached "Connection Accepted" status',
+                badgesTracking: 'Contact Viewed Profile (2.3) OR Connection Accepted (2.4) OR Email Reply Received (3.4). Any positive sign of engagement.',
+                displayConditions: 'Earned when a contact accepts your LinkedIn connection request, views your profile, or replies to your email. This indicates positive engagement.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            },
+            {
+                id: 'conversation_starter',
+                name: 'Conversation Starter',
+                points: 20,
+                phase: 'engagement',
+                phaseLabel: 'Engagement',
+                triggerStatus: 'In Conversation',
+                description: 'Contact reached "In Conversation" status',
+                badgesTracking: 'Value-Driven Email Sent (3.3) and Contact is Actively Responding. You are exchanging messages to set a meeting.',
+                displayConditions: 'Earned when you and the contact are actively exchanging messages, working toward scheduling a meeting.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            },
+            {
+                id: 'scheduler_master',
+                name: 'Scheduler Master',
+                points: 30,
+                phase: 'engagement',
+                phaseLabel: 'Engagement',
+                triggerStatus: 'Meeting Scheduled',
+                description: 'Contact reached "Meeting Scheduled" status',
+                badgesTracking: 'Call/Meeting Confirmed on Calendar (Step 8). A specific date/time is set.',
+                displayConditions: 'Earned when a meeting or call is confirmed and scheduled on the calendar with a specific date and time.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            },
+            {
+                id: 'rapport_builder',
+                name: 'Rapport Builder',
+                points: 50,
+                phase: 'engagement',
+                phaseLabel: 'Engagement',
+                triggerStatus: 'Meeting Complete',
+                description: 'Contact reached "Meeting Complete" status',
+                badgesTracking: 'Meeting Occurred and Debrief is Done (Step 9). Informational interview or call is complete.',
+                displayConditions: 'Earned when a scheduled meeting or call has been completed and you\'ve done a debrief of the conversation.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            },
+            {
+                id: 'relationship_manager',
+                name: 'Relationship Manager',
+                points: 2,
+                phase: 'nurture',
+                phaseLabel: 'Nurture',
+                triggerStatus: 'Strong Connection',
+                description: 'Contact reached "Strong Connection" status',
+                badgesTracking: 'Next Check-in Scheduled (Step 4.1) or Maintenance Check-in Sent (Step 4.2). Relationship is established and active.',
+                displayConditions: 'Earned each time you perform a check-in with a contact who has reached "Strong Connection" status. This is a recurring badge - you earn points every time you check in.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section',
+                recurring: true
+            },
+            {
+                id: 'super_connector',
+                name: 'Super Connector',
+                points: 100,
+                phase: 'nurture',
+                phaseLabel: 'Nurture',
+                triggerStatus: 'Referral Partner',
+                description: 'Contact reached "Referral Partner" status',
+                badgesTracking: 'Contact Provides Referral/Opportunity OR Explicitly Offers Advocacy. Confirmed as a high-value relationship.',
+                displayConditions: 'Earned when a contact provides a referral, opportunity, or explicitly offers to advocate for you. This is the highest-value badge.',
+                whereDisplayed: 'Networking Contact Profile header, Application Hero section'
+            }
+        ];
+        
+        // Generate badge cards
+        function generateBadgeCards() {
+            const grid = document.getElementById('badgesGrid');
+            grid.innerHTML = '';
+            
+            badges.forEach(badge => {
+                const card = document.createElement('div');
+                card.className = 'badge-card';
+                
+                // Map badge names to actual file names
+                const badgeNameMap = {
+                    'Deep Diver': 'DeepDiver',
+                    'Profile Magnet': 'ProfileMagnet',
+                    'Qualified Lead': 'QualifiedLead',
+                    'Conversation Starter': 'ConversationStarter',
+                    'Scheduler Master': 'SchedulerMaster',
+                    'Rapport Builder': 'RapportBuilder',
+                    'Relationship Manager': 'RelationshipManager',
+                    'Super Connector': 'SuperConnector'
+                };
+                
+                const fileName = badgeNameMap[badge.name] || badge.name.replace(/\s+/g, '');
+                
+                card.innerHTML = `
+                    <h3>${badge.name}</h3>
+                    <div class="points">+${badge.points} Points</div>
+                    <span class="phase-badge phase-${badge.phase}">${badge.phaseLabel}</span>
+                    <div class="badge-images">
+                        <div class="badge-image-container">
+                            <img src="/static/images/badges/${fileName}U.jpeg" alt="${badge.name} Unearned" onerror="this.onerror=null; this.src='/static/images/badges/${fileName}U.jpg'">
+                            <span class="badge-image-label">Unearned</span>
+                        </div>
+                        <div class="badge-image-container">
+                            <img src="/static/images/badges/${fileName}W.jpg" alt="${badge.name} Earned" onerror="this.onerror=null; this.src='/static/images/badges/${fileName}W.jpeg'">
+                            <span class="badge-image-label">Earned</span>
+                        </div>
+                    </div>
+                    <div class="badge-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Trigger Status:</span> ${badge.triggerStatus}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Description:</span> ${badge.description}
+                        </div>
+                        <h4>When It Displays</h4>
+                        <p>${badge.displayConditions}</p>
+                        <h4>Where It Appears</h4>
+                        <p>${badge.whereDisplayed}</p>
+                        ${badge.recurring ? '<p><strong>Note:</strong> This is a recurring badge - you can earn it multiple times.</p>' : ''}
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', generateBadgeCards);
+    </script>
+</body>
+</html>

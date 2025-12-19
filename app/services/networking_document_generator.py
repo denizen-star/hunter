@@ -912,27 +912,21 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             <div>
                 <h1>{contact.person_name}</h1>
                 <div class="subtitle">{contact.company_name}{f' • {contact.job_title}' if contact.job_title else ''}</div>
+                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                    <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'Found Contact'}</span>
+                    {f'<span class="status-pill tag tag-green">{contact.match_score:.0f}% Match</span>' if contact.match_score is not None else ''}
+                </div>
             </div>
-            <div style="display: flex; gap: 12px;">
-                <a href="{self.generate_google_calendar_url(contact)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-                    📅 Add to GCal
-                </a>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                {self._generate_contact_rewards_cards(contact)}
             </div>
         </div>
     </div>
     
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
-        <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'Found Contact'}</span>
-        </div>
-        {self._generate_contact_rewards_cards(contact)}
         {self._generate_company_positions_html(contact)}
         <div class="app-meta">
-            <div class="meta-item">
-                <span>📍</span>
-                <span>{contact.location or 'N/A'}</span>
-            </div>
             <div class="meta-item">
                 <span>📅</span>
                 <span><strong>Connected:</strong> {format_for_display(contact.created_at)}</span>
@@ -941,15 +935,15 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                 <span>🔄</span>
                 <span id="statusUpdated"><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
             </div>
-            <div class="meta-item">
-                <span>📊</span>
-                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'Found Contact'}</span></span>
-            </div>
             {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
             <div class="meta-item" id="emailMetaItem">
                 <span>📧</span>
                 {f'<span id="emailDisplay" style="cursor: pointer; text-decoration: underline; text-decoration-style: dotted;" onclick="editEmailInline()" title="Click to edit">{contact.email}</span>' if contact.email else '<span id="emailDisplay" style="cursor: pointer; color: #3b82f6; text-decoration: underline;" onclick="editEmailInline()">Add Email</span>'}
                 <input type="email" id="emailInput" value="{contact.email or ''}" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
+            </div>
+            <div class="meta-item">
+                <span>📅</span>
+                <a href="{self.generate_google_calendar_url(contact)}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none;">Add to GCal</a>
             </div>
         </div>
     </div>
@@ -2573,31 +2567,21 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             <div>
                 <h1>{contact.person_name}</h1>
                 <div class="subtitle">{contact.company_name}{f' • {contact.job_title}' if contact.job_title else ''}</div>
+                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                    <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'Found Contact'}</span>
+                    {f'<span class="status-pill tag tag-green">{contact.match_score:.0f}% Match</span>' if contact.match_score is not None else ''}
+                </div>
             </div>
-            <div style="display: flex; gap: 12px;">
-                    <a href="{self.generate_google_calendar_url(contact)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-                        📅 Add to GCal
-                    </a>
-                    <button onclick="regenerateDocuments()" class="btn btn-secondary" id="regenerateBtn">
-                        🔄 Regen
-                    </button>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                {self._generate_contact_rewards_cards(contact)}
             </div>
         </div>
     </div>
     
     <!-- Hero Card with Metadata -->
     <div class="app-header-card">
-        <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px;">
-            <span id="statusPill" class="status-pill tag tag-blue">{contact.status or 'Found Contact'}</span>
-            {f'<span class="status-pill tag tag-green">{contact.match_score:.0f}% Match</span>' if contact.match_score is not None else ''}
-        </div>
-        {self._generate_contact_rewards_cards(contact)}
         {self._generate_company_positions_html(contact)}
         <div class="app-meta">
-            <div class="meta-item">
-                <span>📍</span>
-                <span>{contact.location or 'N/A'}</span>
-            </div>
             <div class="meta-item">
                 <span>📅</span>
                 <span><strong>Connected:</strong> {format_for_display(contact.created_at)}</span>
@@ -2606,15 +2590,15 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 <span>🔄</span>
                 <span id="statusUpdated"><strong>Updated:</strong> {format_for_display(contact.status_updated_at or contact.created_at)}</span>
             </div>
-            <div class="meta-item">
-                <span>📊</span>
-                <span><strong>Status:</strong> <span id="statusDisplay">{contact.status or 'Found Contact'}</span></span>
-            </div>
             {f'<div class="meta-item"><span>🔗</span><a href="{contact.linkedin_url}" target="_blank" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a></div>' if contact.linkedin_url else ''}
             <div class="meta-item" id="emailMetaItem">
                 <span>📧</span>
                 {f'<span id="emailDisplay" style="cursor: pointer; text-decoration: underline; text-decoration-style: dotted;" onclick="editEmailInline()" title="Click to edit">{contact.email}</span>' if contact.email else '<span id="emailDisplay" style="cursor: pointer; color: #3b82f6; text-decoration: underline;" onclick="editEmailInline()">Add Email</span>'}
                 <input type="email" id="emailInput" value="{contact.email or ''}" style="display: none; padding: 4px 8px; border: 1px solid #3b82f6; border-radius: 4px; font-size: 14px; width: 200px;" onblur="saveEmailInline()" onkeypress="if(event.key==='Enter') saveEmailInline()">
+            </div>
+            <div class="meta-item">
+                <span>📅</span>
+                <a href="{self.generate_google_calendar_url(contact)}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none;">Add to GCal</a>
             </div>
         </div>
     </div>
@@ -3179,37 +3163,6 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             }}
         }}
         
-        async function regenerateDocuments() {{
-            const regenerateBtn = document.getElementById('regenerateBtn');
-            
-            if (!confirm('Regenerate all AI analysis and messages? This will take 5-6 minutes.')) {{
-                return;
-            }}
-            
-            regenerateBtn.disabled = true;
-            regenerateBtn.textContent = '🔄 Regenerating...';
-            
-            try {{
-                const response = await fetch(`/api/networking/contacts/${{contactId}}/regenerate`, {{
-                    method: 'POST'
-                }});
-                
-                const data = await response.json();
-                
-                if (data.success) {{
-                    alert('Documents regenerated successfully! Reloading page...');
-                    location.reload();
-                }} else {{
-                    alert(`Error: ${{data.error}}`);
-                    regenerateBtn.disabled = false;
-                    regenerateBtn.textContent = '🔄 Regen';
-                }}
-            }} catch (error) {{
-                alert(`Error: ${{error.message}}`);
-                regenerateBtn.disabled = false;
-                regenerateBtn.textContent = '🔄 Regen';
-            }}
-        }}
         
         // Inline email editing in hero card
         function editEmailInline() {{
@@ -3385,6 +3338,36 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         write_text_file(html, summary_path)
         contact.summary_path = summary_path
     
+    def _get_badge_image_path(self, badge_id: str, earned: bool) -> str:
+        """Get the image path for a badge based on ID and earned status"""
+        badge_name_map = {
+            'deep_diver': 'DeepDiver',
+            'profile_magnet': 'ProfileMagnet',
+            'qualified_lead': 'QualifiedLead',
+            'conversation_starter': 'ConversationStarter',
+            'scheduler_master': 'SchedulerMaster',
+            'rapport_builder': 'RapportBuilder',
+            'relationship_manager': 'RelationshipManager',
+            'super_connector': 'SuperConnector'
+        }
+        suffix = 'W' if earned else 'U'
+        badge_name = badge_name_map.get(badge_id, '')
+        # Check which extension exists (.jpg or .jpeg)
+        from pathlib import Path
+        static_path = Path(__file__).parent.parent.parent / 'static' / 'images' / 'badges'
+        jpg_path = static_path / f'{badge_name}{suffix}.jpg'
+        jpeg_path = static_path / f'{badge_name}{suffix}.jpeg'
+        
+        # Use .jpg if it exists, otherwise .jpeg
+        if jpg_path.exists():
+            extension = '.jpg'
+        elif jpeg_path.exists():
+            extension = '.jpeg'
+        else:
+            # Default to .jpg if neither exists (fallback)
+            extension = '.jpg'
+        return f'/static/images/badges/{badge_name}{suffix}{extension}'
+    
     def _generate_contact_rewards_cards(self, contact: NetworkingContact) -> str:
         """Generate all 8 badges for a single contact with cumulative points"""
         try:
@@ -3457,35 +3440,26 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             for badge_id, badge_def in badge_service.badge_definitions.items():
                 is_earned = badge_id in earned_badge_ids
                 
-                border_color = '#3b82f6' if is_earned else '#d1d5db'
-                icon_color = '#3b82f6' if is_earned else '#9ca3af'
-                points_color = '#10b981' if is_earned else '#9ca3af'
-                icon = '✓' if is_earned else '○'
+                # Use transparent border for all badges
+                border_color = 'transparent'
                 
-                # Build tooltip with badges tracking description
-                tooltip_parts = [badge_def['description']]
-                if 'badges_tracking' in badge_def and badge_def['badges_tracking']:
-                    tooltip_parts.append(f"Badges tracking: {badge_def['badges_tracking']}")
-                if 'trigger_status' in badge_def:
-                    tooltip_parts.append(f"Trigger: {badge_def['trigger_status']}")
-                tooltip_text = " | ".join(tooltip_parts)
+                # Build tooltip with badge name and points only
+                tooltip_text = f"{badge_def['name']} +{badge_def['points']}"
                 # Escape HTML entities for title attribute
                 tooltip_text = html.escape(tooltip_text)
                 
+                # Get badge image path
+                image_path = self._get_badge_image_path(badge_id, is_earned)
+                
                 all_badges_html.append(f'''
-                    <div style="padding: 10px; min-width: 160px; border: 2px solid {border_color}; border-radius: 8px; background: white; cursor: help;" title="{tooltip_text}">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 16px; color: {icon_color}; font-weight: bold;">{icon}</span>
-                            <span style="font-size: 13px; font-weight: 600; color: #1f2937; flex: 1;">{badge_def['name']}</span>
-                            <span style="font-size: 13px; font-weight: 700; color: {points_color}; white-space: nowrap;">+{badge_def['points']}</span>
-                        </div>
+                    <div style="padding: 10px; border: 2px solid {border_color}; border-radius: 8px; background: transparent; cursor: help; display: flex; align-items: center; justify-content: center;" title="{tooltip_text}">
+                        <img src="{image_path}" alt="{badge_def['name']}" style="width: 70px; height: auto; display: block;" />
                     </div>
                 ''')
             
             return f'''
-            <div style="margin: 20px 0;">
                 <!-- All 8 Badges -->
-                <div style="padding: 16px; background: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                <div style="padding: 16px; background: transparent; border: 1px solid transparent; border-radius: 8px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleBadgeSection()">
                         <h3 style="margin: 0; font-size: 14px; font-weight: 600; color: #1f2937;">Networking Rewards ({total_points} pts)</h3>
                         <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease;">
@@ -3512,7 +3486,6 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                         }}
                     </script>
                 </div>
-            </div>
             '''
         except Exception as e:
             print(f"Warning: Could not generate contact rewards cards: {e}")
