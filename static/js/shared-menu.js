@@ -30,6 +30,9 @@
 
     const helpItems = [
         { href: '/how-to-hunter', label: 'How to Hunter?' },
+        { href: '/tracking-guide', label: 'Tracking' },
+        { href: '/dashes-guide', label: 'Dashes' },
+        { href: '/templating-guide', label: 'Templating' },
         { href: '/rewards', label: 'Rewards' }
     ];
 
@@ -39,7 +42,7 @@
         const search = window.location.search;
         const fullPath = path + search;
 
-        // Helper list of all items
+        // Helper list of all items (for active path detection)
         const allItems = [...mainItems, ...adminItems, ...helpItems];
 
         // Check for exact matches first

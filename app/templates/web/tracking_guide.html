@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Guide - Job Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Menu Script -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+        
+        .page-header {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .page-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-primary);
+            padding-bottom: var(--space-md);
+        }
+        
+        .section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul, .section ol {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul li, .section ol li {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+            border-radius: var(--radius-md);
+        }
+        
+        .info-box p {
+            margin-bottom: 0;
+            color: #1e40af;
+        }
+        
+        .workflow-diagram {
+            background: #f9fafb;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin: var(--space-lg) 0;
+            overflow-x: auto;
+        }
+        
+        .workflow-step {
+            background: var(--bg-primary);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+        
+        .workflow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: var(--accent-blue);
+        }
+        
+        .workflow-step:last-child::after {
+            display: none;
+        }
+        
+        .workflow-step h4 {
+            color: var(--accent-blue);
+            margin-top: 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-lg) 0;
+        }
+        
+        .feature-card {
+            background: #f9fafb;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+        }
+        
+        .feature-card h4 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature-card p {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .url-link {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: var(--space-sm);
+            transition: background 0.2s ease;
+        }
+        
+        .url-link:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .guide-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+        
+        .guide-link:hover {
+            border-bottom-color: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="page-header">
+            <h1>Tracking Guide</h1>
+            <p>
+                Learn how to use Hunter's tracking features to monitor your job search progress, analyze performance metrics, 
+                and stay on top of your application pipeline. This guide covers Reports, Analytics, and Daily Activities pages.
+            </p>
+            <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
+                Related guides: <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
+                <a href="/dashes-guide" class="guide-link">Dashes Guide</a>
+            </p>
+        </div>
+        
+        <!-- Overview Workflow Diagram -->
+        <div class="section">
+            <h2>Tracking Overview</h2>
+            <p>
+                Hunter provides three powerful tracking tools to help you understand and optimize your job search:
+            </p>
+            
+            <div class="workflow-diagram">
+                <div class="workflow-step">
+                    <h4>📊 Reports Page</h4>
+                    <p>High-level overview with charts, status distributions, and follow-up lists. Perfect for quick status checks and identifying items needing attention.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>📈 Analytics Page</h4>
+                    <p>Deep insights into performance metrics, response rates, time-to-response analysis, and skill gap identification. Use for strategic optimization.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>📅 Daily Activities Page</h4>
+                    <p>Chronological timeline of all activities (jobs and networking). Perfect for daily reviews and understanding your activity patterns.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reports Page Section -->
+        <div class="section">
+            <h2>Reports Page</h2>
+            <p><strong>URL:</strong> <a href="/reports" class="url-link">/reports</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Check weekly or bi-weekly for overall pipeline status, identify applications needing follow-up, review status distributions, and see flagged items.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Period Selector</h4>
+                    <p>Filter data by time period: Today, Yesterday, Last 7 Days, Last 30 Days, or All Time. Change periods to see trends over different timeframes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Type Filter</h4>
+                    <p>View Jobs only, Networking contacts only, or Both combined. Combined view shows networking statuses with "Net:" prefix for clarity.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Status Distribution Charts</h4>
+                    <p>Visual pie charts showing how many applications/contacts are in each status. Quickly see where your pipeline is concentrated.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Activity Charts</h4>
+                    <p>Daily and cumulative activity charts showing application volume over time. Identify application velocity trends.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Follow-up Needed List</h4>
+                    <p>Automatically lists all items (jobs or contacts) that haven't been updated in 7+ days. Click links to go directly to items needing attention.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Flagged Items</h4>
+                    <p>Shows all flagged applications and networking contacts in one place. Great for managing high-priority opportunities.</p>
+                </div>
+            </div>
+            
+            <h3>Why Use Reports?</h3>
+            <ul>
+                <li><strong>Quick Status Check:</strong> Get a high-level view of your entire pipeline in seconds</li>
+                <li><strong>Identify Stale Items:</strong> The follow-up list highlights items that need attention</li>
+                <li><strong>Track Progress:</strong> Activity charts show if you're maintaining consistent application volume</li>
+                <li><strong>Manage Priorities:</strong> Flagged items section helps focus on high-value opportunities</li>
+                <li><strong>Weekly Reviews:</strong> Perfect for weekly pipeline reviews to ensure nothing falls through cracks</li>
+            </ul>
+            
+            <h3>How to Use Reports</h3>
+            <ol>
+                <li><strong>Select Time Period:</strong> Choose the timeframe you want to analyze (default: Last 30 Days)</li>
+                <li><strong>Choose Type:</strong> Select Jobs, Networking, or Both depending on what you want to review</li>
+                <li><strong>Review Charts:</strong> Look at status distribution and activity charts to understand pipeline composition</li>
+                <li><strong>Check Follow-ups:</strong> Review the "Follow-up Needed" list and click links to update stale items</li>
+                <li><strong>Review Flagged:</strong> Check flagged items section for priority opportunities</li>
+                <li><strong>Take Action:</strong> Use the information to prioritize your work for the week</li>
+            </ol>
+        </div>
+        
+        <!-- Analytics Page Section -->
+        <div class="section">
+            <h2>Analytics Page</h2>
+            <p><strong>URL:</strong> <a href="/analytics" class="url-link">/analytics</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Review monthly or quarterly for strategic insights. Use when you want to optimize your job search strategy, understand what's working, identify skill gaps, or analyze performance patterns.</p>
+            </div>
+            
+            <h3>Key Metrics & Insights</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Response Rate</h4>
+                    <p>Percentage of applications that received company responses. Track this over time to see if your applications are improving.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Average Time to Response</h4>
+                    <p>Mean, median, min, and max days from application to first response. Helps set follow-up expectations.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Time to Response Distribution</h4>
+                    <p>Shows how many responses came in 0-1 days, 2-3 days, 4-7 days, etc. Understand typical response patterns.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Success by Match Score</h4>
+                    <p>Response and interview rates grouped by match score ranges (0-50%, 50-70%, 70-85%, 85-100%). Identify optimal match score targets.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Best Performing Day of Week</h4>
+                    <p>Which days you applied correlate with highest response rates. Optimize your application timing.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Application Velocity</h4>
+                    <p>Daily and cumulative charts showing application volume over time. Track consistency and growth.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Company Type Analysis</h4>
+                    <p>Response, interview, and offer rates by company type (startup, enterprise). Focus on where you perform best.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Location Insights</h4>
+                    <p>Response and interview rates by location. Identify geographic patterns in your search.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Salary Range Distribution</h4>
+                    <p>Distribution of applications across salary ranges. Understand where you're applying.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Skills Gap Analysis</h4>
+                    <p>Most requested skills, missing skills from your resume, and learning priorities. Identify skills to develop.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Skill Match Trends</h4>
+                    <p>How your match scores for top 10 skills have changed over time. Track skill relevance trends.</p>
+                </div>
+            </div>
+            
+            <h3>Why Use Analytics?</h3>
+            <ul>
+                <li><strong>Optimize Strategy:</strong> Understand what's working and what isn't in your job search</li>
+                <li><strong>Set Realistic Expectations:</strong> Know average response times to plan follow-ups</li>
+                <li><strong>Identify Skill Gaps:</strong> See which skills appear frequently but you're missing</li>
+                <li><strong>Focus Efforts:</strong> Concentrate on company types, locations, or match scores that perform best</li>
+                <li><strong>Track Improvement:</strong> Monitor metrics over time to see if your applications are getting better</li>
+                <li><strong>Learning Priorities:</strong> Get data-driven recommendations on which skills to learn next</li>
+            </ul>
+            
+            <h3>How to Use Analytics</h3>
+            <ol>
+                <li><strong>Review Core Metrics:</strong> Start with Response Rate and Time to Response to understand baseline performance</li>
+                <li><strong>Analyze Match Scores:</strong> Check "Success by Match Score" to see if targeting higher matches improves results</li>
+                <li><strong>Check Timing:</strong> Review "Best Performing Day" to optimize when you submit applications</li>
+                <li><strong>Review Company Types:</strong> See if you perform better with startups or enterprises</li>
+                <li><strong>Identify Skill Gaps:</strong> Check "Skills Gap Analysis" to see top missing skills</li>
+                <li><strong>Set Learning Goals:</strong> Use "Learning Priorities" to focus skill development</li>
+                <li><strong>Track Trends:</strong> Review monthly to see how metrics change over time</li>
+            </ol>
+        </div>
+        
+        <!-- Daily Activities Page Section -->
+        <div class="section">
+            <h2>Daily Activities Page</h2>
+            <p><strong>URL:</strong> <a href="/daily-activities" class="url-link">/daily-activities</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Review daily or multiple times per week. Perfect for daily standups with yourself, understanding activity patterns, and ensuring consistent engagement with your pipeline.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Chronological Timeline</h4>
+                    <p>All activities (job applications and networking contacts) sorted by date and time. See everything that happened in order.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Collapsible Day Sections</h4>
+                    <p>Activities grouped by day with collapsible sections. Click day headers to expand/collapse. Each day shows activity count.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Activity Type Icons</h4>
+                    <p>💼 Blue "Job" badge for job application activities. 🤝 Green "Networking" badge for networking contact activities.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Activity Details</h4>
+                    <p>Each activity shows: Company name, Position/title, Activity type (Created, Status Changed, etc.), Current status badge, Timestamp (EST).</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Quick Navigation</h4>
+                    <p>Click on any activity to jump directly to the application or contact detail page for easy follow-up.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Activity Counts</h4>
+                    <p>Each day header shows the total number of activities. Quickly see which days were most active.</p>
+                </div>
+            </div>
+            
+            <h3>Why Use Daily Activities?</h3>
+            <ul>
+                <li><strong>Daily Review:</strong> Perfect for daily check-ins to see what happened recently</li>
+                <li><strong>Activity Tracking:</strong> Ensure you're maintaining consistent activity levels</li>
+                <li><strong>Pattern Recognition:</strong> See if you have activity patterns (e.g., more active on certain days)</li>
+                <li><strong>Nothing Missed:</strong> Chronological view ensures you don't miss any important updates</li>
+                <li><strong>Quick Navigation:</strong> Easy way to jump to recent applications or contacts</li>
+                <li><strong>Unified View:</strong> See both job and networking activities together in one timeline</li>
+            </ul>
+            
+            <h3>How to Use Daily Activities</h3>
+            <ol>
+                <li><strong>Daily Check-in:</strong> Review each morning or evening to see recent activity</li>
+                <li><strong>Expand Today/Yesterday:</strong> Check the most recent days to see what's new</li>
+                <li><strong>Review Activity Types:</strong> See mix of job applications vs networking activities</li>
+                <li><strong>Click for Details:</strong> Click any activity to view the full application or contact</li>
+                <li><strong>Identify Gaps:</strong> Notice if certain days have no activity - plan to fill gaps</li>
+                <li><strong>Track Consistency:</strong> Ensure you're maintaining regular activity patterns</li>
+            </ol>
+        </div>
+        
+        <!-- Integration Workflow -->
+        <div class="section">
+            <h2>How These Tools Work Together</h2>
+            
+            <div class="workflow-diagram">
+                <div class="workflow-step">
+                    <h4>Daily: Check Daily Activities</h4>
+                    <p>Start each day by reviewing Daily Activities page to see what happened yesterday and what needs attention today.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>Weekly: Review Reports</h4>
+                    <p>Once per week, check the Reports page to get overall pipeline status, review follow-up list, and check flagged items.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>Monthly: Analyze with Analytics</h4>
+                    <p>Monthly review of Analytics page to understand performance trends, identify skill gaps, and optimize strategy for the next month.</p>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>Pro Tip:</strong> Use Daily Activities for tactical daily management, Reports for weekly pipeline reviews, and Analytics for strategic monthly optimization. Each tool serves a different purpose in your job search management.</p>
+            </div>
+        </div>
+        
+        <!-- Related Guides -->
+        <div class="section">
+            <h2>Related Guides</h2>
+            <p>Explore other guides to learn more about using Hunter:</p>
+            <ul>
+                <li><a href="/how-to-hunter" class="guide-link">How to Hunter?</a> - Complete workflow guide for job hunting with Hunter</li>
+                <li><a href="/dashes-guide" class="guide-link">Dashes Guide</a> - Learn about all dashboard pages and when to use each</li>
+                <li><a href="/templating-guide" class="guide-link">Templating Guide</a> - Create and use templates for consistent communication</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashes Guide - Job Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Menu Script -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+        
+        .page-header {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .page-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-primary);
+            padding-bottom: var(--space-md);
+        }
+        
+        .section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul, .section ol {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul li, .section ol li {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+            border-radius: var(--radius-md);
+        }
+        
+        .info-box p {
+            margin-bottom: 0;
+            color: #1e40af;
+        }
+        
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+            border-radius: var(--radius-md);
+        }
+        
+        .warning-box p {
+            margin-bottom: 0;
+            color: #92400e;
+        }
+        
+        .workflow-diagram {
+            background: #f9fafb;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin: var(--space-lg) 0;
+            overflow-x: auto;
+        }
+        
+        .workflow-step {
+            background: var(--bg-primary);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+        
+        .workflow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: var(--accent-blue);
+        }
+        
+        .workflow-step:last-child::after {
+            display: none;
+        }
+        
+        .workflow-step h4 {
+            color: var(--accent-blue);
+            margin-top: 0;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-lg) 0;
+        }
+        
+        .dashboard-card {
+            background: #f9fafb;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+        }
+        
+        .dashboard-card h4 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: var(--space-sm);
+            font-size: 18px;
+        }
+        
+        .dashboard-card p {
+            margin-bottom: var(--space-sm);
+            font-size: 14px;
+        }
+        
+        .url-link {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: var(--space-sm);
+            transition: background 0.2s ease;
+        }
+        
+        .url-link:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .guide-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+        
+        .guide-link:hover {
+            border-bottom-color: var(--accent-blue);
+        }
+        
+        .tab-list {
+            list-style: none;
+            margin: var(--space-md) 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        
+        .tab-list li {
+            background: #f3f4f6;
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="page-header">
+            <h1>Dashes Guide</h1>
+            <p>
+                Learn about Hunter's dashboard pages and when to use each one. Each dashboard provides a different 
+                view of your job search pipeline and networking contacts to help you stay organized and focused.
+            </p>
+            <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
+                Related guides: <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
+                <a href="/tracking-guide" class="guide-link">Tracking Guide</a>
+            </p>
+        </div>
+        
+        <!-- Overview -->
+        <div class="section">
+            <h2>Dashboard Overview</h2>
+            <p>
+                Hunter provides four specialized dashboards, each designed for a specific purpose in managing your job search:
+            </p>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h4>📊 App Dash</h4>
+                    <p><strong>Purpose:</strong> Main dashboard for managing all job applications</p>
+                    <p><strong>Use When:</strong> Daily application management and status tracking</p>
+                    <a href="/dashboard" class="url-link">Open App Dash</a>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h4>👥 Network Dash</h4>
+                    <p><strong>Purpose:</strong> Manage all networking contacts and relationships</p>
+                    <p><strong>Use When:</strong> Tracking networking outreach and relationship management</p>
+                    <a href="/networking" class="url-link">Open Network Dash</a>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h4>📈 Progress Dash</h4>
+                    <p><strong>Purpose:</strong> Unified view of application progress and pipeline health</p>
+                    <p><strong>Use When:</strong> Weekly reviews and strategic pipeline assessment</p>
+                    <a href="/progress" class="url-link">Open Progress Dash</a>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h4>📦 Archive Dash</h4>
+                    <p><strong>Purpose:</strong> View archived/rejected applications for reference</p>
+                    <p><strong>Use When:</strong> Reviewing past applications or analyzing rejections</p>
+                    <a href="/archived" class="url-link">Open Archive Dash</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- App Dash Section -->
+        <div class="section">
+            <h2>App Dash (Application Dashboard)</h2>
+            <p><strong>URL:</strong> <a href="/dashboard" class="url-link">/dashboard</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> This is your primary dashboard for daily job application management. Use it daily to track application statuses, sort applications, view match scores, and navigate to application details.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <h4>Tabbed Interface</h4>
+            <p>The dashboard organizes applications into status tabs:</p>
+            <ul class="tab-list">
+                <li>Active (default) - All applications except rejected</li>
+                <li>All - Complete list of all applications</li>
+                <li>Pending - Applications not yet submitted</li>
+                <li>Applied - Submitted applications</li>
+                <li>Contacted - Applications where you've contacted someone</li>
+                <li>Hiring Mgr - Applications where you contacted a hiring manager</li>
+                <li>Interviewed - Applications in interview process</li>
+                <li>Offered - Applications with job offers</li>
+                <li>Rejected - Rejected applications</li>
+                <li>Accepted - Accepted offers</li>
+            </ul>
+            <p><strong>Dynamic Counts:</strong> Each tab shows the number of applications in parentheses (e.g., "Applied (15)")</p>
+            
+            <h4>Advanced Sorting</h4>
+            <p>Each tab has independent sorting options. Sort by:</p>
+            <ul>
+                <li><strong>Updated Timestamp:</strong> Newest/Oldest first - see most recently updated applications</li>
+                <li><strong>Applied Timestamp:</strong> Newest/Oldest first - see most recently applied</li>
+                <li><strong>Job Posted Date:</strong> Newest/Oldest first - prioritize fresher job postings</li>
+                <li><strong>Match Percentage:</strong> Highest/Lowest first - focus on best matches or address weaker ones</li>
+            </ul>
+            <p><strong>Independent Sorting:</strong> Each tab remembers its own sort preference. Sort "Applied" by Match % while keeping "Interviewed" sorted by Updated date.</p>
+            
+            <h4>Application Cards</h4>
+            <p>Each application is displayed as a card showing:</p>
+            <ul>
+                <li><strong>Company Name & Job Title</strong></li>
+                <li><strong>Match Score:</strong> Prominently displayed percentage (e.g., "85%")</li>
+                <li><strong>Status Badge:</strong> Color-coded pill showing current status</li>
+                <li><strong>Metadata:</strong> Applied Date, Posted Date (📋 icon), Last Updated Date</li>
+                <li><strong>View Summary Button:</strong> Click to open detailed application summary page</li>
+            </ul>
+            
+            <h4>Statistics Cards</h4>
+            <p>Top of dashboard shows quick stats:</p>
+            <ul>
+                <li>Total Applications</li>
+                <li>Pending Count</li>
+                <li>Applied Count</li>
+                <li>Interviewed Count</li>
+                <li>And more status-specific counts</li>
+            </ul>
+            
+            <h3>Why Use App Dash?</h3>
+            <ul>
+                <li><strong>Daily Management:</strong> Your go-to page for day-to-day application tracking</li>
+                <li><strong>Quick Navigation:</strong> Fast access to any application via organized tabs</li>
+                <li><strong>Status Focus:</strong> Quickly see what needs attention in each status category</li>
+                <li><strong>Match Score Visibility:</strong> Instantly see which applications have best match scores</li>
+                <li><strong>Flexible Sorting:</strong> Organize applications how you need them for different tasks</li>
+            </ul>
+            
+            <h3>How to Use App Dash</h3>
+            <ol>
+                <li><strong>Start with Active Tab:</strong> This shows all in-flight applications (everything except rejected) - your main working view</li>
+                <li><strong>Review Status Tabs:</strong> Check each status tab to see applications in different stages</li>
+                <li><strong>Use Sorting:</strong> Sort by Match % to prioritize high-scoring applications, or by Updated to see what needs attention</li>
+                <li><strong>Click Cards:</strong> Click "View Summary" on any card to see full application details</li>
+                <li><strong>Track Progress:</strong> Move applications through tabs as their status changes</li>
+            </ol>
+        </div>
+        
+        <!-- Network Dash Section -->
+        <div class="section">
+            <h2>Network Dash (Networking Dashboard)</h2>
+            <p><strong>URL:</strong> <a href="/networking" class="url-link">/networking</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Use daily or weekly to manage networking contacts, track relationship progress, identify contacts needing follow-up, and review networking pipeline.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <h4>Status Filters</h4>
+            <p>Filter contacts by their current relationship status:</p>
+            <ul>
+                <li><strong>To Research:</strong> Contacts identified but research not complete</li>
+                <li><strong>Contacted:</strong> Initial outreach sent (LinkedIn connection or email)</li>
+                <li><strong>In Conversation:</strong> Actively exchanging messages</li>
+                <li><strong>Meetings:</strong> Meetings scheduled or completed</li>
+                <li><strong>New Connection:</strong> Successful initial conversation complete</li>
+                <li><strong>Nurture:</strong> Ongoing relationship maintenance</li>
+                <li><strong>Referral Partner:</strong> Strong advocates and referral sources</li>
+                <li><strong>Cold/Archive:</strong> Inactive contacts</li>
+            </ul>
+            
+            <h4>Timing Filters</h4>
+            <p>Filter by days since last update to identify contacts needing attention:</p>
+            <ul>
+                <li><strong>All:</strong> Show all contacts regardless of timing</li>
+                <li><strong>Recent:</strong> Updated in last 7 days (green border)</li>
+                <li><strong>Needs Activity:</strong> 8-15 days since update (yellow border)</li>
+                <li><strong>Approaching:</strong> 15-30 days since update (yellow border)</li>
+                <li><strong>Overdue:</strong> 30-60 days since update (red border) - for "Contacted" status</li>
+                <li><strong>Nurture:</strong> 60-90 days (blue border) - scheduled future contact</li>
+                <li><strong>Cold:</strong> 90+ days (gray border) - for prospecting statuses</li>
+            </ul>
+            
+            <h4>Contact Tiles</h4>
+            <p>Each contact displayed as a tile showing:</p>
+            <ul>
+                <li><strong>Person Name & Company:</strong> Contact identification</li>
+                <li><strong>Job Title:</strong> Their current position</li>
+                <li><strong>Status Badge:</strong> Current relationship status</li>
+                <li><strong>Match Score:</strong> Skill overlap percentage with your resume</li>
+                <li><strong>Timing Indicator:</strong> Color-coded left border based on days since update</li>
+                <li><strong>Next Step:</strong> Suggested action based on status and timing</li>
+                <li><strong>Dates:</strong> Created date and last updated timestamp</li>
+                <li><strong>View Button:</strong> Click to open full contact summary page</li>
+            </ul>
+            
+            <h4>Create New Contact</h4>
+            <p>"New Contact" button to quickly add networking contacts from the dashboard.</p>
+            
+            <h3>Why Use Network Dash?</h3>
+            <ul>
+                <li><strong>Relationship Management:</strong> Track all professional relationships in one place</li>
+                <li><strong>Follow-up Tracking:</strong> Timing filters help identify contacts needing attention</li>
+                <li><strong>Status Overview:</strong> Quickly see where each relationship stands</li>
+                <li><strong>Pipeline Management:</strong> Manage networking pipeline similar to job application pipeline</li>
+                <li><strong>Color-Coded Urgency:</strong> Visual indicators show which contacts need immediate attention</li>
+            </ul>
+            
+            <h3>How to Use Network Dash</h3>
+            <ol>
+                <li><strong>Choose Status Filter:</strong> Select the relationship phase you want to focus on</li>
+                <li><strong>Apply Timing Filter:</strong> Use timing filters to find contacts needing follow-up</li>
+                <li><strong>Review Contact Tiles:</strong> Check match scores and next step suggestions</li>
+                <li><strong>Take Action:</strong> Click contacts with overdue timing or high match scores</li>
+                <li><strong>Update Status:</strong> Move contacts through status filters as relationships progress</li>
+                <li><strong>Create New Contacts:</strong> Use "New Contact" button to add contacts from company research</li>
+            </ol>
+        </div>
+        
+        <!-- Progress Dash Section -->
+        <div class="section">
+            <h2>Progress Dash (Progress Dashboard)</h2>
+            <p><strong>URL:</strong> <a href="/progress" class="url-link">/progress</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Use weekly or bi-weekly for strategic pipeline reviews. Perfect for assessing overall progress, identifying bottlenecks, understanding conversion rates between stages, and planning next steps.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <h4>Unified Progress View</h4>
+            <p>The Progress Dashboard provides a comprehensive view of your entire job search pipeline, showing:</p>
+            <ul>
+                <li><strong>Pipeline Stages:</strong> Visual representation of applications moving through stages</li>
+                <li><strong>Conversion Metrics:</strong> How many applications convert from each stage to the next</li>
+                <li><strong>Bottleneck Identification:</strong> See where applications tend to get stuck</li>
+                <li><strong>Progress Trends:</strong> How your pipeline health changes over time</li>
+            </ul>
+            
+            <h4>Stage Analysis</h4>
+            <p>Analyze progress through key stages:</p>
+            <ul>
+                <li><strong>Application Submission:</strong> How many applications you've submitted</li>
+                <li><strong>Response Rate:</strong> Percentage receiving company responses</li>
+                <li><strong>Interview Conversion:</strong> How many responses lead to interviews</li>
+                <li><strong>Offer Rate:</strong> Interview-to-offer conversion</li>
+            </ul>
+            
+            <h3>Why Use Progress Dash?</h3>
+            <ul>
+                <li><strong>Strategic Planning:</strong> Understand where to focus efforts based on conversion rates</li>
+                <li><strong>Bottleneck Detection:</strong> Identify stages where applications stall</li>
+                <li><strong>Progress Tracking:</strong> See overall health and momentum of your job search</li>
+                <li><strong>Goal Setting:</strong> Set realistic targets based on conversion metrics</li>
+                <li><strong>Weekly Reviews:</strong> Perfect for weekly pipeline health checks</li>
+            </ul>
+            
+            <h3>How to Use Progress Dash</h3>
+            <ol>
+                <li><strong>Review Pipeline Health:</strong> Check overall progress and conversion rates</li>
+                <li><strong>Identify Bottlenecks:</strong> Look for stages with low conversion rates</li>
+                <li><strong>Assess Trends:</strong> See if your pipeline is improving over time</li>
+                <li><strong>Plan Actions:</strong> Use insights to focus efforts on areas needing improvement</li>
+                <li><strong>Set Targets:</strong> Establish goals for each pipeline stage</li>
+            </ol>
+        </div>
+        
+        <!-- Archive Dash Section -->
+        <div class="section">
+            <h2>Archive Dash (Archived Dashboard)</h2>
+            <p><strong>URL:</strong> <a href="/archived" class="url-link">/archived</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Use occasionally to review rejected applications, analyze rejection patterns, or reference past applications. Helps keep main dashboard focused on active opportunities.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <h4>Rejected Applications</h4>
+            <p>The Archive Dashboard shows all applications with "Rejected" status, including:</p>
+            <ul>
+                <li><strong>Complete Application History:</strong> All rejected applications for reference</li>
+                <li><strong>Same Card View:</strong> Same application cards as main dashboard for consistency</li>
+                <li><strong>Full Details Access:</strong> Can still view full summaries and documents</li>
+                <li><strong>Search & Sort:</strong> Sort and organize archived applications like active ones</li>
+            </ul>
+            
+            <h3>Why Use Archive Dash?</h3>
+            <ul>
+                <li><strong>Keep Main Dashboard Clean:</strong> Separates active pipeline from closed opportunities</li>
+                <li><strong>Pattern Analysis:</strong> Review rejections to identify patterns or common issues</li>
+                <li><strong>Historical Reference:</strong> Access past applications and documents when needed</li>
+                <li><strong>Focus on Active:</strong> Main dashboard stays focused on opportunities still in play</li>
+                <li><strong>Learning Opportunities:</strong> Review rejections to improve future applications</li>
+            </ul>
+            
+            <h3>How to Use Archive Dash</h3>
+            <ol>
+                <li><strong>Review Rejections:</strong> Periodically check archived applications</li>
+                <li><strong>Analyze Patterns:</strong> Look for common themes in rejected applications</li>
+                <li><strong>Reference Past Work:</strong> Use archived applications as reference for similar roles</li>
+                <li><strong>Learn & Improve:</strong> Identify what might have led to rejections to improve future applications</li>
+            </ol>
+            
+            <div class="warning-box">
+                <p><strong>Note:</strong> Applications are automatically moved to Archive Dash when their status is set to "Rejected". You don't need to manually archive them.</p>
+            </div>
+        </div>
+        
+        <!-- Dashboard Workflow -->
+        <div class="section">
+            <h2>Dashboard Workflow</h2>
+            
+            <div class="workflow-diagram">
+                <div class="workflow-step">
+                    <h4>Daily: Use App Dash</h4>
+                    <p>Start each day with App Dash to see all active applications. Use the "Active" tab by default to focus on in-flight opportunities. Sort by Updated date to see what needs attention.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>Daily: Check Network Dash</h4>
+                    <p>Review Network Dash using timing filters to identify contacts needing follow-up. Focus on "Overdue" or "Needs Activity" contacts to maintain relationships.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>Weekly: Review Progress Dash</h4>
+                    <p>Weekly review of Progress Dash to assess pipeline health, identify bottlenecks, and plan strategic improvements for the coming week.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>Occasionally: Check Archive Dash</h4>
+                    <p>Periodically review Archive Dash to analyze rejection patterns and learn from past applications.</p>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>Pro Tip:</strong> Set App Dash as your browser homepage or bookmark it. Use Network Dash daily for relationship management. Reserve Progress Dash for strategic weekly reviews. Keep Archive Dash for occasional analysis.</p>
+            </div>
+        </div>
+        
+        <!-- Related Guides -->
+        <div class="section">
+            <h2>Related Guides</h2>
+            <p>Explore other guides to learn more about using Hunter:</p>
+            <ul>
+                <li><a href="/how-to-hunter" class="guide-link">How to Hunter?</a> - Complete workflow guide for job hunting with Hunter</li>
+                <li><a href="/tracking-guide" class="guide-link">Tracking Guide</a> - Learn about Reports, Analytics, and Daily Activities pages</li>
+                <li><a href="/templating-guide" class="guide-link">Templating Guide</a> - Create and use templates for consistent communication</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

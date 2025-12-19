@@ -1730,6 +1730,21 @@ def view_how_to_hunter():
     """View the How to Hunter guide page"""
     return render_template('how_to_hunter.html')
 
+@app.route('/tracking-guide')
+def view_tracking_guide():
+    """View the Tracking guide page"""
+    return render_template('tracking_guide.html')
+
+@app.route('/dashes-guide')
+def view_dashes_guide():
+    """View the Dashes guide page"""
+    return render_template('dashes_guide.html')
+
+@app.route('/templating-guide')
+def view_templating_guide():
+    """View the Templating guide page"""
+    return render_template('templating_guide.html')
+
 @app.route('/api/reports', methods=['GET'])
 def get_reports_data():
     """Get reports data for specified period"""
