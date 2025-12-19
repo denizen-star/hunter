@@ -1778,12 +1778,19 @@ def get_reports_data():
             activities = [a for a in activities if 'networking' in a.get('type', '')]
         # 'both' includes all activities
         
+        # Sort activities by timestamp to ensure chronological processing
+        # This ensures creations are processed before status changes for the same application
+        activities.sort(key=lambda a: a.get('timestamp', ''))
+        
         # Process activities for reports
         from collections import defaultdict
         applications_by_status = {}
         status_changes_by_status = {}
         daily_counts = defaultdict(lambda: defaultdict(int))
         status_changes_count = 0
+        
+        # Track final status per application/contact for the period (to avoid double-counting)
+        app_final_status = {}  # app_id -> final status in period
         
         # Track whether we're showing networking data (for grouping)
         is_networking_view = report_type in ['networking', 'both']
@@ -1819,7 +1826,20 @@ def get_reports_data():
                     else:
                         display_status = normalized_status
                     
-                    applications_by_status[display_status] = applications_by_status.get(display_status, 0) + 1
+                    # Track initial status for this application (will be overridden by status changes if any)
+                    app_id = activity.get('application_id') or activity.get('contact_id', '')
+                    if app_id:
+                        if app_id not in app_final_status:
+                            app_final_status[app_id] = display_status
+                    else:
+                        # No app_id, track it with a temporary ID based on company/position (fallback)
+                        # Use company and position as a fallback identifier
+                        company = activity.get('company') or activity.get('company_name', '')
+                        position = activity.get('job_title', '')
+                        if company and position:
+                            temp_id = f"{company}-{position}-{activity_date}"
+                            if temp_id not in app_final_status:
+                                app_final_status[temp_id] = display_status
                 
                 # Count daily (apply same normalization and grouping)
                 date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
@@ -1880,6 +1900,18 @@ def get_reports_data():
                     else:
                         display_status = normalized_status
                     
+                    # Track final status (status changes override initial status for the period)
+                    app_id = activity.get('application_id') or activity.get('contact_id', '')
+                    if app_id:
+                        app_final_status[app_id] = display_status
+                    else:
+                        # No app_id, track it with a temporary ID based on company/position (fallback)
+                        company = activity.get('company') or activity.get('company_name', '')
+                        position = activity.get('job_title', '')
+                        if company and position:
+                            temp_id = f"{company}-{position}-{activity_date}"
+                            app_final_status[temp_id] = display_status
+                    
                     status_changes_by_status[display_status] = status_changes_by_status.get(display_status, 0) + 1
                     status_changes_count += 1
                 
@@ -1911,6 +1943,11 @@ def get_reports_data():
                     display_status = normalized_status
                 
                 daily_counts[date_obj][display_status] += 1
+        
+        # Rebuild applications_by_status from final statuses (more accurate than incremental counting)
+        applications_by_status = {}
+        for app_id, final_status in app_final_status.items():
+            applications_by_status[final_status] = applications_by_status.get(final_status, 0) + 1
         
         # Calculate total count from activities
         total_count = len([a for a in activities if a.get('type') in ['job_application_created', 'networking_contact_created']])

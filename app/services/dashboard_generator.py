@@ -1090,7 +1090,7 @@ class DashboardGenerator:
             
             // Initialize with "all" filter active (for archived dashboard) or "active" (for main dashboard)
             const isArchived = {js_is_archived};
-            const defaultFilter = 'active';
+            const defaultFilter = isArchived ? 'all' : 'active';
             filterApplications(defaultFilter);
             
             // Initialize company search if archived
