@@ -5,7 +5,7 @@ Complete REST API documentation for Job Hunter.
 ## Base URL
 
 ```
-http://localhost:51002
+http://localhost:51003
 ```
 
 ## Authentication
@@ -373,7 +373,7 @@ GET /applications/Google-SeniorSoftwareEngineer/20251013153548-Summary-Google-Se
 import requests
 
 # Create application
-response = requests.post('http://localhost:51002/api/applications', json={
+response = requests.post('http://localhost:51003/api/applications', json={
     'company': 'Google',
     'job_title': 'Senior Software Engineer',
     'job_description': 'Full job description...',
@@ -390,7 +390,7 @@ if data['success']:
 
 ```bash
 # Create application
-curl -X POST http://localhost:51002/api/applications \
+curl -X POST http://localhost:51003/api/applications \
   -H "Content-Type: application/json" \
   -d '{
     "company": "Google",
@@ -400,7 +400,7 @@ curl -X POST http://localhost:51002/api/applications \
   }'
 
 # Update status
-curl -X PUT http://localhost:51002/api/applications/<APP_ID>/status \
+curl -X PUT http://localhost:51003/api/applications/<APP_ID>/status \
   -H "Content-Type: application/json" \
   -d '{
     "status": "applied",
@@ -408,14 +408,14 @@ curl -X PUT http://localhost:51002/api/applications/<APP_ID>/status \
   }'
 
 # List applications
-curl http://localhost:51002/api/applications
+curl http://localhost:51003/api/applications
 ```
 
 ### JavaScript (fetch)
 
 ```javascript
 // Create application
-const response = await fetch('http://localhost:51002/api/applications', {
+const response = await fetch('http://localhost:51003/api/applications', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'

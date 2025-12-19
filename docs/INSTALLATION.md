@@ -143,7 +143,7 @@ python -m app.web
 You should see:
 ```
 🚀 Starting Job Hunter Application...
-📱 Open http://localhost:51002 in your browser
+📱 Open http://localhost:51003 in your browser
 ✅ Ollama is connected
 📦 Available models: llama3:latest
 ```
@@ -151,14 +151,14 @@ You should see:
 ## Step 6: Access the Application
 
 Open your browser and go to:
-- **Main UI**: http://localhost:51002
-- **Dashboard**: http://localhost:51002/dashboard
+- **Main UI**: http://localhost:51003
+- **Dashboard**: http://localhost:51003/dashboard
 
 ## Next Steps
 
 1. **Set up your resume**: Click "📄 Manage Resume" and add your information
 2. **Create your first application**: Click "+ New Application"
-3. **Explore the dashboard**: See all your applications at http://localhost:51002/dashboard
+3. **Explore the dashboard**: See all your applications at http://localhost:51003/dashboard
 
 ## Troubleshooting Installation
 
@@ -183,7 +183,7 @@ python3 --version
 # If not, install Python 3.11+
 ```
 
-### Port 51002 Already in Use
+### Port 51003 Already in Use
 
 Edit `app/web.py` and change the port:
 

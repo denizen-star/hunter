@@ -1,5 +1,34 @@
 # Changelog
 
+## Version 11.0.0 - December 19, 2025
+
+### 🎨 Visual Enrichment & Icon System (MAJOR RELEASE)
+
+**Feature:** Comprehensive visual enhancements and icon system
+- **Comprehensive Icon System**: Every menu item, page header, and guide now features descriptive icons
+- **Hero Header Icons**: Large 80px × 80px icons in page headers for instant visual recognition
+- **Menu Icons**: All navigation items have unique icons for better visual scanning
+- **Sidebar Branding**: Hunter logo icon at bottom of sidebar with elegant tooltip
+- **Visual Layout Improvements**: Consistent icon sizing, flexbox layouts, improved spacing
+- **Enhanced Navigation**: Visual menu cues, hover effects, active state indicators
+- **Guide Page Enhancements**: All user guide pages feature prominent icons
+
+**Files Changed:**
+- `static/js/shared-menu.js` - Complete menu system overhaul with icons
+- `app/services/dashboard_generator.py` - Hero header icons for dashboards
+- Multiple template files - Icon integration across all pages
+- `static/images/icons/` - New directory with 17 application icons
+
+**Impact:** Transformed Hunter into a visually rich, icon-driven application with improved navigation and user experience
+
+**Note:** For detailed release notes, see [RELEASE_NOTES_v11.0.0.md](RELEASE_NOTES_v11.0.0.md)
+
+---
+
+**Note on Version History:** Versions 6.0.0 through 10.0.0 are not documented in this changelog. Release notes for versions 2.0.0, 2.4.0, 3.0.0, and 4.0.0 have been archived. See `docs/archive/` for historical release notes.
+
+---
+
 ## Version 5.0.0 - December 1, 2025
 
 ### 🚀 Performance & Accuracy Improvements (MAJOR RELEASE)
@@ -230,11 +259,11 @@ None currently identified.
 
 ## Deployment Notes
 
-**Port:** Application runs on port **51002**
+**Port:** Application runs on port **51003**
 **URLs:**
-- Main UI: http://localhost:51002
-- Dashboard: http://localhost:51002/dashboard
-- API: http://localhost:51002/api/*
+- Main UI: http://localhost:51003
+- Dashboard: http://localhost:51003/dashboard
+- API: http://localhost:51003/api/*
 
 **Requirements:**
 - Ollama running with llama3 model
@@ -249,7 +278,7 @@ No migration needed. All changes are backward compatible.
 
 **To get updates:**
 1. Restart the Flask application (Ctrl+C, then `python -m app.web`)
-2. Regenerate dashboard: `curl -X POST http://localhost:51002/api/dashboard/update`
+2. Regenerate dashboard: `curl -X POST http://localhost:51003/api/dashboard/update`
 
 That's it! All existing applications will work with updated code.
 

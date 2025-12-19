@@ -366,7 +366,7 @@ pip install -r requirements.txt --force-reinstall
 ---
 
 **Last Updated**: December 10, 2025  
-**Hunter Version**: 2.0.0+  
+**Hunter Version**: 11.0.0+  
 **Maintained By**: Hunter Documentation Team
 
 ---

@@ -33,7 +33,7 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
 - **[WINDOWS_TROUBLESHOOTING_FLOWCHART.md](WINDOWS_TROUBLESHOOTING_FLOWCHART.md)** - Windows troubleshooting decision tree
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-- **[RELEASE_NOTES_v2.0.0.md](RELEASE_NOTES_v2.0.0.md)** - Latest release notes
+- **[RELEASE_NOTES_v11.0.0.md](RELEASE_NOTES_v11.0.0.md)** - Latest release notes
 
 ### 🤝 **Development**
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
@@ -88,9 +88,10 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 
 ## 🔄 **Documentation Updates**
 
-This documentation is actively maintained and updated with each release. The current version reflects **Job Hunter v2.0.0** with enhanced dashboard features and improved matching system.
+This documentation is actively maintained and updated with each release. The current version reflects **Job Hunter v11.0.0** with comprehensive visual enhancements, icon system, and improved user experience.
 
 ### **Recent Updates**
+- ✅ Comprehensive icon system and visual enhancements (v11.0.0)
 - ✅ Enhanced dashboard with tabs and sorting (v2.0.0)
 - ✅ Two-phase matching system (v1.5.0)
 - ✅ Improved feature extraction and analysis
@@ -111,8 +112,8 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: October 21, 2025  
+**Version**: 11.0.0  
+**Last Updated**: December 19, 2025  
 **Author**: Kervin Leacock
 
 **Happy Job Hunting! 🎯**

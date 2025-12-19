@@ -1,4 +1,4 @@
 """Job Hunting Follow-Ups Application"""
 
-__version__ = "1.0.0"
+__version__ = "11.0.0"
 

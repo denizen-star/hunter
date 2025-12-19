@@ -11,7 +11,7 @@ Run these commands to check system status:
 curl http://localhost:11434/api/tags
 
 # Check if Job Hunter is running
-curl http://localhost:51002/api/check-ollama
+curl http://localhost:51003/api/check-ollama
 
 # Check if resume exists
 ls -la data/resumes/base_resume.md
@@ -91,8 +91,8 @@ python3 --version
 
 **Check for port conflicts:**
 ```bash
-lsof -i :51002  # macOS/Linux
-netstat -ano | findstr :51002  # Windows
+lsof -i :51003  # macOS/Linux
+netstat -ano | findstr :51003  # Windows
 
 # If port is in use, kill the process or change port in app/web.py
 ```
@@ -109,7 +109,7 @@ netstat -ano | findstr :51002  # Windows
 **Solutions:**
 
 **Create resume via web interface:**
-1. Go to http://localhost:51002
+1. Go to http://localhost:51003
 2. Click "📄 Manage Resume"
 3. Fill in your information
 4. Click "Save Resume"
@@ -218,7 +218,7 @@ ls -la data/applications/<Company>-<JobTitle>/
 
 **Regenerate documents:**
 ```bash
-curl -X POST http://localhost:51002/api/applications/<APP_ID>/regenerate
+curl -X POST http://localhost:51003/api/applications/<APP_ID>/regenerate
 ```
 
 **Check file permissions:**
@@ -228,7 +228,7 @@ chmod -R 755 data/applications/
 
 **Access directly:**
 ```
-http://localhost:51002/applications/<Company>-<JobTitle>/<Summary-File>.html
+http://localhost:51003/applications/<Company>-<JobTitle>/<Summary-File>.html
 ```
 
 ---
@@ -259,7 +259,7 @@ Look for errors in the terminal where Job Hunter is running.
 
 **Regenerate manually:**
 ```bash
-curl -X POST http://localhost:51002/api/applications/<APP_ID>/regenerate
+curl -X POST http://localhost:51003/api/applications/<APP_ID>/regenerate
 ```
 
 ---
@@ -275,13 +275,13 @@ curl -X POST http://localhost:51002/api/applications/<APP_ID>/regenerate
 
 **Force dashboard regeneration:**
 ```bash
-curl -X POST http://localhost:51002/api/dashboard/update
+curl -X POST http://localhost:51003/api/dashboard/update
 ```
 
 **Or from browser:**
 ```javascript
 // In browser console
-fetch('http://localhost:51002/api/dashboard/update', {method: 'POST'})
+fetch('http://localhost:51003/api/dashboard/update', {method: 'POST'})
 ```
 
 **Clear browser cache:**
@@ -425,7 +425,7 @@ Enable detailed logging:
 
 ```python
 # Edit app/web.py
-app.run(debug=True, port=51002, host='0.0.0.0')
+app.run(debug=True, port=51003, host='0.0.0.0')
 ```
 
 Check logs in terminal for detailed error messages.
@@ -454,7 +454,7 @@ ollama list
 curl http://localhost:11434/api/tags
 
 # Check Job Hunter
-curl http://localhost:51002/api/check-ollama
+curl http://localhost:51003/api/check-ollama
 
 # List files
 ls -la data/resumes/

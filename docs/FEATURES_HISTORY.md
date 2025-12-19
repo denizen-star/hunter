@@ -985,7 +985,7 @@ Both tabs now provide much more reliable and accurate information for job applic
 - Organized all documentation into docs/ folder with clear structure
 - Created comprehensive documentation index and navigation
 - Moved outdated documentation to docs/archive/ folder
-- Updated all documentation to reflect current v2.0.0 status
+- Updated all documentation to reflect current v11.0.0 status
 - Fixed reports functionality and raw data tab issues
 - Enhanced documentation with better organization and navigation
 - Created documentation overview and maintenance guidelines

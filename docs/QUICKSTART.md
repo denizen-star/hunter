@@ -68,7 +68,7 @@ python -m app.web
 
 ## Step 5: Open Browser
 
-Navigate to: **http://localhost:51002**
+Navigate to: **http://localhost:51003**
 
 ## Step 6: Set Up Your Resume (2 minutes)
 
@@ -102,15 +102,15 @@ Navigate to: **http://localhost:51002**
 
 ## Step 9: Check Dashboard
 
-Go to **http://localhost:51002/dashboard** to see all your applications!
+Go to **http://localhost:51003/dashboard** to see all your applications!
 
 ---
 
 ## Quick Reference
 
 ### URLs
-- **Main UI**: http://localhost:51002
-- **Dashboard**: http://localhost:51002/dashboard
+- **Main UI**: http://localhost:51003
+- **Dashboard**: http://localhost:51003/dashboard
 
 ### Common Commands
 
@@ -127,7 +127,7 @@ python -m app.web
 curl http://localhost:11434/api/tags
 
 # Check Job Hunter
-curl http://localhost:51002/api/check-ollama
+curl http://localhost:51003/api/check-ollama
 ```
 
 ### Troubleshooting Quick Fixes
@@ -138,13 +138,13 @@ ollama serve
 ```
 
 **Resume not found?**
-- Go to http://localhost:51002
+- Go to http://localhost:51003
 - Click "📄 Manage Resume"
 - Fill in and save
 
 **Port already in use?**
 - Edit `app/web.py` line 370
-- Change port from 51002 to another number
+- Change port from 51003 to another number
 
 ---
 

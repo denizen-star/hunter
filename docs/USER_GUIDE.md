@@ -28,7 +28,7 @@ Complete guide to using Job Hunter for managing your job applications.
    python -m app.web
    ```
 
-3. **Open your browser**: http://localhost:51002
+3. **Open your browser**: http://localhost:51003
 
 ### Main Interface
 
@@ -112,7 +112,7 @@ Brief summary of your experience and skills.
 
 1. Find a job posting you're interested in
 2. Copy the complete job description
-3. Go to http://localhost:51002
+3. Go to http://localhost:51003
 4. Fill in the application form:
    - **Company Name** (required)
    - **Job Title** (required)
@@ -213,7 +213,7 @@ Timeline of:
 
 ### Viewing All Applications
 
-Go to **http://localhost:51002/dashboard**
+Go to **http://localhost:51003/dashboard**
 
 You'll see:
 - Total applications count
@@ -233,7 +233,7 @@ Each card shows:
 Use the API to update status:
 
 ```bash
-curl -X PUT http://localhost:51002/api/applications/<APP_ID>/status \
+curl -X PUT http://localhost:51003/api/applications/<APP_ID>/status \
   -H "Content-Type: application/json" \
   -d '{
     "status": "applied",
@@ -316,7 +316,7 @@ Click "+ New Application" to return to main form
 If you have industry-specific resumes, you can set a custom resume per application:
 
 ```bash
-curl -X POST http://localhost:51002/api/applications/<APP_ID>/custom-resume \
+curl -X POST http://localhost:51003/api/applications/<APP_ID>/custom-resume \
   -H "Content-Type: application/json" \
   -d '{"resume_content": "Your custom resume..."}'
 ```
@@ -327,7 +327,7 @@ See [CUSTOM_RESUME_GUIDE.md](../CUSTOM_RESUME_GUIDE.md) for details.
 If you update your base resume and want to refresh an application:
 
 ```bash
-curl -X POST http://localhost:51002/api/applications/<APP_ID>/regenerate
+curl -X POST http://localhost:51003/api/applications/<APP_ID>/regenerate
 ```
 
 ## Tips for Success
@@ -352,8 +352,8 @@ curl -X POST http://localhost:51002/api/applications/<APP_ID>/regenerate
 ## Keyboard Shortcuts & Tips
 
 ### Quick Navigation
-- Main UI: http://localhost:51002
-- Dashboard: http://localhost:51002/dashboard
+- Main UI: http://localhost:51003
+- Dashboard: http://localhost:51003/dashboard
 - Check AI: Click "🔍 Check AI Status"
 
 ### Efficiency Tips

@@ -11,7 +11,7 @@ Your base resume is used for ALL applications by default. This is the resume you
 ### How to Set/Update Your Base Resume
 
 **Option 1: Via Web Interface**
-1. Go to http://localhost:51002
+1. Go to http://localhost:51003
 2. Click "📄 Manage Resume"
 3. Fill in your information
 4. Paste your resume content (Markdown format)
@@ -32,7 +32,7 @@ Use a custom resume when you want to use a different version of your resume for 
 
 **Via API:**
 ```bash
-curl -X POST http://localhost:51002/api/applications/<APP_ID>/custom-resume \
+curl -X POST http://localhost:51003/api/applications/<APP_ID>/custom-resume \
   -H "Content-Type: application/json" \
   -d '{
     "resume_content": "Your custom resume in markdown format here..."

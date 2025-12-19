@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 **Option A: Via Web Interface (Recommended)**
 1. Start the app: `./run.sh`
-2. Open http://localhost:3000
+2. Open http://localhost:51003
 3. Click "📄 Manage Resume"
 4. Paste your resume content
 5. Click "Save Resume"
@@ -57,7 +57,7 @@ source venv/bin/activate
 python -m app.web
 ```
 
-Open **http://localhost:3000** in your browser!
+Open **http://localhost:51003** in your browser!
 
 ## Step 5: Create Your First Application
 
@@ -70,7 +70,7 @@ Open **http://localhost:3000** in your browser!
 
 ## View Your Dashboard
 
-Go to **http://localhost:3000/dashboard** to see all your applications!
+Go to **http://localhost:51003/dashboard** to see all your applications!
 
 ---
 
@@ -83,7 +83,7 @@ ollama serve
 ```
 
 ### "Resume not found"
-1. Go to http://localhost:3000
+1. Go to http://localhost:51003
 2. Click "📄 Manage Resume"
 3. Fill in your info and save
 
