@@ -62,6 +62,25 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
+        .page-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .page-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .page-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
         .page-header h1 {
             font-size: 32px;
             font-weight: 700;
@@ -231,11 +250,16 @@
 <body>
     <div class="main-wrapper">
         <div class="page-header">
-            <h1>Tracking Guide</h1>
-            <p>
-                Learn how to use Hunter's tracking features to monitor your job search progress, analyze performance metrics, 
-                and stay on top of your application pipeline. This guide covers Reports, Analytics, and Daily Activities pages.
-            </p>
+            <div class="page-header-content-wrapper">
+                <img src="/static/images/icons/TrackingGuide.jpg" alt="" class="page-header-icon">
+                <div class="page-header-text">
+                    <h1>Tracking Guide</h1>
+                    <p>
+                        Learn how to use Hunter's tracking features to monitor your job search progress, analyze performance metrics, 
+                        and stay on top of your application pipeline. This guide covers Reports, Analytics, and Daily Activities pages.
+                    </p>
+                </div>
+            </div>
             <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
                 Related guides: <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
                 <a href="/dashes-guide" class="guide-link">Dashes Guide</a>

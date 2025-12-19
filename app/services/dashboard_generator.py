@@ -267,6 +267,25 @@ class DashboardGenerator:
             text-align: left;
         }}
         
+        .hero-header-icon {{
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }}
+        
+        .hero-header-content-wrapper {{
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }}
+        
+        .hero-header-text {{
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }}
+        
         .hero-header-subtitle {{
             font-size: 14px;
             color: #6b7280;
@@ -881,9 +900,12 @@ class DashboardGenerator:
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
-            <div>
-                <h1>{header_title}</h1>
-                <p class="hero-header-subtitle">{header_subtitle}</p>
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/{'ArchiveDash.png' if is_archived else 'AppDash.jpg'}" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>{header_title}</h1>
+                    <p class="hero-header-subtitle">{header_subtitle}</p>
+                </div>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
                 {nav_link_html}
@@ -1943,6 +1965,28 @@ class DashboardGenerator:
             color: #1f2937;
             margin: 0;
             text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        
+        .hero-header-icon {{
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }}
+        
+        .hero-header-content-wrapper {{
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }}
+        
+        .hero-header-text {{
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }}
         
         .hero-header-subtitle {{
@@ -2402,7 +2446,12 @@ class DashboardGenerator:
     <div class="hero-header">
         <div class="hero-header-top">
             <div class="back-link-spacer"></div>
-            <h1>Progress Dashboard - {total} Applications</h1>
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/ProgressDash.png" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>Progress Dashboard - {total} Applications</h1>
+                </div>
+            </div>
         </div>
         </div>
     

@@ -13,27 +13,27 @@
 
     // Menu configuration
     const mainItems = [
-        { href: '/dashboard', label: 'App Dash' },
-        { href: '/networking', label: 'Network Dash' },
-        { href: '/progress', label: 'Progress Dash' },
-        { href: '/reports', label: 'Reports' },
-        { href: '/analytics', label: 'Analytics' },
-        { href: '/daily-activities', label: 'Daily Activities' }
+        { href: '/dashboard', label: 'App Dash', icon: 'AppDash.jpg' },
+        { href: '/networking', label: 'Network Dash', icon: 'NetworkDash.jpg' },
+        { href: '/progress', label: 'Progress Dash', icon: 'ProgressDash.png' },
+        { href: '/reports', label: 'Reports', icon: 'Reports.png' },
+        { href: '/analytics', label: 'Analytics', icon: 'Analytics.png' },
+        { href: '/daily-activities', label: 'Daily Activities', icon: 'DailyActivities.jpg' }
     ];
 
     const adminItems = [
-        { href: '/templates', label: 'Templates' },
-        { href: '#', label: 'Check AI Status', onclick: 'showAIStatus(); return false;' },
-        { href: '/archived', label: 'Archive Dash' },
-        { href: '/new-application?resume=true', label: 'Manage Resume' }
+        { href: '/templates', label: 'Templates', icon: 'Templates.png' },
+        { href: '#', label: 'Check AI Status', onclick: 'showAIStatus(); return false;', icon: 'CheckAiStatus.png' },
+        { href: '/archived', label: 'Archive Dash', icon: 'ArchiveDash.png' },
+        { href: '/new-application?resume=true', label: 'Manage Resume', icon: 'ManageResume.png' }
     ];
 
     const helpItems = [
-        { href: '/how-to-hunter', label: 'How to Hunter?' },
-        { href: '/tracking-guide', label: 'Tracking' },
-        { href: '/dashes-guide', label: 'Dashes' },
-        { href: '/templating-guide', label: 'Templating' },
-        { href: '/rewards', label: 'Rewards' }
+        { href: '/how-to-hunter', label: 'How to Hunter?', icon: 'HowtoHunter.jpg' },
+        { href: '/tracking-guide', label: 'Tracking', icon: 'TrackingGuide.jpg' },
+        { href: '/dashes-guide', label: 'Dashes', icon: 'DashesGuide.jpg' },
+        { href: '/templating-guide', label: 'Templating', icon: 'TemplatingGuide.jpg' },
+        { href: '/rewards', label: 'Rewards', icon: 'Rewards.png' }
     ];
 
     // Determine active menu item based on current path
@@ -69,9 +69,6 @@
         
         let menuHTML = `
         <div class="sidebar">
-            <div class="sidebar-header">
-                <h3>Hunter</h3>
-            </div>
             <ul class="sidebar-menu sidebar-menu-main">
         `;
 
@@ -81,10 +78,11 @@
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            const iconHTML = item.icon ? `<img src="/static/images/icons/${item.icon}" alt="" class="nav-icon">` : '';
             
             menuHTML += `
                 <li>
-                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${item.label}</a>
+                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
                 </li>
             `;
         });
@@ -107,10 +105,11 @@
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            const iconHTML = item.icon ? `<img src="/static/images/icons/${item.icon}" alt="" class="nav-icon">` : '';
             
             menuHTML += `
                 <li>
-                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${item.label}</a>
+                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
                 </li>
             `;
         });
@@ -134,16 +133,21 @@
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            const iconHTML = item.icon ? `<img src="/static/images/icons/${item.icon}" alt="" class="nav-icon">` : '';
             
             menuHTML += `
                 <li>
-                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${item.label}</a>
+                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
                 </li>
             `;
         });
 
         menuHTML += `
                 </ul>
+            </div>
+            
+            <div class="sidebar-header">
+                <img src="/static/images/icons/Hunter.png" alt="Hunter" class="sidebar-header-icon" title="Hunter">
             </div>
         </div>
         `;
@@ -172,16 +176,41 @@
         
         .sidebar-header {
             padding: 16px 24px;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 16px;
+            border-top: 1px solid #e5e7eb;
+            margin-top: auto;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .sidebar-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .sidebar-header-icon::after {
+            content: 'Hunter';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(31, 41, 55, 0.1);
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: -1;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         .sidebar-header h3 {
-            color: #1f2937;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
+            display: none;
         }
         
         .sidebar-menu {
@@ -200,7 +229,8 @@
         }
         
         .sidebar-menu a {
-            display: block;
+            display: flex;
+            align-items: center;
             padding: 12px 24px;
             color: #6b7280;
             text-decoration: none;
@@ -210,10 +240,24 @@
             font-size: 14px;
         }
         
+        .sidebar-menu a .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            object-fit: contain;
+            flex-shrink: 0;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        
         .sidebar-menu a:hover {
             background: #f9fafb;
             color: #1f2937;
             border-left-color: #3b82f6;
+        }
+        
+        .sidebar-menu a:hover .nav-icon {
+            opacity: 1;
         }
         
         .sidebar-menu a.active {
@@ -222,10 +266,13 @@
             border-left-color: #3b82f6;
             font-weight: 600;
         }
+        
+        .sidebar-menu a.active .nav-icon {
+            opacity: 1;
+        }
 
         .sidebar-admin-section,
         .sidebar-help-section {
-            margin-top: auto;
             padding-top: 24px;
             border-top: 1px solid #e5e7eb;
             flex-shrink: 0;
@@ -316,16 +363,16 @@
             existingSidebar.remove();
         }
 
-        // Inject CSS
+        // Inject CSS first (before menu HTML) to prevent flickering
         if (!document.getElementById('shared-menu-styles')) {
             document.head.insertAdjacentHTML('beforeend', generateMenuCSS());
         }
 
+        // Add class to body for margin adjustment BEFORE injecting menu (prevents flicker)
+        document.body.classList.add('with-sidebar');
+
         // Inject menu HTML at the beginning of body
         document.body.insertAdjacentHTML('afterbegin', generateMenuHTML());
-        
-        // Add class to body for margin adjustment (fallback)
-        document.body.classList.add('with-sidebar');
 
         // Set initial collapsed state for sections
         const adminHeader = document.querySelector('#admin-section').previousElementSibling;
@@ -354,6 +401,15 @@
                     alert('Error checking AI status');
                 }
             };
+        }
+    }
+
+    // Inject CSS immediately to prevent flickering (before DOM is ready)
+    if (document.head && !document.getElementById('shared-menu-styles')) {
+        document.head.insertAdjacentHTML('beforeend', generateMenuCSS());
+        // Add body class immediately if body exists to prevent layout shift
+        if (document.body) {
+            document.body.classList.add('with-sidebar');
         }
     }
 

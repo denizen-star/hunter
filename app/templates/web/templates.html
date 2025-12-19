@@ -99,6 +99,25 @@
             color: #2563eb;
         }
         
+        .hero-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .hero-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
         .hero-header h1 {
             font-size: 24px;
             font-weight: 700;
@@ -557,8 +576,13 @@
                 </svg>
                 Back to Dashboard
             </a>
-            <h1>Templates</h1>
-            <p class="hero-header-subtitle">Manage your communication standards.</p>
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/Templates.png" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>Templates</h1>
+                    <p class="hero-header-subtitle">Manage your communication standards.</p>
+                </div>
+            </div>
         </div>
     </div>
     

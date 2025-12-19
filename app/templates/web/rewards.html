@@ -60,6 +60,25 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
+        .page-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .page-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .page-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
         .page-header h1 {
             font-size: 32px;
             font-weight: 700;
@@ -252,14 +271,18 @@
     <div class="main-wrapper">
         <div class="page-header">
             <img src="/static/images/rewards-badges-overview.png" alt="Networking Rewards Badges" style="max-width: 100%; height: auto; margin-bottom: 24px; border-radius: 8px;">
-            <h1>Networking Rewards</h1>
-            <p>
-                The Networking Rewards System gamifies your networking efforts by awarding badges and points 
-                based on your progress with each contact. As you advance contacts through different relationship 
-                stages, you earn badges that reflect your networking achievements. Points are cumulative and 
-                help you track your overall networking success.
-            </p>
-        </div>
+            <div class="page-header-content-wrapper">
+                <img src="/static/images/icons/Rewards.png" alt="" class="page-header-icon">
+                <div class="page-header-text">
+                    <h1>Networking Rewards</h1>
+                    <p>
+                        The Networking Rewards System gamifies your networking efforts by awarding badges and points 
+                        based on your progress with each contact. As you advance contacts through different relationship 
+                        stages, you earn badges that reflect your networking achievements. Points are cumulative and 
+                        help you track your overall networking success.
+                    </p>
+                </div>
+            </div>
         
         <div class="section">
             <h2>How It Works</h2>

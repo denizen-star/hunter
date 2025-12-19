@@ -61,6 +61,25 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
+        .page-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .page-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .page-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
         .page-header h1 {
             font-size: 32px;
             font-weight: 700;
@@ -367,11 +386,16 @@
 <body>
     <div class="main-wrapper">
         <div class="page-header">
-            <h1>How to Hunter?</h1>
-            <p>
-                Complete guide to using Hunter for your job hunting workflow. Follow the three-phase process 
-                to streamline your applications, networking, and outreach.
-            </p>
+            <div class="page-header-content-wrapper">
+                <img src="/static/images/icons/HowtoHunter.jpg" alt="" class="page-header-icon">
+                <div class="page-header-text">
+                    <h1>How to Hunter?</h1>
+                    <p>
+                        Complete guide to using Hunter for your job hunting workflow. Follow the three-phase process 
+                        to streamline your applications, networking, and outreach.
+                    </p>
+                </div>
+            </div>
             <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
                 Related guides: <a href="/tracking-guide" class="guide-link">Tracking</a> | 
                 <a href="/dashes-guide" class="guide-link">Dashes</a> | 

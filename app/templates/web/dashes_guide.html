@@ -62,6 +62,25 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
+        .page-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .page-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .page-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
         .page-header h1 {
             font-size: 32px;
             font-weight: 700;
@@ -263,11 +282,16 @@
 <body>
     <div class="main-wrapper">
         <div class="page-header">
-            <h1>Dashes Guide</h1>
-            <p>
-                Learn about Hunter's dashboard pages and when to use each one. Each dashboard provides a different 
-                view of your job search pipeline and networking contacts to help you stay organized and focused.
-            </p>
+            <div class="page-header-content-wrapper">
+                <img src="/static/images/icons/DashesGuide.jpg" alt="" class="page-header-icon">
+                <div class="page-header-text">
+                    <h1>Dashes Guide</h1>
+                    <p>
+                        Learn about Hunter's dashboard pages and when to use each one. Each dashboard provides a different 
+                        view of your job search pipeline and networking contacts to help you stay organized and focused.
+                    </p>
+                </div>
+            </div>
             <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
                 Related guides: <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
                 <a href="/tracking-guide" class="guide-link">Tracking Guide</a>
