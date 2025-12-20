@@ -462,6 +462,35 @@
             white-space: nowrap;
         }
         
+        /* Tag classes for status pills */
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .tag-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .tag-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag-gray {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .tag-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
         /* Tabs Container */
         .tabs-container {
             background: #ffffff;
@@ -802,12 +831,40 @@
             margin-bottom: -1px; 
             font-weight: var(--font-semibold);
         }
-        .tab-content { 
-            padding: var(--space-xl); 
-            display: none; 
+        .tab-content {
+            padding: var(--space-xl);
+            display: none;
+            background: #ffffff;
         }
+        
+        .tabs-container .tab-content {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        #timeline.tab-content {
+            padding: var(--space-lg) var(--space-xl);
+            background: #ffffff;
+        }
+        
+        #timeline.tab-content h2 {
+            margin-top: 0;
+            margin-bottom: var(--space-sm);
+            font-size: var(--font-xl);
+        }
+        
+        #timeline.tab-content > p {
+            margin-bottom: var(--space-md);
+            margin-top: 0;
+        }
+        
+        #timeline-container {
+            margin-top: 0;
+            padding-top: 0;
+        }
+        
         .tab-content.active { 
-            display: block; 
+            display: block !important; 
         }
         .tab-content pre { 
             background: var(--bg-secondary); 
@@ -1301,13 +1358,52 @@
                         <span class="match-score-label">Match Score</span>
                     </span>
                 </div>
-                <div class="app-meta" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                <div class="app-meta" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
                     <div class="meta-item">
-                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        <span>Boston, MA</span></div><div class="meta-item"><svg...salary range for this role is $214,300 - $321,500. For sales roles, the range provided is the role’s On Target Earnings ("OTE") range, meaning that the range includes both the sales commissions/sales bonuses target and annual base salary for the role. This salary range may be inclusive of several career levels at Fintech A co and will be narrowed during the interview process based on a number of factors, including the candidate’s experience, qualifications, and location. Applicants interested in this role and who are not located in the US may request the annual salary range for their location during the interview process.
+                        <span>On-site (Boston, MA)</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>$125K/yr - $155K/yr</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Applied: Dec 12</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Posted: 3 weeks ago</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span>Updated: Dec 19</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Contact #: 3</span>
+                    </div>
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #9ca3af;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        <a href="#" style="color: #3b82f6; text-decoration: none;">View Job Posting</a>
+                    </div>
+                </div>
+            </div> for this role is $214,300 - $321,500. For sales roles, the range provided is the role’s On Target Earnings ("OTE") range, meaning that the range includes both the sales commissions/sales bonuses target and annual base salary for the role. This salary range may be inclusive of several career levels at Fintech A co and will be narrowed during the interview process based on a number of factors, including the candidate’s experience, qualifications, and location. Applicants interested in this role and who are not located in the US may request the annual salary range for their location during the interview process.
 
 Additional benefits for this role may include: equity, company bonus or sales commissions/bonuses; 401(k) plan; medical, dental, and vision benefits; and wellness stipends.
 
@@ -1340,12 +1436,13 @@ Candidate education level
         <div class="tabs-container">
             <div class="tabs-header">
                 <div class="tabs">
-                    <button class="tab active" onclick="showTab(this, 'summary')">Summary</button>
+                    <button class="tab active" onclick="showTab(this, 'summary')">JD</button>
+                    <button class="tab" onclick="showTab(this, 'raw-entry')">Raw Entry</button>
                     <button class="tab" onclick="showTab(this, 'skills')">Skills</button>
                     <button class="tab" onclick="showTab(this, 'research')">Research</button>
                     <button class="tab" onclick="showTab(this, 'qualifications')">Qualifications</button>
                     <button class="tab" onclick="showTab(this, 'cover-letter')">Cover Letter</button>
-                    <button class="tab" onclick="showTab(this, 'resume')">Resume</button>
+                    <button class="tab" onclick="showTab(this, 'resume')">Custom Resume</button>
                     <button class="tab" onclick="showTab(this, 'rewards')">Rewards</button>
                     <button class="tab" onclick="showTab(this, 'networking')">Networking</button>
                     <button class="tab" onclick="showTab(this, 'updates')">Updates</button>
@@ -1355,9 +1452,8 @@ Candidate education level
         </div>
         
         <div id="summary" class="tab-content active">
-            <h2>Application Summary</h2>
+            <h2>Job Description</h2>
             <div class="content-section">
-                <h3>Job Description</h3>
                 <pre style="white-space: pre-wrap; font-family: inherit; background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; overflow-x: auto;">This is a demo application for the Senior Software Engineer position at Capital Finance Firm. The job description and application details are shown in the other tabs.
 
 Key highlights:
@@ -1370,8 +1466,13 @@ Key highlights:
 Use the tabs above to explore Skills, Research, Qualifications, Cover Letter, Resume, and other details for this application.</pre>
             </div>
         </div>
-        
-
+            
+        <div id="raw-entry" class="tab-content">
+            <h2>Raw Entry</h2>
+            <div class="content-section">
+                <pre style="white-space: pre-wrap; font-family: inherit; background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; overflow-x: auto;">Raw job description entry as originally submitted.</pre>
+            </div>
+        </div>
         
         <div id="skills" class="tab-content">
 
@@ -1429,41 +1530,55 @@ Use the tabs above to explore Skills, Research, Qualifications, Cover Letter, Re
         
 </div>
         
-        <div id="research" class="tab-content"><h2>Company Research</h2><div class="content-section"># Company Research: Fintech A co
-
-**Company Website:** https://www.fintechaco.com
-
-## Company Overview & Mission
-- Fintech A co is a leading provider of innovative solutions in the technology sector, serving clients across multiple industries
-- The company focuses on delivering cutting-edge products and services that drive digital transformation
-- With a strong commitment to innovation and customer success, Fintech A co has established itself as a trusted partner for businesses seeking technological advancement
-
-## Recent News & Developments
-- Recent expansion into new market segments demonstrates the company's growth trajectory
-- Strategic partnerships with industry leaders have strengthened their market position
-- Investment in research and development continues to drive product innovation
-
-## Company Culture & Values
-- Emphasis on collaboration, innovation, and professional development
-- Commitment to diversity and inclusion in the workplace
-- Strong focus on work-life balance and employee well-being
-
-## Industry Position
-- Recognized as a key player in the technology services sector
-- Strong financial performance and market presence
-- Active in industry associations and thought leadership initiatives
-
-## Technology Stack & Innovation
-- Utilizes modern technology platforms and development methodologies
-- Invests heavily in emerging technologies and digital solutions
-- Maintains a forward-thinking approach to technology adoption</div>
-        </div>
+            <div id="research" class="tab-content">
+                <h2>Company Research</h2>
+                <div class="content-section" style="padding: 20px;">
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: #1f2937;">Company Research: Fintech A co</h3>
+                    
+                    <p style="margin-bottom: 16px; font-size: 14px; color: #374151;">
+                        <strong>Company Website:</strong> <a href="https://www.fintechaco.com" target="_blank" style="color: #3b82f6; text-decoration: none;">https://www.fintechaco.com</a>
+                    </p>
+                    
+                    <h4 style="font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; color: #1f2937;">Company Overview & Mission</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px; color: #374151; line-height: 1.6;">
+                        <li style="margin-bottom: 8px;">Fintech A co is a leading provider of innovative solutions in the technology sector, serving clients across multiple industries</li>
+                        <li style="margin-bottom: 8px;">The company focuses on delivering cutting-edge products and services that drive digital transformation</li>
+                        <li style="margin-bottom: 8px;">With a strong commitment to innovation and customer success, Fintech A co has established itself as a trusted partner for businesses seeking technological advancement</li>
+                    </ul>
+                    
+                    <h4 style="font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; color: #1f2937;">Recent News & Developments</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px; color: #374151; line-height: 1.6;">
+                        <li style="margin-bottom: 8px;">Recent expansion into new market segments demonstrates the company's growth trajectory</li>
+                        <li style="margin-bottom: 8px;">Strategic partnerships with industry leaders have strengthened their market position</li>
+                        <li style="margin-bottom: 8px;">Investment in research and development continues to drive product innovation</li>
+                    </ul>
+                    
+                    <h4 style="font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; color: #1f2937;">Company Culture & Values</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px; color: #374151; line-height: 1.6;">
+                        <li style="margin-bottom: 8px;">Emphasis on collaboration, innovation, and professional development</li>
+                        <li style="margin-bottom: 8px;">Commitment to diversity and inclusion in the workplace</li>
+                        <li style="margin-bottom: 8px;">Strong focus on work-life balance and employee well-being</li>
+                    </ul>
+                    
+                    <h4 style="font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; color: #1f2937;">Industry Position</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px; color: #374151; line-height: 1.6;">
+                        <li style="margin-bottom: 8px;">Recognized as a key player in the technology services sector</li>
+                        <li style="margin-bottom: 8px;">Strong financial performance and market presence</li>
+                        <li style="margin-bottom: 8px;">Active in industry associations and thought leadership initiatives</li>
+                    </ul>
+                    
+                    <h4 style="font-size: 18px; font-weight: 600; margin-top: 24px; margin-bottom: 12px; color: #1f2937;">Technology Stack & Innovation</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px; color: #374151; line-height: 1.6;">
+                        <li style="margin-bottom: 8px;">Utilizes modern technology platforms and development methodologies</li>
+                        <li style="margin-bottom: 8px;">Invests heavily in emerging technologies and digital solutions</li>
+                        <li style="margin-bottom: 8px;">Maintains a forward-thinking approach to technology adoption</li>
+                    </ul>
+                </div>
+            </div>
         
             </div>
         
-</div>
-        
-        <div id="qualifications" class="tab-content">
+            <div id="qualifications" class="tab-content">
 
             <h2>Qualifications Analysis</h2>
             <pre>
@@ -2152,61 +2267,16 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                 
                 <div id="status-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
             </div>
-                </div>
-            </div>
         </div>
         
-        <div id="timeline" class="tab-content"><div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-date">Dec 19, 2025 03:00 PM EST</div>
-                <div class="timeline-content">
-                    <div class="timeline-status status-interview-notes">interview notes</div>
-                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
-                        Completed technical interview. Discussion went well. They asked about my experience with microservices architecture.
-                    </div>
-                </div>
+        <div id="timeline" class="tab-content">
+            <h2>Application Timeline</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Complete history of this application:</p>
+            <div class="timeline" id="timeline-container">
+                <p style="color: #6b7280; font-size: 14px;">Loading timeline...</p>
             </div>
-        
-            <div class="timeline-item">
-                <div class="timeline-date">Dec 17, 2025 10:00 AM EST</div>
-                <div class="timeline-content">
-                    <div class="timeline-status status-scheduled-interview">scheduled interview</div>
-                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
-                        Technical interview scheduled for this week.
-                    </div>
-                </div>
             </div>
-        
-            <div class="timeline-item">
-                <div class="timeline-date">Dec 15, 2025 11:30 AM EST</div>
-                <div class="timeline-content">
-                    <div class="timeline-status status-company-response">company response</div>
-                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
-                        Received call from recruiter. They are interested in moving forward.
-                    </div>
-                </div>
-            </div>
-        
-            <div class="timeline-item">
-                <div class="timeline-date">Dec 13, 2025 09:00 AM EST</div>
-                <div class="timeline-content">
-                    <div class="timeline-status status-applied">applied</div>
-                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
-                        Application submitted.
-                    </div>
-                </div>
-            </div>
-        
-            <div class="timeline-item">
-                <div class="timeline-date">Dec 12, 2025 10:00 AM EST</div>
-                <div class="timeline-content">
-                    <div class="timeline-status status-pending">pending</div>
-                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
-                        Application created.
-                    </div>
-                </div>
-            </div>
-        </div></div></div>
+        </div>
         </div>
     </div>
     
@@ -2215,6 +2285,167 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
         const APPLICATION_ID = '20251209115631-Fintech A co-Software Engineer';
         const COMPANY = 'Fintech A co';
         const JOB_TITLE = 'Software Engineer';
+        
+        // Timeline loading functions
+        function getTimelineKey(company) {
+            // Map company names to timeline keys in DEMO_TIMELINES
+            const companyMap = {
+                'Capital Finance Firm': 'capital-finance-firm-001',
+                'Handy Repairs': 'handy-repairs-001',
+                'Hitech co': 'hitech-co-001',
+                'Superstars': 'superstars-001',
+                'Mortgage Co': 'mortgage-co-001',
+                'Fintech A co': 'fintech-a-co-001',
+                'Fintect B Co': 'fintect-b-co-001',
+                'Global a co': 'global-a-co-001',
+                'JustTest': 'justtest-001',
+                'Medical Network Co': 'medical-network-co-001'
+            };
+            
+            // Try exact match first
+            if (companyMap[company]) {
+                return companyMap[company];
+            }
+            
+            // Try case-insensitive match
+            const lowerCompany = company.toLowerCase();
+            for (const [key, value] of Object.entries(companyMap)) {
+                if (key.toLowerCase() === lowerCompany) {
+                    return value;
+                }
+            }
+            
+            // Try partial match
+            for (const [key, value] of Object.entries(companyMap)) {
+                if (lowerCompany.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerCompany)) {
+                    return value;
+                }
+            }
+            
+            return null;
+        }
+        
+        function formatTimelineDate(datetimeStr) {
+            try {
+                const date = new Date(datetimeStr);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const month = months[date.getMonth()];
+                const day = date.getDate();
+                const year = date.getFullYear();
+                
+                let hours = date.getHours();
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                const timeStr = `${hours}:${minutes} ${ampm} EST`;
+                
+                return `${month} ${day}, ${year} ${timeStr}`;
+            } catch (e) {
+                return datetimeStr;
+            }
+        }
+        
+        function getTagClass(status) {
+            const statusLower = status.toLowerCase();
+            if (statusLower.includes('interview')) {
+                return 'tag-green';
+            } else if (statusLower.includes('rejected')) {
+                return 'tag-red';
+            } else if (statusLower.includes('offered') || statusLower.includes('accepted')) {
+                return 'tag-green';
+            } else if (statusLower.includes('thank')) {
+                return 'tag-gray';
+            } else {
+                return 'tag-blue';
+            }
+        }
+        
+        function anonymizeNotes(notes) {
+            if (!notes) return '';
+            
+            // If notes contain HTML tags, it's already formatted - return as-is
+            if (notes.includes('<') && notes.includes('>')) {
+                return notes;
+            }
+            
+            // Remove or anonymize company names, personal names, and specific details
+            let anonymized = notes;
+            
+            // Remove specific company references (keep generic terms)
+            anonymized = anonymized.replace(/\b[A-Z][a-z]+ (Finance|Tech|Co|Corp|Inc|LLC|Ltd)\b/g, 'the company');
+            anonymized = anonymized.replace(/\b[A-Z][a-z]+ [A-Z][a-z]+ (Manager|Director|Recruiter|HR)\b/g, 'a representative');
+            anonymized = anonymized.replace(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, (match) => {
+                // Keep common words, anonymize names
+                const commonWords = ['Phone', 'Email', 'Technical', 'Application', 'Interview'];
+                if (commonWords.some(word => match.includes(word))) {
+                    return match;
+                }
+                return 'a contact';
+            });
+            
+            // Remove specific email addresses
+            anonymized = anonymized.replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, 'contact@company.com');
+            
+            // Remove specific phone numbers
+            anonymized = anonymized.replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, 'phone number');
+            
+            return anonymized;
+        }
+        
+        function loadTimeline() {
+            const container = document.getElementById('timeline-container');
+            if (!container) return;
+            
+            // Wait for DEMO_DATA.timelines to be available
+            if (typeof window.DEMO_DATA === 'undefined' || !window.DEMO_DATA || !window.DEMO_DATA.timelines) {
+                setTimeout(loadTimeline, 100);
+                return;
+            }
+            
+            const DEMO_TIMELINES = window.DEMO_DATA.timelines;
+            const timelineKey = getTimelineKey(COMPANY);
+            if (!timelineKey || !DEMO_TIMELINES[timelineKey]) {
+                container.innerHTML = '<p style="color: #6b7280; font-size: 14px;">No timeline entries yet.</p>';
+                return;
+            }
+            
+            const timelineItems = DEMO_TIMELINES[timelineKey];
+            if (!timelineItems || timelineItems.length === 0) {
+                container.innerHTML = '<p style="color: #6b7280; font-size: 14px;">No timeline entries yet.</p>';
+                return;
+            }
+            
+            // Sort by datetime descending (newest first)
+            const sortedItems = [...timelineItems].sort((a, b) => {
+                return new Date(b.datetime) - new Date(a.datetime);
+            });
+            
+            let timelineHTML = '';
+            sortedItems.forEach(item => {
+                const tagClass = getTagClass(item.status);
+                const icon = item.type === 'networking' ? '🤝' : '💼';
+                const statusDisplay = item.status;
+                const dateStr = formatTimelineDate(item.datetime);
+                const statusPill = `<span class="tag ${tagClass}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">${icon} ${statusDisplay}</span>`;
+                
+                let notesHTML = '';
+                if (item.notes) {
+                    const anonymizedNotes = anonymizeNotes(item.notes);
+                    notesHTML = `<div style="margin-top: 8px; font-size: 14px; color: #000; margin-left: 0; padding-left: 0;"><div style="margin-bottom: 4px; margin-left: 0; padding-left: 0;"><strong>Notes:</strong></div><div class="timeline-notes-content" style="margin-left: 0; padding-left: 0;">${anonymizedNotes}</div></div>`;
+                }
+                
+                timelineHTML += `
+                    <div class="timeline-item">
+                        <div style="margin-bottom: 8px; white-space: nowrap;">
+                            ${statusPill} - <span style="color: #666; font-size: 14px;">${dateStr}</span>
+                        </div>
+                        ${notesHTML}
+                    </div>`;
+            });
+            
+            container.innerHTML = timelineHTML;
+        }
         
         // Initialize Quill editor
         let quillEditor = null;
@@ -2238,6 +2469,9 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
         }
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Load timeline
+            loadTimeline();
+            
             statusNotesCharacterCount = document.getElementById('status_notes_character_count');
             if (typeof Quill !== 'undefined') {
                 console.log('✅ Quill.js loaded successfully');
@@ -2468,8 +2702,9 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                     opt.textContent = label;
                     selector.appendChild(opt);
                 }
+                */
             } catch (e) {
-                console.warn('Failed to load templates', e);
+                console.warn('Failed to load templates (demo mode - expected)', e);
             }
         }
         
@@ -2611,9 +2846,17 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
             // Add active class to clicked tab
             button.classList.add('active');
             
-            // Load networking contacts when networking tab is shown
+            // Load data when specific tabs are shown
             if (tabId === 'networking' && typeof window.loadNetworkingContacts === 'function') {
-                setTimeout(window.loadNetworkingContacts, 100);
+                setTimeout(() => {
+                    window.loadNetworkingContacts();
+                }, 100);
+            }
+            
+            if (tabId === 'timeline') {
+                setTimeout(() => {
+                    loadTimeline();
+                }, 100);
             }
         }
         
