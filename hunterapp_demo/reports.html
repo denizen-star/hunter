@@ -803,7 +803,6 @@
                 Back to Dashboard
             </a>
             <div class="hero-header-content-wrapper">
-                <img src="/static/images/icons/Reports.png" alt="" class="hero-header-icon">
                 <div class="hero-header-text">
                     <h1>Reports</h1>
                     <p class="hero-header-subtitle">Track your progress by status.</p>
@@ -1094,6 +1093,64 @@
             loadReportsData();
         }
         
+        // Helper function to determine if a status is networking-related
+        function isNetworkingStatus(status) {
+            if (!status) return false;
+            const statusLower = status.toLowerCase().trim();
+            
+            // Clear networking status indicators
+            const clearNetworkingIndicators = [
+                'contacted sent', 'contacted---sent', 'ready to contact', 'to research', 'found contact',
+                'sent linkedin connection', 'sent email', 'connection accepted',
+                'in conversation', 'conversation', 'action pending', 'new connection',
+                'cold', 'archive', 'dormant', 'inactive', 'research', 'sent',
+                'meeting scheduled'
+            ];
+            
+            // Check for clear networking indicators first
+            if (clearNetworkingIndicators.some(indicator => statusLower.includes(indicator))) {
+                return true;
+            }
+            
+            // Job application statuses that should NOT be grouped as networking
+            const jobStatuses = [
+                'applied', 'rejected', 'accepted', 'offered',
+                'interview notes', 'interview follow up', 'scheduled interview',
+                'company response', 'contacted hiring manager', 'contacted someone'
+            ];
+            
+            // If it's a clear job status, it's not networking
+            if (jobStatuses.some(jobStatus => statusLower.includes(jobStatus))) {
+                return false;
+            }
+            
+            // Ambiguous: "Contacted" alone could be job or networking
+            if (statusLower === 'contacted') {
+                return true; // Likely networking if just "contacted"
+            }
+            
+            return false;
+        }
+        
+        // Filter data based on currentType (jobs, networking, both)
+        function filterDataByType(data, type) {
+            if (type === 'both') {
+                return data; // Return all data
+            }
+            
+            const isNetworking = type === 'networking';
+            const filtered = {};
+            
+            Object.keys(data).forEach(status => {
+                const statusIsNetworking = isNetworkingStatus(status);
+                if ((isNetworking && statusIsNetworking) || (!isNetworking && !statusIsNetworking)) {
+                    filtered[status] = data[status];
+                }
+            });
+            
+            return filtered;
+        }
+        
         // Load reports data
         async function loadReportsData() {
             try {
@@ -1125,10 +1182,28 @@
                 // Use real reports data if available, otherwise fall back to demo data
                 let data;
                 if (typeof window.DEMO_REPORTS_DATA !== 'undefined' && window.DEMO_REPORTS_DATA.success) {
+                    console.log('Using DEMO_REPORTS_DATA');
                     data = window.DEMO_REPORTS_DATA;
                 } else if (typeof window.DEMO_DATA !== 'undefined') {
+                    console.log('Falling back to DEMO_DATA');
                     // Fallback to demo data
                     const allApps = [...window.DEMO_DATA.applications, ...window.DEMO_DATA.archived];
+                    
+                    // Generate cumulative_activities_by_status from daily_activities_by_status if missing
+                    let cumulativeData = window.DEMO_DATA.cumulativeActivitiesByStatus || {};
+                    if (!cumulativeData || Object.keys(cumulativeData).length === 0) {
+                        const dailyData = window.DEMO_DATA.dailyActivitiesByStatus || {};
+                        cumulativeData = {};
+                        Object.keys(dailyData).forEach(status => {
+                            const dailyStatusData = dailyData[status] || [];
+                            let cumulative = 0;
+                            cumulativeData[status] = dailyStatusData.map(item => {
+                                cumulative += item.count || 0;
+                                return { date: item.date, count: cumulative };
+                            });
+                        });
+                    }
+                    
                     data = {
                         success: true,
                         stats: window.DEMO_DATA.stats || {},
@@ -1139,7 +1214,7 @@
                         applications_by_status: window.DEMO_DATA.applicationsByStatus || {},
                         status_changes: window.DEMO_DATA.statusChanges || {},
                         daily_activities_by_status: window.DEMO_DATA.dailyActivitiesByStatus || {},
-                        cumulative_activities_by_status: window.DEMO_DATA.cumulativeActivitiesByStatus || {},
+                        cumulative_activities_by_status: cumulativeData,
                         summary: {
                             total_applications: allApps.length,
                             new_applications: 2,
@@ -1153,116 +1228,248 @@
                         }
                     };
                 } else {
+                    console.error('No data available - DEMO_DATA and DEMO_REPORTS_DATA both undefined');
                     data = { success: false, error: 'No data available' };
                 }
+                
+                // Process data (continue with existing logic)
+                if (data && data.success) {
+                    reportsData = data;
                     
-                    // Process data (continue with existing logic)
-                    if (data.success) {
-                        reportsData = data;
-                        // Update charts with hardcoded demo data
-                        updateApplicationsByStatusChart(data.applications_by_status);
-                        updateStatusChangesChart(data.status_changes);
-                        updateDailyActivitiesChart(data.daily_activities_by_status);
-                        updateCumulativeActivitiesChart(data.cumulative_activities_by_status);
-                        updateFollowupList(data.followup_applications || []);
-                        updateFlaggedList(data.flagged_applications || []);
-                        // Update stats summary
-                        updateStatsSummary(data.summary);
+                    // Filter data based on currentType (jobs, networking, both)
+                    const applicationsByStatus = filterDataByType(data.applications_by_status || {}, currentType);
+                    const statusChanges = filterDataByType(data.status_changes || {}, currentType);
+                    const dailyActivities = filterDataByType(data.daily_activities_by_status || {}, currentType);
+                    const cumulativeActivities = filterDataByType(data.cumulative_activities_by_status || {}, currentType);
+                    
+                    // Recalculate summary based on filtered data
+                    const summary = { ...data.summary };
+                    if (currentType === 'jobs') {
+                        // For jobs, focus on job-related metrics
+                        summary.total_contact_count = 0; // Hide contact count for jobs view
+                    } else if (currentType === 'networking') {
+                        // For networking, focus on networking metrics
+                        summary.total_applications = 0; // Hide application count for networking view
+                        summary.active_applications = 0;
+                        summary.archived_applications = 0;
+                    }
+                    // For "both", keep all metrics
+                    
+                    console.log('Updating charts with filtered data (type:', currentType, '):', {
+                        applicationsByStatus: Object.keys(applicationsByStatus).length,
+                        statusChanges: Object.keys(statusChanges).length,
+                        dailyActivities: Object.keys(dailyActivities).length,
+                        cumulativeActivities: Object.keys(cumulativeActivities).length
+                    });
+                    
+                    // Update charts with filtered data
+                    if (Object.keys(applicationsByStatus).length > 0) {
+                        updateApplicationsByStatusChart(applicationsByStatus);
+                    } else {
+                        console.warn('No applications_by_status data available after filtering for type:', currentType);
+                        // Clear the chart and show empty state
+                        const canvas = document.getElementById('applicationsByStatusChart');
+                        if (canvas && window.applicationsByStatusChart) {
+                            window.applicationsByStatusChart.destroy();
+                            window.applicationsByStatusChart = null;
+                        }
+                        const textFallback = document.getElementById('applicationsByStatusData');
+                        if (textFallback) {
+                            textFallback.style.display = 'block';
+                            textFallback.innerHTML = '<div style="text-align: center; padding: 20px; color: #6b7280;">No data available for selected filter.</div>';
+                        }
+                    }
+                    
+                    if (Object.keys(statusChanges).length > 0) {
+                        updateStatusChangesChart(statusChanges);
+                    } else {
+                        console.warn('No status_changes data available after filtering for type:', currentType);
+                        // Clear the chart and show empty state
+                        const canvas = document.getElementById('statusChangesChart');
+                        if (canvas && window.statusChangesChart) {
+                            window.statusChangesChart.destroy();
+                            window.statusChangesChart = null;
+                        }
+                        const textFallback = document.getElementById('statusChangesData');
+                        if (textFallback) {
+                            textFallback.style.display = 'block';
+                            textFallback.innerHTML = '<div style="text-align: center; padding: 20px; color: #6b7280;">No data available for selected filter.</div>';
+                        }
+                    }
+                    
+                    if (Object.keys(dailyActivities).length > 0) {
+                        updateDailyActivitiesChart(dailyActivities);
+                    } else {
+                        console.warn('No daily_activities_by_status data available after filtering for type:', currentType);
+                        // Clear the chart
+                        const canvas = document.getElementById('dailyActivitiesChart');
+                        if (canvas && window.dailyActivitiesChart) {
+                            window.dailyActivitiesChart.destroy();
+                            window.dailyActivitiesChart = null;
+                        }
+                    }
+                    
+                    if (Object.keys(cumulativeActivities).length > 0) {
+                        updateCumulativeActivitiesChart(cumulativeActivities);
+                    } else {
+                        console.warn('No cumulative_activities_by_status data available after filtering for type:', currentType);
+                        // Clear the chart
+                        const canvas = document.getElementById('cumulativeActivitiesChart');
+                        if (canvas && window.cumulativeActivitiesChart) {
+                            window.cumulativeActivitiesChart.destroy();
+                            window.cumulativeActivitiesChart = null;
+                        }
+                    }
+                    
+                    updateFollowupList(data.followup_applications || []);
+                    updateFlaggedList(data.flagged_applications || []);
+                    
+                    // Update stats summary
+                    updateStatsSummary(summary);
+                } else {
+                    console.error('Failed to load reports data:', data?.error || 'Unknown error');
+                    // Show error message to user
+                    const statsSummary = document.getElementById('stats-summary');
+                    if (statsSummary) {
+                        statsSummary.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">⚠️</div>
+                                <div class="empty-state-text">Failed to load reports data. Please refresh the page.</div>
+                            </div>
+                        `;
                     }
                 }
             } catch (error) {
                 console.error('Error loading reports data:', error);
+                // Show error message to user
+                const statsSummary = document.getElementById('stats-summary');
+                if (statsSummary) {
+                    statsSummary.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⚠️</div>
+                            <div class="empty-state-text">Error loading reports: ${error.message}</div>
+                        </div>
+                    `;
+                }
             }
         }
         
         // Update stats summary
         function updateStatsSummary(summary) {
+            // Add null checks and default values
+            if (!summary) {
+                console.warn('Summary data is null or undefined');
+                summary = {};
+            }
+            
+            const statsSummaryEl = document.getElementById('stats-summary');
+            if (!statsSummaryEl) {
+                console.error('Stats summary element not found');
+                return;
+            }
+            
+            // Provide default values for all summary properties
+            const totalApplications = summary.total_applications || 0;
+            const newApplications = summary.new_applications || 0;
+            const activeApplications = summary.active_applications || 0;
+            const statusChanges = summary.status_changes || 0;
+            const totalContactCount = summary.total_contact_count || 0;
+            const rejected = summary.rejected || 0;
+            const followupNeeded = summary.followup_needed || 0;
+            const totalActions = summary.total_actions || 0;
+            
             const summaryHtml = `
                 <div class="stats-grid">
                     <div class="stat-item">
-                        <div class="stat-number">${summary.total_applications}</div>
+                        <div class="stat-number">${totalApplications}</div>
                         <div class="stat-label">Total Applications</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.new_applications}</div>
+                        <div class="stat-number">${newApplications}</div>
                         <div class="stat-label">New Applications</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.active_applications}</div>
+                        <div class="stat-number">${activeApplications}</div>
                         <div class="stat-label">Active Applications</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.status_changes}</div>
+                        <div class="stat-number">${statusChanges}</div>
                         <div class="stat-label">Status Changes</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.total_contact_count}</div>
+                        <div class="stat-number">${totalContactCount}</div>
                         <div class="stat-label">Total Contacts</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.rejected}</div>
+                        <div class="stat-number">${rejected}</div>
                         <div class="stat-label">Rejected</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.followup_needed}</div>
+                        <div class="stat-number">${followupNeeded}</div>
                         <div class="stat-label">Need Follow-up</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">${summary.total_actions}</div>
+                        <div class="stat-number">${totalActions}</div>
                         <div class="stat-label">Actions</div>
                     </div>
                 </div>
             `;
-            document.getElementById('stats-summary').innerHTML = summaryHtml;
+            statsSummaryEl.innerHTML = summaryHtml;
         }
         
         // Update applications by status chart
         function updateApplicationsByStatusChart(data) {
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded');
-                showDataAsText('applicationsByStatusData', data);
-                return;
-            }
-            
-            const canvas = document.getElementById('applicationsByStatusChart');
-            if (!canvas) {
-                console.error('Canvas element not found');
-                return;
-            }
-            const ctx = canvas.getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (window.applicationsByStatusChart && typeof window.applicationsByStatusChart.destroy === 'function') {
-                window.applicationsByStatusChart.destroy();
-            }
-            
-            // Format labels to title case and make them shorter
-            const labelMapping = {
-                'applied': 'Applied',
-                'pending': 'Pending',
-                'rejected': 'Rejected',
-                'contacted someone': 'Contacted',
-                'contacted hiring manager': 'Company Response',
-                'company response': 'Company Response',
-                'scheduled interview': 'Scheduled Interview',
-                'interviewed': 'Interview Notes',
-                'interview notes': 'Interview Notes',
-                'interview - follow up': 'Interview Follow Up',
-                'offered': 'Offered',
-                'accepted': 'Accepted',
-                'withdrawn': 'Withdrawn'
-            };
-            
-            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
-            const values = Object.values(data);
-            const colors = [
-                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
-                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
-            ];
-            
-            console.log('Applications by Status Chart Data:', { labels, values, data });
-            
             try {
+                // Validate data
+                if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+                    console.warn('Invalid or empty data for Applications by Status Chart:', data);
+                    return;
+                }
+                
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded');
+                    showDataAsText('applicationsByStatusData', data);
+                    return;
+                }
+                
+                const canvas = document.getElementById('applicationsByStatusChart');
+                if (!canvas) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (window.applicationsByStatusChart && typeof window.applicationsByStatusChart.destroy === 'function') {
+                    window.applicationsByStatusChart.destroy();
+                }
+                
+                // Format labels to title case and make them shorter
+                const labelMapping = {
+                    'applied': 'Applied',
+                    'pending': 'Pending',
+                    'rejected': 'Rejected',
+                    'contacted someone': 'Contacted',
+                    'contacted hiring manager': 'Company Response',
+                    'company response': 'Company Response',
+                    'scheduled interview': 'Scheduled Interview',
+                    'interviewed': 'Interview Notes',
+                    'interview notes': 'Interview Notes',
+                    'interview - follow up': 'Interview Follow Up',
+                    'offered': 'Offered',
+                    'accepted': 'Accepted',
+                    'withdrawn': 'Withdrawn'
+                };
+                
+                const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
+                const values = Object.values(data).map(val => typeof val === 'number' ? val : 0);
+                const colors = [
+                    '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                    '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
+                ];
+                
+                console.log('Applications by Status Chart Data:', { labels, values, data });
+                
                 window.applicationsByStatusChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1295,7 +1502,10 @@
                 });
                 console.log('Applications by Status Chart created successfully');
                 // Hide text fallback immediately when chart works
-                document.getElementById('applicationsByStatusData').style.display = 'none';
+                const textFallback = document.getElementById('applicationsByStatusData');
+                if (textFallback) {
+                    textFallback.style.display = 'none';
+                }
             } catch (error) {
                 console.error('Error creating Applications by Status Chart:', error);
                 // Show text fallback
@@ -1305,51 +1515,57 @@
         
         // Update status changes chart
         function updateStatusChangesChart(data) {
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded');
-                showDataAsText('statusChangesData', data);
-                return;
-            }
-            
-            const canvas = document.getElementById('statusChangesChart');
-            if (!canvas) {
-                console.error('Canvas element not found');
-                return;
-            }
-            const ctx = canvas.getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (window.statusChangesChart && typeof window.statusChangesChart.destroy === 'function') {
-                window.statusChangesChart.destroy();
-            }
-            
-            // Format labels to title case and make them shorter
-            const labelMapping = {
-                'applied': 'Applied',
-                'pending': 'Pending',
-                'rejected': 'Rejected',
-                'contacted someone': 'Contacted',
-                'contacted hiring manager': 'Company Response',
-                'company response': 'Company Response',
-                'scheduled interview': 'Scheduled Interview',
-                'interviewed': 'Interview Notes',
-                'interview notes': 'Interview Notes',
-                'interview - follow up': 'Interview Follow Up',
-                'offered': 'Offered',
-                'accepted': 'Accepted',
-                'withdrawn': 'Withdrawn'
-            };
-            
-            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
-            const values = Object.values(data);
-            const colors = [
-                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
-                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
-            ];
-            
-            console.log('Status Changes Chart Data:', { labels, values, data });
-            
             try {
+                // Validate data
+                if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+                    console.warn('Invalid or empty data for Status Changes Chart:', data);
+                    return;
+                }
+                
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded');
+                    showDataAsText('statusChangesData', data);
+                    return;
+                }
+                
+                const canvas = document.getElementById('statusChangesChart');
+                if (!canvas) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (window.statusChangesChart && typeof window.statusChangesChart.destroy === 'function') {
+                    window.statusChangesChart.destroy();
+                }
+                
+                // Format labels to title case and make them shorter
+                const labelMapping = {
+                    'applied': 'Applied',
+                    'pending': 'Pending',
+                    'rejected': 'Rejected',
+                    'contacted someone': 'Contacted',
+                    'contacted hiring manager': 'Company Response',
+                    'company response': 'Company Response',
+                    'scheduled interview': 'Scheduled Interview',
+                    'interviewed': 'Interview Notes',
+                    'interview notes': 'Interview Notes',
+                    'interview - follow up': 'Interview Follow Up',
+                    'offered': 'Offered',
+                    'accepted': 'Accepted',
+                    'withdrawn': 'Withdrawn'
+                };
+                
+                const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
+                const values = Object.values(data).map(val => typeof val === 'number' ? val : 0);
+                const colors = [
+                    '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                    '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
+                ];
+                
+                console.log('Status Changes Chart Data:', { labels, values, data });
+                
                 window.statusChangesChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1382,7 +1598,10 @@
                 });
                 console.log('Status Changes Chart created successfully');
                 // Hide text fallback immediately when chart works
-                document.getElementById('statusChangesData').style.display = 'none';
+                const textFallback = document.getElementById('statusChangesData');
+                if (textFallback) {
+                    textFallback.style.display = 'none';
+                }
             } catch (error) {
                 console.error('Error creating Status Changes Chart:', error);
                 // Show text fallback
@@ -1392,69 +1611,78 @@
         
         // Update daily activities chart
         function updateDailyActivitiesChart(data) {
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded');
-                return;
-            }
-            
-            const canvas = document.getElementById('dailyActivitiesChart');
-            if (!canvas) {
-                console.error('Canvas element not found');
-                return;
-            }
-            const ctx = canvas.getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (window.dailyActivitiesChart && typeof window.dailyActivitiesChart.destroy === 'function') {
-                window.dailyActivitiesChart.destroy();
-            }
-            
-            // Check if data is empty
-            if (!data || Object.keys(data).length === 0) {
-                console.log('No daily activities data to display');
-                return;
-            }
-            
-            // Get status color mapping
-            const statusColors = {
-                'pending': '#fbbf24',
-                'applied': '#3b82f6',
-                'contacted someone': '#6b7280',
-                'company response': '#3b82f6',
-                'scheduled interview': '#fbbf24',
-                'interview notes': '#10b981',
-                'interview - follow up': '#ec4899',
-                'offered': '#10b981',
-                'rejected': '#ef4444',
-                'accepted': '#10b981'
-            };
-            
-            // Prepare datasets
-            const datasets = [];
-            const allDates = [];
-            
-            // Get all dates from first status (they should all have same dates)
-            const statuses = Object.keys(data);
-            if (statuses.length > 0 && data[statuses[0]]) {
-                allDates.push(...data[statuses[0]].map(d => d.date));
-            }
-            
-            // Create a dataset for each status
-            statuses.forEach(status => {
-                const statusData = data[status] || [];
-                const counts = statusData.map(d => d.count);
-                
-                datasets.push({
-                    label: status.charAt(0).toUpperCase() + status.slice(1),
-                    data: counts,
-                    borderColor: statusColors[status] || '#6b7280',
-                    backgroundColor: 'transparent',
-                    tension: 0.4,
-                    borderWidth: 2
-                });
-            });
-            
             try {
+                // Validate data
+                if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+                    console.warn('Invalid or empty data for Daily Activities Chart:', data);
+                    return;
+                }
+                
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded');
+                    return;
+                }
+                
+                const canvas = document.getElementById('dailyActivitiesChart');
+                if (!canvas) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (window.dailyActivitiesChart && typeof window.dailyActivitiesChart.destroy === 'function') {
+                    window.dailyActivitiesChart.destroy();
+                }
+                
+                // Get status color mapping
+                const statusColors = {
+                    'pending': '#fbbf24',
+                    'applied': '#3b82f6',
+                    'contacted someone': '#6b7280',
+                    'company response': '#3b82f6',
+                    'scheduled interview': '#fbbf24',
+                    'interview notes': '#10b981',
+                    'interview - follow up': '#ec4899',
+                    'offered': '#10b981',
+                    'rejected': '#ef4444',
+                    'accepted': '#10b981'
+                };
+                
+                // Prepare datasets
+                const datasets = [];
+                const allDates = [];
+                
+                // Get all dates from first status (they should all have same dates)
+                const statuses = Object.keys(data);
+                if (statuses.length > 0 && data[statuses[0]] && Array.isArray(data[statuses[0]])) {
+                    allDates.push(...data[statuses[0]].map(d => d && d.date ? d.date : null).filter(Boolean));
+                }
+                
+                // Create a dataset for each status
+                statuses.forEach(status => {
+                    const statusData = data[status] || [];
+                    if (!Array.isArray(statusData)) {
+                        console.warn(`Status data for ${status} is not an array:`, statusData);
+                        return;
+                    }
+                    const counts = statusData.map(d => (d && typeof d.count === 'number') ? d.count : 0);
+                    
+                    datasets.push({
+                        label: status.charAt(0).toUpperCase() + status.slice(1),
+                        data: counts,
+                        borderColor: statusColors[status] || '#6b7280',
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        borderWidth: 2
+                    });
+                });
+                
+                if (datasets.length === 0 || allDates.length === 0) {
+                    console.warn('No valid datasets or dates for Daily Activities Chart');
+                    return;
+                }
+                
                 window.dailyActivitiesChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -1511,69 +1739,78 @@
         
         // Update cumulative activities chart
         function updateCumulativeActivitiesChart(data) {
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded');
-                return;
-            }
-            
-            const canvas = document.getElementById('cumulativeActivitiesChart');
-            if (!canvas) {
-                console.error('Canvas element not found');
-                return;
-            }
-            const ctx = canvas.getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (window.cumulativeActivitiesChart && typeof window.cumulativeActivitiesChart.destroy === 'function') {
-                window.cumulativeActivitiesChart.destroy();
-            }
-            
-            // Check if data is empty
-            if (!data || Object.keys(data).length === 0) {
-                console.log('No cumulative activities data to display');
-                return;
-            }
-            
-            // Get status color mapping
-            const statusColors = {
-                'pending': '#fbbf24',
-                'applied': '#3b82f6',
-                'contacted someone': '#6b7280',
-                'company response': '#3b82f6',
-                'scheduled interview': '#fbbf24',
-                'interview notes': '#10b981',
-                'interview - follow up': '#ec4899',
-                'offered': '#10b981',
-                'rejected': '#ef4444',
-                'accepted': '#10b981'
-            };
-            
-            // Prepare datasets
-            const datasets = [];
-            const allDates = [];
-            
-            // Get all dates from first status (they should all have same dates)
-            const statuses = Object.keys(data);
-            if (statuses.length > 0 && data[statuses[0]]) {
-                allDates.push(...data[statuses[0]].map(d => d.date));
-            }
-            
-            // Create a dataset for each status
-            statuses.forEach(status => {
-                const statusData = data[status] || [];
-                const counts = statusData.map(d => d.count);
-                
-                datasets.push({
-                    label: status.charAt(0).toUpperCase() + status.slice(1),
-                    data: counts,
-                    borderColor: statusColors[status] || '#6b7280',
-                    backgroundColor: 'transparent',
-                    tension: 0.4,
-                    borderWidth: 2
-                });
-            });
-            
             try {
+                // Validate data
+                if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+                    console.warn('Invalid or empty data for Cumulative Activities Chart:', data);
+                    return;
+                }
+                
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js not loaded');
+                    return;
+                }
+                
+                const canvas = document.getElementById('cumulativeActivitiesChart');
+                if (!canvas) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (window.cumulativeActivitiesChart && typeof window.cumulativeActivitiesChart.destroy === 'function') {
+                    window.cumulativeActivitiesChart.destroy();
+                }
+                
+                // Get status color mapping
+                const statusColors = {
+                    'pending': '#fbbf24',
+                    'applied': '#3b82f6',
+                    'contacted someone': '#6b7280',
+                    'company response': '#3b82f6',
+                    'scheduled interview': '#fbbf24',
+                    'interview notes': '#10b981',
+                    'interview - follow up': '#ec4899',
+                    'offered': '#10b981',
+                    'rejected': '#ef4444',
+                    'accepted': '#10b981'
+                };
+                
+                // Prepare datasets
+                const datasets = [];
+                const allDates = [];
+                
+                // Get all dates from first status (they should all have same dates)
+                const statuses = Object.keys(data);
+                if (statuses.length > 0 && data[statuses[0]] && Array.isArray(data[statuses[0]])) {
+                    allDates.push(...data[statuses[0]].map(d => d && d.date ? d.date : null).filter(Boolean));
+                }
+                
+                // Create a dataset for each status
+                statuses.forEach(status => {
+                    const statusData = data[status] || [];
+                    if (!Array.isArray(statusData)) {
+                        console.warn(`Status data for ${status} is not an array:`, statusData);
+                        return;
+                    }
+                    const counts = statusData.map(d => (d && typeof d.count === 'number') ? d.count : 0);
+                    
+                    datasets.push({
+                        label: status.charAt(0).toUpperCase() + status.slice(1),
+                        data: counts,
+                        borderColor: statusColors[status] || '#6b7280',
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        borderWidth: 2
+                    });
+                });
+                
+                if (datasets.length === 0 || allDates.length === 0) {
+                    console.warn('No valid datasets or dates for Cumulative Activities Chart');
+                    return;
+                }
+                
                 window.cumulativeActivitiesChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -1648,52 +1885,29 @@
             try {
                 const container = document.getElementById('followup-list');
                 
-                console.log('Follow-up applications received:', applications);
-                console.log('Container element:', container);
-                
                 if (!container) {
                     console.error('Follow-up container not found');
                     return;
                 }
                 
-                if (!applications || applications.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">✓</div>
-                            <p>No applications require follow-up at this time!</p>
-                        </div>
-                    `;
-                    console.log('Follow-up list updated with empty state');
-                    return;
-                }
-            
-                const html = applications.map(app => `
-                    <div class="followup-item">
-                        <div class="followup-info">
-                            <div class="followup-company">${app.company}</div>
-                            <div class="followup-position">${app.job_title}</div>
-                            <div class="followup-match">${app.match_score}% Match • ${app.contact_count} Contacts</div>
-                        </div>
-                        <div class="followup-timestamp">
-                            Last updated: ${app.last_updated}
-                        </div>
-                        <a href="${app.summary_url}" class="followup-link" target="_blank">View Summary →</a>
+                // Demo version - always show empty state
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No applications requiring follow-up</h3>
+                        <p>All applications are up to date</p>
                     </div>
-                `).join('');
-                
-                container.innerHTML = html;
-                console.log('Follow-up list updated with applications');
+                `;
+                console.log('Follow-up list updated with empty state (demo)');
             } catch (error) {
                 console.error('Error updating follow-up list:', error);
                 const container = document.getElementById('followup-list');
                 if (container) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">!</div>
-                            <p>Error loading follow-up applications</p>
-                            <p style="font-size: 14px; color: #999; margin-top: 10px;">
-                                Please refresh the page to try again.
-                            </p>
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No applications requiring follow-up</h3>
+                            <p>All applications are up to date</p>
                         </div>
                     `;
                 }
@@ -1805,52 +2019,29 @@
             try {
                 const container = document.getElementById('flagged-list');
                 
-                console.log('Flagged applications received:', applications);
-                console.log('Container element:', container);
-                
                 if (!container) {
                     console.error('Flagged container not found');
                     return;
                 }
                 
-                if (!applications || applications.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🚩</div>
-                            <p>No flagged applications at this time!</p>
-                        </div>
-                    `;
-                    console.log('Flagged list updated with empty state');
-                    return;
-                }
-            
-                const html = applications.map(app => `
-                    <div class="followup-item">
-                        <div class="followup-info">
-                            <div class="followup-company">${app.company}</div>
-                            <div class="followup-position">${app.job_title}</div>
-                            <div class="followup-match">${app.match_score}% Match • ${app.contact_count} Contacts • Status: ${app.status}</div>
-                        </div>
-                        <div class="followup-timestamp">
-                            Last updated: ${app.last_updated}
-                        </div>
-                        <a href="${app.summary_url || '#'}" class="followup-link" target="_blank">View Summary →</a>
+                // Demo version - always show empty state
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No flagged applications</h3>
+                        <p>You haven't flagged any applications yet</p>
                     </div>
-                `).join('');
-                
-                container.innerHTML = html;
-                console.log('Flagged list updated with applications');
+                `;
+                console.log('Flagged list updated with empty state (demo)');
             } catch (error) {
                 console.error('Error updating flagged list:', error);
                 const container = document.getElementById('flagged-list');
                 if (container) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">!</div>
-                            <p>Error loading flagged applications</p>
-                            <p style="font-size: 14px; color: #999; margin-top: 10px;">
-                                Please refresh the page to try again.
-                            </p>
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No flagged applications</h3>
+                            <p>You haven't flagged any applications yet</p>
                         </div>
                     `;
                 }
