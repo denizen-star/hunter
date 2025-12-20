@@ -78,3 +78,4 @@ if __name__ == "__main__":
     delete_applications_before_date("2025-10-01")
 
 
+

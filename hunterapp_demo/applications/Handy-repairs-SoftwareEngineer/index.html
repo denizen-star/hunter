@@ -1815,7 +1815,7 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                     <h3 id="networking-summary-title" style="margin: 0;">Contact Summary</h3>
                     <button onclick="closeNetworkingSummary()" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Close Summary</button>
                 </div>
-                <div id="networking-summary-content" style="flex: 1; overflow: hidden; min-height: 0; position: relative;">
+                <div id="networking-summary-content" style="flex: 1; overflow: auto; min-height: 0; position: relative; background: #fafafa;">
                     <div style="text-align: center; padding: 40px; color: #6b7280;">Loading summary...</div>
                 </div>
             </div>
@@ -1939,6 +1939,8 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                     color: #3b82f6;
                 }
             </style>
+            
+        </div>
             <script>
                 // Make function globally accessible
                 window.loadNetworkingContacts = async function loadNetworkingContacts() {
@@ -1995,28 +1997,46 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                         
                         grid.innerHTML = contacts.map(contact => {
                             const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
-                            const statusClass = contact.status === 'in conversation' ? 'blue' : 
-                                               contact.status === 'connection accepted' ? 'green' : 'gray';
+                            const flagIcon = contact.flagged ? '⚐' : '⚑';
+                            const flagClass = contact.flagged ? 'flagged' : '';
+                            const nextStep = contact.next_step || 'Review contact status and determine next action';
+                            const timingColor = 'green'; // Default to green for demo
+                            
+                            // Calculate days since update
+                            const updatedDate = contact.status_updated_at || contact.created_at;
+                            const daysSinceUpdate = updatedDate ? Math.floor((new Date() - new Date(updatedDate)) / (1000 * 60 * 60 * 24)) : 0;
                             
                             return `
-                                <div class="contact-tile" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
-                                    <div class="contact-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                                        <div>
-                                            <h3 class="contact-name" style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">${escapeHtml(contact.person_name || 'Contact')}</h3>
-                                            <div class="contact-company" style="color: #6b7280; font-size: 14px;">${escapeHtml(contact.company_name || '')}</div>
-                                            ${contact.job_title ? `<div class="contact-title" style="color: #9ca3af; font-size: 12px; margin-top: 4px;">${escapeHtml(contact.job_title)}</div>` : ''}
-                                        </div>
+                                <div class="contact-tile timing-${timingColor}">
+                                    <div class="contact-header">
+                                        <h3 class="contact-name">${escapeHtml(contact.person_name || 'Contact')}</h3>
                                         <div style="display: flex; align-items: center; gap: 12px;">
-                                            <span class="match-score" style="font-size: 14px; font-weight: 600; color: #3b82f6;">${matchScore}%</span>
+                                            <span class="match-score">${matchScore}%</span>
+                                            <span class="flag ${flagClass}" style="cursor: pointer; font-size: 18px; opacity: ${contact.flagged ? '1' : '0.3'}; transition: opacity 0.15s ease;">${flagIcon}</span>
                                         </div>
                                     </div>
-                                    <div class="status-badge" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; background: #e5e7eb; color: #374151; margin-bottom: 12px;">${escapeHtml(contact.status || 'connected')}</div>
-                                    <div class="contact-dates" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280;">
-                                        <div style="margin-bottom: 4px;">📅 Connected: ${formatDate(contact.created_at)}</div>
+                                    <div class="contact-company">${escapeHtml(contact.company_name || '')}</div>
+                                    ${contact.job_title ? `<div class="contact-title">${escapeHtml(contact.job_title)}</div>` : ''}
+                                    <div class="status-badge">${escapeHtml(contact.status || 'connected')}</div>
+                                    <div class="next-step-section">
+                                        <div class="next-step-label">Next Step</div>
+                                        <div class="next-step-text">${escapeHtml(nextStep)}</div>
                                     </div>
-                                    <button onclick="viewContactSummary('${escapeHtml(contact.id || '')}', '${escapeHtml(contact.person_name || 'Contact')}')" style="width: 100%; margin-top: 16px; padding: 10px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid #e5e7eb; background: white; color: #1f2937; cursor: pointer; transition: all 0.15s ease;">
-                                        View Details
-                                    </button>
+                                    <div class="contact-dates">
+                                        <div class="date-row">
+                                            <span>📅</span>
+                                            <span>Connected: ${formatDate(contact.created_at)}</span>
+                                        </div>
+                                        <div class="date-row">
+                                            <span>🔄</span>
+                                            <span>Updated: ${formatDate(updatedDate)}</span>
+                                        </div>
+                                        <div class="date-row">
+                                            <span>⏰</span>
+                                            <span>${daysSinceUpdate} days ago</span>
+                                        </div>
+                                    </div>
+                                    <button class="view-btn" onclick="viewContactSummary('${escapeHtml(contact.id || '')}', '${escapeHtml(contact.person_name || 'Contact')}')">View Contact</button>
                                 </div>
                             `;
                         }).join('');
@@ -2044,17 +2064,468 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                         return date.toLocaleDateString('en-US', { 
                             month: 'short', 
                             day: 'numeric', 
-                            year: 'numeric'
-                        });
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit'
+                        }) + ' EST';
                     } catch (error) {
                         return 'N/A';
                     }
                 }
                 
                 async function viewContactSummary(contactId, contactName) {
-                    // Demo version - show upgrade message
-                    showUpgradeMessage();
-                    return;
+                    try {
+                        // Demo version - find contact in DEMO_DATA
+                        if (typeof window.DEMO_DATA === 'undefined' || !window.DEMO_DATA.contacts) {
+                            console.error('DEMO_DATA not available');
+                            alert('Contact data not available');
+                            return;
+                        }
+                        
+                        const contact = window.DEMO_DATA.contacts.find(c => c.id === contactId);
+                        if (!contact) {
+                            alert('Contact not found');
+                            return;
+                        }
+                        
+                        // Hide contacts grid and show summary container
+                        document.getElementById('networking-contacts-grid').style.display = 'none';
+                        document.getElementById('networking-summary-container').style.display = 'flex';
+                        document.getElementById('networking-summary-title').textContent = `${contactName} - Summary`;
+                        
+                        // Update button state
+                        const createBtn = document.getElementById('create-contact-btn');
+                        createBtn.textContent = 'Back to Contacts';
+                        createBtn.onclick = showContactsGrid;
+                        
+                        // Generate full summary page HTML matching original structure
+                        const summaryContent = document.getElementById('networking-summary-content');
+                        const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
+                        const connectedDate = formatDate(contact.created_at);
+                        
+                        summaryContent.innerHTML = `
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #1f2937;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .status-pill {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 8px;
+            margin-right: 8px;
+        }
+        .tag-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .tag-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .app-header-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .meta-item strong {
+            color: #374151;
+        }
+        .tabs {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0;
+            display: flex;
+            gap: 0;
+            margin: 0 32px;
+        }
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 400;
+            color: #6b7280;
+            transition: all 0.15s ease;
+        }
+        .tab:hover {
+            color: #374151;
+            background: #f9fafb;
+        }
+        .tab.active {
+            color: #1f2937;
+            border-bottom-color: #3b82f6;
+            font-weight: 500;
+        }
+        .content {
+            margin: 0 32px;
+            padding: 0;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .section {
+            background: white;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            overflow: hidden;
+        }
+        .section-header {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            margin: 0;
+        }
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
+            color: #1f2937;
+        }
+        .section-content {
+            padding: 28px;
+        }
+        .analysis-section {
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .analysis-text {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .message-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .message-box h3 {
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .copy-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+        }
+        .copy-btn:hover {
+            background: #f3f4f6;
+        }
+        pre {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+
+
+    <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1>${escapeHtml(contact.person_name || contactName)}</h1>
+                <div class="subtitle">${escapeHtml(contact.company_name || '')}${contact.job_title ? ' • ' + escapeHtml(contact.job_title) : ''}</div>
+                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                    <span class="status-pill tag-blue">${escapeHtml(contact.status || 'Found Contact')}</span>
+                    <span class="status-pill tag-green">${matchScore}% Match</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="app-header-card">
+        <div class="app-meta">
+            <div class="meta-item">
+                <span>📅</span>
+                <span><strong>Connected:</strong> ${connectedDate}</span>
+            </div>
+            <div class="meta-item">
+                <span>🔄</span>
+                <span><strong>Updated:</strong> ${connectedDate}</span>
+            </div>
+            <div class="meta-item">
+                <span>🔗</span>
+                <a href="#" style="color: #3b82f6; text-decoration: none;">LinkedIn Profile</a>
+            </div>
+            <div class="meta-item">
+                <span>📧</span>
+                <span style="color: #3b82f6; text-decoration: underline; cursor: pointer;">Add Email</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('summary')">Summary</div>
+        <div class="tab" onclick="switchTab('raw')">Raw Entry</div>
+        <div class="tab" onclick="switchTab('skills')">Skills</div>
+        <div class="tab" onclick="switchTab('research')">Research</div>
+        <div class="tab" onclick="switchTab('messages')">Messages</div>
+        <div class="tab" onclick="switchTab('updates')">Updates & Notes</div>
+    </div>
+    
+    <div class="content">
+        <div id="summary" class="tab-content active">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Match Analysis</h2>
+                </div>
+                <div class="section-content">
+                    <div class="analysis-section">
+                        <div class="analysis-text">This is a demo match analysis for ${escapeHtml(contact.person_name || contactName)} at ${escapeHtml(contact.company_name || '')}. 
+
+In the full application, this section would display a comprehensive AI-generated analysis comparing your background with ${escapeHtml(contact.person_name || contactName)}'s profile, including:
+- Shared experiences and skills
+- Common professional interests
+- Potential conversation starters
+- Strategic connection value
+- Recommended outreach approach
+
+Match Score: ${matchScore}%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2>Key Strengths & Talking Points</h2>
+                </div>
+                <div class="section-content">
+                    <div style="background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px; padding: 20px;">
+                        <ul style="margin: 0; padding-left: 20px; color: #374151; line-height: 1.8;">
+                            <li>Shared background in data and analytics</li>
+                            <li>Common experience with modern technology platforms</li>
+                            <li>Mutual interest in driving business value through data insights</li>
+                            <li>Potential collaboration opportunities</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="raw" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Raw Profile Details</h2>
+                </div>
+                <div class="section-content">
+                    <pre>This is a demo contact. In the full application, this would display the raw LinkedIn profile data extracted for ${escapeHtml(contact.person_name || contactName)}.</pre>
+                </div>
+            </div>
+        </div>
+        
+        <div id="skills" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Skills Analysis</h2>
+                </div>
+                <div class="section-content">
+                    <p style="color: #6b7280; margin-bottom: 16px;">
+                        Comparison of your skills with ${escapeHtml(contact.person_name || contactName)}'s profile.
+                    </p>
+                    
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 20px 0 12px 0; color: #374151;">Shared Skills</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+                        <span style="padding: 6px 12px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 13px; font-weight: 500;">Data Analytics</span>
+                        <span style="padding: 6px 12px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 13px; font-weight: 500;">Product Management</span>
+                        <span style="padding: 6px 12px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 13px; font-weight: 500;">Business Strategy</span>
+                    </div>
+                    
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 20px 0 12px 0; color: #374151;">Your Unique Skills</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+                        <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px; font-weight: 500;">Python</span>
+                        <span style="padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; font-size: 13px; font-weight: 500;">SQL</span>
+                    </div>
+                    
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 20px 0 12px 0; color: #374151;">Their Skills (Learning Opportunities)</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <span style="padding: 6px 12px; background: #e0e7ff; color: #3730a3; border-radius: 6px; font-size: 13px; font-weight: 500;">Cloud Platforms</span>
+                        <span style="padding: 6px 12px; background: #e0e7ff; color: #3730a3; border-radius: 6px; font-size: 13px; font-weight: 500;">Machine Learning</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="research" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>AI-Generated Research & Background</h2>
+                </div>
+                <div class="section-content">
+                    <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                        <p style="color: #1e40af; font-size: 14px; margin-bottom: 12px;">
+                            <strong>Note:</strong> This research was automatically generated from the LinkedIn profile data and available information.
+                        </div>
+                    <div class="analysis-text" style="white-space: pre-wrap; line-height: 1.8;">
+## COMPANY BACKGROUND: ${escapeHtml(contact.company_name || '')}
+
+${escapeHtml(contact.company_name || 'Company')} is a leading organization in the technology sector, known for innovation and growth.
+
+## RECENT COMPANY NEWS & UPDATES
+
+Recent expansion and strategic initiatives demonstrate the company's commitment to growth and market leadership.
+
+## ${escapeHtml(contact.person_name || contactName)}'S RECENT ACTIVITY
+
+Professional with strong background in ${escapeHtml(contact.job_title || 'their field')}, actively engaged in industry discussions and professional development.
+
+## KEY TALKING POINTS
+
+- Shared background in data and analytics
+- Common experience with modern platforms
+- Mutual interest in driving business value
+- Potential collaboration opportunities
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="messages" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Networking Messages</h2>
+                </div>
+                <div class="section-content">
+                    <div class="message-box">
+                        <h3>
+                            <span>1. Initial Connection Request (LinkedIn)</span>
+                            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+                        </h3>
+                        <div>Hi ${escapeHtml((contact.person_name || contactName).split(' ')[0])}, I noticed your work at ${escapeHtml(contact.company_name || '')} and would love to connect and exchange insights.</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 8px;">${(contact.person_name || contactName).length + (contact.company_name || '').length + 80} characters</div>
+                    </div>
+                    
+                    <div class="message-box">
+                        <h3>
+                            <span>2. Meeting Invitation</span>
+                            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+                        </h3>
+                        <div>Thanks for connecting! I'd love to chat briefly about our shared interests. Would you have 15-20 minutes for a virtual coffee?</div>
+                    </div>
+                    
+                    <div class="message-box">
+                        <h3>
+                            <span>3. Thank You Message</span>
+                            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+                        </h3>
+                        <div>Thanks for the great conversation! I really enjoyed discussing our shared interests. Let's definitely stay in touch.</div>
+                    </div>
+                    
+                    <div class="message-box">
+                        <h3>
+                            <span>4. Consulting Services Offer</span>
+                            <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+                        </h3>
+                        <div>I'd be happy to discuss how my expertise in data analytics and product management could support ${escapeHtml(contact.company_name || 'your organization')}'s initiatives.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="updates" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Update Status</h2>
+                </div>
+                <div class="section-content">
+                    <p style="color: #6b7280; margin-bottom: 16px;">
+                        This is a demo contact. In the full application, you can update the contact status and add notes here.
+                    </p>
+                    <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                        <p style="color: #6b7280; font-size: 14px; margin: 0;">Status update functionality is available in the full application.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+`;
+                        
+                        
+                        currentViewState = 'summary';
+                    } catch (error) {
+                        console.error('Error loading contact summary:', error);
+                        alert('Error loading contact summary');
+                    }
                 }
                 
                 window.showCreateContactForm = function() {
@@ -2156,7 +2627,6 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                 // Initialize immediately
                 initNetworkingContacts();
             </script>
-        </div>
         
         <div id="updates" class="tab-content">
             <h2>Updates</h2>

@@ -1231,10 +1231,10 @@
                     console.error('No data available - DEMO_DATA and DEMO_REPORTS_DATA both undefined');
                     data = { success: false, error: 'No data available' };
                 }
-                
-                // Process data (continue with existing logic)
+                    
+                    // Process data (continue with existing logic)
                 if (data && data.success) {
-                    reportsData = data;
+                        reportsData = data;
                     
                     // Filter data based on currentType (jobs, networking, both)
                     const applicationsByStatus = filterDataByType(data.applications_by_status || {}, currentType);
@@ -1321,10 +1321,10 @@
                         }
                     }
                     
-                    updateFollowupList(data.followup_applications || []);
-                    updateFlaggedList(data.flagged_applications || []);
+                        updateFollowupList(data.followup_applications || []);
+                        updateFlaggedList(data.flagged_applications || []);
                     
-                    // Update stats summary
+                        // Update stats summary
                     updateStatsSummary(summary);
                 } else {
                     console.error('Failed to load reports data:', data?.error || 'Unknown error');
@@ -1426,50 +1426,50 @@
                     return;
                 }
                 
-                if (typeof Chart === 'undefined') {
-                    console.error('Chart.js not loaded');
-                    showDataAsText('applicationsByStatusData', data);
-                    return;
-                }
-                
-                const canvas = document.getElementById('applicationsByStatusChart');
-                if (!canvas) {
-                    console.error('Canvas element not found');
-                    return;
-                }
-                const ctx = canvas.getContext('2d');
-                
-                // Destroy existing chart if it exists
-                if (window.applicationsByStatusChart && typeof window.applicationsByStatusChart.destroy === 'function') {
-                    window.applicationsByStatusChart.destroy();
-                }
-                
-                // Format labels to title case and make them shorter
-                const labelMapping = {
-                    'applied': 'Applied',
-                    'pending': 'Pending',
-                    'rejected': 'Rejected',
-                    'contacted someone': 'Contacted',
-                    'contacted hiring manager': 'Company Response',
-                    'company response': 'Company Response',
-                    'scheduled interview': 'Scheduled Interview',
-                    'interviewed': 'Interview Notes',
-                    'interview notes': 'Interview Notes',
-                    'interview - follow up': 'Interview Follow Up',
-                    'offered': 'Offered',
-                    'accepted': 'Accepted',
-                    'withdrawn': 'Withdrawn'
-                };
-                
-                const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                showDataAsText('applicationsByStatusData', data);
+                return;
+            }
+            
+            const canvas = document.getElementById('applicationsByStatusChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.applicationsByStatusChart && typeof window.applicationsByStatusChart.destroy === 'function') {
+                window.applicationsByStatusChart.destroy();
+            }
+            
+            // Format labels to title case and make them shorter
+            const labelMapping = {
+                'applied': 'Applied',
+                'pending': 'Pending',
+                'rejected': 'Rejected',
+                'contacted someone': 'Contacted',
+                'contacted hiring manager': 'Company Response',
+                'company response': 'Company Response',
+                'scheduled interview': 'Scheduled Interview',
+                'interviewed': 'Interview Notes',
+                'interview notes': 'Interview Notes',
+                'interview - follow up': 'Interview Follow Up',
+                'offered': 'Offered',
+                'accepted': 'Accepted',
+                'withdrawn': 'Withdrawn'
+            };
+            
+            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
                 const values = Object.values(data).map(val => typeof val === 'number' ? val : 0);
-                const colors = [
-                    '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
-                    '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
-                ];
-                
-                console.log('Applications by Status Chart Data:', { labels, values, data });
-                
+            const colors = [
+                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
+            ];
+            
+            console.log('Applications by Status Chart Data:', { labels, values, data });
+            
                 window.applicationsByStatusChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1522,50 +1522,50 @@
                     return;
                 }
                 
-                if (typeof Chart === 'undefined') {
-                    console.error('Chart.js not loaded');
-                    showDataAsText('statusChangesData', data);
-                    return;
-                }
-                
-                const canvas = document.getElementById('statusChangesChart');
-                if (!canvas) {
-                    console.error('Canvas element not found');
-                    return;
-                }
-                const ctx = canvas.getContext('2d');
-                
-                // Destroy existing chart if it exists
-                if (window.statusChangesChart && typeof window.statusChangesChart.destroy === 'function') {
-                    window.statusChangesChart.destroy();
-                }
-                
-                // Format labels to title case and make them shorter
-                const labelMapping = {
-                    'applied': 'Applied',
-                    'pending': 'Pending',
-                    'rejected': 'Rejected',
-                    'contacted someone': 'Contacted',
-                    'contacted hiring manager': 'Company Response',
-                    'company response': 'Company Response',
-                    'scheduled interview': 'Scheduled Interview',
-                    'interviewed': 'Interview Notes',
-                    'interview notes': 'Interview Notes',
-                    'interview - follow up': 'Interview Follow Up',
-                    'offered': 'Offered',
-                    'accepted': 'Accepted',
-                    'withdrawn': 'Withdrawn'
-                };
-                
-                const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                showDataAsText('statusChangesData', data);
+                return;
+            }
+            
+            const canvas = document.getElementById('statusChangesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.statusChangesChart && typeof window.statusChangesChart.destroy === 'function') {
+                window.statusChangesChart.destroy();
+            }
+            
+            // Format labels to title case and make them shorter
+            const labelMapping = {
+                'applied': 'Applied',
+                'pending': 'Pending',
+                'rejected': 'Rejected',
+                'contacted someone': 'Contacted',
+                'contacted hiring manager': 'Company Response',
+                'company response': 'Company Response',
+                'scheduled interview': 'Scheduled Interview',
+                'interviewed': 'Interview Notes',
+                'interview notes': 'Interview Notes',
+                'interview - follow up': 'Interview Follow Up',
+                'offered': 'Offered',
+                'accepted': 'Accepted',
+                'withdrawn': 'Withdrawn'
+            };
+            
+            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
                 const values = Object.values(data).map(val => typeof val === 'number' ? val : 0);
-                const colors = [
-                    '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
-                    '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
-                ];
-                
-                console.log('Status Changes Chart Data:', { labels, values, data });
-                
+            const colors = [
+                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
+            ];
+            
+            console.log('Status Changes Chart Data:', { labels, values, data });
+            
                 window.statusChangesChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1618,66 +1618,66 @@
                     return;
                 }
                 
-                if (typeof Chart === 'undefined') {
-                    console.error('Chart.js not loaded');
-                    return;
-                }
-                
-                const canvas = document.getElementById('dailyActivitiesChart');
-                if (!canvas) {
-                    console.error('Canvas element not found');
-                    return;
-                }
-                const ctx = canvas.getContext('2d');
-                
-                // Destroy existing chart if it exists
-                if (window.dailyActivitiesChart && typeof window.dailyActivitiesChart.destroy === 'function') {
-                    window.dailyActivitiesChart.destroy();
-                }
-                
-                // Get status color mapping
-                const statusColors = {
-                    'pending': '#fbbf24',
-                    'applied': '#3b82f6',
-                    'contacted someone': '#6b7280',
-                    'company response': '#3b82f6',
-                    'scheduled interview': '#fbbf24',
-                    'interview notes': '#10b981',
-                    'interview - follow up': '#ec4899',
-                    'offered': '#10b981',
-                    'rejected': '#ef4444',
-                    'accepted': '#10b981'
-                };
-                
-                // Prepare datasets
-                const datasets = [];
-                const allDates = [];
-                
-                // Get all dates from first status (they should all have same dates)
-                const statuses = Object.keys(data);
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            const canvas = document.getElementById('dailyActivitiesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.dailyActivitiesChart && typeof window.dailyActivitiesChart.destroy === 'function') {
+                window.dailyActivitiesChart.destroy();
+            }
+            
+            // Get status color mapping
+            const statusColors = {
+                'pending': '#fbbf24',
+                'applied': '#3b82f6',
+                'contacted someone': '#6b7280',
+                'company response': '#3b82f6',
+                'scheduled interview': '#fbbf24',
+                'interview notes': '#10b981',
+                'interview - follow up': '#ec4899',
+                'offered': '#10b981',
+                'rejected': '#ef4444',
+                'accepted': '#10b981'
+            };
+            
+            // Prepare datasets
+            const datasets = [];
+            const allDates = [];
+            
+            // Get all dates from first status (they should all have same dates)
+            const statuses = Object.keys(data);
                 if (statuses.length > 0 && data[statuses[0]] && Array.isArray(data[statuses[0]])) {
                     allDates.push(...data[statuses[0]].map(d => d && d.date ? d.date : null).filter(Boolean));
-                }
-                
-                // Create a dataset for each status
-                statuses.forEach(status => {
-                    const statusData = data[status] || [];
+            }
+            
+            // Create a dataset for each status
+            statuses.forEach(status => {
+                const statusData = data[status] || [];
                     if (!Array.isArray(statusData)) {
                         console.warn(`Status data for ${status} is not an array:`, statusData);
                         return;
                     }
                     const counts = statusData.map(d => (d && typeof d.count === 'number') ? d.count : 0);
-                    
-                    datasets.push({
-                        label: status.charAt(0).toUpperCase() + status.slice(1),
-                        data: counts,
-                        borderColor: statusColors[status] || '#6b7280',
-                        backgroundColor: 'transparent',
-                        tension: 0.4,
-                        borderWidth: 2
-                    });
-                });
                 
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: counts,
+                    borderColor: statusColors[status] || '#6b7280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2
+                });
+            });
+            
                 if (datasets.length === 0 || allDates.length === 0) {
                     console.warn('No valid datasets or dates for Daily Activities Chart');
                     return;
@@ -1746,66 +1746,66 @@
                     return;
                 }
                 
-                if (typeof Chart === 'undefined') {
-                    console.error('Chart.js not loaded');
-                    return;
-                }
-                
-                const canvas = document.getElementById('cumulativeActivitiesChart');
-                if (!canvas) {
-                    console.error('Canvas element not found');
-                    return;
-                }
-                const ctx = canvas.getContext('2d');
-                
-                // Destroy existing chart if it exists
-                if (window.cumulativeActivitiesChart && typeof window.cumulativeActivitiesChart.destroy === 'function') {
-                    window.cumulativeActivitiesChart.destroy();
-                }
-                
-                // Get status color mapping
-                const statusColors = {
-                    'pending': '#fbbf24',
-                    'applied': '#3b82f6',
-                    'contacted someone': '#6b7280',
-                    'company response': '#3b82f6',
-                    'scheduled interview': '#fbbf24',
-                    'interview notes': '#10b981',
-                    'interview - follow up': '#ec4899',
-                    'offered': '#10b981',
-                    'rejected': '#ef4444',
-                    'accepted': '#10b981'
-                };
-                
-                // Prepare datasets
-                const datasets = [];
-                const allDates = [];
-                
-                // Get all dates from first status (they should all have same dates)
-                const statuses = Object.keys(data);
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            const canvas = document.getElementById('cumulativeActivitiesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.cumulativeActivitiesChart && typeof window.cumulativeActivitiesChart.destroy === 'function') {
+                window.cumulativeActivitiesChart.destroy();
+            }
+            
+            // Get status color mapping
+            const statusColors = {
+                'pending': '#fbbf24',
+                'applied': '#3b82f6',
+                'contacted someone': '#6b7280',
+                'company response': '#3b82f6',
+                'scheduled interview': '#fbbf24',
+                'interview notes': '#10b981',
+                'interview - follow up': '#ec4899',
+                'offered': '#10b981',
+                'rejected': '#ef4444',
+                'accepted': '#10b981'
+            };
+            
+            // Prepare datasets
+            const datasets = [];
+            const allDates = [];
+            
+            // Get all dates from first status (they should all have same dates)
+            const statuses = Object.keys(data);
                 if (statuses.length > 0 && data[statuses[0]] && Array.isArray(data[statuses[0]])) {
                     allDates.push(...data[statuses[0]].map(d => d && d.date ? d.date : null).filter(Boolean));
-                }
-                
-                // Create a dataset for each status
-                statuses.forEach(status => {
-                    const statusData = data[status] || [];
+            }
+            
+            // Create a dataset for each status
+            statuses.forEach(status => {
+                const statusData = data[status] || [];
                     if (!Array.isArray(statusData)) {
                         console.warn(`Status data for ${status} is not an array:`, statusData);
                         return;
                     }
                     const counts = statusData.map(d => (d && typeof d.count === 'number') ? d.count : 0);
-                    
-                    datasets.push({
-                        label: status.charAt(0).toUpperCase() + status.slice(1),
-                        data: counts,
-                        borderColor: statusColors[status] || '#6b7280',
-                        backgroundColor: 'transparent',
-                        tension: 0.4,
-                        borderWidth: 2
-                    });
-                });
                 
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: counts,
+                    borderColor: statusColors[status] || '#6b7280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2
+                });
+            });
+            
                 if (datasets.length === 0 || allDates.length === 0) {
                     console.warn('No valid datasets or dates for Cumulative Activities Chart');
                     return;
@@ -1891,13 +1891,13 @@
                 }
                 
                 // Demo version - always show empty state
-                container.innerHTML = `
-                    <div class="empty-state">
+                    container.innerHTML = `
+                        <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
                         <h3>No applications requiring follow-up</h3>
                         <p>All applications are up to date</p>
-                    </div>
-                `;
+                        </div>
+                    `;
                 console.log('Follow-up list updated with empty state (demo)');
             } catch (error) {
                 console.error('Error updating follow-up list:', error);
@@ -2025,13 +2025,13 @@
                 }
                 
                 // Demo version - always show empty state
-                container.innerHTML = `
-                    <div class="empty-state">
+                    container.innerHTML = `
+                        <div class="empty-state">
                         <div class="empty-state-icon">📭</div>
                         <h3>No flagged applications</h3>
                         <p>You haven't flagged any applications yet</p>
-                    </div>
-                `;
+                        </div>
+                    `;
                 console.log('Flagged list updated with empty state (demo)');
             } catch (error) {
                 console.error('Error updating flagged list:', error);
