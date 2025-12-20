@@ -25,7 +25,7 @@
         { href: '/templates.html', label: 'Templates', icon: 'Templates.png' },
         { href: '#', label: 'Check AI Status', onclick: 'showAIStatus(); return false;', icon: 'CheckAiStatus.png' },
         { href: '/archived.html', label: 'Archive Dash', icon: 'ArchiveDash.png' },
-        { href: '/manage-resume.html', label: 'Manage Resume', icon: 'ManageResume.png' }
+        { href: 'manage-resume.html', label: 'Manage Resume', icon: 'ManageResume.png' }
     ];
 
     const helpItems = [

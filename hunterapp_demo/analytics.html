@@ -877,7 +877,38 @@
         let currentGapPeriod = 'all';  // For skill gaps: 'daily', 'weekly', 'monthly', 'all'
         let analyticsData = null;
         let charts = {};
+
+        // Company name anonymization mapping - maps to Company1, Company2, etc.
+        let companyNameCache = {};
+        let companyCounter = 1;
         
+        function anonymizeCompanyName(companyName) {
+            if (!companyName) return 'Unknown Company';
+            
+            // Normalize the company name for matching
+            const normalizedName = companyName.trim();
+            
+            // Check if we've already mapped this company
+            if (companyNameCache[normalizedName]) {
+                return companyNameCache[normalizedName];
+            }
+            
+            // Check case-insensitive match in cache
+            const lowerName = normalizedName.toLowerCase();
+            for (const [key, value] of Object.entries(companyNameCache)) {
+                if (key.toLowerCase() === lowerName) {
+                    return value;
+                }
+            }
+            
+            // Create new mapping
+            const anonymizedName = `Company${companyCounter}`;
+            companyNameCache[normalizedName] = anonymizedName;
+            companyCounter++;
+            
+            return anonymizedName;
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadAnalyticsData();
@@ -1675,7 +1706,7 @@
                                             if (skill.applications && skill.applications.length > 0) {
                                                 label += '\n\nJobs:';
                                                 skill.applications.slice(0, 5).forEach(app => {
-                                                    label += `\n• ${app.company} - ${app.job_title}`;
+                                                    label += `\n• ${anonymizeCompanyName(app.company)} - ${app.job_title}`;
                                                 });
                                                 if (skill.applications.length > 5) {
                                                     label += `\n... and ${skill.applications.length - 5} more`;
@@ -1688,7 +1719,7 @@
                                             if (skill.applications && skill.applications.length > 0) {
                                                 let jobsText = '\n\nJobs:';
                                                 skill.applications.forEach(app => {
-                                                    jobsText += `\n• ${app.company} - ${app.job_title}`;
+                                                    jobsText += `\n• ${anonymizeCompanyName(app.company)} - ${app.job_title}`;
                                                 });
                                                 return jobsText;
                                             }
@@ -1825,7 +1856,7 @@
                                             if (skill.applications && skill.applications.length > 0) {
                                                 label += '\n\nJobs:';
                                                 skill.applications.slice(0, 5).forEach(app => {
-                                                    label += `\n• ${app.company} - ${app.job_title}`;
+                                                    label += `\n• ${anonymizeCompanyName(app.company)} - ${app.job_title}`;
                                                 });
                                                 if (skill.applications.length > 5) {
                                                     label += `\n... and ${skill.applications.length - 5} more`;
@@ -1936,7 +1967,7 @@
                                     if (skill.applications && skill.applications.length > 0) {
                                         label += '\n\nApplications:';
                                         skill.applications.slice(0, 5).forEach(app => {
-                                            label += `\n• ${app.company} - ${app.job_title}`;
+                                            label += `\n• ${anonymizeCompanyName(app.company)} - ${app.job_title}`;
                                         });
                                         if (skill.applications.length > 5) {
                                             label += `\n... and ${skill.applications.length - 5} more`;
@@ -1949,7 +1980,7 @@
                                     if (skill.applications && skill.applications.length > 0) {
                                         let appsText = '\n\nApplications:';
                                         skill.applications.slice(0, 5).forEach(app => {
-                                            appsText += `\n• ${app.company} - ${app.job_title}`;
+                                            appsText += `\n• ${anonymizeCompanyName(app.company)} - ${app.job_title}`;
                                             appsText += `\n  ${app.url}`;
                                         });
                                         if (skill.applications.length > 5) {
@@ -2097,7 +2128,7 @@
                                     if (skill.applications && skill.applications.length > 0) {
                                         label += '\n\nApplications:';
                                         skill.applications.slice(0, 5).forEach(app => {
-                                            label += `\n• ${app.company} - ${app.job_title}`;
+                                            label += `\n• ${anonymizeCompanyName(app.company)} - ${app.job_title}`;
                                         });
                                         if (skill.applications.length > 5) {
                                             label += `\n... and ${skill.applications.length - 5} more`;
@@ -2164,7 +2195,7 @@
                     const appLinks = gap.applications && Array.isArray(gap.applications) && gap.applications.length > 0 
                         ? gap.applications.map(app => {
                             const url = app?.url || '#';
-                            const company = app?.company || 'Unknown';
+                            const company = anonymizeCompanyName(app?.company || 'Unknown');
                             const jobTitle = app?.job_title || 'Unknown';
                             return `<a href="${url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${company} - ${jobTitle}</a>`;
                         }).join('')
@@ -2222,7 +2253,7 @@
                     const appLinks = p.applications && Array.isArray(p.applications) && p.applications.length > 0 
                         ? p.applications.map(app => {
                             const url = app?.url || '#';
-                            const company = app?.company || 'Unknown';
+                            const company = anonymizeCompanyName(app?.company || 'Unknown');
                             const jobTitle = app?.job_title || 'Unknown';
                             return `<a href="${url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${company} - ${jobTitle}</a>`;
                         }).join('')
@@ -2274,8 +2305,8 @@
     <!-- Footer -->
     <div class="page-footer">
         <div class="footer-buttons">
-            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
-            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+            <a href="new-application.html" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="manage-resume.html" class="footer-btn">Manage Resume</a>
         </div>
     </div>
 </body>

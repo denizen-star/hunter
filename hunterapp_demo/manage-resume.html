@@ -665,83 +665,19 @@
     <!-- Hero Header -->
     <div class="hero-header">
         <div class="hero-header-top">
-            <a href="/index.html" class="back-link">
+            <a href="index.html" class="back-link">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
                 Back to Dashboard
             </a>
-            <h1>New Application</h1>
+            <h1>Profile Management</h1>
         </div>
     </div>
     
     <div class="main-wrapper">
         
         <div id="status-banner" class="status-banner hidden"></div>
-        
-        <div class="card" id="application-form" style="padding-top: 16px;">
-            <form id="jobForm" onsubmit="submitApplication(event)">
-                <div class="form-group" style="margin-top: 0;">
-                    <label for="company">Company Name *</label>
-                    <input type="text" id="company" name="company" required placeholder="e.g., Google, Microsoft, Apple">
-                </div>
-                
-                <div class="form-group">
-                    <label for="job_title">Job Title *</label>
-                    <input type="text" id="job_title" name="job_title" required placeholder="e.g., Senior Software Engineer">
-                </div>
-                
-                <div class="form-group">
-                    <label for="job_url">Job URL</label>
-                    <input type="url" id="job_url" name="job_url" placeholder="https://...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="job_description">Job Description *</label>
-                    <textarea id="job_description" name="job_description" required placeholder="Paste the complete job description here..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn" id="submitBtn">
-                    Analyze & Create Application
-                </button>
-            </form>
-            
-            <div class="loading hidden" id="loading">
-                <div class="spinner"></div>
-                <p style="color: #666; font-size: 18px; margin-bottom: 10px;"><strong>Processing...</strong></p>
-                <p style="color: #999; font-size: 14px;">Creating your application and generating documents</p>
-            </div>
-        </div>
-
-        <!-- Global Loading Overlay -->
-        <div id="loading-overlay" class="loading-overlay">
-            <div class="panel">
-                <div class="spinner"></div>
-                <div style="color:#333; font-weight:600; margin-bottom:4px;">Processing...</div>
-                <div style="color:#666; font-size:14px;">Creating your application and generating documents</div>
-            </div>
-        </div>
-
-        <div class="card hidden" id="success-card">
-            <div class="success-message">
-                <h2>Application Created Successfully!</h2>
-                <div class="match-score" id="match-score">--</div>
-                <p style="color: #666; margin-bottom: 10px;">Match Score</p>
-                <h1 id="success-title" style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 20px 0 15px 0; text-align: center;">--</h1>
-                <div id="success-job-info" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
-                    <!-- Job information will be populated by JavaScript -->
-            </div>
-                <div id="success-job-link" style="margin-top: 20px; text-align: center;">
-                    <!-- Job link will be populated by JavaScript -->
-        </div>
-            </div>
-        </div>
-        
-        <!-- Success Actions - Outside both cards -->
-        <div class="success-actions" id="success-actions" style="display: none; margin-top: 20px;">
-            <a href="#" id="view-summary-btn" class="btn">View Summary</a>
-            <button class="btn btn-secondary" onclick="createAnother()">Create Another</button>
-        </div>
         
         <!-- Resume Manager Modal (shown by default for manage-resume page) -->
         <div class="card" id="resume-manager">
@@ -1899,8 +1835,8 @@ Experienced Software Engineering and Product Development professional with over 
     <!-- Footer -->
     <div class="page-footer">
         <div class="footer-buttons">
-            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
-            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+            <a href="new-application.html" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="manage-resume.html" class="footer-btn">Manage Resume</a>
         </div>
     </div>
 </body>
