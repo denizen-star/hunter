@@ -885,7 +885,7 @@
             padding-top: 0;
         }
         .tab-content.active { 
-            display: block; 
+            display: block !important; 
         }
         .tab-content pre { 
             background: var(--bg-secondary); 
@@ -1425,35 +1425,8 @@
                         <a href="#" style="color: #3b82f6; text-decoration: none;">View Job Posting</a>
                     </div>
                 </div>
-            </div> for this role is $214,300 - $321,500. For sales roles, the range provided is the role’s On Target Earnings ("OTE") range, meaning that the range includes both the sales commissions/sales bonuses target and annual base salary for the role. This salary range may be inclusive of several career levels at Capital Finance Firm and will be narrowed during the interview process based on a number of factors, including the candidate’s experience, qualifications, and location. Applicants interested in this role and who are not located in the US may request the annual salary range for their location during the interview process.
-
-Additional benefits for this role may include: equity, company bonus or sales commissions/bonuses; 401(k) plan; medical, dental, and vision benefits; and wellness stipends.
-
-
-See how you compare to others who clicked apply
-Candidates who clicked apply
-2,357	total
-37	in the past day
-Candidate seniority level
-53% Senior level candidates
-
-
-18% Entry level candidates
-
-
-11% Director level candidates
-
-
-10% Manager level candidates
-
-
-Candidate education level
-15%	have a Bachelor's Degree (Similar to you)
-33%	have a Master of Business Administration
-14%	have a Master's Degree
-38%	have other degrees</pre>
-        
-</div>
+            </div>
+        </div>
         <!-- Tabs Navigation -->
         <div class="tabs-container">
             <div class="tabs-header">
@@ -2891,6 +2864,8 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
         }
         
         function showTab(button, tabId) {
+            console.log('showTab called with tabId:', tabId);
+            
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
@@ -2903,8 +2878,12 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
 
             // Show selected tab content
             const selectedContent = document.getElementById(tabId);
+            console.log('Selected content element:', selectedContent);
             if (selectedContent) {
                 selectedContent.classList.add('active');
+                console.log('Active class added to:', tabId);
+            } else {
+                console.error('Tab content not found for id:', tabId);
             }
 
             // Add active class to clicked tab
@@ -2923,6 +2902,9 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
                 }, 100);
             }
         }
+        
+        // Make showTab globally accessible
+        window.showTab = showTab;
         
         function toggleChecklist() {
             const content = document.getElementById('checklist-content');
@@ -3427,6 +3409,32 @@ Based on the preliminary matching results, this candidate demonstrates a strong 
         function showUpgradeMessage() {
             alert('Purchase Upgrade for Functionality');
         }
+    </script>
+    
+    <!-- Initialize and verify tabs -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, verifying tabs...');
+            
+            // Verify all tab-content divs exist
+            const tabIds = ['summary', 'raw-entry', 'skills', 'research', 'qualifications', 'cover-letter', 'resume', 'rewards', 'networking', 'updates', 'timeline'];
+            tabIds.forEach(tabId => {
+                const tabContent = document.getElementById(tabId);
+                if (!tabContent) {
+                    console.error('❌ Tab content not found for:', tabId);
+                } else {
+                    console.log('✅ Tab content found for:', tabId, 'Content length:', tabContent.innerHTML.length);
+                }
+            });
+            
+            // Ensure showTab is accessible
+            if (typeof showTab === 'function') {
+                window.showTab = showTab;
+                console.log('✅ showTab function is available and assigned to window');
+            } else {
+                console.error('❌ showTab function not found!');
+            }
+        });
     </script>
 </body>
 </html>
