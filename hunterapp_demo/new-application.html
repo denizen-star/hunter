@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Hunter - AI-Powered Application Manager</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+        
+        .main-wrapper {
+            width: 100%;
+            margin: 0;
+            padding: var(--space-lg);
+            box-sizing: border-box;
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        
+        .sidebar-header {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sidebar-menu a:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a.active {
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 10px 32px;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+        
+        .footer-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+            position: relative;
+            z-index: 1;
+            color: var(--text-primary);
+        }
+        
+        .card h2 {
+            font-size: var(--font-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .status-banner {
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            border: 1px solid var(--border-primary);
+        }
+        
+        .status-banner.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: var(--accent-green);
+        }
+        
+        .status-banner.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+        
+        .status-banner.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+        
+        .status-banner.info {
+            background: var(--accent-blue-light);
+            color: #1e40af;
+            border-color: var(--accent-blue);
+        }
+        
+        .status-banner.hidden {
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-size: 12px;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
+        }
+        
+        .form-group textarea {
+            min-height: 170px;
+            resize: vertical;
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
+        }
+        
+        .btn {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 12px var(--space-xl);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-family: var(--font-family);
+        }
+        
+        .btn:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .btn:disabled {
+            background: var(--text-tertiary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            border: 3px solid var(--border-primary);
+            border-top: 3px solid var(--accent-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-md);
+        }
+
+        /* Full-page loading overlay to guarantee visibility */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000; /* Above sidebar/header/cards */
+        }
+        .loading-overlay .panel {
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-primary);
+            text-align: center;
+            min-width: 260px;
+        }
+        .loading-overlay .spinner {
+            margin-bottom: 12px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        
+        .quick-links {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quick-links-header {
+            display: flex;
+            background: #8b9dc3;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(139, 157, 195, 0.2);
+        }
+        
+        .quick-links a {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+            border-bottom: 3px solid transparent;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .quick-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .quick-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-bottom: 3px solid #ffffff;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .success-message h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        
+        .success-message .match-score {
+            font-size: 72px;
+            font-weight: 300;
+            color: #8b9dc3;
+            margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(139, 157, 195, 0.3);
+        }
+        
+        .success-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .success-actions button,
+        .success-actions a {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Application Dropdown Styles */
+        .application-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(108, 123, 149, 0.2);
+        }
+        
+        .application-dropdown-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        .application-dropdown-item:hover {
+            background-color: rgba(139, 157, 195, 0.1);
+        }
+        
+        .application-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .application-dropdown-item.selected {
+            background-color: rgba(139, 157, 195, 0.15);
+            border-left: 4px solid #8b9dc3;
+        }
+        
+        .application-dropdown-item .company {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .application-dropdown-item .job-title {
+            color: #4a5568;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .application-dropdown-item .app-id {
+            color: #718096;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            color: #4a5568;
+            box-shadow: 0 2px 4px rgba(108, 123, 149, 0.1);
+        }
+        
+        .form-group select:focus {
+            outline: none;
+            border-color: #8b9dc3;
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        /* Quill Editor Styles */
+        .ql-editor {
+            min-height: 120px;
+            font-size: 11pt !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-weight: 400 !important;
+            line-height: 1.5 !important;
+            color: black !important;
+            text-align: justify !important;
+        }
+        
+        /* Override any pasted content font styles */
+        .ql-editor * {
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 11pt !important;
+            color: black !important;
+        }
+        
+        .ql-editor p,
+        .ql-editor div,
+        .ql-editor span {
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 11pt !important;
+            color: black !important;
+            text-align: justify !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Paragraph spacing and alignment */
+        .ql-editor p {
+            margin-bottom: 0.5em !important;
+            text-align: justify !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Ensure all text elements use justified alignment */
+        .ql-editor p[style*="text-align"],
+        .ql-editor div[style*="text-align"],
+        .ql-editor span[style*="text-align"] {
+            text-align: justify !important;
+        }
+        
+        .ql-toolbar {
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .ql-container {
+            border: 2px solid rgba(139, 157, 195, 0.3);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .ql-container.ql-snow:focus-within {
+            border-color: #8b9dc3;
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+        }
+        
+        .ql-toolbar.ql-snow {
+            border-color: rgba(139, 157, 195, 0.3);
+        }
+        
+        .ql-toolbar.ql-snow .ql-picker-label {
+            border-color: transparent;
+        }
+        
+        .ql-toolbar.ql-snow .ql-picker-options {
+            border-color: rgba(139, 157, 195, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(139, 157, 195, 0.2);
+        }
+        
+        .ql-toolbar.ql-snow button {
+            border-radius: 6px;
+            margin: 2px;
+        }
+        
+        .ql-toolbar.ql-snow button:hover {
+            background-color: rgba(139, 157, 195, 0.1);
+        }
+        
+        .ql-toolbar.ql-snow button.ql-active {
+            background-color: rgba(139, 157, 195, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/index.html" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <h1>New Application</h1>
+        </div>
+    </div>
+    
+    <div class="main-wrapper">
+        
+        <div id="status-banner" class="status-banner hidden"></div>
+        
+        <div class="card" id="application-form" style="padding-top: 16px;">
+            <form id="jobForm" onsubmit="submitApplication(event)">
+                <div class="form-group" style="margin-top: 0;">
+                    <label for="company">Company Name *</label>
+                    <input type="text" id="company" name="company" required placeholder="e.g., Google, Microsoft, Apple">
+                </div>
+                
+                <div class="form-group">
+                    <label for="job_title">Job Title *</label>
+                    <input type="text" id="job_title" name="job_title" required placeholder="e.g., Senior Software Engineer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="job_url">Job URL</label>
+                    <input type="url" id="job_url" name="job_url" placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="job_description">Job Description *</label>
+                    <textarea id="job_description" name="job_description" required placeholder="Paste the complete job description here..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-disabled" id="submitBtn" onclick="showUpgradeMessage(); return false;" title="Purchase Upgrade for Functionality">
+                    Analyze & Create Application
+                </button>
+            </form>
+            
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p style="color: #666; font-size: 18px; margin-bottom: 10px;"><strong>Processing...</strong></p>
+                <p style="color: #999; font-size: 14px;">Creating your application and generating documents</p>
+            </div>
+        </div>
+
+        <!-- Global Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="panel">
+                <div class="spinner"></div>
+                <div style="color:#333; font-weight:600; margin-bottom:4px;">Processing...</div>
+                <div style="color:#666; font-size:14px;">Creating your application and generating documents</div>
+            </div>
+        </div>
+
+        <div class="card hidden" id="success-card">
+            <div class="success-message">
+                <h2>Application Created Successfully!</h2>
+                <div class="match-score" id="match-score">--</div>
+                <p style="color: #666; margin-bottom: 10px;">Match Score</p>
+                <h1 id="success-title" style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 20px 0 15px 0; text-align: center;">--</h1>
+                <div id="success-job-info" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+                    <!-- Job information will be populated by JavaScript -->
+            </div>
+                <div id="success-job-link" style="margin-top: 20px; text-align: center;">
+                    <!-- Job link will be populated by JavaScript -->
+        </div>
+            </div>
+        </div>
+        
+        <!-- Success Actions - Outside both cards -->
+        <div class="success-actions" id="success-actions" style="display: none; margin-top: 20px;">
+            <a href="#" id="view-summary-btn" class="btn">View Summary</a>
+            <button class="btn btn-secondary" onclick="createAnother()">Create Another</button>
+        </div>
+        
+        <!-- Resume Manager Modal (hidden by default) -->
+        <div class="card hidden" id="resume-manager">
+            <h2 class="card-title">Resume Manager</h2>
+            
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="john@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" placeholder="+1-234-567-8900">
+            </div>
+            
+            <div class="form-group">
+                <label for="linkedin">LinkedIn</label>
+                <input type="text" id="linkedin" placeholder="linkedin.com/in/johndoe">
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="City, State">
+            </div>
+            
+            <div class="form-group">
+                <label for="resume_content">Resume Content (Markdown)</label>
+                <textarea id="resume_content" style="min-height: 300px;" placeholder="Paste your resume in markdown format..."></textarea>
+            </div>
+            
+            <!-- Technologies Section -->
+            <div class="form-group" id="technologies-section" style="display: none;">
+                <label>Extracted Technologies</label>
+                <div id="technologies-display" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; max-height: 200px; overflow-y: auto;">
+                    <p style="color: #666; font-style: italic; margin: 0;">No technologies extracted yet. Save your resume to extract technologies.</p>
+                </div>
+                <small style="color: #666; margin-top: 5px; display: block;">
+                    Technologies are automatically extracted when you save your resume and used for job matching.
+                </small>
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <button class="btn btn-disabled" id="save-resume-btn" onclick="showUpgradeMessage(); return false;" title="Purchase Upgrade for Functionality">Save Resume</button>
+                <button class="btn btn-secondary" onclick="hideResumeManager()">Cancel</button>
+            </div>
+        </div>
+        
+        <!-- Status Update Module (hidden by default) -->
+        <div class="card hidden" id="status-update-module">
+            <h2 class="card-title">Update Status</h2>
+            
+            <hr style="border: none; height: 1px; background: #e9ecef; margin-bottom: 30px;">
+            
+            <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
+                <div class="form-group">
+                    <label for="application_search">Application ID</label>
+                    <input type="text" id="application_search" placeholder="Search or select application ID..." autocomplete="off">
+                    <div id="application_dropdown" class="application-dropdown hidden"></div>
+                    <small>Start typing to search applications by company, job title, or ID</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_status">New Status</label>
+                    <select id="new_status" required>
+                        <option value="">-- Select Status --</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Applied">Applied</option>
+                        <option value="Contacted Someone">Contacted Someone</option>
+                        <option value="Company Response">Company Response</option>
+                        <option value="Scheduled Interview">Scheduled Interview</option>
+                        <option value="Interview Notes">Interview Notes</option>
+                        <option value="Interview - Follow Up">Interview - Follow Up</option>
+                        <option value="Offered">Offered</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Accepted">Accepted</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status_notes">Notes</label>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <small id="status_notes_character_count" style="color: #6c757d;">0 characters</small>
+                        </div>
+                    </div>
+                    <small style="color: #6c757d; margin-top: 8px; display: block;">You can format your notes with bold, italic, lists, and more. HTML formatting is preserved.</small>
+                </div>
+                
+                <button type="submit" class="btn" style="background: #fd7e14; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                    <div style="width: 16px; height: 16px; background: linear-gradient(45deg, #28a745, #dc3545, #007bff); border-radius: 2px; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-size: 8px;"></span>
+                    </div>
+                    Update Status
+                </button>
+            </form>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="hideStatusUpdate()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check Ollama status on page load
+        window.addEventListener('load', () => {
+            checkOllama(false);
+        });
+        
+        async function checkOllama(showMessage = true) {
+            // Demo version - hardcoded response
+            if (showMessage) {
+                showStatus(' AI Connected - Model: llama3:latest', 'success');
+            }
+            return;
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                if (data.connected) {
+                    if (showMessage) {
+                        showStatus(` AI Connected - Model: ${data.current_model}`, 'success');
+                    }
+                } else {
+                    showStatus(' AI Not Connected - Please start Ollama', 'warning');
+                }
+            } catch (error) {
+                showStatus(' Error checking AI status', 'error');
+            }
+        }
+        
+        async function submitApplication(event) {
+            event.preventDefault();
+            // Demo version - show upgrade message
+            showUpgradeMessage();
+            return;
+            
+            // Original function commented out for demo
+            // try {
+            //     const form = document.getElementById('jobForm');
+            //     ...
+            //     const response = await fetch('/api/applications', {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json'
+            //         },
+            //         body: JSON.stringify(data)
+            //     });
+                
+                const result = await response.json();
+                console.log('API Response:', result);
+                console.log('Response success:', result.success);
+                
+                if (result.success) {
+                    console.log('Success! Hiding form and showing success card...');
+                    
+                    // Hide loading and form
+                    document.getElementById('application-form').classList.add('hidden');
+                    
+                    // Show success card
+                    const successCard = document.getElementById('success-card');
+                    const matchScore = document.getElementById('match-score');
+                    const successTitle = document.getElementById('success-title');
+                    const successJobInfo = document.getElementById('success-job-info');
+                    
+                    if (successCard) successCard.classList.remove('hidden');
+                    if (matchScore) matchScore.textContent = `${Math.round(result.match_score || 0)}%`;
+                    if (successTitle) successTitle.textContent = `${data.company} - ${data.job_title}`;
+                    
+                    // Populate job information
+                    if (successJobInfo) {
+                        let jobInfoHtml = '';
+                        
+                        // Location
+                        if (result.location && result.location !== 'N/A') {
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span>${result.location}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        // Salary
+                        if (result.salary_range && result.salary_range !== 'N/A' && result.salary_range !== '$0') {
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>${result.salary_range}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        // Applied Date
+                        if (result.created_at) {
+                            const appliedDate = result.created_at.split(',')[0]; // Get date part only
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Applied: ${appliedDate}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        // Posted Date
+                        if (result.posted_date && result.posted_date !== 'N/A') {
+                            jobInfoHtml += `
+                                <div style="display: flex; align-items: center; gap: 8px; color: #6b7280; font-size: 14px; justify-content: center;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Posted: ${result.posted_date}</span>
+                                </div>
+                            `;
+                        }
+                        
+                        successJobInfo.innerHTML = jobInfoHtml || '<div style="color: #9ca3af; font-size: 14px; text-align: center;">No additional information available</div>';
+                    }
+                    
+                    // Populate job link
+                    const successJobLink = document.getElementById('success-job-link');
+                    if (successJobLink) {
+                        const jobUrl = result.job_url || data.job_url;
+                        if (jobUrl) {
+                            successJobLink.innerHTML = `
+                                <a href="${jobUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    View Job Posting
+                                </a>
+                            `;
+                        } else {
+                            successJobLink.innerHTML = '';
+                        }
+                    }
+                    
+                    const overlay = document.getElementById('loading-overlay');
+                    if (overlay) overlay.style.display = 'none';
+                    
+                    // Show success actions
+                    document.getElementById('success-actions').style.display = 'flex';
+                    
+                    // Set summary link - use the summary_url from backend
+                    if (result.summary_url) {
+                        document.getElementById('view-summary-btn').href = result.summary_url;
+                    }
+                    
+                    showStatus('Application created successfully!', 'success');
+                } else {
+                    showStatus(` Error: ${result.error}`, 'error');
+                    const formElement = document.getElementById('application-form').querySelector('form');
+                    if (formElement) formElement.classList.remove('hidden');
+                    document.getElementById('loading').classList.add('hidden');
+                    const overlay = document.getElementById('loading-overlay');
+                    if (overlay) overlay.style.display = 'none';
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            } catch (error) {
+                showStatus(` Error: ${error.message}`, 'error');
+                const formElement = document.getElementById('application-form').querySelector('form');
+                if (formElement) formElement.classList.remove('hidden');
+                document.getElementById('loading').classList.add('hidden');
+                const overlay = document.getElementById('loading-overlay');
+                if (overlay) overlay.style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            }
+            } catch (error) {
+                console.error('Error in submitApplication:', error);
+                showStatus(`Unexpected error: ${error.message}`, 'error');
+                // Reset form state
+                const formElement = document.getElementById('application-form').querySelector('form');
+                if (formElement) formElement.classList.remove('hidden');
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+        
+        function createAnother() {
+            // Reset form
+            document.getElementById('jobForm').reset();
+            
+            // Hide success card and related elements
+            document.getElementById('success-card').classList.add('hidden');
+            document.getElementById('success-actions').style.display = 'none';
+            
+            // Show form
+            document.getElementById('application-form').classList.remove('hidden');
+            const formElement = document.getElementById('application-form').querySelector('form');
+            if (formElement) formElement.classList.remove('hidden');
+            document.getElementById('loading').classList.add('hidden');
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+            
+            // Clear status
+            document.getElementById('status-banner').classList.add('hidden');
+        }
+        
+        function showStatus(message, type) {
+            const banner = document.getElementById('status-banner');
+            banner.textContent = message;
+            banner.className = `status-banner ${type}`;
+            banner.classList.remove('hidden');
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    banner.classList.add('hidden');
+                }, 5000);
+            }
+        }
+        
+        async function showResumeManager() {
+            document.getElementById('application-form').classList.add('hidden');
+            document.getElementById('resume-manager').classList.remove('hidden');
+            
+            // Load existing resume
+            try {
+                const response = await fetch('/api/resume');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const resume = data.resume;
+                    document.getElementById('full_name').value = resume.full_name || '';
+                    document.getElementById('email').value = resume.email || '';
+                    document.getElementById('phone').value = resume.phone || '';
+                    document.getElementById('linkedin').value = resume.linkedin || '';
+                    document.getElementById('location').value = resume.location || '';
+                    document.getElementById('resume_content').value = resume.content || '';
+                }
+                
+                // Load technologies
+                await loadTechnologies();
+            } catch (error) {
+                console.error('Error loading resume:', error);
+            }
+        }
+        
+        function showNewApplication() {
+            document.getElementById('resume-manager').classList.add('hidden');
+            document.getElementById('status-update-module').classList.add('hidden');
+            document.getElementById('application-form').classList.remove('hidden');
+        }
+        
+        function hideResumeManager() {
+            document.getElementById('resume-manager').classList.add('hidden');
+            document.getElementById('application-form').classList.remove('hidden');
+        }
+        
+        async function saveResume() {
+            // Demo version - show upgrade message
+            showUpgradeMessage();
+            return;
+            
+            // Original function commented out for demo
+            // async function saveResume() {
+            const data = {
+                full_name: document.getElementById('full_name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                linkedin: document.getElementById('linkedin').value,
+                location: document.getElementById('location').value,
+                content: document.getElementById('resume_content').value
+            };
+            
+            // Disable button and show loading
+            const saveButton = event?.target || document.getElementById('save-resume-btn') || document.querySelector('button[onclick*="saveResume"]');
+            const originalText = saveButton?.textContent || 'Save Resume';
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.textContent = 'Saving & Extracting Skills...';
+            }
+            
+            // Show initial status
+            showStatus('💾 Saving resume and extracting skills... This may take 30-60 seconds. Please wait...', 'info');
+            
+            console.log('Saving resume with content length:', data.content.length);
+            console.log('Content preview:', data.content.substring(0, 200) + '...');
+            
+            try {
+                const response = await fetch('/api/resume', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                console.log('Save response:', result);
+                
+                if (result.success) {
+                    let message = '✅ Resume saved successfully!';
+                    if (result.skills_extracted) {
+                        message += ` Skills extracted: ${result.skills_count} skills found.`;
+                    } else {
+                        message += ' (Note: Skill extraction may still be in progress or failed - check server logs)';
+                    }
+                    showStatus(message, 'success');
+                    
+                    // Show technologies section and reload technologies after saving
+                    document.getElementById('technologies-section').style.display = 'block';
+                    await loadTechnologies();
+                    
+                    // Reload page after 2 seconds to show updated skills
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showStatus(` ❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(` ❌ Error: ${error.message}`, 'error');
+            } finally {
+                // Re-enable button
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = originalText;
+                }
+            }
+        }
+        
+        // Status Update Module Functions
+        let selectedApplicationId = null;
+        let searchTimeout = null;
+        let quillEditor = null;
+        const statusNotesCharacterCount = document.getElementById('status_notes_character_count');
+        
+        function updateStatusNotesCharacterCount() {
+            if (!statusNotesCharacterCount) {
+                return;
+            }
+            
+            if (!quillEditor) {
+                statusNotesCharacterCount.textContent = '0 characters';
+                return;
+            }
+            
+            const text = quillEditor.getText();
+            const normalizedText = text.endsWith('\n') ? text.slice(0, -1) : text;
+            const length = normalizedText.length;
+            
+            statusNotesCharacterCount.textContent = `${length} ${length === 1 ? 'character' : 'characters'}`;
+        }
+        
+        async function showStatusUpdate() {
+            document.getElementById('application-form').classList.add('hidden');
+            document.getElementById('resume-manager').classList.add('hidden');
+            document.getElementById('status-update-module').classList.remove('hidden');
+            
+            // Reset form
+            document.getElementById('statusUpdateForm').reset();
+            selectedApplicationId = null;
+            document.getElementById('application_dropdown').classList.add('hidden');
+            
+            // Initialize Quill editor if not already initialized
+            if (!quillEditor) {
+                try {
+                    // Check if Quill is available
+                    if (typeof Quill === 'undefined') {
+                        console.error('Quill.js library not loaded');
+                        showStatus(' Rich text editor not available. Please refresh the page.', 'error');
+                        return;
+                    }
+                    
+                    quillEditor = new Quill('#status_notes', {
+                        theme: 'snow',
+                        placeholder: 'Add notes about this status update...',
+                        modules: {
+                            toolbar: [
+                                [{ 'header': [1, 2, 3, false] }],
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'color': [] }, { 'background': [] }],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                                [{ 'align': [] }],
+                                ['link', 'image', 'blockquote', 'code-block'],
+                                ['clean']
+                            ]
+                        }
+                    });
+                    
+                    // Add image upload handler
+                    const toolbar = quillEditor.getModule('toolbar');
+                    toolbar.addHandler('image', function() {
+                        const input = document.createElement('input');
+                        input.setAttribute('type', 'file');
+                        input.setAttribute('accept', 'image/*');
+                        input.click();
+                        
+                        input.onchange = async function() {
+                            const file = input.files[0];
+                            if (file) {
+                                const formData = new FormData();
+                                formData.append('image', file);
+                                
+                                try {
+                                    showStatus('📤 Uploading image...', 'info');
+                                    
+                                    const response = await fetch('/api/upload-image', {
+                                        method: 'POST',
+                                        body: formData
+                                    });
+                                    
+                                    const result = await response.json();
+                                    
+                                    if (result.success) {
+                                        const range = quillEditor.getSelection();
+                                        quillEditor.insertEmbed(range.index, 'image', result.url);
+                                        showStatus('✅ Image uploaded successfully!', 'success');
+                                    } else {
+                                        showStatus('❌ Failed to upload image: ' + result.error, 'error');
+                                    }
+                                } catch (error) {
+                                    console.error('Image upload error:', error);
+                                    showStatus('❌ Failed to upload image: ' + error.message, 'error');
+                                }
+                            }
+                        };
+                    });
+                    
+                    // Function to normalize all content to use CSS styles
+                    function normalizeEditorContent() {
+                        if (!quillEditor) return;
+                        
+                        const length = quillEditor.getLength();
+                        if (length <= 1) return; // Empty or just newline
+                        
+                        // Remove all inline formatting that would override CSS
+                        quillEditor.formatText(0, length - 1, {
+                            'font': false,
+                            'size': false,
+                            'color': false,
+                            'align': false
+                        }, 'api');
+                        
+                        // Remove inline styles from HTML elements
+                        const editorElement = quillEditor.root;
+                        const allElements = editorElement.querySelectorAll('*');
+                        allElements.forEach(function(el) {
+                            // Remove style attributes that override our CSS
+                            if (el.hasAttribute('style')) {
+                                const style = el.getAttribute('style');
+                                // Remove font-size, font-family, color, text-align, line-height from inline styles
+                                const newStyle = style
+                                    .replace(/font-size\s*:\s*[^;]+;?/gi, '')
+                                    .replace(/font-family\s*:\s*[^;]+;?/gi, '')
+                                    .replace(/color\s*:\s*[^;]+;?/gi, '')
+                                    .replace(/text-align\s*:\s*[^;]+;?/gi, '')
+                                    .replace(/line-height\s*:\s*[^;]+;?/gi, '');
+                                
+                                if (newStyle.trim()) {
+                                    el.setAttribute('style', newStyle.trim());
+                                } else {
+                                    el.removeAttribute('style');
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Add paste handler to normalize font styles and formatting
+                    quillEditor.clipboard.addMatcher(Node.TEXT_NODE, function(node, delta) {
+                        // Remove any formatting attributes that would override CSS
+                        const ops = [];
+                        delta.ops.forEach(function(op) {
+                            if (op.attributes) {
+                                // Remove attributes that override CSS
+                                delete op.attributes['font-family'];
+                                delete op.attributes['size'];
+                                delete op.attributes['color'];
+                                delete op.attributes['align'];
+                            }
+                            ops.push(op);
+                        });
+                        return { ops: ops };
+                    });
+                    
+                    quillEditor.clipboard.addMatcher(Node.ELEMENT_NODE, function(node, delta) {
+                        // Normalize all pasted elements
+                        if (node.nodeName === 'P' || node.nodeName === 'DIV' || node.nodeName === 'SPAN') {
+                            const ops = [];
+                            delta.ops.forEach(function(op) {
+                                if (op.attributes) {
+                                    // Remove attributes that override CSS
+                                    delete op.attributes['font-family'];
+                                    delete op.attributes['size'];
+                                    delete op.attributes['color'];
+                                    delete op.attributes['align'];
+                                }
+                                ops.push(op);
+                            });
+                            return { ops: ops };
+                        }
+                        return delta;
+                    });
+                    
+                    // Additional paste normalization after paste event
+                    quillEditor.root.addEventListener('paste', function(e) {
+                        setTimeout(function() {
+                            normalizeEditorContent();
+                        }, 100);
+                    }, true);
+                    
+                    // Normalize content after significant changes (paste, template insertion)
+                    // Use a flag to track if we should normalize (set by paste handler or manual insertion)
+                    let shouldNormalize = false;
+                    
+                    quillEditor.on('text-change', function(delta, oldDelta, source) {
+                        // Always update character count
+                        updateStatusNotesCharacterCount();
+                        
+                        // Only normalize if content was inserted from external source (paste, API, etc.)
+                        // Not on user typing (source === 'user')
+                        if (source !== 'user' || shouldNormalize) {
+                            setTimeout(function() {
+                                normalizeEditorContent();
+                                shouldNormalize = false;
+                            }, 100);
+                        }
+                    });
+                    
+                    // Override setContents to normalize after template insertion
+                    const originalSetContents = quillEditor.setContents.bind(quillEditor);
+                    quillEditor.setContents = function(delta, source) {
+                        const result = originalSetContents(delta, source);
+                        setTimeout(function() {
+                            normalizeEditorContent();
+                        }, 100);
+                        return result;
+                    };
+                    
+                    console.log('Quill editor initialized successfully');
+
+                    updateStatusNotesCharacterCount();
+                } catch (error) {
+                    console.error('Error initializing Quill editor:', error);
+                    showStatus(' Error initializing rich text editor. Please refresh the page.', 'error');
+                }
+            } else {
+                // Clear the editor content
+                quillEditor.setContents([]);
+                updateStatusNotesCharacterCount();
+            }
+            
+            // Add event listeners
+            const searchInput = document.getElementById('application_search');
+            searchInput.addEventListener('input', handleApplicationSearch);
+            searchInput.addEventListener('blur', () => {
+                // Delay hiding dropdown to allow clicks
+                setTimeout(() => {
+                    document.getElementById('application_dropdown').classList.add('hidden');
+                }, 200);
+            });
+            searchInput.addEventListener('focus', () => {
+                if (document.getElementById('application_dropdown').children.length > 0) {
+                    document.getElementById('application_dropdown').classList.remove('hidden');
+                }
+            });
+        }
+        
+        function hideStatusUpdate() {
+            document.getElementById('status-update-module').classList.add('hidden');
+            document.getElementById('application-form').classList.remove('hidden');
+        }
+        
+        async function handleApplicationSearch(event) {
+            const query = event.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                if (query.length < 2) {
+                    document.getElementById('application_dropdown').classList.add('hidden');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/api/applications/search?q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        displayApplicationDropdown(data.applications);
+                    }
+                } catch (error) {
+                    console.error('Error searching applications:', error);
+                }
+            }, 300);
+        }
+        
+        function displayApplicationDropdown(applications) {
+            const dropdown = document.getElementById('application_dropdown');
+            dropdown.innerHTML = '';
+            
+            if (applications.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'application-dropdown-item';
+                noResults.textContent = 'No applications found';
+                noResults.style.color = '#999';
+                noResults.style.fontStyle = 'italic';
+                dropdown.appendChild(noResults);
+            } else {
+                applications.forEach(app => {
+                    const item = document.createElement('div');
+                    item.className = 'application-dropdown-item';
+                    item.innerHTML = `
+                        <div class="company">${app.company}</div>
+                        <div class="job-title">${app.job_title}</div>
+                        <div class="app-id">${app.id}</div>
+                    `;
+                    item.addEventListener('click', () => selectApplication(app));
+                    dropdown.appendChild(item);
+                });
+            }
+            
+            dropdown.classList.remove('hidden');
+        }
+        
+        function selectApplication(app) {
+            selectedApplicationId = app.id;
+            document.getElementById('application_search').value = `${app.company} - ${app.job_title}`;
+            document.getElementById('application_dropdown').classList.add('hidden');
+        }
+        
+        async function submitStatusUpdate(event) {
+            event.preventDefault();
+            
+            console.log('=== STATUS UPDATE SUBMISSION START ===');
+            
+            if (!selectedApplicationId) {
+                showStatus(' Please select an application first', 'error');
+                return;
+            }
+            
+            const status = document.getElementById('new_status').value;
+            console.log('Selected status:', `"${status}"`);
+            console.log('Status length:', status.length);
+            console.log('Status trimmed:', `"${status.trim()}"`);
+            
+            // Get HTML content from Quill editor
+            const notes = quillEditor ? quillEditor.root.innerHTML : '';
+            
+            if (!status) {
+                showStatus(' Please select a status', 'error');
+                return;
+            }
+            
+            console.log('Making API call...');
+            
+            try {
+                const response = await fetch(`/api/applications/${selectedApplicationId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        notes: notes || null
+                    })
+                });
+                
+                console.log('Response received:', response.status);
+                
+                const result = await response.json();
+                
+                console.log('=== API RESPONSE ===');
+                console.log('Full result:', result);
+                console.log('Success:', result.success);
+                console.log('Redirect:', result.redirect);
+                console.log('Message:', result.message);
+                
+                if (result.success) {
+                    // Navigate to dashboard FIRST if this was a rejection (before any other code runs)
+                    if (result.redirect === 'dashboard') {
+                        // Immediately prevent any other navigation
+                        event.preventDefault();
+                        
+                        // Use window.location.replace to prevent back button from going to error page
+                        // Check if we're on the main UI page or a summary page
+                        if (window.location.pathname.includes('/applications/')) {
+                            // We're on a summary page - do full redirect
+                            window.location.replace('/index.html');
+                        } else {
+                            // We're on the main UI - use NavigationManager
+                            if (window.navManager) {
+                                window.navManager.navigateToPage('dashboard');
+                                
+                                // After navigation, ensure the "all" tab is active
+                                setTimeout(() => {
+                                    if (window.dashboardManager && window.dashboardManager.switchTab) {
+                                        window.dashboardManager.switchTab('all');
+                                    } else {
+                                        const allTab = document.querySelector('[data-status="all"]');
+                                        if (allTab) {
+                                            allTab.click();
+                                        }
+                                    }
+                                }, 300);
+                            } else {
+                                window.location.replace('/index.html');
+                            }
+                        }
+                        
+                        // Show success message
+                        showStatus(` ${result.message}`, 'success');
+                        hideStatusUpdate();
+                        return; // Exit early to prevent any other code from running
+                    }
+                    
+                    showStatus(` ${result.message}`, 'success');
+                    hideStatusUpdate();
+                    
+                    // Reset form
+                    document.getElementById('statusUpdateForm').reset();
+                    if (quillEditor) {
+                        quillEditor.setContents([]);
+                    }
+                    selectedApplicationId = null;
+                } else {
+                    showStatus(` Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.log('=== ERROR ===');
+                console.log('Error:', error);
+                showStatus(` Error: ${error.message}`, 'error');
+            }
+            
+            console.log('=== STATUS UPDATE SUBMISSION END ===');
+        }
+        
+        // Technology Management Functions
+        async function loadTechnologies() {
+            try {
+                console.log('Loading technologies...');
+                const response = await fetch(`/api/resume/technologies?t=${Date.now()}`);
+                const data = await response.json();
+                console.log('Technologies API response:', data);
+                
+                const technologiesSection = document.getElementById('technologies-section');
+                const technologiesDisplay = document.getElementById('technologies-display');
+                
+                if (data.success && data.technologies) {
+                    console.log('Displaying technologies:', data.technologies);
+                    technologiesSection.style.display = 'block';
+                    displayTechnologies(data.technologies);
+                } else {
+                    console.log('No technologies found or API error');
+                    technologiesSection.style.display = 'block';
+                    technologiesDisplay.innerHTML = '<p style="color: #666; font-style: italic; margin: 0;">No technologies extracted yet. Save your resume to extract technologies.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading technologies:', error);
+            }
+        }
+        
+        function displayTechnologies(techData) {
+            const technologiesDisplay = document.getElementById('technologies-display');
+            const technologies = techData.technologies || {};
+            
+            if (Object.keys(technologies).length === 0) {
+                technologiesDisplay.innerHTML = '<p style="color: #666; font-style: italic; margin: 0;">No technologies found in resume.</p>';
+                return;
+            }
+            
+            // Group technologies by category
+            const categories = {};
+            Object.entries(technologies).forEach(([techName, techInfo]) => {
+                const category = techInfo.category || 'Other';
+                if (!categories[category]) {
+                    categories[category] = [];
+                }
+                categories[category].push({
+                    name: techName,
+                    display_name: techInfo.display_name || techName,
+                    variations: techInfo.variations_found || []
+                });
+            });
+            
+            // Create HTML for technologies
+            let html = `<div style="margin-bottom: 10px; color: #666; font-size: 12px;">
+                <strong>Total Technologies:</strong> ${techData.total_technologies} | 
+                <strong>Extracted:</strong> ${new Date(techData.extracted_at).toLocaleString()}
+            </div>`;
+            
+            Object.entries(categories).sort().forEach(([category, techs]) => {
+                html += `<div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; color: #333; margin-bottom: 8px; font-size: 14px;">${category}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">`;
+                
+                techs.forEach(tech => {
+                    html += `<span style="display: inline-block; background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 12px; font-size: 11px; border: 1px solid #bbdefb;">
+                        ${tech.display_name}
+                    </span>`;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            technologiesDisplay.innerHTML = html;
+        }
+        
+        // Simple loading state - no complex animation needed
+        
+        // Test Quill availability on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Quill !== 'undefined') {
+                console.log('✅ Quill.js loaded successfully');
+            } else {
+                console.error('❌ Quill.js not loaded');
+            }
+            
+            // Check if resume parameter is present in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('resume') === 'true') {
+                // Auto-show resume manager
+                if (typeof showResumeManager === 'function') {
+                    showResumeManager();
+                }
+            }
+        });
+    </script>
+    
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,349 @@
+/* Cover Letter Minimalist Design System */
+
+.cover-letter-minimal {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  background: #ffffff;
+  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.7;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+/* Header - Minimalist */
+.minimal-header {
+  text-align: left;
+  margin-bottom: 50px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.minimal-name {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.minimal-contact {
+  font-size: 15px;
+  color: #666666;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.minimal-date {
+  font-size: 14px;
+  color: #999999;
+  margin-top: 20px;
+  font-weight: 400;
+}
+
+/* Content Sections */
+.minimal-content {
+  margin-bottom: 50px;
+}
+
+.minimal-salutation {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 25px;
+  color: #333333;
+}
+
+.minimal-paragraph {
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2a2a2a;
+  text-align: justify;
+}
+
+.minimal-paragraph:last-of-type {
+  margin-bottom: 35px;
+}
+
+/* ML Analysis - Minimalist Cards */
+.minimal-analysis {
+  margin-top: 50px;
+  padding: 40px;
+  background: #fafafa;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+}
+
+.minimal-analysis-header {
+  margin-bottom: 35px;
+  text-align: center;
+}
+
+.minimal-analysis-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.minimal-analysis-subtitle {
+  font-size: 15px;
+  color: #666666;
+  font-weight: 400;
+}
+
+/* Match Score - Minimalist */
+.minimal-match-score {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+}
+
+.minimal-score-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 8px;
+  letter-spacing: -0.03em;
+}
+
+.minimal-score-label {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.minimal-score-bar {
+  width: 200px;
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  margin: 20px auto 0;
+  overflow: hidden;
+}
+
+.minimal-score-fill {
+  height: 100%;
+  background: #000000;
+  border-radius: 2px;
+  transition: width 0.8s ease;
+}
+
+/* Metrics Grid */
+.minimal-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.minimal-metric {
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  text-align: center;
+}
+
+.minimal-metric-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 5px;
+  letter-spacing: -0.01em;
+}
+
+.minimal-metric-label {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Skills Section - Minimalist */
+.minimal-skills {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.minimal-skills-header {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.minimal-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.minimal-skill-item {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  border: 1px solid #f0f0f0;
+}
+
+/* Methodology - Minimalist */
+.minimal-methodology {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  padding: 30px;
+  text-align: center;
+}
+
+.minimal-methodology-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 15px;
+}
+
+.minimal-methodology-text {
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Closing */
+.minimal-closing {
+  margin-top: 50px;
+  text-align: left;
+}
+
+.minimal-closing-paragraph {
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2a2a2a;
+  text-align: justify;
+}
+
+.minimal-signature {
+  margin-top: 40px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.minimal-signature-name {
+  font-weight: 600;
+  color: #000000;
+  margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cover-letter-minimal {
+    padding: 40px 20px;
+  }
+  
+  .minimal-name {
+    font-size: 28px;
+  }
+  
+  .minimal-score-value {
+    font-size: 36px;
+  }
+  
+  .minimal-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .minimal-skills-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .minimal-analysis {
+    padding: 30px 20px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .cover-letter-minimal {
+    padding: 40px 30px;
+    box-shadow: none;
+  }
+  
+  .minimal-analysis {
+    background: #fafafa !important;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .minimal-match-score,
+  .minimal-metric,
+  .minimal-skills,
+  .minimal-methodology {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .cover-letter-minimal {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+  
+  .minimal-name,
+  .minimal-score-value,
+  .minimal-skills-header,
+  .minimal-methodology-title {
+    color: #ffffff;
+  }
+  
+  .minimal-contact,
+  .minimal-date,
+  .minimal-analysis-subtitle,
+  .minimal-score-label,
+  .minimal-metric-label,
+  .minimal-methodology-text {
+    color: #cccccc;
+  }
+  
+  .minimal-paragraph,
+  .minimal-closing-paragraph {
+    color: #e0e0e0;
+  }
+  
+  .minimal-analysis {
+    background: #2a2a2a;
+    border-color: #404040;
+  }
+  
+  .minimal-match-score,
+  .minimal-metric,
+  .minimal-skills,
+  .minimal-methodology {
+    background: #2a2a2a;
+    border-color: #404040;
+  }
+  
+  .minimal-skill-item {
+    background: #333333;
+    color: #ffffff;
+    border-color: #404040;
+  }
+}
+

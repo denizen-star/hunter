@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Reports - Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+        
+        .main-wrapper {
+            width: 100%;
+            margin: 0;
+            padding: var(--space-md);
+            box-sizing: border-box;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            flex: 1;
+        }
+        
+        .hero-header-period {
+            display: flex;
+            align-items: center;
+        }
+        
+        .period-selector {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            background: var(--bg-primary);
+            padding: 4px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+        
+        .hero-header-period .period-selector {
+            margin: 0;
+        }
+        
+        .period-btn {
+            padding: 8px var(--space-md);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .period-btn:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
+        }
+        
+        .period-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .hero-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .stats-grid {
+                gap: var(--space-sm);
+            }
+            
+            .stat-item {
+                min-width: 110px;
+                padding: var(--space-sm) var(--space-md);
+            }
+            
+            .stat-number {
+                font-size: var(--font-xl);
+            }
+            
+            .stat-label {
+                font-size: var(--font-xs);
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .stats-grid {
+                justify-content: flex-start;
+            }
+            
+            .stat-item {
+                min-width: 100px;
+                padding: var(--space-sm) var(--space-md);
+            }
+            
+            .stat-number {
+                font-size: var(--font-lg);
+            }
+            
+            .stat-label {
+                font-size: 10px;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-primary);
+            }
+            
+            .container {
+                width: 100%;
+                margin-left: 0;
+                padding: var(--space-md);
+            }
+            
+            .stats-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stat-item {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .tabs-header {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                min-width: 100px;
+                flex: 1;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+            
+            .followup-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            
+            .followup-timestamp {
+                margin-left: 0;
+            }
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
+            z-index: 1000;
+            padding: var(--space-md) 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sidebar-menu a:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a.active {
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .nav-bar {
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            position: sticky;
+            top: 100px;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        
+        .tabs-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .tabs-header {
+            display: flex;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px var(--space-lg);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+        
+        .tab:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .followup-flagged-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            max-width: 1200px;
+            margin: 0 auto var(--space-lg) auto;
+            width: 100%;
+        }
+        
+        .followup-flagged-container .report-card {
+            width: 100%;
+        }
+        
+        .report-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+            overflow: hidden;
+            color: var(--text-primary);
+        }
+        
+        .report-card-header {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .report-card-header:hover {
+            background: var(--bg-hover);
+        }
+        
+        .report-card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .report-card-header .collapse-icon {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        .report-card.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .report-card-body {
+            padding: var(--space-lg);
+            transition: max-height 0.3s ease;
+        }
+        
+        .report-card.collapsed .report-card-body {
+            display: none;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            margin-bottom: var(--space-md);
+            background: var(--bg-primary);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            box-sizing: border-box;
+        }
+        
+        .chart-container canvas {
+            max-width: 100%;
+            height: 100% !important;
+        }
+        
+        .chart-timestamp {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 6pt;
+            color: var(--text-tertiary);
+            font-family: var(--font-family);
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .followup-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .followup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-sm);
+            background: var(--bg-primary);
+        }
+        
+        .followup-item:hover {
+            background: var(--bg-hover);
+        }
+        
+        .followup-item:last-child {
+            border-bottom: none;
+        }
+        
+        .followup-info {
+            flex: 1;
+        }
+        
+        .followup-company {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            font-size: var(--font-base);
+        }
+        
+        .followup-position {
+            color: var(--text-secondary);
+            font-size: var(--font-sm);
+            margin-bottom: 5px;
+        }
+        
+        .followup-match {
+            color: var(--accent-blue);
+            font-weight: var(--font-semibold);
+            font-size: var(--font-sm);
+        }
+        
+        .followup-timestamp {
+            color: var(--text-tertiary);
+            font-size: var(--font-xs);
+            margin-left: var(--space-md);
+        }
+        
+        .followup-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            padding: 8px var(--space-md);
+            border-radius: var(--radius-sm);
+            background: var(--accent-blue-light);
+            transition: all 0.2s ease;
+        }
+        
+        .followup-link:hover {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0 0 var(--space-sm) 0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            border: 3px solid var(--border-primary);
+            border-top: 3px solid var(--accent-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-md);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Stats Summary - Full Width, aligned with main content */
+        .stats-summary {
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            margin: 0;
+            margin-top: 0;
+            border: none;
+            box-shadow: none;
+            position: relative;
+            z-index: 1;
+            color: var(--text-primary);
+            width: 100%;
+            margin-left: 0;
+            box-sizing: border-box;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 6px;
+            margin: 0;
+            padding: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .stat-item {
+            text-align: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            box-shadow: none;
+            min-width: auto;
+            flex: 0 0 auto;
+        }
+        
+        .stat-item:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+            border-color: var(--accent-blue);
+        }
+        
+        .stat-number {
+            font-size: 17px;
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: 1px;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: var(--font-medium);
+            line-height: 1.2;
+        }
+        
+        @media (max-width: 1400px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+        }
+    </style>
+<!-- Shared sidebar is injected by static/js/shared-menu.js -->
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/index.html" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/Reports.png" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>Reports</h1>
+                    <p class="hero-header-subtitle">Track your progress by status.</p>
+                </div>
+            </div>
+        </div>
+        <div class="hero-header-period" style="display: flex; align-items: center; gap: 16px;">
+            <!-- Type Filter -->
+            <div class="period-selector" style="margin-right: 16px;">
+                <button class="period-btn active" data-type="jobs" onclick="selectType('jobs')">Jobs</button>
+                <button class="period-btn" data-type="networking" onclick="selectType('networking')">Networking</button>
+                <button class="period-btn" data-type="both" onclick="selectType('both')">Both</button>
+            </div>
+            <!-- Period Filter -->
+            <div class="period-selector">
+                <button class="period-btn active" data-period="today" onclick="selectPeriod('today')">Today</button>
+                <button class="period-btn" data-period="yesterday" onclick="selectPeriod('yesterday')">Yesterday</button>
+                <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Days</button>
+                <button class="period-btn" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
+                <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
+            </div>
+            <button class="period-btn btn-disabled" onclick="showUpgradeMessage(); return false;" title="Purchase Upgrade for Functionality" style="margin-left: 8px; background: #10b981; color: white; opacity: 0.5; cursor: not-allowed;">
+                Export CSV
+            </button>
+        </div>
+    </div>
+    
+    <div class="stats-summary" id="stats-summary">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading statistics...</p>
+        </div>
+    </div>
+    
+    <div class="main-wrapper">
+        
+        <div class="reports-grid">
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Applications by Status</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="applicationsByStatusChart"></canvas>
+                        <div class="chart-timestamp" id="applicationsByStatusChart-timestamp"></div>
+                    </div>
+                    <div id="applicationsByStatusData" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Applications by Status Change</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="statusChangesChart"></canvas>
+                        <div class="chart-timestamp" id="statusChangesChart-timestamp"></div>
+                    </div>
+                    <div id="statusChangesData" style="display: none; margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="reports-grid" style="margin-top: var(--space-lg);">
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Daily Activities by Status</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="dailyActivitiesChart"></canvas>
+                        <div class="chart-timestamp" id="dailyActivitiesChart-timestamp"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Cumulative Activities by Status</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="chart-container">
+                        <canvas id="cumulativeActivitiesChart"></canvas>
+                        <div class="chart-timestamp" id="cumulativeActivitiesChart-timestamp"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Networking Rewards by Category Report -->
+        <div class="reports-grid" style="margin-top: var(--space-lg);">
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Networking Rewards by Category</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <div id="networking-rewards-category" style="padding: 20px;">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading networking rewards...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="followup-flagged-container">
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Applications Requiring Follow-up</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-md); font-size: var(--font-sm);">Applications with more than one week without updates</p>
+                    <div id="followup-list" class="followup-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No applications requiring follow-up</h3>
+                            <p>All applications are up to date</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-card-header" onclick="toggleCollapse(this)">
+                    <h3>Flagged Applications</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="report-card-body">
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-md); font-size: var(--font-sm);">Applications you've flagged for review</p>
+                    <div id="flagged-list" class="followup-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>No flagged applications</h3>
+                            <p>You haven't flagged any applications yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        let currentPeriod = 'today';
+        let currentType = 'jobs';
+        let reportsData = null;
+        
+        // Format current time in EST timezone
+        function formatTimestampEST() {
+            const now = new Date();
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/New_York',
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            const parts = formatter.formatToParts(now);
+            const month = parts.find(p => p.type === 'month').value;
+            const day = parts.find(p => p.type === 'day').value;
+            const year = parts.find(p => p.type === 'year').value;
+            const hour = parts.find(p => p.type === 'hour').value;
+            const minute = parts.find(p => p.type === 'minute').value;
+            const ampm = parts.find(p => p.type === 'dayPeriod').value.toUpperCase();
+            return `Last updated: ${month}/${day}/${year} ${hour}:${minute} ${ampm} EST`;
+        }
+        
+        // Update all chart timestamps
+        function updateAllTimestamps() {
+            const timestamp = formatTimestampEST();
+            document.querySelectorAll('.chart-timestamp').forEach(el => {
+                el.textContent = timestamp;
+            });
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, Chart.js available:', typeof Chart !== 'undefined');
+            
+            // Load networking rewards by category
+            loadNetworkingRewardsByCategory();
+            
+            // Wait a bit for Chart.js to fully initialize
+            setTimeout(() => {
+                if (typeof Chart !== 'undefined') {
+                    console.log('Chart.js version:', Chart.version);
+                    testChartCreation();
+                    loadReportsData();
+                } else {
+                    console.error('Chart.js not loaded after timeout');
+                    loadReportsData(); // Still load data for text fallback
+                }
+            }, 100);
+        });
+        
+        // Test chart creation
+        function testChartCreation() {
+            const testCanvas = document.createElement('canvas');
+            testCanvas.id = 'test-chart';
+            testCanvas.style.display = 'none';
+            document.body.appendChild(testCanvas);
+            
+            try {
+                const testCtx = testCanvas.getContext('2d');
+                const testChart = new Chart(testCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Test'],
+                        datasets: [{
+                            label: 'Test',
+                            data: [1],
+                            backgroundColor: ['#667eea']
+                        }]
+                    },
+                    options: {
+                        responsive: false
+                    }
+                });
+                console.log('Test chart created successfully');
+                testChart.destroy();
+                document.body.removeChild(testCanvas);
+            } catch (error) {
+                console.error('Test chart failed:', error);
+                document.body.removeChild(testCanvas);
+            }
+        }
+        
+        // Type selection
+        function selectType(type) {
+            // Remove active from all type buttons
+            document.querySelectorAll('[data-type]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Activate the clicked button
+            const clickedButton = document.querySelector(`[data-type="${type}"]`);
+            clickedButton.classList.add('active');
+            currentType = type;
+            
+            // Reload data
+            loadReportsData();
+        }
+        
+        // Period selection
+        function selectPeriod(period) {
+            const clickedButton = document.querySelector(`[data-period="${period}"]`);
+            const isCurrentlyActive = clickedButton.classList.contains('active');
+            
+            // If clicking the same period that's already active, toggle it off
+            if (isCurrentlyActive) {
+                clickedButton.classList.remove('active');
+                // If deselecting 'all', switch to a default period (30days)
+                if (period === 'all') {
+                    currentPeriod = '30days';
+                    const defaultButton = document.querySelector(`[data-period="30days"]`);
+                    if (defaultButton) {
+                        defaultButton.classList.add('active');
+                    }
+                } else {
+                    // If deselecting any other period, switch to 'all'
+                    currentPeriod = 'all';
+                    const allButton = document.querySelector(`[data-period="all"]`);
+                    if (allButton) {
+                        allButton.classList.add('active');
+                    }
+                }
+            } else {
+                // Remove active from all period buttons
+                document.querySelectorAll('[data-period]').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Activate the clicked button
+                clickedButton.classList.add('active');
+                currentPeriod = period;
+            }
+            
+            // Reload data
+            loadReportsData();
+        }
+        
+        // Load reports data
+        async function loadReportsData() {
+            try {
+                console.log('Loading reports data for period:', currentPeriod, 'type:', currentType);
+                
+                // Wait for DEMO_DATA to load
+                let attempts = 0;
+                const maxAttempts = 50; // Wait up to 5 seconds
+                while (attempts < maxAttempts) {
+                    if (typeof window.DEMO_DATA !== 'undefined') {
+                        break; // DEMO_DATA is available
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                // Demo version - use real data from hunter app
+                // Wait for reports data to load
+                let attempts2 = 0;
+                const maxAttempts2 = 50;
+                while (attempts2 < maxAttempts2) {
+                    if (typeof window.DEMO_REPORTS_DATA !== 'undefined') {
+                        break;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts2++;
+                }
+                
+                // Use real reports data if available, otherwise fall back to demo data
+                let data;
+                if (typeof window.DEMO_REPORTS_DATA !== 'undefined' && window.DEMO_REPORTS_DATA.success) {
+                    data = window.DEMO_REPORTS_DATA;
+                } else if (typeof window.DEMO_DATA !== 'undefined') {
+                    // Fallback to demo data
+                    const allApps = [...window.DEMO_DATA.applications, ...window.DEMO_DATA.archived];
+                    data = {
+                        success: true,
+                        stats: window.DEMO_DATA.stats || {},
+                        applications: allApps,
+                        followup_applications: [], // Empty for demo
+                        flagged_applications: [], // Empty for demo
+                        // Use hardcoded chart data
+                        applications_by_status: window.DEMO_DATA.applicationsByStatus || {},
+                        status_changes: window.DEMO_DATA.statusChanges || {},
+                        daily_activities_by_status: window.DEMO_DATA.dailyActivitiesByStatus || {},
+                        cumulative_activities_by_status: window.DEMO_DATA.cumulativeActivitiesByStatus || {},
+                        summary: {
+                            total_applications: allApps.length,
+                            new_applications: 2,
+                            active_applications: window.DEMO_DATA.applications?.length || 0,
+                            archived_applications: window.DEMO_DATA.archived?.length || 0,
+                            status_changes: 12,
+                            total_contact_count: window.DEMO_DATA.contacts?.length || 0,
+                            rejected: 0,
+                            followup_needed: 0,
+                            total_actions: 15
+                        }
+                    };
+                } else {
+                    data = { success: false, error: 'No data available' };
+                }
+                    
+                    // Process data (continue with existing logic)
+                    if (data.success) {
+                        reportsData = data;
+                        // Update charts with hardcoded demo data
+                        updateApplicationsByStatusChart(data.applications_by_status);
+                        updateStatusChangesChart(data.status_changes);
+                        updateDailyActivitiesChart(data.daily_activities_by_status);
+                        updateCumulativeActivitiesChart(data.cumulative_activities_by_status);
+                        updateFollowupList(data.followup_applications || []);
+                        updateFlaggedList(data.flagged_applications || []);
+                        // Update stats summary
+                        updateStatsSummary(data.summary);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading reports data:', error);
+            }
+        }
+        
+        // Update stats summary
+        function updateStatsSummary(summary) {
+            const summaryHtml = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.total_applications}</div>
+                        <div class="stat-label">Total Applications</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.new_applications}</div>
+                        <div class="stat-label">New Applications</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.active_applications}</div>
+                        <div class="stat-label">Active Applications</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.status_changes}</div>
+                        <div class="stat-label">Status Changes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.total_contact_count}</div>
+                        <div class="stat-label">Total Contacts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.rejected}</div>
+                        <div class="stat-label">Rejected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.followup_needed}</div>
+                        <div class="stat-label">Need Follow-up</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${summary.total_actions}</div>
+                        <div class="stat-label">Actions</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('stats-summary').innerHTML = summaryHtml;
+        }
+        
+        // Update applications by status chart
+        function updateApplicationsByStatusChart(data) {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                showDataAsText('applicationsByStatusData', data);
+                return;
+            }
+            
+            const canvas = document.getElementById('applicationsByStatusChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.applicationsByStatusChart && typeof window.applicationsByStatusChart.destroy === 'function') {
+                window.applicationsByStatusChart.destroy();
+            }
+            
+            // Format labels to title case and make them shorter
+            const labelMapping = {
+                'applied': 'Applied',
+                'pending': 'Pending',
+                'rejected': 'Rejected',
+                'contacted someone': 'Contacted',
+                'contacted hiring manager': 'Company Response',
+                'company response': 'Company Response',
+                'scheduled interview': 'Scheduled Interview',
+                'interviewed': 'Interview Notes',
+                'interview notes': 'Interview Notes',
+                'interview - follow up': 'Interview Follow Up',
+                'offered': 'Offered',
+                'accepted': 'Accepted',
+                'withdrawn': 'Withdrawn'
+            };
+            
+            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
+            const values = Object.values(data);
+            const colors = [
+                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
+            ];
+            
+            console.log('Applications by Status Chart Data:', { labels, values, data });
+            
+            try {
+                window.applicationsByStatusChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Applications',
+                            data: values,
+                            backgroundColor: colors.slice(0, labels.length),
+                            borderColor: colors.slice(0, labels.length),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Applications by Status Chart created successfully');
+                // Hide text fallback immediately when chart works
+                document.getElementById('applicationsByStatusData').style.display = 'none';
+            } catch (error) {
+                console.error('Error creating Applications by Status Chart:', error);
+                // Show text fallback
+                showDataAsText('applicationsByStatusData', data);
+            }
+        }
+        
+        // Update status changes chart
+        function updateStatusChangesChart(data) {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                showDataAsText('statusChangesData', data);
+                return;
+            }
+            
+            const canvas = document.getElementById('statusChangesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.statusChangesChart && typeof window.statusChangesChart.destroy === 'function') {
+                window.statusChangesChart.destroy();
+            }
+            
+            // Format labels to title case and make them shorter
+            const labelMapping = {
+                'applied': 'Applied',
+                'pending': 'Pending',
+                'rejected': 'Rejected',
+                'contacted someone': 'Contacted',
+                'contacted hiring manager': 'Company Response',
+                'company response': 'Company Response',
+                'scheduled interview': 'Scheduled Interview',
+                'interviewed': 'Interview Notes',
+                'interview notes': 'Interview Notes',
+                'interview - follow up': 'Interview Follow Up',
+                'offered': 'Offered',
+                'accepted': 'Accepted',
+                'withdrawn': 'Withdrawn'
+            };
+            
+            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
+            const values = Object.values(data);
+            const colors = [
+                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
+                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
+            ];
+            
+            console.log('Status Changes Chart Data:', { labels, values, data });
+            
+            try {
+                window.statusChangesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Status Changes',
+                            data: values,
+                            backgroundColor: colors.slice(0, labels.length),
+                            borderColor: colors.slice(0, labels.length),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Status Changes Chart created successfully');
+                // Hide text fallback immediately when chart works
+                document.getElementById('statusChangesData').style.display = 'none';
+            } catch (error) {
+                console.error('Error creating Status Changes Chart:', error);
+                // Show text fallback
+                showDataAsText('statusChangesData', data);
+            }
+        }
+        
+        // Update daily activities chart
+        function updateDailyActivitiesChart(data) {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            const canvas = document.getElementById('dailyActivitiesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.dailyActivitiesChart && typeof window.dailyActivitiesChart.destroy === 'function') {
+                window.dailyActivitiesChart.destroy();
+            }
+            
+            // Check if data is empty
+            if (!data || Object.keys(data).length === 0) {
+                console.log('No daily activities data to display');
+                return;
+            }
+            
+            // Get status color mapping
+            const statusColors = {
+                'pending': '#fbbf24',
+                'applied': '#3b82f6',
+                'contacted someone': '#6b7280',
+                'company response': '#3b82f6',
+                'scheduled interview': '#fbbf24',
+                'interview notes': '#10b981',
+                'interview - follow up': '#ec4899',
+                'offered': '#10b981',
+                'rejected': '#ef4444',
+                'accepted': '#10b981'
+            };
+            
+            // Prepare datasets
+            const datasets = [];
+            const allDates = [];
+            
+            // Get all dates from first status (they should all have same dates)
+            const statuses = Object.keys(data);
+            if (statuses.length > 0 && data[statuses[0]]) {
+                allDates.push(...data[statuses[0]].map(d => d.date));
+            }
+            
+            // Create a dataset for each status
+            statuses.forEach(status => {
+                const statusData = data[status] || [];
+                const counts = statusData.map(d => d.count);
+                
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: counts,
+                    borderColor: statusColors[status] || '#6b7280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2
+                });
+            });
+            
+            try {
+                window.dailyActivitiesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: allDates,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const date = context[0].label;
+                                        // Calculate total count for this date across all statuses
+                                        let total = 0;
+                                        context.forEach(item => {
+                                            total += item.parsed.y;
+                                        });
+                                        return `${date} - ${total}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Daily Activities Chart created successfully');
+            } catch (error) {
+                console.error('Error creating Daily Activities Chart:', error);
+            }
+        }
+        
+        // Update cumulative activities chart
+        function updateCumulativeActivitiesChart(data) {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            const canvas = document.getElementById('cumulativeActivitiesChart');
+            if (!canvas) {
+                console.error('Canvas element not found');
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.cumulativeActivitiesChart && typeof window.cumulativeActivitiesChart.destroy === 'function') {
+                window.cumulativeActivitiesChart.destroy();
+            }
+            
+            // Check if data is empty
+            if (!data || Object.keys(data).length === 0) {
+                console.log('No cumulative activities data to display');
+                return;
+            }
+            
+            // Get status color mapping
+            const statusColors = {
+                'pending': '#fbbf24',
+                'applied': '#3b82f6',
+                'contacted someone': '#6b7280',
+                'company response': '#3b82f6',
+                'scheduled interview': '#fbbf24',
+                'interview notes': '#10b981',
+                'interview - follow up': '#ec4899',
+                'offered': '#10b981',
+                'rejected': '#ef4444',
+                'accepted': '#10b981'
+            };
+            
+            // Prepare datasets
+            const datasets = [];
+            const allDates = [];
+            
+            // Get all dates from first status (they should all have same dates)
+            const statuses = Object.keys(data);
+            if (statuses.length > 0 && data[statuses[0]]) {
+                allDates.push(...data[statuses[0]].map(d => d.date));
+            }
+            
+            // Create a dataset for each status
+            statuses.forEach(status => {
+                const statusData = data[status] || [];
+                const counts = statusData.map(d => d.count);
+                
+                datasets.push({
+                    label: status.charAt(0).toUpperCase() + status.slice(1),
+                    data: counts,
+                    borderColor: statusColors[status] || '#6b7280',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2
+                });
+            });
+            
+            try {
+                window.cumulativeActivitiesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: allDates,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const date = context[0].label;
+                                        // Calculate total count for this date across all statuses
+                                        let total = 0;
+                                        context.forEach(item => {
+                                            total += item.parsed.y;
+                                        });
+                                        return `${date} - ${total}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Cumulative Activities Chart created successfully');
+            } catch (error) {
+                console.error('Error creating Cumulative Activities Chart:', error);
+            }
+        }
+        
+        // Show data as text when charts fail
+        function showDataAsText(elementId, data) {
+            const element = document.getElementById(elementId);
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+            
+            let html = '<strong>Data Summary:</strong><br>';
+            for (let i = 0; i < labels.length; i++) {
+                html += `• ${labels[i]}: ${values[i]}<br>`;
+            }
+            
+            element.innerHTML = html;
+            element.style.display = 'block';
+        }
+        
+        // Update follow-up list
+        function updateFollowupList(applications) {
+            try {
+                const container = document.getElementById('followup-list');
+                
+                console.log('Follow-up applications received:', applications);
+                console.log('Container element:', container);
+                
+                if (!container) {
+                    console.error('Follow-up container not found');
+                    return;
+                }
+                
+                if (!applications || applications.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">✓</div>
+                            <p>No applications require follow-up at this time!</p>
+                        </div>
+                    `;
+                    console.log('Follow-up list updated with empty state');
+                    return;
+                }
+            
+                const html = applications.map(app => `
+                    <div class="followup-item">
+                        <div class="followup-info">
+                            <div class="followup-company">${app.company}</div>
+                            <div class="followup-position">${app.job_title}</div>
+                            <div class="followup-match">${app.match_score}% Match • ${app.contact_count} Contacts</div>
+                        </div>
+                        <div class="followup-timestamp">
+                            Last updated: ${app.last_updated}
+                        </div>
+                        <a href="${app.summary_url}" class="followup-link" target="_blank">View Summary →</a>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = html;
+                console.log('Follow-up list updated with applications');
+            } catch (error) {
+                console.error('Error updating follow-up list:', error);
+                const container = document.getElementById('followup-list');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading follow-up applications</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">
+                                Please refresh the page to try again.
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Load and display networking rewards by category
+        async function loadNetworkingRewardsByCategory() {
+            try {
+                // Demo version - use hardcoded data
+                const data = {
+                    success: true,
+                    points_by_category: {
+                        prospecting: 150,
+                        outreach: 200,
+                        engagement: 180,
+                        nurture: 120
+                    },
+                    total_points: 650,
+                    badges_by_category: {
+                        prospecting: { badges: [{ earned: true }, { earned: true }, { earned: false }] },
+                        outreach: { badges: [{ earned: true }, { earned: true }, { earned: true }] },
+                        engagement: { badges: [{ earned: true }, { earned: false }] },
+                        nurture: { badges: [{ earned: true }] }
+                    }
+                };
+                
+                // Original API call commented out for demo
+                // const response = await fetch('/api/networking/rewards/category');
+                // const data = await response.json();
+                
+                const container = document.getElementById('networking-rewards-category');
+                if (!container) {
+                    console.error('Networking rewards container not found');
+                    return;
+                }
+                
+                if (!data.success) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading networking rewards</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">${data.error || 'Unknown error'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const pointsByCategory = data.points_by_category || {};
+                const totalPoints = data.total_points || 0;
+                const badgesByCategory = data.badges_by_category || {};
+                
+                const categories = [
+                    { id: 'prospecting', name: 'Prospecting', color: '#3b82f6' },
+                    { id: 'outreach', name: 'Outreach', color: '#10b981' },
+                    { id: 'engagement', name: 'Engagement', color: '#f59e0b' },
+                    { id: 'nurture', name: 'Nurture', color: '#8b5cf6' }
+                ];
+                
+                const categoryCards = categories.map(cat => {
+                    const points = pointsByCategory[cat.id] || 0;
+                    const badges = badgesByCategory[cat.id] || { badges: [] };
+                    const badgeCount = badges.badges ? badges.badges.filter(b => b.earned).length : 0;
+                    
+                    return `
+                        <div class="category-card" style="background: white; border-radius: 8px; padding: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                <div style="width: 4px; height: 32px; background: ${cat.color}; border-radius: 2px;"></div>
+                                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">${cat.name}</h3>
+                            </div>
+                            <div style="font-size: 32px; font-weight: 700; color: ${cat.color}; margin-bottom: 8px;">${points}</div>
+                            <div style="font-size: 14px; color: #6b7280;">points</div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                                <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                                <div style="font-size: 20px; font-weight: 600; color: #1f2937;">${badgeCount}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; font-size: 24px; font-weight: 600; color: #1f2937;">Total Points</h2>
+                            <div style="font-size: 48px; font-weight: 700; color: #3b82f6;">${totalPoints}</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        ${categoryCards}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading networking rewards:', error);
+                const container = document.getElementById('networking-rewards-category');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading networking rewards</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">Please refresh the page to try again.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Update flagged applications list
+        function updateFlaggedList(applications) {
+            try {
+                const container = document.getElementById('flagged-list');
+                
+                console.log('Flagged applications received:', applications);
+                console.log('Container element:', container);
+                
+                if (!container) {
+                    console.error('Flagged container not found');
+                    return;
+                }
+                
+                if (!applications || applications.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🚩</div>
+                            <p>No flagged applications at this time!</p>
+                        </div>
+                    `;
+                    console.log('Flagged list updated with empty state');
+                    return;
+                }
+            
+                const html = applications.map(app => `
+                    <div class="followup-item">
+                        <div class="followup-info">
+                            <div class="followup-company">${app.company}</div>
+                            <div class="followup-position">${app.job_title}</div>
+                            <div class="followup-match">${app.match_score}% Match • ${app.contact_count} Contacts • Status: ${app.status}</div>
+                        </div>
+                        <div class="followup-timestamp">
+                            Last updated: ${app.last_updated}
+                        </div>
+                        <a href="${app.summary_url || '#'}" class="followup-link" target="_blank">View Summary →</a>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = html;
+                console.log('Flagged list updated with applications');
+            } catch (error) {
+                console.error('Error updating flagged list:', error);
+                const container = document.getElementById('flagged-list');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">!</div>
+                            <p>Error loading flagged applications</p>
+                            <p style="font-size: 14px; color: #999; margin-top: 10px;">
+                                Please refresh the page to try again.
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Export to CSV Function
+        function exportToCSV() {
+            // Demo version - show upgrade message
+            showUpgradeMessage();
+            return;
+            // Original API call commented out for demo
+            // const url = `/api/reports/export-csv?period=${currentPeriod}`;
+            window.location.href = url;
+        }
+        
+        // AI Status Check Function (DEMO VERSION)
+        async function showAIStatus() {
+            // Demo version - hardcoded response
+            alert('AI Connected - Model: llama3:latest\nStatus: Operational');
+            return;
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                // Create status message element
+                let statusDiv = document.getElementById('ai-status-message');
+                if (!statusDiv) {
+                    statusDiv = document.createElement('div');
+                    statusDiv.id = 'ai-status-message';
+                    statusDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #28a745;
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        z-index: 1000;
+                        max-width: 300px;
+                        font-size: 14px;
+                    `;
+                    document.body.appendChild(statusDiv);
+                }
+                
+                if (data.connected) {
+                    statusDiv.style.background = '#28a745';
+                    statusDiv.innerHTML = `
+                        <strong>AI Status: Connected</strong><br>
+                        Model: ${data.current_model}<br>
+                        Available: ${data.available_models.join(', ')}
+                    `;
+                } else {
+                    statusDiv.style.background = '#dc3545';
+                    statusDiv.innerHTML = `
+                        <strong>AI Status: Not Connected</strong><br>
+                        Please check your Ollama installation.
+                    `;
+                }
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    if (statusDiv) statusDiv.remove();
+                }, 5000);
+                
+            } catch (error) {
+                console.error('AI Status Error:', error);
+            }
+        }
+        
+        // Collapsible Card Functionality
+        function toggleCollapse(header) {
+            const card = header.closest('.report-card');
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
+    </script>
+    
+    <!-- Demo Data -->
+    <script src="/static/js/demo-data.js"></script>
+    <script src="/static/js/demo-reports-data.js"></script>
+    <!-- Upgrade Handler -->
+    <script src="/static/js/upgrade-handler.js"></script>
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
+</body>
+</html>

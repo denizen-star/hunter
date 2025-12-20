@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: var(--font-family); 
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+        .container { 
+            width: calc(100vw - 180px);
+            margin: 0;
+            padding: var(--space-lg);
+            box-sizing: border-box;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .hero-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .hero-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .hero-header-action-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .hero-header-action-link:hover {
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue-hover);
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: calc(100vw - 180px);
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .container {
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
+            z-index: 1000;
+            padding: var(--space-md) 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sidebar-menu a:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a.active {
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        .actions {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+        .nav-bar {
+            background: var(--bg-primary);
+            padding: var(--space-md) 0;
+            margin-bottom: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 10px var(--space-md);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+        }
+        .nav-link:hover {
+            background: var(--bg-hover);
+        }
+        .btn {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 12px var(--space-xl);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+        }
+        .btn:hover {
+            background: var(--accent-blue-hover);
+        }
+        .tabs-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+        }
+        .tabs-header {
+            display: flex;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1;
+            min-width: 100px;
+            padding: 14px var(--space-lg);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            position: relative;
+            font-family: var(--font-family);
+        }
+        .tab:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
+        }
+        .tab.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+        .tab-count {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-left: 5px;
+        }
+        .tab-content {
+            padding: var(--space-lg);
+            min-height: 400px;
+        }
+        .sort-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .sort-controls h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+        }
+        .sort-select {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 0;
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            background: transparent;
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            cursor: pointer;
+        }
+        .sort-select:focus {
+            outline: none;
+        }
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: var(--space-lg);
+        }
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-primary);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .card-company {
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            flex: 1;
+        }
+        .flag-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: var(--space-xs);
+            margin-left: var(--space-sm);
+            transition: transform 0.2s;
+            opacity: 0.6;
+        }
+        .flag-btn:hover {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+        .flag-btn.flagged {
+            opacity: 1;
+        }
+        .card-title {
+            font-size: var(--font-sm);
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            font-weight: var(--font-medium);
+        }
+        .card-status-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .card-status {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .card-progress-pill {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--bg-active);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-primary);
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-applied { background: #dbeafe; color: #1e40af; }
+        .status-contacted-someone { background: var(--bg-active); color: var(--text-secondary); }
+        .status-contacted-hiring-manager { background: #fee2e2; color: #991b1b; }
+        .status-company-response { background: var(--accent-blue-light); color: #1e40af; }
+        .status-scheduled-interview { background: #fef3c7; color: #92400e; }
+        .status-interviewed { background: #d1fae5; color: #065f46; }
+        .status-interview-notes { background: #d1fae5; color: #065f46; }
+        .status-interview-follow-up { background: #fce7f3; color: #9f1239; }
+        .status-offered { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-accepted { background: #d1fae5; color: #065f46; }
+        .card-meta {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+        .card-notes {
+            margin-top: var(--space-md);
+            margin-bottom: var(--space-md);
+            padding: var(--space-md);
+            background: #fee2e2;
+            border-left: 3px solid #991b1b;
+            border-radius: var(--radius-sm);
+        }
+        .card-notes-label {
+            font-size: 11px;
+            font-weight: var(--font-semibold);
+            color: #991b1b;
+            margin-bottom: var(--space-xs);
+        }
+        .card-notes-text {
+            font-size: 12px;
+            color: #7f1d1d;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .card-actions {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--border-light);
+        }
+        .card-btn {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: #ffffff;
+            padding: 10px var(--space-md);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+            width: 100%;
+            text-align: center;
+        }
+        .card-btn:hover {
+            background: var(--accent-blue-hover);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
+        }
+        .empty-state-text {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+        .match-score {
+            float: right;
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--accent-blue);
+        }
+        .hidden { display: none; }
+        
+        /* Status Toggle Box */
+        .status-toggle-box {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .status-toggle-header {
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .status-toggle-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+        }
+        
+        .status-toggle-btn {
+            padding: 6px 12px;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-family);
+        }
+        
+        .status-toggle-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+        
+        .status-toggle-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-blue);
+        }
+        
+        /* Dashboard Stats Container - match main content width (no extra left offset) */
+        .dashboard-stats-container {
+            padding: 0;
+            margin: 0;
+            margin-top: 0;
+            width: calc(100vw - 180px);
+            box-sizing: border-box;
+        }
+        
+        /* Stat Cards Grid - Full width, evenly distributed, single row */
+        .stat-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 6px;
+            margin: 0;
+            padding: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            text-align: center;
+            box-shadow: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+            border-color: var(--accent-blue);
+        }
+        
+        .stat-card.active {
+            border: 1px solid var(--accent-blue);
+            background: var(--accent-blue-light);
+        }
+        
+        .stat-number {
+            font-size: 17px;
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: 1px;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            line-height: 1.2;
+        }
+        
+        @media (max-width: 1400px) {
+            .stat-cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .stat-cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .stat-cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+        }
+        
+        /* Company Search Styles */
+        .company-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .company-suggestion-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .company-suggestion-item:hover {
+            background: var(--bg-hover);
+        }
+        
+        .company-suggestion-item.selected {
+            background: var(--accent-blue-light);
+        }
+        
+        .company-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--accent-blue-light);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--accent-blue);
+        }
+        
+        .company-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Shared sidebar is injected by static/js/shared-menu.js -->
+    
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/AppDash.jpg" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>Job Application Dashboard - 10</h1>
+                    <p class="hero-header-subtitle">Overview of your job search pipeline</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                
+                <a href="/new-application" class="hero-header-action-link">New Application</a>
+            </div>
+        </div>
+    </div>
+        
+    
+        <div class="dashboard-stats-container">
+            <div class="stat-cards-grid">
+                
+                    <div class="stat-card" data-status="active">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                
+                    <div class="stat-card" data-status="flagged">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Flagged</div>
+                    </div>
+                
+                    <div class="stat-card" data-status="pending">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                
+                    <div class="stat-card" data-status="applied">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Applied</div>
+                    </div>
+                
+                    <div class="stat-card" data-status="company">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Company</div>
+                    </div>
+                
+                    <div class="stat-card" data-status="scheduled">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Scheduled</div>
+                    </div>
+                
+                    <div class="stat-card" data-status="interview-notes">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Interview Notes</div>
+                    </div>
+                
+            </div>
+        </div>
+        <div class="container">
+            <div class="sort-controls" style="display: flex; align-items: center; gap: 16px;">
+                <h3 style="margin: 0; color: var(--text-primary); font-size: var(--font-lg); font-weight: var(--font-semibold);">Applications</h3>
+                
+                <select id="sort-select" class="sort-select" onchange="handleSortChange()" style="margin-left: auto;">
+                    <option value="updated_desc">Updated (Newest First)</option>
+                    <option value="updated_asc">Updated (Oldest First)</option>
+                    <option value="applied_desc">Applied (Newest First)</option>
+                    <option value="applied_asc">Applied (Oldest First)</option>
+                    <option value="job_posted_desc">Job Posted (Newest First)</option>
+                    <option value="job_posted_asc">Job Posted (Oldest First)</option>
+                    <option value="match_desc">Match % (Highest First)</option>
+                    <option value="match_asc">Match % (Lowest First)</option>
+                    <option value="company_asc">Company (A-Z)</option>
+                    <option value="company_desc">Company (Z-A)</option>
+                </select>
+            </div>
+            <div class="applications-grid" id="applications-grid">
+            
+        </div>
+        
+            </div>
+        </div>
+        <script>
+            // Company search data
+            const allCompanies = [" Centro Benefits Research", "1-800-FLOWERS", "A Place for Mom", "Accordion", "Addepar", "AirOps", "AmTrust Financial Services, Inc", "AmeriSave Mortgage Corporation", "American Eagle Outfitters Inc", "American Eagle Outfitters Inc.", "Handy repairs", "Arcadia", "Attentive", "Aya Healthcare ", "BNY", "Bacardi", "Beacon Hill", "Belden Inc.", "Blend", "Block", "Block xyz", "Bluehost", "Brightline", "Global a co", "Brown & Brown", "Buchanan Legal Professional Services", "Button", "CArnival", "Capital Finance Firm", "Capital Credit Card", "Centene Corporation", "Charlie Health", "Chewy", "ClickUp", "Coda Search│Staffing", "Considine Search", "Covera Health", "Covington & Burling LLP", "Fintech A co", "Dayforce", "DeepIntent", "Diana Health", "Director, People Data and Analytics", "Dow Jones", "Dropbox", "Dynatrace", "Dynatron Software, Inc", "Elastic", "Elite Technology", "Empower Pharmacy", "Everseen", "Fanatics", "Fenwick & West", "FirstParty", "Flex", "Fora Financial", "Ford Motor Company", "Forsyth Barnes", "Forward Financing", "Garner Health", "Gemini", "GlossGenius", "GoodPower", "Gopuff", "Superstars", "Harnham", "Harnham trash", "Haus", "Head of Data Science And POCs", "Hitachi Solutions America", "Human Agency", "IPG Mediabrands", "Included Health", "Industrious", "Insight Global", "Intellias", "Intuit", "Invesco US", "JPMorganChase", "Jazwares, LLC", "Jobgether", "Juniper Square", "JustAnswer", "JustTest", "Justworks", "Klick", "Komodo Health", "LHH", "Lawrence Harvey", "Lennar", "Levi Strauss Co.", "MDCalc", "MLS - Major League Soccer", "MNTN", "Madison-Davis, LLC - Recruiters Insurance Company", "Marcus & Millichap ", "Marsh McLennan", "Medallia", "Memorial Healthcare System", "Merkle", "Metropolis Technologies", "Moody's Corporation", "Fortune500 Bank", "Muck Rack", "Mutual of America Financial Group", "NerdWallet", "New York Life Insurance Company", "Norwegian Cruise Line Holdings Ltd", "Novartis", "Novolex", "Nuvei", "Omada Health", "OnePay Test", "Ouro", "Papa", "Paramount", "Peerspace", "PicnicHealth", "Plaid", "Pluralsight II ", "Porter Airlines Inc.", "Priceline", "Princess Cruises", "Public", "RPL International", "Regal", "Regal NM", "RemoteHunter", "Restaurant Brands International", "Rippling", "Robert Walters", "Rockbot", "SMB Recruiting", "Samba TV", "Sanity", "Saragossa", "Sayari", "SimplePractice", "Smile Doctors", "SoFi", "Sortly", "Stabile Search", "Staff People Analytics Business Data Analyst", "Stord", "Storm2", "Stott and May", "Fintect B Co", "Taskrabbit", "Test OnePay", "The Home Depot", "Together for Talent", "Tungsten Automation", "Turing", "Typeform", "Uplight", "Upside", "Upstart", "Valon", "Vanta", "Viral Nation", "VytlOne", "W Talent", "WISEcode", "Waymo", "WebstaurantStore", "Webster Bank", "Wikimedia Foundation", "Winston & Strawn LLP", "Wolters Kluwer", "Xcede", "Zillow", "Medical Network Co", "dv01"];
+            let currentCompanyFilter = [];
+        </script>
+        
+    
+    <script>
+        // AI Status Check Function - Show message on screen (DEMO VERSION)
+        async function showAIStatus() {
+            // Demo version - hardcoded response
+            alert('AI Connected - Model: llama3:latest\nStatus: Operational');
+            return;
+        }
+        
+        // New Application Function
+        function openNewApplication() {
+            // Open new application form in same window
+            window.location.href = '/new-application';
+        }
+        
+        // Resume Manager Function  
+        function openResumeManager() {
+            // Open new application page where resume manager is located
+            window.location.href = '/new-application';
+        }
+        
+        
+        // Filter applications by status
+        function filterApplications(filterStatus) {
+            // Update active stat card
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.classList.remove('active');
+                card.style.border = '1px solid var(--border-primary)';
+            });
+            const activeCard = document.querySelector(`.stat-card[data-status="${filterStatus}"]`);
+            if (activeCard) {
+                activeCard.classList.add('active');
+            }
+            
+            // Get all application cards
+            const grid = document.getElementById('applications-grid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.card'));
+            const isArchived = false;
+            
+            // Filter cards based on status and company
+            cards.forEach(card => {
+                let show = false;
+                const companyElement = card.querySelector('.card-company');
+                const companyName = companyElement?.textContent.trim() || '';
+                
+                // Simplified filtering for archived dashboard
+                if (isArchived) {
+                    // Only 'all' and 'rejected' filters for archived
+                    if (filterStatus === 'all') {
+                        show = true;
+                    }
+                } else {
+                    // Full filtering logic for main dashboard
+                    const statusElement = card.querySelector('.card-status');
+                    const statusText = statusElement?.textContent.toLowerCase() || '';
+                    const statusClass = statusElement?.className || '';
+                    const isFlagged = card.dataset.flagged === 'true';
+                    
+                    if (filterStatus === 'active') {
+                        show = !statusText.includes('rejected') && !statusText.includes('accepted');
+                    } else if (filterStatus === 'flagged') {
+                        show = isFlagged;
+                    } else if (filterStatus === 'pending') {
+                        show = statusText.includes('pending');
+                    } else if (filterStatus === 'applied') {
+                        show = statusText.includes('applied') && !statusText.includes('company') && !statusClass.includes('company');
+                    } else if (filterStatus === 'contacted') {
+                        show = statusText.includes('contacted') || statusClass.includes('contacted');
+                    } else if (filterStatus === 'company') {
+                        show = statusText.includes('company') || statusClass.includes('company-response');
+                    } else if (filterStatus === 'scheduled') {
+                        show = statusText.includes('scheduled') || statusClass.includes('scheduled');
+                    } else if (filterStatus === 'follow-up') {
+                        show = statusText.includes('follow') || statusClass.includes('follow');
+                    } else if (filterStatus === 'offered') {
+                        show = statusText.includes('offered') || statusClass.includes('offered');
+                    } else if (filterStatus === 'accepted') {
+                        show = statusText.includes('accepted') || statusClass.includes('accepted');
+                    }
+                }
+                
+                // Company filtering (if company filter is active)
+                if (show && typeof currentCompanyFilter !== 'undefined' && currentCompanyFilter.length > 0) {
+                    show = currentCompanyFilter.includes(companyName);
+                }
+                
+                card.style.display = show ? '' : 'none';
+            });
+        }
+        
+        // Sort applications
+        function sortApplications(sortBy) {
+            const grid = document.getElementById('applications-grid');
+            if (!grid) return;
+            
+            const cards = Array.from(grid.querySelectorAll('.card:not([style*="display: none"])'));
+            const isArchived = false;
+            
+            cards.sort((a, b) => {
+                switch(sortBy) {
+                    case 'updated_desc':
+                        return new Date(b.dataset.updatedAt) - new Date(a.dataset.updatedAt);
+                    case 'updated_asc':
+                        return new Date(a.dataset.updatedAt) - new Date(b.dataset.updatedAt);
+                    case 'applied_desc':
+                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                    case 'applied_asc':
+                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
+                    case 'company_asc':
+                        const companyA = a.querySelector('.card-company')?.textContent.trim() || '';
+                        const companyB = b.querySelector('.card-company')?.textContent.trim() || '';
+                        return companyA.localeCompare(companyB);
+                    case 'company_desc':
+                        const companyA2 = a.querySelector('.card-company')?.textContent.trim() || '';
+                        const companyB2 = b.querySelector('.card-company')?.textContent.trim() || '';
+                        return companyB2.localeCompare(companyA2);
+                    case 'job_posted_desc':
+                        return new Date(b.dataset.appliedAt) - new Date(a.dataset.appliedAt);
+                    case 'job_posted_asc':
+                        return new Date(a.dataset.appliedAt) - new Date(b.dataset.appliedAt);
+                    case 'match_desc':
+                        return parseFloat(b.dataset.matchScore || 0) - parseFloat(a.dataset.matchScore || 0);
+                    case 'match_asc':
+                        return parseFloat(a.dataset.matchScore || 0) - parseFloat(b.dataset.matchScore || 0);
+                    
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Re-append sorted cards
+            cards.forEach(card => grid.appendChild(card));
+        }
+        
+        // Handle sort dropdown change
+        function handleSortChange() {
+            const sortSelect = document.getElementById('sort-select');
+                if (sortSelect) {
+                sortApplications(sortSelect.value);
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make stat cards clickable
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const status = this.dataset.status;
+                    filterApplications(status);
+                });
+            });
+            
+            // Initialize with "all" filter active (for archived dashboard) or "active" (for main dashboard)
+            const isArchived = false;
+            const defaultFilter = isArchived ? 'all' : 'active';
+            filterApplications(defaultFilter);
+            
+            // Initialize company search if archived
+            if (isArchived && typeof allCompanies !== 'undefined') {
+                if (typeof updateSelectedCompaniesDisplay === 'function') {
+                    updateSelectedCompaniesDisplay();
+                }
+            }
+            
+            // Activate 'active' stat card by default (if not archived)
+            if (!isArchived) {
+                const activeCard = document.querySelector('.stat-card[data-status="active"]');
+                if (activeCard) {
+                    activeCard.classList.add('active');
+                }
+            }
+        });
+        
+        // Company search functions (for archived dashboard)
+        function handleCompanySearch(event) {
+            const input = event.target;
+            const query = input.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                showCompanySuggestions(query);
+            } else {
+                showCompanySuggestions('');
+            }
+        }
+        
+        function updateSelectedCompaniesDisplay() {
+            const container = document.getElementById('selectedCompanies');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+            
+            currentCompanyFilter.forEach((company, index) => {
+                const tag = document.createElement('div');
+                tag.style.cssText = 'display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--accent-blue-light); border-radius: 4px; font-size: 12px; color: var(--accent-blue);';
+                tag.innerHTML = `
+                    <span>${escapeHtml(company)}</span>
+                    <span style="cursor: pointer; font-weight: bold;" onclick="removeCompany(${index})">×</span>
+                `;
+                container.appendChild(tag);
+            });
+        }
+        
+        function removeCompany(index) {
+            if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+            if (index >= 0 && index < currentCompanyFilter.length) {
+                currentCompanyFilter.splice(index, 1);
+                updateSelectedCompaniesDisplay();
+                filterApplications(document.querySelector('.stat-card.active')?.dataset.status || 'all');
+            }
+        }
+        
+        function showCompanySuggestions(query = '') {
+            const suggestionsDiv = document.getElementById('companySuggestions');
+            if (!suggestionsDiv || typeof allCompanies === 'undefined') return;
+            
+            const companies = allCompanies || [];
+            let filtered = [];
+            
+            if (!query || query.length === 0) {
+                filtered = companies.slice(0, 15);
+            } else {
+                filtered = companies
+                    .filter(company => company.toLowerCase().includes(query.toLowerCase()))
+                    .slice(0, 15);
+            }
+            
+            suggestionsDiv.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.style.cssText = 'padding: 12px; color: var(--text-secondary); text-align: center;';
+                noResults.textContent = 'No companies found';
+                suggestionsDiv.appendChild(noResults);
+            } else {
+                filtered.forEach(company => {
+                    if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+                    const isSelected = currentCompanyFilter.includes(company);
+                    const item = document.createElement('div');
+                    item.style.cssText = 'padding: 10px 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light);';
+                    item.innerHTML = `<span>${escapeHtml(company)}</span>${isSelected ? '<span style="color: var(--accent-blue);">✓</span>' : ''}`;
+                    item.onmouseenter = () => item.style.background = 'var(--bg-hover)';
+                    item.onmouseleave = () => item.style.background = '';
+                    item.onmousedown = (e) => {
+                        e.preventDefault();
+                        toggleCompany(company);
+                    };
+                    suggestionsDiv.appendChild(item);
+                });
+            }
+            
+            suggestionsDiv.style.display = filtered.length > 0 ? 'block' : 'none';
+        }
+        
+        function toggleCompany(company) {
+            if (typeof currentCompanyFilter === 'undefined') currentCompanyFilter = [];
+            
+            if (currentCompanyFilter.includes(company)) {
+                currentCompanyFilter = currentCompanyFilter.filter(c => c !== company);
+            } else {
+                currentCompanyFilter.push(company);
+            }
+            
+            const input = document.getElementById('companyFilter');
+            if (input) input.value = '';
+            
+            updateSelectedCompaniesDisplay();
+            showCompanySuggestions('');
+            filterApplications(document.querySelector('.stat-card.active')?.dataset.status || 'all');
+        }
+        
+        function handleCompanySearchFocus() {
+            const input = document.getElementById('companyFilter');
+            if (input) {
+                showCompanySuggestions(input.value);
+            }
+        }
+        
+        function hideCompanySuggestions() {
+            setTimeout(() => {
+                const suggestionsDiv = document.getElementById('companySuggestions');
+                if (suggestionsDiv) {
+                    suggestionsDiv.style.display = 'none';
+                }
+            }, 200);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Toggle flag for an application (DEMO VERSION - no-op)
+        async function toggleFlag(appId, currentFlagged) {
+            // Demo version - just toggle visual state, no API call
+            const newFlagged = !currentFlagged;
+            try {
+                // Original API call commented out for demo
+                // const url = '/api/applications/' + appId + '/flag';
+                // const response = await fetch(url, {
+                //     method: 'PUT',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({ flagged: newFlagged })
+                // });
+                
+                // Simulate success for demo
+                const data = { success: true };
+                
+                if (data.success) {
+                    // Find the card by looking for the button with matching onclick attribute
+                    const flagBtn = Array.from(document.querySelectorAll('.flag-btn')).find(btn => {
+                        const onclick = btn.getAttribute('onclick');
+                        return onclick && onclick.includes("'" + appId + "'");
+                    });
+                    
+                    if (flagBtn) {
+                        flagBtn.textContent = newFlagged ? '🚩' : '⚐';
+                        const flagClass = newFlagged ? 'flagged' : 'unflagged';
+                        flagBtn.className = 'flag-btn ' + flagClass;
+                        flagBtn.title = newFlagged ? 'Unflag this job' : 'Flag this job';
+                        const onclickValue = 'toggleFlag(' + "'" + appId + "'" + ', ' + String(newFlagged).toLowerCase() + ')';
+                        flagBtn.setAttribute('onclick', onclickValue);
+                        
+                        // Update the card's data-flagged attribute
+                        const card = flagBtn.closest('.card');
+                        if (card) {
+                            card.setAttribute('data-flagged', String(newFlagged).toLowerCase());
+                        }
+                    }
+                    
+                    // Reload the page to update the flagged tab count and ensure consistency
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 300);
+                } else {
+                    alert('Failed to update flag: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error toggling flag:', error);
+                alert('Error updating flag. Please try again.');
+            }
+        };
+        
+        
+    </script>
+    <!-- Demo Data -->
+    <script src="/static/js/demo-data.js"></script>
+    <!-- Dashboard Manager -->
+    <script src="/static/js/dashboard.js"></script>
+    <!-- Upgrade Handler -->
+    <script src="/static/js/upgrade-handler.js"></script>
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
+    <script>
+        // Override AI status check for demo
+        if (typeof showAIStatus !== 'undefined') {
+            const originalShowAIStatus = showAIStatus;
+            window.showAIStatus = function() {
+                alert('AI Connected - Model: llama3:latest\nStatus: Operational');
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templates - Job Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+        
+        .main-wrapper {
+            width: 100%;
+            margin: 0;
+            padding: var(--space-lg);
+            box-sizing: border-box;
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .hero-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .container {
+            padding-bottom: 100px; /* Space for fixed footer */
+        }
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .card h2 {
+            font-size: var(--font-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-xl)) var(--space-lg) calc(-1 * var(--space-xl));
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card h2:hover {
+            background: var(--bg-hover);
+        }
+        
+        .card h2::after {
+            content: '▼';
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        .card h2.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .card-content {
+            transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+            max-height: 10000px; /* Large enough for content */
+        }
+        
+        .card-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin: 0;
+            opacity: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: var(--space-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            font-size: var(--font-sm);
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: var(--space-xs);
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
+        }
+        
+        .quill-editor {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            min-height: 300px;
+        }
+        
+        .btn {
+            padding: 12px var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-family: var(--font-family);
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        .status-banner {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .status-banner.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status-banner.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .templates-list {
+            margin-top: 30px;
+        }
+        
+        .template-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .template-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(139, 157, 195, 0.2);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .template-header:hover {
+            opacity: 0.8;
+        }
+        
+        .template-header::before {
+            content: '▼';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #8b9dc3;
+            transition: transform 0.3s ease;
+        }
+        
+        .template-header.collapsed::before {
+            transform: translateY(-50%) rotate(-90deg);
+        }
+        
+        .template-header-info {
+            flex: 1;
+            margin-left: 25px;
+        }
+        
+        .template-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+        
+        .template-meta {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .template-delivery-method {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #8b9dc3;
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .template-actions button {
+            cursor: pointer;
+        }
+        
+        .template-content {
+            margin-bottom: 15px;
+            color: #4a5568;
+            line-height: 1.6;
+            transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+            overflow: hidden;
+            max-height: 10000px;
+        }
+        
+        .template-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin: 0;
+            opacity: 0;
+        }
+        
+        .template-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        /* Delivery Method Groups */
+        .delivery-method-group {
+            margin-bottom: var(--space-md);
+        }
+        
+        .delivery-method-header {
+            padding: 8px 0;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: var(--space-md);
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .delivery-method-header:hover {
+            opacity: 0.7;
+        }
+        
+        .delivery-method-header::before {
+            content: '▼';
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-right: 12px;
+            transition: transform 0.2s ease;
+        }
+        
+        .delivery-method-header.collapsed::before {
+            transform: rotate(-90deg);
+        }
+        
+        .delivery-method-name {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-primary);
+        }
+        
+        .template-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .delivery-method-content {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+            max-height: 10000px;
+            opacity: 1;
+        }
+        
+        .delivery-method-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+        
+        .delivery-method-content .template-item {
+            margin-left: 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 64px var(--space-xl);
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-md);
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0 0 var(--space-sm) 0;
+        }
+        
+        .empty-state-text {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/index.html" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/Templates.png" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>Templates</h1>
+                    <p class="hero-header-subtitle">Manage your communication standards.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-wrapper">
+        
+        <div id="status-banner" class="status-banner"></div>
+        
+        <!-- Create Template Form -->
+        <div class="card">
+            <h2 class="collapsed" onclick="toggleCard(this)">Create New Template</h2>
+            
+            <div class="card-content collapsed">
+                <form id="templateForm" onsubmit="submitTemplate(event)">
+                <div class="form-group">
+                    <label for="delivery_method">Delivery Method</label>
+                    <select id="delivery_method" required>
+                        <option value="">-- Select Delivery Method --</option>
+                        <option value="LinkedIn Connection">LinkedIn Connection</option>
+                        <option value="Email">Email</option>
+                        <option value="Other">Other</option>
+                        <option value="LinkedIn Inmail">LinkedIn Inmail</option>
+                        <option value="LinkedIn Message">LinkedIn Message</option>
+                        <option value="Text">Text</option>
+                        <option value="Phone">Phone</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="template_title">Title</label>
+                    <input type="text" id="template_title" placeholder="Enter template title..." required>
+                    <small>Give your template a descriptive name</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="template_content">Message</label>
+                    <div id="template_content" class="quill-editor"></div>
+                    <small>Format your message with bold, italic, lists, and more. HTML formatting is preserved.</small>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-disabled" onclick="showUpgradeMessage(); return false;" title="Purchase Upgrade for Functionality">
+                    Save Template
+                </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Saved Templates List -->
+        <div class="card">
+            <h2 onclick="toggleCard(this)">Saved Templates</h2>
+            <div class="card-content">
+                    <div id="templates-list" class="templates-list">
+                    <div class="loading" style="text-align: center; padding: 40px;">
+                        <p>Loading templates...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let quillEditor;
+        
+        // Initialize Quill editor
+        document.addEventListener('DOMContentLoaded', function() {
+            quillEditor = new Quill('#template_content', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'image'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['clean']
+                    ]
+                }
+            });
+            
+            loadTemplates();
+        });
+        
+        async function loadTemplates() {
+            // Demo version - wait for DEMO_DATA to load
+            let attempts = 0;
+            const maxAttempts = 50; // Wait up to 5 seconds
+            
+            while (attempts < maxAttempts) {
+                if (typeof window.DEMO_DATA !== 'undefined' && window.DEMO_DATA.templates) {
+                    displayTemplates(window.DEMO_DATA.templates);
+                    return;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            // If DEMO_DATA still not available, show empty state
+            displayTemplates([]);
+        }
+        
+        function displayTemplates(templates) {
+            const container = document.getElementById('templates-list');
+            
+            if (templates.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div class="empty-state-text">No templates saved yet. Create your first template above.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group templates by delivery method
+            const groupedTemplates = {};
+            templates.forEach(template => {
+                const method = template.delivery_method || 'Other';
+                if (!groupedTemplates[method]) {
+                    groupedTemplates[method] = [];
+                }
+                groupedTemplates[method].push(template);
+            });
+            
+            // Sort templates within each group alphabetically by title
+            Object.keys(groupedTemplates).forEach(method => {
+                groupedTemplates[method].sort((a, b) => {
+                    const titleA = (a.title || '').toLowerCase();
+                    const titleB = (b.title || '').toLowerCase();
+                    return titleA.localeCompare(titleB);
+                });
+            });
+            
+            // Define delivery method order
+            const deliveryMethodOrder = [
+                'LinkedIn Connection',
+                'Email',
+                'Other',
+                'LinkedIn Inmail',
+                'LinkedIn Message',
+                'Text',
+                'Phone'
+            ];
+            
+            // Get sorted delivery methods
+            const sortedMethods = [];
+            deliveryMethodOrder.forEach(method => {
+                if (groupedTemplates[method]) {
+                    sortedMethods.push(method);
+                }
+            });
+            
+            // Add any unlisted methods alphabetically at the end
+            Object.keys(groupedTemplates).forEach(method => {
+                if (!deliveryMethodOrder.includes(method)) {
+                    sortedMethods.push(method);
+                }
+            });
+            sortedMethods.sort((a, b) => {
+                const aIndex = deliveryMethodOrder.indexOf(a);
+                const bIndex = deliveryMethodOrder.indexOf(b);
+                if (aIndex === -1 && bIndex === -1) {
+                    return a.localeCompare(b);
+                }
+                return 0;
+            });
+            
+            // Build HTML with grouped templates
+            let html = '';
+            sortedMethods.forEach(method => {
+                const methodTemplates = groupedTemplates[method];
+                const templateCount = methodTemplates.length;
+                
+                html += `
+                    <div class="delivery-method-group">
+                        <div class="delivery-method-header collapsed" onclick="toggleDeliveryMethodGroup(this)">
+                            <span class="delivery-method-name">${escapeHtml(method)}</span>
+                            <span class="template-count">(${templateCount} template${templateCount !== 1 ? 's' : ''})</span>
+                        </div>
+                        <div class="delivery-method-content collapsed">
+                `;
+                
+                methodTemplates.forEach(template => {
+                    html += `
+                        <div class="template-item">
+                            <div class="template-header collapsed" onclick="toggleTemplateItem(this)">
+                                <div class="template-header-info">
+                                    <div class="template-title">${escapeHtml(template.title)}</div>
+                                    <div class="template-meta">
+                                        ${template.created_at_display || 'Date not available'}
+                                        <span class="template-delivery-method">${escapeHtml(template.delivery_method)}</span>
+                                    </div>
+                                </div>
+                                <div class="template-actions" onclick="event.stopPropagation();">
+                                    <button class="btn btn-primary btn-sm" onclick="copyTemplate('${template.id}'); return false;">
+                                        📋 Copy
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm btn-disabled" onclick="showUpgradeMessage(); return false;" title="Purchase Upgrade for Functionality">
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="template-content collapsed">
+                                ${template.content || ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        async function submitTemplate(event) {
+            event.preventDefault();
+            
+            const deliveryMethod = document.getElementById('delivery_method').value;
+            const title = document.getElementById('template_title').value;
+            const content = quillEditor.root.innerHTML;
+            
+            if (!deliveryMethod || !title || !content || content === '<p><br></p>') {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                // Demo version - show upgrade message
+                showUpgradeMessage();
+                return;
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function copyTemplate(templateId) {
+            try {
+                // Demo version - use DEMO_DATA
+                let templates = [];
+                if (typeof window.DEMO_DATA !== 'undefined' && window.DEMO_DATA.templates) {
+                    templates = window.DEMO_DATA.templates;
+                } else {
+                    showStatus('Templates not available', 'error');
+                    return;
+                }
+                
+                const template = templates.find(t => t.id === templateId);
+                
+                if (template && template.content) {
+                    // Create a temporary element to copy HTML content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = template.content;
+                    
+                    // Try to copy as HTML first, fallback to text
+                    if (navigator.clipboard && navigator.clipboard.write) {
+                        const blob = new Blob([template.content], { type: 'text/html' });
+                        const clipboardItem = new ClipboardItem({ 'text/html': blob });
+                        await navigator.clipboard.write([clipboardItem]);
+                        showStatus('Template copied to clipboard!', 'success');
+                    } else {
+                        // Fallback: copy text content
+                        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+                        await navigator.clipboard.writeText(textContent);
+                        showStatus('Template copied to clipboard (as text)!', 'success');
+                    }
+                } else {
+                    showStatus('Template content not found', 'error');
+                }
+            } catch (error) {
+                showStatus('Error copying template: ' + error.message, 'error');
+            }
+        }
+        
+        async function deleteTemplate(templateId) {
+            // Demo version - show upgrade message
+            showUpgradeMessage();
+            return;
+        }
+        
+        function showStatus(message, type) {
+            const banner = document.getElementById('status-banner');
+            banner.textContent = message;
+            banner.className = `status-banner ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    banner.classList.remove('success');
+                    banner.className = 'status-banner hidden';
+                }, 3000);
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function checkAIStatus() {
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                
+                if (data.connected) {
+                    alert(`AI Connected\nModel: ${data.current_model}`);
+                } else {
+                    alert('AI Not Connected\nPlease start Ollama');
+                }
+            } catch (error) {
+                alert('Error checking AI status');
+            }
+        }
+        
+        // Toggle card collapse/expand
+        function toggleCard(headerElement) {
+            const card = headerElement.parentElement;
+            const content = card.querySelector('.card-content');
+            
+            // Toggle collapsed class on header
+            headerElement.classList.toggle('collapsed');
+            
+            // Toggle collapsed class on content
+            content.classList.toggle('collapsed');
+        }
+        
+        // Toggle template item collapse/expand
+        function toggleTemplateItem(headerElement) {
+            const templateItem = headerElement.parentElement;
+            const content = templateItem.querySelector('.template-content');
+            
+            // Toggle collapsed class on header
+            headerElement.classList.toggle('collapsed');
+            
+            // Toggle collapsed class on content
+            content.classList.toggle('collapsed');
+        }
+        
+        // Toggle delivery method group collapse/expand
+        function toggleDeliveryMethodGroup(headerElement) {
+            const group = headerElement.parentElement;
+            const content = group.querySelector('.delivery-method-content');
+            
+            // Toggle collapsed class on header
+            headerElement.classList.toggle('collapsed');
+            
+            // Toggle collapsed class on content
+            content.classList.toggle('collapsed');
+        }
+    </script>
+    
+    <!-- Demo Data -->
+    <script src="/static/js/demo-data.js"></script>
+    <!-- Upgrade Handler -->
+    <script src="/static/js/upgrade-handler.js"></script>
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
+</body>
+</html>
+

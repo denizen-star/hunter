@@ -1,0 +1,3125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech A co - Software Engineer</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Quill.js Rich Text Editor -->
+    <link href="/static/css/quill.snow.css" rel="stylesheet">
+    <script src="/static/js/quill.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-xs: 12px;
+            --font-sm: 14px;
+            --font-base: 16px;
+            --font-lg: 18px;
+            --font-xl: 20px;
+            --font-2xl: 24px;
+            --font-3xl: 32px;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar - Smaller */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            z-index: 1000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 16px 16px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: #f9fafb;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+        }
+        
+        .sidebar-menu a.active {
+            background: #f3f4f6;
+            color: #1f2937;
+            border-left-color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        /* Main Container */
+        .container {
+            width: calc(100vw - 180px);
+            margin-left: 0;
+            min-height: 100vh;
+            background: #fafafa;
+            box-sizing: border-box;
+        }
+        
+        /* Header */
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .header-top > div:first-child {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        
+        /* Content */
+        .content {
+            padding: 32px;
+            max-width: 100%;
+        }
+        
+        /* Application Header Card */
+        .app-header-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .meta-icon {
+            width: 16px;
+            height: 16px;
+            color: #9ca3af;
+        }
+        
+        .tag {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .tag-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .tag-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag-gray {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .tag-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .match-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .match-percentage {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .match-score-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        @media (max-width: 968px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .content-section {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+        
+        .section-content {
+            color: #4b5563;
+            line-height: 1.8;
+        }
+        
+        .section-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 20px 0 12px 0;
+        }
+        
+        .section-content h3:first-child {
+            margin-top: 0;
+        }
+        
+        .section-content ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        
+        .section-content li {
+            margin-bottom: 8px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 2px #e5e7eb;
+            z-index: 1;
+        }
+        
+        .timeline-date {
+            font-size: 13px;
+            color: #6b7280;
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            font-size: 14px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .timeline-notes-content {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .timeline-notes-content p,
+        .timeline-notes-content div,
+        .timeline-notes-content ul,
+        .timeline-notes-content ol,
+        .timeline-notes-content li {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .timeline-description {
+            flex: 1;
+        }
+        
+        .timeline-status {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 16px;
+            white-space: nowrap;
+        }
+        
+        /* Tabs Container */
+        .tabs-container {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafafa;
+            overflow-x: auto;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-primary);
+            padding: 0 var(--space-xl);
+            background: var(--bg-secondary);
+            overflow-x: auto;
+        }
+        
+        .back-btn { 
+            display: inline-block; 
+            background: var(--bg-hover); 
+            color: var(--text-primary); 
+            padding: 10px var(--space-md); 
+            border-radius: var(--radius-sm); 
+            text-decoration: none; 
+            margin-bottom: var(--space-lg); 
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-primary);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+        }
+        .back-btn:hover { 
+            background: var(--bg-active); 
+            color: var(--text-primary); 
+            text-decoration: none; 
+        }
+        
+        /* Checklist Styles */
+        .checklist-container { 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-md); 
+            padding: 4px; 
+        }
+        .checklist-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: var(--space-sm); 
+            cursor: pointer; 
+            padding: 4px;
+            border-bottom: 1px solid var(--border-primary);
+        }
+        .checklist-header:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Badge Display Styles */
+        .badge-section {
+            padding: 12px;
+            background: transparent;
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        
+        .badge-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            min-height: auto;
+        }
+        
+        .badge-item:hover {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .badge-locked {
+            opacity: 0.6;
+        }
+        
+        .badge-unlocked {
+            opacity: 1;
+            border-color: #3b82f6;
+        }
+        
+        .badge-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3b82f6;
+            flex-shrink: 0;
+        }
+        
+        .badge-locked .badge-icon {
+            color: #9ca3af;
+        }
+        
+        .badge-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .badge-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .badge-progress {
+            flex: 1;
+            height: 4px;
+            min-width: 40px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .badge-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }
+        
+        .badge-locked .badge-progress-fill {
+            background: #d1d5db;
+        }
+        
+        .badge-count {
+            font-size: 10px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+        
+        .badge-points {
+            font-size: 12px;
+            font-weight: 700;
+            color: #10b981;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .badge-locked .badge-points {
+            color: #9ca3af;
+        }
+        
+        .checklist-title { 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            letter-spacing: 0.3px; 
+            color: var(--text-secondary);
+        }
+        .checklist-toggle { 
+            background: transparent; 
+            border: none; 
+            color: var(--text-secondary); 
+            padding: 0;
+            cursor: pointer; 
+            font-size: var(--font-xs); 
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s ease;
+        }
+        .checklist-toggle:hover { 
+            color: var(--text-primary);
+        }
+        .checklist-toggle svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.2s ease;
+        }
+        .checklist-toggle.expanded svg {
+            transform: rotate(180deg);
+        }
+        .checklist-collapsed { display: none !important; }
+        .checklist-expanded { display: block; }
+        .checklist-pill { 
+            display: inline-block; 
+            background: var(--bg-active); 
+            color: var(--text-secondary); 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: var(--font-xs); 
+            font-weight: var(--font-medium); 
+            margin-top: var(--space-sm); 
+        }
+        .checklist-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: var(--space-sm); 
+            margin-top: var(--space-sm); 
+        }
+        .checklist-item { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--space-sm); 
+            padding: var(--space-sm); 
+            border-radius: var(--radius-sm); 
+            transition: background 0.2s; 
+        }
+        .checklist-item:hover { 
+            background: var(--bg-hover); 
+        }
+        .checklist-item label { 
+            cursor: pointer; 
+            user-select: none; 
+        }
+        .checklist-item input[type="checkbox"] { 
+            width: 16px; 
+            height: 16px; 
+            cursor: pointer; 
+            accent-color: var(--accent-blue); 
+        }
+        .checklist-item label { 
+            font-size: var(--font-xs); 
+            cursor: pointer; 
+            flex: 1; 
+            color: var(--text-primary);
+            line-height: 1.4; 
+        }
+        .checklist-item input[type="checkbox"]:checked + label { 
+            font-weight: var(--font-medium); 
+        }
+        .summary { 
+            padding: var(--space-xl); 
+            border-bottom: 1px solid var(--border-light); 
+            background: var(--bg-secondary); 
+        }
+        .summary-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: var(--space-lg); 
+            margin-top: var(--space-lg); 
+        }
+        .summary-item { 
+            background: var(--bg-primary); 
+            padding: var(--space-md); 
+            border-radius: var(--radius-md); 
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .summary-item label { 
+            display: block; 
+            font-size: var(--font-xs); 
+            text-transform: uppercase; 
+            color: var(--text-secondary); 
+            margin-bottom: 5px; 
+            font-weight: var(--font-semibold); 
+        }
+        .summary-item value { 
+            display: block; 
+            font-size: var(--font-base); 
+            color: var(--text-primary); 
+        }
+        .match-score { 
+            font-size: var(--font-3xl); 
+            font-weight: var(--font-bold); 
+            color: #f59e0b; 
+            text-align: center; 
+            padding: var(--space-lg); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+        }
+        .status-badge { 
+            display: inline-block; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: var(--font-xs); 
+            font-weight: var(--font-medium); 
+            text-transform: capitalize; 
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-applied { background: #dbeafe; color: #1e40af; }
+        .status-contacted-someone { background: var(--bg-active); color: var(--text-secondary); }
+        .status-company-response { background: var(--accent-blue-light); color: #1e40af; }
+        .status-contacted-hiring-manager { background: var(--accent-blue-light); color: #1e40af; }
+        .status-scheduled-interview { background: #fef3c7; color: #92400e; }
+        .status-interviewed { background: #d1fae5; color: #065f46; }
+        .status-interview-notes { background: #d1fae5; color: #065f46; }
+        .status-interview-follow-up { background: #fce7f3; color: #9f1239; }
+        .status-offered { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-accepted { background: #d1fae5; color: #065f46; }
+        .tabs { 
+            display: flex; 
+            border-bottom: 1px solid var(--border-primary); 
+            padding: 0 var(--space-xl); 
+            background: var(--bg-secondary); 
+            overflow-x: auto;
+        }
+        .tab { 
+            padding: 14px var(--space-lg); 
+            cursor: pointer; 
+            border: none; 
+            background: none; 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-medium); 
+            color: var(--text-secondary); 
+            transition: all 0.2s; 
+            font-family: var(--font-family);
+            white-space: nowrap;
+        }
+        .tab:hover { 
+            color: var(--text-primary); 
+            background: var(--bg-active);
+        }
+        .tab.active { 
+            color: var(--accent-blue); 
+            border-bottom: 3px solid var(--accent-blue); 
+            margin-bottom: -1px; 
+            font-weight: var(--font-semibold);
+        }
+        .tab-content { 
+            padding: var(--space-xl); 
+            display: none; 
+        }
+        .tab-content.active { 
+            display: block; 
+        }
+        .tab-content pre { 
+            background: var(--bg-secondary); 
+            padding: var(--space-lg); 
+            border-radius: var(--radius-md); 
+            overflow-x: auto; 
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            border: 1px solid var(--border-primary);
+        }
+        .tab-content h3 { 
+            color: var(--text-primary); 
+            margin-top: var(--space-lg); 
+            margin-bottom: var(--space-sm); 
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+        }
+        a { 
+            color: var(--accent-blue); 
+            text-decoration: none; 
+        }
+        a:hover { 
+            text-decoration: underline; 
+        }
+        .timeline { 
+            margin-top: var(--space-lg); 
+        }
+        .timeline-item { 
+            padding: var(--space-md); 
+            border-left: 3px solid var(--accent-blue); 
+            margin-left: var(--space-sm); 
+            margin-bottom: var(--space-md); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-sm);
+        }
+        .timeline-item img { max-width: 100%; height: auto; border-radius: 6px; margin: 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        
+        /* Job Description Specific Styles */
+        .job-meta { 
+            background: var(--bg-secondary); 
+            padding: var(--space-md) var(--space-lg); 
+            border-radius: var(--radius-md); 
+            margin-bottom: var(--space-lg); 
+            border-left: 3px solid var(--accent-blue);
+            border: 1px solid var(--border-primary);
+        }
+        .job-meta p { 
+            margin: 5px 0; 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+        }
+        .job-meta strong { 
+            color: var(--text-primary); 
+            font-weight: var(--font-semibold); 
+        }
+        .job-section { 
+            margin-bottom: var(--space-xl); 
+            padding: var(--space-lg); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-primary);
+        }
+        .job-section-title { 
+            color: var(--text-primary); 
+            font-size: var(--font-lg); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-md); 
+            padding-bottom: var(--space-sm); 
+            border-bottom: 1px solid var(--border-light); 
+        }
+        .job-section-content { 
+            color: var(--text-primary); 
+            font-size: var(--font-base); 
+            line-height: 1.7; 
+        }
+        .job-section-content p { 
+            margin: 10px 0; 
+        }
+        .job-section-content ul { 
+            margin: 10px 0 10px 20px; 
+        }
+        .job-section-content li { 
+            margin: 8px 0; 
+            padding-left: 5px; 
+        }
+        .job-section-content strong { 
+            color: var(--text-primary); 
+            font-weight: var(--font-semibold); 
+        }
+        #job-desc h2 { 
+            color: var(--text-primary); 
+            font-size: var(--font-2xl); 
+            margin-bottom: var(--space-lg); 
+            font-weight: var(--font-semibold);
+        }
+        
+        /* Technology Pills Styles */
+        .tech-pills-container { margin-top: 20px; }
+        .tech-pills-section { margin-bottom: 20px; }
+        .tech-pills-label { 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            color: var(--text-primary); 
+            margin-bottom: var(--space-sm); 
+            display: flex; 
+            align-items: center; 
+            gap: var(--space-sm);
+        }
+        .tech-pills { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px;
+        }
+        .tech-pill { 
+            display: inline-block; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .tech-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .tech-pill-green { 
+            background: #d1fae5; 
+            color: #065f46;
+            border: 1px solid var(--accent-green);
+        }
+        .tech-pill-yellow { 
+            background: #fef3c7; 
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .tech-pill-red { 
+            background: #fee2e2; 
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .tech-legend { 
+            margin-top: var(--space-md); 
+            padding: var(--space-md); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-sm); 
+            font-size: var(--font-xs); 
+            color: var(--text-secondary);
+            display: flex;
+            gap: var(--space-lg);
+            flex-wrap: wrap;
+            border: 1px solid var(--border-primary);
+        }
+        .tech-legend-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+        }
+        .tech-legend-dot { 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%;
+        }
+        
+        /* Research Tab Styles */
+        .research-container { 
+            max-width: 100%;
+        }
+        .research-section { 
+            margin-bottom: var(--space-xl); 
+            padding: var(--space-lg); 
+            background: var(--bg-secondary); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border-primary);
+        }
+        .research-section h3 { 
+            color: var(--text-primary); 
+            font-size: var(--font-lg); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-md); 
+            padding-bottom: var(--space-sm); 
+            border-bottom: 1px solid var(--border-light);
+        }
+        .research-item { 
+            margin-bottom: var(--space-md); 
+            padding: var(--space-md); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-sm); 
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .research-item h4 { 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-sm);
+        }
+        .research-item p { 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            line-height: 1.6; 
+            margin: 0;
+        }
+        .research-item a { 
+            color: var(--accent-blue); 
+            text-decoration: none; 
+            font-weight: var(--font-medium);
+        }
+        .research-item a:hover { 
+            text-decoration: underline; 
+        }
+        .news-item { 
+            margin-bottom: var(--space-md); 
+            padding: var(--space-md); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-sm); 
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .news-item h5 { 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: var(--space-sm);
+        }
+        .news-item p { 
+            color: var(--text-secondary); 
+            font-size: var(--font-xs); 
+            line-height: 1.5; 
+            margin-bottom: var(--space-sm);
+        }
+        .news-item .news-link { 
+            color: var(--accent-blue); 
+            font-size: var(--font-xs); 
+            text-decoration: none;
+        }
+        .news-item .news-link:hover { 
+            text-decoration: underline;
+        }
+        .person-item { 
+            margin-bottom: var(--space-sm); 
+            padding: var(--space-md); 
+            background: var(--bg-primary); 
+            border-radius: var(--radius-sm); 
+            border-left: 3px solid var(--accent-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .person-item h5 { 
+            color: var(--text-primary); 
+            font-size: var(--font-sm); 
+            font-weight: var(--font-semibold); 
+            margin-bottom: 5px;
+        }
+        .person-item .title { 
+            color: var(--text-secondary); 
+            font-size: var(--font-xs); 
+            font-style: italic;
+        }
+        .loading-research { 
+            text-align: center; 
+            padding: var(--space-xl); 
+            color: var(--text-secondary);
+        }
+        .research-error { 
+            color: #dc3545; 
+            background: #f8d7da; 
+            padding: 15px; 
+            border-radius: 6px; 
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Quill Editor Styles */
+        .ql-editor {
+            min-height: 120px;
+            font-size: 11pt !important;
+            font-family: var(--font-family) !important;
+            font-weight: 400 !important;
+            line-height: 1.5 !important;
+            color: var(--text-primary) !important;
+            text-align: justify !important;
+        }
+        
+        /* Override any pasted content font styles */
+        .ql-editor * {
+            font-family: var(--font-family) !important;
+            font-size: 11pt !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .ql-editor p,
+        .ql-editor div,
+        .ql-editor span {
+            font-family: var(--font-family) !important;
+            font-size: 11pt !important;
+            color: var(--text-primary) !important;
+            text-align: justify !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Paragraph spacing and alignment */
+        .ql-editor p {
+            margin-bottom: 0.5em !important;
+            text-align: justify !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Ensure all text elements use justified alignment */
+        .ql-editor p[style*="text-align"],
+        .ql-editor div[style*="text-align"],
+        .ql-editor span[style*="text-align"] {
+            text-align: justify !important;
+        }
+        
+        .ql-toolbar {
+            border: 1px solid var(--border-primary);
+            border-bottom: none;
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            background-color: var(--bg-primary);
+        }
+        
+        .ql-container {
+            border: 1px solid var(--border-primary);
+            border-top: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            background-color: var(--bg-primary);
+            font-family: var(--font-family);
+        }
+        
+        .ql-container.ql-snow:focus-within {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
+        }
+        
+        .ql-toolbar.ql-snow {
+            border-color: var(--border-primary);
+        }
+        
+        .ql-toolbar.ql-snow .ql-picker-label {
+            border-color: transparent;
+        }
+        
+        .ql-toolbar.ql-snow .ql-picker-options {
+            border-color: var(--border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            background: var(--bg-primary);
+        }
+        
+        .ql-toolbar.ql-snow button {
+            border-radius: var(--radius-sm);
+            margin: 2px;
+        }
+        
+        .ql-toolbar.ql-snow button:hover {
+            background-color: var(--bg-hover);
+        }
+        
+        .ql-toolbar.ql-snow button.ql-active {
+            background-color: var(--bg-active);
+        }
+        
+        /* Percentage Widget Styles */
+        .percentage-widget-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .percentage-input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .percentage-input-group label {
+            font-weight: 500;
+            color: #4b5563;
+            font-size: 13px;
+        }
+        
+        #percentage-input {
+            width: 60px;
+            padding: 6px 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        
+        #percentage-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .percentage-progress-fill.green {
+            background: #3491B2;
+        }
+        
+        .percentage-progress-fill.orange {
+            background: #3491B2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation - Injected by shared-menu.js -->
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div style="flex: 1;">
+                    <a href="/index.html" class="back-link" style="display: inline-block; margin-bottom: 8px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        Back to Applications
+                    </a>
+                    <h1 style="margin: 0 0 4px 0;">Fintech A co - Software Engineer</h1>
+                    <div class="header-subtitle">Application ID: 20251209115631-Fintech A co-Software Engineer</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
+                    <div class="header-actions">
+                        <button class="btn" onclick="toggleFlag('20251209115631-Fintech A co-Software Engineer', false)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                            Flag
+                        </button>
+                        <button class="btn btn-primary" onclick="const tabs = Array.from(document.querySelectorAll('.tab')); const updatesTab = tabs.find(t => t.textContent.includes('Updates') || t.textContent.includes('updates')); if (updatesTab) { showTab(updatesTab, 'updates'); }">Update Status</button>
+            </div>
+                    
+                <div style="margin-top: 16px; width: 100%;">
+                    
+            <div class="badge-section" style="padding: 12px; background: transparent; border-radius: 8px; border: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; cursor: pointer;" onclick="toggleBadgeSection()">
+                    <h3 style="margin: 0; font-size: 13px; font-weight: 600; color: #1f2937;">Networking Rewards</h3>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="font-size: 16px; font-weight: 700; color: #3b82f6; margin-left: 16px;">13 pts</div>
+                        <svg id="badge-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #6b7280; transition: transform 0.3s ease; transform: rotate(180deg);">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div id="badge-grid-content" style="display: none; gap: 12px; align-items: flex-start; max-height: 300px; overflow-y: auto;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; flex: 1;">
+                        
+            <div class="badge-item badge-unlocked" title="Profile Magnet +3" style="padding: 10px; border: 2px solid transparent; border-radius: 8px; background: transparent; cursor: help; position: relative; display: flex; align-items: center; justify-content: center;">
+                <img src="/static/images/badges/ProfileMagnetW.jpeg" alt="Profile Magnet" style="width: 70px; height: auto; display: block;" />
+            </div>
+        
+                    </div>
+                    <div style="flex-shrink: 0;">
+            <div class="badge-item badge-locked" title="Qualified Lead +15" style="padding: 10px; border: 2px solid transparent; border-radius: 8px; background: transparent; cursor: help; position: relative; display: flex; align-items: center; justify-content: center;">
+                <img src="/static/images/badges/QualifiedLeadU.jpeg" alt="Qualified Lead" style="width: 70px; height: auto; display: block;" />
+            </div>
+        </div>
+                </div>
+                <script>
+                    let badgeSectionExpanded = false;
+                    function toggleBadgeSection() {
+                        const content = document.getElementById('badge-grid-content');
+                        const icon = document.getElementById('badge-toggle-icon');
+                        if (!badgeSectionExpanded) {
+                            content.style.display = 'flex';
+                            icon.style.transform = 'rotate(0deg)';
+                            badgeSectionExpanded = true;
+                        } else {
+                            content.style.display = 'none';
+                            icon.style.transform = 'rotate(180deg)';
+                            badgeSectionExpanded = false;
+                        }
+                    }
+                </script>
+            </div>
+            
+                </div>
+            </div>
+        </div>
+            </div>
+            
+        <!-- Content -->
+        <div class="content">
+            <!-- Application Header Card -->
+            <div class="app-header-card">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <span class="status-pill tag tag-blue">Applied</span>
+                    <span class="match-pill">
+                        <span class="match-percentage" data-score="88" style="color: #f59e0b;">88%</span>
+                        <span class="match-score-label">Match Score</span>
+                    </span>
+                </div>
+                <div class="app-meta" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <div class="meta-item">
+                        <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Boston, MA</span></div><div class="meta-item"><svg...salary range for this role is $214,300 - $321,500. For sales roles, the range provided is the role’s On Target Earnings ("OTE") range, meaning that the range includes both the sales commissions/sales bonuses target and annual base salary for the role. This salary range may be inclusive of several career levels at Fintech A co and will be narrowed during the interview process based on a number of factors, including the candidate’s experience, qualifications, and location. Applicants interested in this role and who are not located in the US may request the annual salary range for their location during the interview process.
+
+Additional benefits for this role may include: equity, company bonus or sales commissions/bonuses; 401(k) plan; medical, dental, and vision benefits; and wellness stipends.
+
+
+See how you compare to others who clicked apply
+Candidates who clicked apply
+2,357	total
+37	in the past day
+Candidate seniority level
+53% Senior level candidates
+
+
+18% Entry level candidates
+
+
+11% Director level candidates
+
+
+10% Manager level candidates
+
+
+Candidate education level
+15%	have a Bachelor's Degree (Similar to you)
+33%	have a Master of Business Administration
+14%	have a Master's Degree
+38%	have other degrees</pre>
+        
+</div>
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab(this, 'summary')">Summary</button>
+                    <button class="tab" onclick="showTab(this, 'skills')">Skills</button>
+                    <button class="tab" onclick="showTab(this, 'research')">Research</button>
+                    <button class="tab" onclick="showTab(this, 'qualifications')">Qualifications</button>
+                    <button class="tab" onclick="showTab(this, 'cover-letter')">Cover Letter</button>
+                    <button class="tab" onclick="showTab(this, 'resume')">Resume</button>
+                    <button class="tab" onclick="showTab(this, 'rewards')">Rewards</button>
+                    <button class="tab" onclick="showTab(this, 'networking')">Networking</button>
+                    <button class="tab" onclick="showTab(this, 'updates')">Updates</button>
+                    <button class="tab" onclick="showTab(this, 'timeline')">Timeline</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="summary" class="tab-content active">
+            <h2>Application Summary</h2>
+            <div class="content-section">
+                <h3>Job Description</h3>
+                <pre style="white-space: pre-wrap; font-family: inherit; background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; overflow-x: auto;">This is a demo application for the Senior Software Engineer position at Capital Finance Firm. The job description and application details are shown in the other tabs.
+
+Key highlights:
+- Position: Senior Software Engineer
+- Company: Capital Finance Firm
+- Location: New York, NY
+- Match Score: 85%
+- Status: Applied
+
+Use the tabs above to explore Skills, Research, Qualifications, Cover Letter, Resume, and other details for this application.</pre>
+            </div>
+        </div>
+        
+
+        
+        <div id="skills" class="tab-content">
+
+            <h2>Skills Analysis</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Skills extracted from job description and matched against your resume:</p>
+            
+            <div class="tech-pills-container">
+                <div class="tech-pills-section">
+<div class="tech-pills-label">📋 Skills Extracted from Job Description</div>
+<div class="tech-pills">
+<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">Business Acumen</span>
+<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">Data Analytics</span>
+<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">Data Engineering</span>
+<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">Financial Oversight</span>
+<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">None</span>
+<span class="tech-pill" style="background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb;">Programming Languages</span>
+<div style="margin-top: 10px; font-size: 12px; color: #666;">Total: 6 skills extracted</div>
+</div>
+</div>
+<div class="tech-pills-section">
+<div class="tech-pills-label">✅ Skills Matched (Found in Resume)</div>
+<div class="tech-pills">
+<span class="tech-pill tech-pill-green">Business Acumen</span>
+<span class="tech-pill tech-pill-green">Data Analytics</span>
+<span class="tech-pill tech-pill-green">Data Engineering</span>
+<span class="tech-pill tech-pill-green">Financial Oversight</span>
+<span class="tech-pill tech-pill-green">Programming Languages</span>
+<div style="margin-top: 10px; font-size: 12px; color: #666;">Total: 5 skills matched</div>
+</div>
+</div>
+<div class="tech-pills-section">
+<div class="tech-pills-label">❌ Skills Unmatched (Not Found in Resume)</div>
+<div class="tech-pills">
+<span class="tech-pill tech-pill-red">None</span>
+<div style="margin-top: 10px; font-size: 12px; color: #666;">Total: 1 skills missing</div>
+</div>
+</div>
+
+        <div class="tech-legend">
+            <div class="tech-legend-item">
+                <div class="tech-legend-dot" style="background: #e3f2fd; border: 1px solid #bbdefb;"></div>
+                <span>Extracted from Job Description</span>
+            </div>
+            <div class="tech-legend-item">
+                <div class="tech-legend-dot" style="background: #d4edda; border: 1px solid #c3e6cb;"></div>
+                <span>Matched (Found in Resume)</span>
+            </div>
+            <div class="tech-legend-item">
+                <div class="tech-legend-dot" style="background: #f8d7da; border: 1px solid #f5c6cb;"></div>
+                <span>Unmatched (Not Found in Resume)</span>
+            </div>
+        </div>
+        
+            </div>
+        
+</div>
+        
+        <div id="research" class="tab-content"><h2>Company Research</h2><div class="content-section"># Company Research: Fintech A co
+
+**Company Website:** https://www.fintechaco.com
+
+## Company Overview & Mission
+- Fintech A co is a leading provider of innovative solutions in the technology sector, serving clients across multiple industries
+- The company focuses on delivering cutting-edge products and services that drive digital transformation
+- With a strong commitment to innovation and customer success, Fintech A co has established itself as a trusted partner for businesses seeking technological advancement
+
+## Recent News & Developments
+- Recent expansion into new market segments demonstrates the company's growth trajectory
+- Strategic partnerships with industry leaders have strengthened their market position
+- Investment in research and development continues to drive product innovation
+
+## Company Culture & Values
+- Emphasis on collaboration, innovation, and professional development
+- Commitment to diversity and inclusion in the workplace
+- Strong focus on work-life balance and employee well-being
+
+## Industry Position
+- Recognized as a key player in the technology services sector
+- Strong financial performance and market presence
+- Active in industry associations and thought leadership initiatives
+
+## Technology Stack & Innovation
+- Utilizes modern technology platforms and development methodologies
+- Invests heavily in emerging technologies and digital solutions
+- Maintains a forward-thinking approach to technology adoption</div>
+        </div>
+        
+            </div>
+        
+</div>
+        
+        <div id="qualifications" class="tab-content">
+
+            <h2>Qualifications Analysis</h2>
+            <pre>
+PRELIMINARY MATCHING RESULTS:
+- Match Score: 77% (Source: Preliminary Matcher - validated skill matching)
+- Exact Matches: 4
+- Partial Matches: 5
+- AI Focus Areas: Many partial matches - focus on context and relevance, Programming language requirements, Cloud platform requirements
+
+**Skills Match Summary**
+
+* Match Score: 77% (using preliminary matcher score)
+* Features Compared: 45
+* Strong Matches: Data Engineering, Product Management, Insights, Financial Management, Problem Solving
+* Missing Skills: None
+* Partial Matches: Cloud Platforms (partial), Communication (partial)
+
+**Skills Analysis by Category**
+
+### Technical Skills
+
+| Skill | Job Requirement | Resume Evidence | Match Level |
+| --- | --- | --- | --- |
+| Data Engineering | "Design and implement data pipelines" | "Data pipelines, data engineering" | Strong Match |
+| Financial Management | "Manage financial projections" | "Financial projections, budget management" | Partial Match |
+| Cloud Platforms | "Deploy to AWS, GCP, Azure" | "AWS Lake Formation, Kinesis, etc." | Partial Match |
+| Programming Languages | "Proficient in Python, SQL" | "Python, SQL, Java" | Strong Match |
+
+### Leadership & Management Skills
+
+| Skill | Job Requirement | Resume Evidence | Match Level |
+| --- | --- | --- | --- |
+| Team Management | "Lead and manage teams" | "Team management, budget management" | Partial Match |
+| Financial Oversight | "Manage financial budgets" | "Financial management, budget management" | Strong Match |
+
+### Business & Strategy Skills
+
+| Skill | Job Requirement | Resume Evidence | Match Level |
+| --- | --- | --- | --- |
+| Product Strategy | "Develop product strategy" | "Product strategy, business strategy" | Partial Match |
+| Business Acumen | "Demonstrate business acumen" | "Business acumen, financial management" | Strong Match |
+
+### Domain Expertise
+
+| Skill | Job Requirement | Resume Evidence | Match Level |
+| --- | --- | --- | --- |
+| Fintech | "Domain expertise in fintech" | "Fintech, payments, reconciliation" | Partial Match |
+| Data Analytics | "Analyze data insights" | "Data analytics, insights" | Strong Match |
+
+### Technical Skills Not Matched
+
+* None
+
+### Leadership Skills Not Matched
+
+* None
+
+### Business Skills Not Matched
+
+* None
+
+### Domain Expertise Not Matched
+
+* None
+
+## Recommendations
+
+1. Emphasize experience in data engineering, product management, and financial management to highlight strong matches.
+2. Address gaps in cloud platforms by highlighting AWS Lake Formation, Kinesis, and other relevant skills.
+3. Prepare for interviews by reviewing data analytics, insights, and financial projections to demonstrate problem-solving skills.
+
+## Overall Assessment
+
+Based on the preliminary matching results, this candidate demonstrates a strong match with the job requirements, particularly in technical skills such as data engineering, product management, and financial management. They also show partial matches in leadership and business skills areas. While there are no unmatched skills listed, it is essential to highlight the relevant experience and address gaps in cloud platforms during the interview preparation. Overall, this candidate has a good fit with the job requirements, and with proper emphasis on strong matches and addressing gaps, they can be considered a competitive candidate for the position.
+</pre>
+        
+</div>
+        
+        <div id="cover-letter" class="tab-content">
+
+            <h2>Cover Letter</h2>
+            
+            <!-- Analysis Summary Box (similar to the one from application creation) -->
+            <div style="border: 1px solid #0099FF; padding: 15px; margin-bottom: 20px; box-shadow: none; border-radius: 8px; background: white;">
+                <h3 style="color: #666; margin-bottom: 10px; font-size: 16px;">
+                    Match Score: 77% - Application for Fintech A co - Software Engineer
+                </h3>
+                
+                <!-- Introductory text before analysis summary -->
+                <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #667eea;">
+                    <p style="color: #333; font-size: 14px; line-height: 1.5; margin: 0;">
+                        I reviewed our compatibility based on job posting, research and my experience with my proprietary ML Model and these are my findings:
+                    </p>
+                </div>
+                
+                <!-- Features Compared -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Features Compared</h4>
+                    <p style="color: #666; font-size: 11px;">
+                        0 individual skills, technologies, and requirements analyzed
+                    </p>
+                </div>
+                
+                <!-- Strong Matches -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Strong Matches</h4>
+                    <div style="color: #666; font-size: 11px;">
+                        <span style="color: #999; font-style: italic;">No strong matches identified</span>
+                    </div>
+                </div>
+                
+                <!-- Methodology -->
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: #0099FF; margin-bottom: 5px; font-size: 12px; font-weight: 600;">Methodology</h4>
+                    <p style="color: #666; font-size: 11px; line-height: 1.4;">
+                        Our AI analyzes your resume against the job description using weighted scoring: 
+                        Technical Skills (40%), Technologies/Tools (30%), Experience Level (15%), Soft Skills (10%), Other Factors (5%).
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Cover Letter Content with Copy Button -->
+            <div style="position: relative;">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333;">Cover Letter Content</h3>
+                    <button onclick="copyCoverLetter()" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        📋 Copy Cover Letter
+                    </button>
+                </div>
+                
+                <h4 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: 600;">**Cover Letter**</h4>
+                
+                <div id="cover-letter-content" style="background: #f5f5f5; padding: 30px 40px; border-radius: 8px; border: 1px solid #e0e0e0; font-family: Georgia, 'Times New Roman', serif; line-height: 1.6; max-height: 600px; overflow-y: auto; color: #333;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 30px; font-weight: 600;">
+                        Software Engineer - Fintech A co - Intro
+                    </div>
+                    
+                    <p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">Here is the improved cover letter:</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6;">Dear Hiring Manager,</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">My profile shows a 77% compatibility score with the role, and Fintech A co verified through weighted scoring methodology: Technical Skills (40%), Tools (30%), Experience (15%), and Soft Skills (10%) across 45 requirements. My strongest matched capabilities include insights, product management, data science, and product management.</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">I am thrilled to apply for the Software Engineer role at Fintech A co, where I can leverage my passion for innovation, data-driven decision-making, and financial technology. With [Number] years of experience in product management, I believe my skills and achievements make me an ideal fit for this position.</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">As a seasoned product manager, I have developed a strong track record of leading cross-functional teams to deliver high-quality products that drive business results. My leadership style is characterized by hands-on involvement from day one, ensuring immediate contribution and high-quality deliverables. I excel at redirecting focus, shifting methodologies, and unleashing growth opportunities.</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">In my previous roles, I have consistently demonstrated the ability to analyze inefficiencies and develop successful solutions that drive customer satisfaction and revenue growth. I have a strong understanding of building strong relationships and fostering a culture of collaboration and innovation.</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">I am particularly drawn to Fintech A co&#x27;s mission to make it easy for developers to build the best possible products, as well as its commitment to simplification and ease of use in the financial industry. I am impressed by Fintech A co&#x27;s recent funding round and expansion into new markets, which demonstrates the company&#x27;s agility and commitment to growth. The opportunity to contribute to the development of innovative solutions like Fintech A co Treasury excites me, and I believe my skills and experience make me a strong fit for this role.</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">As a natural leader with adaptability and vision, I am well-equipped to build and manage high-performing teams that drive results. My excellent communication skills enable me to connect with others, shape top-performing teams, and drive alignment across the organization. I am excited about the prospect of joining Fintech A co&#x27;s team and contributing my skills and experience to drive growth and innovation.</p>
+<p style="margin-bottom: 15px; font-size: 15px; line-height: 1.6; text-align: justify;">Thank you for considering my application. I would be delighted to discuss my qualifications further and explore how my skills and achievements align with the needs of this role.</p>
+                    
+                    <p style="margin-top: 30px; margin-bottom: 5px; font-size: 15px; line-height: 1.6;">Sincerely,</p>
+                    <p style="margin-top: 5px; font-size: 15px; line-height: 1.6;">Jason Smith | 222.222.2222 | jason.smith@hunterapp.com</p>
+                </div>
+            </div>
+            
+            <!-- Hiring Manager Intro Messages Section -->
+            <div style="margin-top: 30px; border: 1px solid #28a745; padding: 15px; box-shadow: none; border-radius: 8px; background: white;">
+                <div style="margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Hiring Manager Intro Messages</h3>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Three ready-to-copy messages for hiring managers</p>
+                </div>
+                
+                <div id="hiring-manager-content">
+<div style="text-align: center; padding: 40px 20px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+                    <p style="color: #6c757d; margin-bottom: 20px; font-size: 14px;">
+                        No Hiring Manager intro messages generated yet. Click the button below to generate them.
+                    </p>
+                    <button id="generateHiringmanagerIntrosBtn" onclick="showUpgradeMessage(); return false;" style="background: #10b981; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed; opacity: 0.5;" class="btn-disabled" title="Purchase Upgrade for Functionality">Generate Hiring Manager Intro Messages</button>
+                </div>
+                </div>
+            </div>
+            
+            <!-- Recruiter Intro Messages Section -->
+            <div style="margin-top: 30px; border: 1px solid #17a2b8; padding: 15px; box-shadow: none; border-radius: 8px; background: white;">
+                <div style="margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #333; font-size: 18px; font-weight: 600;">Recruiter Intro Messages</h3>
+                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Three ready-to-copy messages for recruiters</p>
+                </div>
+                
+                <div id="recruiter-content">
+<div style="text-align: center; padding: 40px 20px; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+                    <p style="color: #6c757d; margin-bottom: 20px; font-size: 14px;">
+                        No Recruiter intro messages generated yet. Click the button below to generate them.
+                    </p>
+                    <button id="generateRecruiterIntrosBtn" onclick="showUpgradeMessage(); return false;" style="background: #10b981; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed; opacity: 0.5;" class="btn-disabled" title="Purchase Upgrade for Functionality">Generate Recruiter Intro Messages</button>
+                </div>
+                </div>
+            </div>
+        
+</div>
+        
+        <div id="resume" class="tab-content">
+            <h2>Customized Resume</h2>
+            <div style="margin: 12px 0; padding: 12px; background: #fffbe6; border: 1px solid #ffe58f; border-radius: 6px; color: #8c6d1f;">
+                No customized resume generated yet. Click the button below to generate one from your base resume and analysis.
+            </div>
+            <button id="generateResumeBtn" onclick="showUpgradeMessage(); return false;" style="background: #10b981; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: not-allowed; opacity: 0.5;" class="btn-disabled" title="Purchase Upgrade for Functionality">Generate Customized Resume</button>
+        </div>
+        
+        <div id="rewards" class="tab-content">
+            <h2>Networking Rewards by Category</h2>
+            
+            <div style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">Networking Rewards by Category</h2>
+                    <div style="font-size: 18px; font-weight: 700; color: #3b82f6;">3 pts</div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #3b82f6;"></div>
+                        <div style="font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">Prospecting</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #3b82f6; margin-bottom: 8px;">0</div>
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">points</div>
+                        <div style="height: 1px; background: #e5e7eb; margin: 8px 0;"></div>
+                        <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">0</div>
+                    </div>
+                
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #10b981;"></div>
+                        <div style="font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">Outreach</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 8px;">3</div>
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">points</div>
+                        <div style="height: 1px; background: #e5e7eb; margin: 8px 0;"></div>
+                        <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">1</div>
+                    </div>
+                
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #f59e0b;"></div>
+                        <div style="font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">Engagement</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #f59e0b; margin-bottom: 8px;">0</div>
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">points</div>
+                        <div style="height: 1px; background: #e5e7eb; margin: 8px 0;"></div>
+                        <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">0</div>
+                    </div>
+                
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #8b5cf6;"></div>
+                        <div style="font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">Nurture</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #8b5cf6; margin-bottom: 8px;">0</div>
+                        <div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">points</div>
+                        <div style="height: 1px; background: #e5e7eb; margin: 8px 0;"></div>
+                        <div style="font-size: 12px; color: #6b7280;">Badges Earned</div>
+                        <div style="font-size: 16px; font-weight: 600; color: #1f2937;">0</div>
+                    </div>
+                
+                </div>
+            </div>
+            
+        </div>
+        
+        <div id="networking" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Networking Contacts</h2>
+                <button id="create-contact-btn" onclick="showCreateContactForm()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">Create New Contact</button>
+            </div>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Contacts at Fintech A co:</p>
+            <div id="networking-contacts-grid" class="contacts-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                <div style="text-align: center; padding: 40px; color: #6b7280;">Loading contacts...</div>
+            </div>
+            <div id="networking-summary-container" style="display: none; position: fixed; top: 0; left: 180px; right: 0; bottom: 0; background: white; z-index: 1000; flex-direction: column; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid #e5e7eb; flex-shrink: 0; background: white;">
+                    <h3 id="networking-summary-title" style="margin: 0;">Contact Summary</h3>
+                    <button onclick="closeNetworkingSummary()" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">Close Summary</button>
+                </div>
+                <div id="networking-summary-content" style="flex: 1; overflow: hidden; min-height: 0; position: relative;">
+                    <div style="text-align: center; padding: 40px; color: #6b7280;">Loading summary...</div>
+                </div>
+            </div>
+            <style>
+                .contact-tile {
+                    background: white;
+                    border-radius: 14px;
+                    padding: 24px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 2px solid transparent;
+                    position: relative;
+                }
+                .contact-tile:hover {
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+                    transform: translateY(-4px);
+                    border-color: rgba(59, 130, 246, 0.2);
+                }
+                .contact-tile.timing-white { border-left: 4px solid #e5e7eb; }
+                .contact-tile.timing-green { border-left: 4px solid #10b981; }
+                .contact-tile.timing-yellow { border-left: 4px solid #f59e0b; }
+                .contact-tile.timing-red { border-left: 4px solid #ef4444; }
+                .contact-tile.timing-blue { border-left: 4px solid #3b82f6; }
+                .contact-tile.timing-gray { border-left: 4px solid #6b7280; }
+                .contact-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 12px;
+                }
+                .contact-name {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #1f2937;
+                    margin: 0;
+                }
+                .match-score {
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #10b981;
+                }
+                .contact-company {
+                    font-size: 15px;
+                    color: #6b7280;
+                    margin: 4px 0;
+                    font-weight: 500;
+                }
+                .contact-title {
+                    font-size: 14px;
+                    color: #9ca3af;
+                    margin: 4px 0;
+                }
+                .status-badge {
+                    display: inline-block;
+                    padding: 4px 12px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border-radius: 6px;
+                    margin-top: 8px;
+                    background: #f9fafb;
+                    color: #6b7280;
+                }
+                .next-step-section {
+                    margin-top: 16px;
+                    padding: 12px;
+                    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                    border-radius: 10px;
+                    border-left: 4px solid #3b82f6;
+                }
+                .next-step-label {
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    color: #1e40af;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 6px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .next-step-label::before {
+                    content: '→';
+                    font-size: 14px;
+                    font-weight: 700;
+                }
+                .next-step-text {
+                    font-size: 12px;
+                    color: #1e3a8a;
+                    line-height: 1.5;
+                    font-weight: 500;
+                }
+                .contact-dates {
+                    margin-top: 14px;
+                    font-size: 13px;
+                    color: #9ca3af;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                .date-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .view-btn {
+                    width: 100%;
+                    margin-top: 16px;
+                    padding: 10px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    border: 1px solid #e5e7eb;
+                    background: white;
+                    color: #1f2937;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                }
+                .view-btn:hover {
+                    background: #f9fafb;
+                    border-color: #3b82f6;
+                    color: #3b82f6;
+                }
+            </style>
+            <script>
+                // Make function globally accessible
+                window.loadNetworkingContacts = async function loadNetworkingContacts() {
+                    console.log('loadNetworkingContacts called');
+                    try {
+                        // Demo version - use DEMO_DATA
+                        const grid = document.getElementById('networking-contacts-grid');
+                        if (!grid) {
+                            console.error('Networking contacts grid not found');
+                            return;
+                        }
+                        
+                       
+                        console.log('Grid found, showing loading state');
+                        // Show loading state
+                        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280; grid-column: 1 / -1;">Loading contacts...</div>';
+                        
+                        // Wait for DEMO_DATA to load
+                        console.log('Waiting for DEMO_DATA...', typeof window.DEMO_DATA);
+                        let attempts = 0;
+                        const maxAttempts = 100; // Wait up to 10 seconds
+                        while (attempts < maxAttempts) {
+                            if (typeof window.DEMO_DATA !== 'undefined' && window.DEMO_DATA.contacts && Array.isArray(window.DEMO_DATA.contacts)) {
+                                break; // DEMO_DATA is available
+                            }
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            attempts++;
+                        }
+                        
+                        if (typeof window.DEMO_DATA === 'undefined' || !window.DEMO_DATA.contacts || !Array.isArray(window.DEMO_DATA.contacts)) {
+                            console.error('DEMO_DATA not available or contacts not an array', window.DEMO_DATA);
+                            grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280; grid-column: 1 / -1;">No networking contacts available.</div>';
+                            return;
+                        }
+                        
+                        // Filter contacts by company name matching this application
+                        const pageCompany = 'Fintech A co';
+                        let contacts = window.DEMO_DATA.contacts.filter(c => {
+                            if (!c || !c.company_name) return false;
+                            // Match company name (case insensitive, handle variations)
+                            const contactCompany = (c.company_name || '').toLowerCase().trim();
+                            const pageCompanyLower = pageCompany.toLowerCase().trim();
+                            return contactCompany === pageCompanyLower || 
+                                   contactCompany.includes(pageCompanyLower) || 
+                                   pageCompanyLower.includes(contactCompany);
+                        });
+                        
+                        // If no matches, show first 2-3 as demo
+                        if (contacts.length === 0) {
+                            contacts = window.DEMO_DATA.contacts.slice(0, 3);
+                        }
+                        
+                        grid.innerHTML = contacts.map(contact => {
+                            const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
+                            const statusClass = contact.status === 'in conversation' ? 'blue' : 
+                                               contact.status === 'connection accepted' ? 'green' : 'gray';
+                            
+                            return `
+                                <div class="contact-tile" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                                    <div class="contact-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                        <div>
+                                            <h3 class="contact-name" style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">${escapeHtml(contact.person_name || 'Contact')}</h3>
+                                            <div class="contact-company" style="color: #6b7280; font-size: 14px;">${escapeHtml(contact.company_name || '')}</div>
+                                            ${contact.job_title ? `<div class="contact-title" style="color: #9ca3af; font-size: 12px; margin-top: 4px;">${escapeHtml(contact.job_title)}</div>` : ''}
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <span class="match-score" style="font-size: 14px; font-weight: 600; color: #3b82f6;">${matchScore}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="status-badge" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; background: #e5e7eb; color: #374151; margin-bottom: 12px;">${escapeHtml(contact.status || 'connected')}</div>
+                                    <div class="contact-dates" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280;">
+                                        <div style="margin-bottom: 4px;">📅 Connected: ${formatDate(contact.created_at)}</div>
+                                    </div>
+                                    <button onclick="viewContactSummary('${escapeHtml(contact.id || '')}', '${escapeHtml(contact.person_name || 'Contact')}')" style="width: 100%; margin-top: 16px; padding: 10px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid #e5e7eb; background: white; color: #1f2937; cursor: pointer; transition: all 0.15s ease;">
+                                        View Details
+                                    </button>
+                                </div>
+                            `;
+                        }).join('');
+                    } catch (error) {
+                        console.error('Error loading networking contacts:', error);
+                        const grid = document.getElementById('networking-contacts-grid');
+                        if (grid) {
+                            console.error('DEMO_DATA not available or contacts not an array', window.DEMO_DATA);
+                            grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280; grid-column: 1 / -1;">No networking contacts available.</div>';
+                        }
+                    }
+                };
+                
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+                
+                function formatDate(dateString) {
+                    if (!dateString) return 'N/A';
+                    try {
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric'
+                        });
+                    } catch (error) {
+                        return 'N/A';
+                    }
+                }
+                
+                async function viewContactSummary(contactId, contactName) {
+                    // Demo version - show upgrade message
+                    showUpgradeMessage();
+                    return;
+                }
+                
+                window.showCreateContactForm = function() {
+                    // Hide contacts grid and show summary container
+                    document.getElementById('networking-contacts-grid').style.display = 'none';
+                    document.getElementById('networking-summary-container').style.display = 'flex';
+                    document.getElementById('networking-summary-title').textContent = 'Create New Contact';
+                    
+                    // Update button state
+                    const createBtn = document.getElementById('create-contact-btn');
+                    createBtn.textContent = 'Back to Contacts';
+                    createBtn.onclick = showContactsGrid;
+                    
+                    // Load create form via iframe with company pre-filled
+                    const summaryContent = document.getElementById('networking-summary-content');
+                    // Clear any existing content immediately (including "Loading summary...")
+                    summaryContent.innerHTML = '';
+                    // Then create and append iframe - this ensures no flash of old content
+                    const iframe = document.createElement('iframe');
+                    iframe.src = '/new-networking-contact?company=Fintech A co';
+                    iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;';
+                    summaryContent.appendChild(iframe);
+                    
+                    currentViewState = 'create';
+                }
+                
+                function showContactsGrid() {
+                    // Show contacts grid and hide summary container
+                    document.getElementById('networking-contacts-grid').style.display = 'grid';
+                    document.getElementById('networking-summary-container').style.display = 'none';
+                    
+                    // Update button state
+                    const createBtn = document.getElementById('create-contact-btn');
+                    createBtn.textContent = 'Create New Contact';
+                    createBtn.onclick = showCreateContactForm;
+                    
+                    currentViewState = 'contacts';
+                }
+                
+                function closeNetworkingSummary() {
+                    showContactsGrid();
+                }
+                
+                // Listen for messages from iframe (e.g., when contact is created)
+                window.addEventListener('message', function(event) {
+                    if (event.data && event.data.type === 'networking-contact-created') {
+                        // Contact was created in the iframe
+                        // Reload contacts to show the new one
+                        window.loadNetworkingContacts();
+                        
+                        // Optionally show the new contact's summary
+                        if (event.data.summary_url) {
+                            setTimeout(() => {
+                                // Find the contact in the list and show its summary
+                                // For now, just reload contacts and show success message
+                                alert(`Contact ${event.data.person_name} at ${event.data.company_name} created successfully!`);
+                            }, 500);
+                        }
+                    }
+                });
+                
+                async function toggleContactFlag(contactId, flagged) {
+                    try {
+                        const response = await fetch(`/api/networking/contacts/${contactId}/flag`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ flagged: flagged })
+                        });
+                        
+                        if (response.ok) {
+                            window.loadNetworkingContacts();
+                        }
+                    } catch (error) {
+                        console.error('Error toggling flag:', error);
+                    }
+                }
+                
+                // Load contacts when tab is shown
+                // Load contacts when tab is shown - handle both cases
+                function initNetworkingContacts() {
+                    // Load immediately if DOM is ready, otherwise wait
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            setTimeout(function() {
+                                if (typeof window.loadNetworkingContacts === 'function') {
+                                    window.loadNetworkingContacts();
+                                }
+                            }, 200);
+                        });
+                    } else {
+                        // DOM already loaded, call immediately
+                        setTimeout(function() {
+                            if (typeof window.loadNetworkingContacts === 'function') {
+                                window.loadNetworkingContacts();
+                            }
+                        }, 200);
+                    }
+                    
+                    // Also load when networking tab is clicked
+                    const networkingTab = document.querySelector('[onclick*="networking"]');
+                    if (networkingTab) {
+                        networkingTab.addEventListener('click', function() {
+                            setTimeout(function() {
+                                if (typeof window.loadNetworkingContacts === 'function') {
+                                    window.loadNetworkingContacts();
+                                }
+                            }, 100);
+                        });
+                    }
+                }
+                
+                // Initialize immediately
+                initNetworkingContacts();
+            </script>
+        </div>
+        
+        <div id="updates" class="tab-content">
+            <h2>Updates</h2>
+            
+            <!-- Update Status Form -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
+                    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+                        <select id="new_status" required style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">-- Select Status --</option>
+                            <option value="Pending">⏳ Pending</option>
+                            <option value="Applied">✉️ Applied</option>
+                            <option value="Contacted Someone">👥 Contacted Someone</option>
+                            <option value="Company Response">🏢 Company Response</option>
+                            <option value="Scheduled Interview">🗓️ Scheduled Interview</option>
+                            <option value="Interview Notes">📝 Interview Notes</option>
+                            <option value="Interview - Follow Up">🔁 Interview - Follow Up</option>
+                            <option value="Offered">🎉 Offered</option>
+                            <option value="Rejected">❌ Rejected</option>
+                            <option value="Accepted">✅ Accepted</option>
+                        </select>
+                        <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Copy</button>
+                        <button type="button" id="clearTemplateBtn" style="background: #e9ecef; color: #333; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div id="status_notes" placeholder="Add notes about this status update..."></div>
+                    </div>
+                    
+                    <!-- Template Inserter -->
+                    <div style="margin: 18px 0; padding: 12px; background: #ffffff; border: 1px dashed #cdd6e1; border-radius: 10px;">
+                        <label for="template_selector" style="display: block; margin-bottom: 6px; font-weight: 600; color: #333;">
+                            Insert from Template
+                        </label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select id="template_selector" style="flex: 1; padding: 10px; border: 1px solid #d0d7de; border-radius: 8px; font-size: 14px; background: #f8fafc;">
+                                <option value="">-- Select Template --</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <small style="color: #6c757d;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
+                            <small id="status_notes_character_count" style="color: #6c757d; margin-left: 10px;">0 characters</small>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" id="updateStatusBtn" style="background: #d97706; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                            <span id="btnText">Update</span>
+                        </button>
+                        
+                        <!-- Percentage Bar Widget -->
+                        <div class="percentage-widget-container" id="percentage-widget-container" style="display: none; align-items: center; gap: 10px; width: 500px; background: white; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <div class="percentage-input-group" style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                                <label for="percentage-input" style="font-weight: 500; color: #4b5563; font-size: 13px;">%:</label>
+                                <input type="number" id="percentage-input" min="0" max="100" value="75" step="1" style="width: 60px; padding: 6px 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center; transition: border-color 0.3s;">
+                            </div>
+                            <div id="percentage-bar-container" style="position: relative; flex: 1; height: 32px; display: flex; align-items: center; gap: 10px;">
+                                <div class="percentage-progress-wrapper" style="position: relative; width: 100%; height: 32px; flex: 1;">
+                                    <div class="percentage-progress-track" style="width: 100%; height: 100%; background: #f3f4f6; border-radius: 16px; position: relative; overflow: hidden;">
+                                        <div class="percentage-progress-fill" id="percentage-progress-bar" style="height: 100%; border-radius: 16px; position: relative; transition: width 0.5s ease; width: 75%; background: #3491B2;"></div>
+                                    </div>
+                                </div>
+                                <div class="percentage-text-display" id="percentage-text-display" style="font-size: 16px; font-weight: 600; color: #1f2937; min-width: 40px; text-align: right; flex-shrink: 0;">88%</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="status-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+            </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="timeline" class="tab-content"><div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-date">Dec 19, 2025 03:00 PM EST</div>
+                <div class="timeline-content">
+                    <div class="timeline-status status-interview-notes">interview notes</div>
+                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
+                        Completed technical interview. Discussion went well. They asked about my experience with microservices architecture.
+                    </div>
+                </div>
+            </div>
+        
+            <div class="timeline-item">
+                <div class="timeline-date">Dec 17, 2025 10:00 AM EST</div>
+                <div class="timeline-content">
+                    <div class="timeline-status status-scheduled-interview">scheduled interview</div>
+                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
+                        Technical interview scheduled for this week.
+                    </div>
+                </div>
+            </div>
+        
+            <div class="timeline-item">
+                <div class="timeline-date">Dec 15, 2025 11:30 AM EST</div>
+                <div class="timeline-content">
+                    <div class="timeline-status status-company-response">company response</div>
+                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
+                        Received call from recruiter. They are interested in moving forward.
+                    </div>
+                </div>
+            </div>
+        
+            <div class="timeline-item">
+                <div class="timeline-date">Dec 13, 2025 09:00 AM EST</div>
+                <div class="timeline-content">
+                    <div class="timeline-status status-applied">applied</div>
+                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
+                        Application submitted.
+                    </div>
+                </div>
+            </div>
+        
+            <div class="timeline-item">
+                <div class="timeline-date">Dec 12, 2025 10:00 AM EST</div>
+                <div class="timeline-content">
+                    <div class="timeline-status status-pending">pending</div>
+                    <div class="timeline-notes-content" style="margin-top: 8px; font-size: 14px; color: #000;">
+                        Application created.
+                    </div>
+                </div>
+            </div>
+        </div></div></div>
+        </div>
+    </div>
+    
+    <script>
+        // Application meta for this summary page
+        const APPLICATION_ID = '20251209115631-Fintech A co-Software Engineer';
+        const COMPANY = 'Fintech A co';
+        const JOB_TITLE = 'Software Engineer';
+        
+        // Initialize Quill editor
+        let quillEditor = null;
+        let statusNotesCharacterCount = null;
+        
+        function updateStatusNotesCharacterCount() {
+            if (!statusNotesCharacterCount) {
+                return;
+            }
+            
+            if (!quillEditor) {
+                statusNotesCharacterCount.textContent = '0 characters';
+                return;
+            }
+            
+            const text = quillEditor.getText();
+            const normalizedText = text.endsWith('\n') ? text.slice(0, -1) : text;
+            const length = normalizedText.length;
+            
+            statusNotesCharacterCount.textContent = `${length} ${length === 1 ? 'character' : 'characters'}`;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            statusNotesCharacterCount = document.getElementById('status_notes_character_count');
+            if (typeof Quill !== 'undefined') {
+                console.log('✅ Quill.js loaded successfully');
+                
+                // Initialize Quill editor
+                quillEditor = new Quill('#status_notes', {
+                    theme: 'snow',
+                    placeholder: 'Add notes about this status update...',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'indent': '-1'}, { 'indent': '+1' }],
+                            [{ 'align': [] }],
+                            ['link', 'image', 'blockquote', 'code-block'],
+                            ['clean']
+                        ]
+                    }
+                });
+                
+                quillEditor.on('text-change', updateStatusNotesCharacterCount);
+                updateStatusNotesCharacterCount();
+                
+                // Add image upload handler
+                const toolbar = quillEditor.getModule('toolbar');
+                toolbar.addHandler('image', function() {
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+                    input.click();
+                    
+                    input.onchange = async function() {
+                        const file = input.files[0];
+                        if (file) {
+                            const formData = new FormData();
+                            formData.append('image', file);
+                            
+                            try {
+                                showMessage('📤 Uploading image...', 'info');
+                                
+                                const response = await fetch('/api/upload-image', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+                                
+                                const result = await response.json();
+                                
+                                if (result.success) {
+                                    const range = quillEditor.getSelection();
+                                    quillEditor.insertEmbed(range.index, 'image', result.url);
+                                    showMessage('✅ Image uploaded successfully!', 'success');
+                                } else {
+                                    showMessage('❌ Failed to upload image: ' + result.error, 'error');
+                                }
+                            } catch (error) {
+                                console.error('Image upload error:', error);
+                                showMessage('❌ Failed to upload image: ' + error.message, 'error');
+                            }
+                        }
+                    };
+                });
+                
+                // Add paste handler to normalize font styles to Montserrat 11px
+                quillEditor.clipboard.addMatcher(Node.TEXT_NODE, function(node, delta) {
+                    // Remove any font-family or font-size attributes and normalize
+                    const ops = [];
+                    delta.ops.forEach(function(op) {
+                        if (op.attributes) {
+                            // Remove font-family and size attributes, they'll use the default
+                            delete op.attributes['font-family'];
+                            delete op.attributes['size'];
+                        }
+                        ops.push(op);
+                    });
+                    return { ops: ops };
+                });
+                
+                quillEditor.clipboard.addMatcher(Node.ELEMENT_NODE, function(node, delta) {
+                    // Normalize all pasted elements
+                    if (node.nodeName === 'P' || node.nodeName === 'DIV' || node.nodeName === 'SPAN') {
+                        const ops = [];
+                        delta.ops.forEach(function(op) {
+                            if (op.attributes) {
+                                delete op.attributes['font-family'];
+                                delete op.attributes['size'];
+                            }
+                            ops.push(op);
+                        });
+                        return { ops: ops };
+                    }
+                    return delta;
+                });
+                
+                // Additional paste normalization after paste event
+                quillEditor.root.addEventListener('paste', function(e) {
+                    setTimeout(function() {
+                        const selection = quillEditor.getSelection();
+                        if (selection) {
+                            // Get the content length that was pasted
+                            const currentLength = quillEditor.getLength();
+                            const pastedLength = currentLength - selection.index;
+                            
+                            if (pastedLength > 0) {
+                                // Normalize the pasted content to remove font formatting
+                                quillEditor.formatText(selection.index, pastedLength, {
+                                    'font': false,
+                                    'size': false
+                                }, 'api');
+                            }
+                        }
+                    }, 50);
+                }, true);
+                
+                console.log('✅ Quill editor initialized successfully');
+
+                // Load templates and wire interactions
+                loadTemplates();
+                const selector = document.getElementById('template_selector');
+                const clearBtn = document.getElementById('clearTemplateBtn');
+                if (selector) {
+                    selector.addEventListener('change', onTemplateSelected);
+                }
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        if (quillEditor) {
+                            quillEditor.setContents([]);
+                            quillEditor.focus();
+                            updateStatusNotesCharacterCount();
+                        }
+                        const sel = document.getElementById('template_selector');
+                        if (sel) { sel.value = ''; }
+                        
+                        // Hide percentage widget when template is cleared
+                        const widgetContainer = document.getElementById('percentage-widget-container');
+                        if (widgetContainer) {
+                            widgetContainer.style.display = 'none';
+                        }
+                    });
+                }
+            } else {
+                console.error('❌ Quill.js not loaded');
+            }
+        });
+        
+        // Templates cache
+        let templatesCache = [];
+        
+        async function loadTemplates() {
+            try {
+                const resp = await fetch('/api/templates');
+                const data = await resp.json();
+                if (!data.success) return;
+                templatesCache = data.templates || [];
+                const selector = document.getElementById('template_selector');
+                if (!selector) return;
+                
+                // Define delivery method order
+                const deliveryMethodOrder = [
+                    'Cover Letter',
+                    'LinkedIn Connection',
+                    'Email',
+                    'Other',
+                    'Intro',
+                    'LinkedIn Inmail',
+                    'LinkedIn Message',
+                    'Text',
+                    'Phone'
+                ];
+                
+                // Sort templates by delivery method order, then by title
+                templatesCache.sort((a, b) => {
+                    const aMethod = a.delivery_method || '';
+                    const bMethod = b.delivery_method || '';
+                    const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                    const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                    
+                    // If both have delivery methods, sort by order
+                    if (aIndex !== -1 && bIndex !== -1) {
+                        if (aIndex !== bIndex) {
+                            return aIndex - bIndex;
+                        }
+                    } else if (aIndex !== -1) {
+                        return -1; // a comes first
+                    } else if (bIndex !== -1) {
+                        return 1; // b comes first
+                    }
+                    
+                    // Within same delivery method, sort by title
+                    return (a.title || '').localeCompare(b.title || '');
+                });
+                
+                // Augment with intro message boxes from this page
+                const introTemplates = collectIntroTemplates();
+                for (const t of introTemplates) {
+                    templatesCache.push(t);
+                }
+                
+                // Re-sort after augmentation (same logic)
+                templatesCache.sort((a, b) => {
+                    const aMethod = a.delivery_method || '';
+                    const bMethod = b.delivery_method || '';
+                    const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                    const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                    
+                    if (aIndex !== -1 && bIndex !== -1) {
+                        if (aIndex !== bIndex) {
+                            return aIndex - bIndex;
+                        }
+                    } else if (aIndex !== -1) {
+                        return -1;
+                    } else if (bIndex !== -1) {
+                        return 1;
+                    }
+                    
+                    return (a.title || '').localeCompare(b.title || '');
+                });
+                
+                // Populate options with delivery method first
+                selector.innerHTML = '<option value="">-- Select Template --</option>';
+                for (const t of templatesCache) {
+                    const baseTitle = t.title || 'Template';
+                    const method = t.delivery_method || '';
+                    const label = method ? (method + ' - ' + baseTitle) : baseTitle;
+                    const opt = document.createElement('option');
+                    opt.value = t.id || ((t.title || '') + '|' + (t.delivery_method || ''));
+                    opt.textContent = label;
+                    selector.appendChild(opt);
+                }
+            } catch (e) {
+                console.warn('Failed to load templates', e);
+            }
+        }
+        
+        function collectIntroTemplates() {
+            const items = [];
+            const textToHtml = (t) => {
+                if (!t) return '';
+                return t
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\n/g, '<br>');
+            };
+            // Add cover letter as a selectable template
+            try {
+                const cl = document.getElementById('cover-letter-content');
+                if (cl) {
+                    const content = textToHtml(cl.innerText || cl.textContent || '');
+                    if (content && content.trim().length > 0) {
+                        const title = 'Cover Letter - ' + COMPANY + ' - ' + JOB_TITLE;
+                        items.push({ id: 'cover-letter', title: title, delivery_method: 'Cover Letter', content: content });
+                    }
+                }
+            } catch (e) { /* ignore */ }
+            const sections = [
+                { id: 'hiring-manager-content', prefix: 'Hiring Manager', method: 'Intro' },
+                { id: 'recruiter-content', prefix: 'Recruiter', method: 'Intro' }
+            ];
+            for (const sec of sections) {
+                const container = document.getElementById(sec.id);
+                if (!container) continue;
+                const headers = container.querySelectorAll('h4');
+                let idx = 0;
+                headers.forEach(h => {
+                    const card = h.closest('div');
+                    let content = '';
+                    if (card && card.nextElementSibling) {
+                        content = textToHtml(card.nextElementSibling.innerText || card.nextElementSibling.textContent || '');
+                    }
+                    const base = h.textContent ? h.textContent.trim() : 'Message';
+                    const title = `${sec.prefix} - ${base}`;
+                    const id = `intro:${sec.method}:${++idx}`;
+                    items.push({ id, title, delivery_method: sec.method, content });
+                });
+            }
+            return items;
+        }
+        
+        function onTemplateSelected(event) {
+            const value = event.target.value;
+            
+            // Show/hide percentage widget based on template selection
+            const widgetContainer = document.getElementById('percentage-widget-container');
+            if (widgetContainer) {
+                if (!value) {
+                    // No template selected, hide widget
+                    widgetContainer.style.display = 'none';
+                } else {
+                    const match = templatesCache.find(t => (t.id && t.id === value) || (((t.title || '') + '|' + (t.delivery_method || '')) === value));
+                    if (match && (match.delivery_method === 'Cover Letter' || match.id === 'cover-letter')) {
+                        // Cover letter template selected, show widget
+                        widgetContainer.style.display = 'flex';
+                    } else {
+                        // Other template selected, hide widget
+                        widgetContainer.style.display = 'none';
+                    }
+                }
+            }
+            
+            if (!value) return;
+            const match = templatesCache.find(t => (t.id && t.id === value) || (((t.title || '') + '|' + (t.delivery_method || '')) === value));
+            if (!match) return;
+            const content = match.content || '';
+            if (quillEditor) {
+                // Insert as HTML to preserve formatting; place caret at end
+                quillEditor.clipboard.dangerouslyPasteHTML(content);
+                quillEditor.focus();
+                const len = quillEditor.getLength();
+                quillEditor.setSelection(len, 0);
+                
+                // Normalize content to apply CSS styles (11pt, black, justified, 1.5 line-height)
+                setTimeout(function() {
+                    if (quillEditor) {
+                        const editorLength = quillEditor.getLength();
+                        if (editorLength > 1) {
+                            // Remove inline formatting that overrides CSS
+                            quillEditor.formatText(0, editorLength - 1, {
+                                'font': false,
+                                'size': false,
+                                'color': false,
+                                'align': false
+                            }, 'api');
+                            
+                            // Remove inline styles from HTML elements
+                            const editorElement = quillEditor.root;
+                            const allElements = editorElement.querySelectorAll('*');
+                            allElements.forEach(function(el) {
+                                if (el.hasAttribute('style')) {
+                                    const style = el.getAttribute('style');
+                                    const newStyle = style
+                                        .replace(/font-size\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/font-family\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/color\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/text-align\s*:\s*[^;]+;?/gi, '')
+                                        .replace(/line-height\s*:\s*[^;]+;?/gi, '');
+                                    
+                                    if (newStyle.trim()) {
+                                        el.setAttribute('style', newStyle.trim());
+                                    } else {
+                                        el.removeAttribute('style');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }, 100);
+                
+                updateStatusNotesCharacterCount();
+            }
+        }
+        
+        function showTab(button, tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(tabId);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Add active class to clicked tab
+            button.classList.add('active');
+            
+            // Load networking contacts when networking tab is shown
+            if (tabId === 'networking' && typeof window.loadNetworkingContacts === 'function') {
+                setTimeout(window.loadNetworkingContacts, 100);
+            }
+        }
+        
+        function toggleChecklist() {
+            const content = document.getElementById('checklist-content');
+            const toggleButton = document.querySelector('.checklist-toggle');
+            
+            if (content.classList.contains('checklist-collapsed')) {
+                content.classList.remove('checklist-collapsed');
+                content.classList.add('checklist-expanded');
+                toggleButton.classList.add('expanded');
+            } else {
+                content.classList.remove('checklist-expanded');
+                content.classList.add('checklist-collapsed');
+                toggleButton.classList.remove('expanded');
+            }
+        }
+        
+        // Checklist functionality (legacy support)
+        let checklistExpanded = false;
+        
+        function toggleChecklistLegacy() {
+            checklistExpanded = !checklistExpanded;
+            const expanded = document.getElementById('checklistExpanded');
+            const pill = document.getElementById('checklistPill');
+            const toggle = document.getElementById('checklistToggle');
+            
+            if (checklistExpanded) {
+                expanded.classList.remove('checklist-collapsed');
+                expanded.classList.add('checklist-expanded');
+                pill.style.display = 'none';
+                toggle.textContent = '▲';
+            } else {
+                expanded.classList.remove('checklist-expanded');
+                expanded.classList.add('checklist-collapsed');
+                updateChecklistPill();
+                toggle.textContent = '▼';
+            }
+        }
+        
+        function updateChecklistPill() {
+            const pill = document.getElementById('checklistPill');
+            // Return early if pill element doesn't exist (e.g., checklist section not present)
+            if (!pill) {
+                return;
+            }
+            
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
+            const checklistDefinitions = {
+                'application_submitted': 'Application Submitted',
+                'linkedin_message_sent': 'LinkedIn Message Sent',
+                'contact_email_found': 'Contact Email Found',
+                'email_verified': 'Email Verified',
+                'email_sent': 'Email Sent',
+                'message_read': 'Message Read',
+                'profile_viewed': 'Profile Viewed',
+                'response_received': 'Response Received',
+                'followup_sent': 'Follow-up Sent',
+                'interview_scheduled': 'Interview Scheduled',
+                'interview_completed': 'Interview Completed',
+                'thank_you_sent': 'Thank You Sent'
+            };
+            
+            // Find the last checked item in order
+            const order = ['application_submitted', 'linkedin_message_sent', 'contact_email_found', 
+                          'email_verified', 'email_sent', 'message_read', 'profile_viewed', 
+                          'response_received', 'followup_sent', 'interview_scheduled', 
+                          'interview_completed', 'thank_you_sent'];
+            
+            let latestItem = null;
+            for (let i = order.length - 1; i >= 0; i--) {
+                const checkbox = document.getElementById('checklist_' + order[i]);
+                if (checkbox && checkbox.checked) {
+                    latestItem = checklistDefinitions[order[i]];
+                    break;
+                }
+            }
+            
+            if (latestItem) {
+                pill.textContent = latestItem;
+                pill.style.display = 'block';
+            } else {
+                pill.style.display = 'none';
+            }
+        }
+        
+        async function updateChecklistItem(itemKey, checked) {
+            try {
+                const response = await fetch(`/api/applications/${APPLICATION_ID}/checklist`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ checklist: { [itemKey]: checked } })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Update the pill immediately
+                    updateChecklistPill();
+                    console.log('Checklist updated successfully');
+                } else {
+                    console.error('Failed to update checklist:', result.error);
+                    // Revert checkbox
+                    const checkbox = document.getElementById('checklist_' + itemKey);
+                    if (checkbox) checkbox.checked = !checked;
+                }
+            } catch (error) {
+                console.error('Error updating checklist:', error);
+                // Revert checkbox
+                const checkbox = document.getElementById('checklist_' + itemKey);
+                if (checkbox) checkbox.checked = !checked;
+            }
+        }
+        
+        // Initialize checklist state
+        document.addEventListener('DOMContentLoaded', function() {
+            updateChecklistPill();
+        });
+        
+        async function submitStatusUpdate(event) {
+            event.preventDefault();
+            
+            const status = document.getElementById('new_status').value;
+            // Get HTML content from Quill editor
+            const notes = quillEditor ? quillEditor.root.innerHTML : '';
+            const messageDiv = document.getElementById('status-message');
+            const submitBtn = document.getElementById('updateStatusBtn');
+            const btnText = document.getElementById('btnText');
+            
+            if (!status) {
+                showMessage('❌ Please select a status', 'error');
+                return;
+            }
+            
+            // Check if this is a rejection BEFORE making the API call
+            const isRejectedStatus = status.toLowerCase().trim() === 'rejected';
+            
+            // If rejecting, set a flag to prevent any reload attempts
+            if (isRejectedStatus) {
+                window.__preventReload = true;
+            }
+            
+            // Clear form immediately
+            document.getElementById('statusUpdateForm').reset();
+            if (quillEditor) {
+                quillEditor.setContents([]);
+                updateStatusNotesCharacterCount();
+            }
+            
+            // Show processing state
+            submitBtn.disabled = true;
+            submitBtn.style.background = '#d97706';
+            submitBtn.style.cursor = 'not-allowed';
+            btnText.textContent = 'Processing...';
+            
+            // Show processing message
+            showMessage('⏳ Updating status...', 'processing');
+            
+            try {
+                const response = await fetch(`/api/applications/${APPLICATION_ID}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        notes: notes || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Check if this was a rejection - redirect to dashboard instead of reloading
+                    // Check redirect field, result status, or original status
+                    const isRejected = isRejectedStatus || 
+                                      result.redirect === 'dashboard' || 
+                                      (result.status && result.status.toLowerCase().trim() === 'rejected');
+                    
+                    if (isRejected) {
+                        // Set flag to prevent any reload
+                        window.__preventReload = true;
+                        
+                        // IMMEDIATELY redirect to dashboard - no delay, no reload, no other code execution
+                        // Use replace to prevent back button from going to deleted page
+                        window.location.replace('/index.html');
+                        return; // Exit immediately - prevent any other code from running
+                    }
+                    
+                    // Show success state
+                    btnText.textContent = 'Updated!';
+                    showMessage(`✅ Status updated to ${status} successfully!`, 'success');
+                    
+                    // Reload the page to show updated status and timeline
+                    // Only reload if we're not preventing it
+                    if (!window.__preventReload) {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                } else {
+                    // Reset button state on error
+                    resetButtonState();
+                    showMessage(`❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                // Reset button state on error
+                resetButtonState();
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function resetButtonState() {
+            const submitBtn = document.getElementById('updateStatusBtn');
+            const btnText = document.getElementById('btnText');
+            
+            submitBtn.disabled = false;
+            submitBtn.style.background = '#d97706';
+            submitBtn.style.cursor = 'pointer';
+            btnText.textContent = 'Update';
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('status-message');
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                messageDiv.style.backgroundColor = '#d4edda';
+                messageDiv.style.color = '#155724';
+                messageDiv.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                messageDiv.style.backgroundColor = '#f8d7da';
+                messageDiv.style.color = '#721c24';
+                messageDiv.style.border = '1px solid #f5c6cb';
+            } else if (type === 'processing') {
+                messageDiv.style.backgroundColor = '#d1ecf1';
+                messageDiv.style.color = '#0c5460';
+                messageDiv.style.border = '1px solid #bee5eb';
+            }
+            
+            // Hide message after 5 seconds (except for processing which will be replaced)
+            if (type !== 'processing') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        function copyCoverLetter() {
+            const coverLetterContent = document.getElementById('cover-letter-content');
+            const text = coverLetterContent.textContent || coverLetterContent.innerText;
+            
+            navigator.clipboard.writeText(text).then(function() {
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#667eea';
+                }, 2000);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#667eea';
+                }, 2000);
+            });
+        }
+        
+        function copyStatusNotes(buttonElement) {
+            // Access the global quillEditor variable
+            if (typeof quillEditor !== 'undefined' && quillEditor) {
+                // Get HTML content from Quill editor to preserve formatting
+                const htmlContent = quillEditor.root.innerHTML;
+                const textContent = quillEditor.getText();
+                
+                // Create a clipboard item with both HTML and plain text
+                const clipboardItem = new ClipboardItem({
+                    'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                    'text/plain': new Blob([textContent], { type: 'text/plain' })
+                });
+                
+                navigator.clipboard.write([clipboardItem]).then(function() {
+                    // Show success message
+                    const button = buttonElement || event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = '#667eea';
+                    }, 2000);
+                }).catch(function(err) {
+                    // Fallback: copy as HTML string
+                    const textArea = document.createElement('textarea');
+                    textArea.value = htmlContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    // Show success message
+                    const button = buttonElement || event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = '#667eea';
+                    }, 2000);
+                });
+            } else {
+                // Fallback if Quill editor is not available
+                const notesElement = document.getElementById('status_notes');
+                if (notesElement) {
+                    const htmlContent = notesElement.innerHTML;
+                    const textArea = document.createElement('textarea');
+                    textArea.value = htmlContent;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    // Show success message
+                    const button = buttonElement || event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✅ Copied!';
+                    button.style.background = '#28a745';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = '#667eea';
+                    }, 2000);
+                }
+            }
+        }
+        
+        function copyMessage(contentId) {
+            const contentElement = document.getElementById(contentId);
+            const text = contentElement.textContent || contentElement.innerText;
+            
+            navigator.clipboard.writeText(text).then(function() {
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#20c997';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#007bff';
+                }, 2000);
+            }).catch(function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#20c997';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#007bff';
+                }, 2000);
+            });
+        }
+
+        async function generateCustomResume() {
+            try {
+                const btn = document.getElementById('generateResumeBtn');
+                if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; btn.style.background = '#6c757d'; }
+                const resp = await fetch('/api/applications/' + APPLICATION_ID + '/generate-resume', { method: 'POST' });
+                const result = await resp.json();
+                if (result && result.success) {
+                    // Reload to show resume tab content
+                    window.location.reload();
+                } else {
+                    const errMsg = (result && result.error) ? result.error : 'Unknown error';
+                    alert('Failed to generate resume: ' + errMsg);
+                    if (btn) { btn.disabled = false; btn.textContent = 'Generate Customized Resume'; btn.style.background = '#10b981'; }
+                }
+            } catch (e) {
+                alert('Failed to generate resume: ' + e.message);
+                const btn = document.getElementById('generateResumeBtn');
+                if (btn) { btn.disabled = false; btn.textContent = 'Generate Customized Resume'; btn.style.background = '#10b981'; }
+            }
+        }
+        
+        async function generateIntroMessages(messageType) {
+            try {
+                const btnId = 'generate' + messageType.replace('_', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'IntrosBtn';
+                const btn = document.getElementById(btnId);
+                if (btn) { btn.disabled = true; btn.textContent = 'Generating...'; btn.style.background = '#6c757d'; }
+                const resp = await fetch('/api/applications/' + APPLICATION_ID + '/generate-intros', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message_type: messageType })
+                });
+                const result = await resp.json();
+                if (result && result.success) {
+                    // Reload to show intro messages content
+                    window.location.reload();
+                } else {
+                    const errMsg = (result && result.error) ? result.error : 'Unknown error';
+                    alert('Failed to generate intro messages: ' + errMsg);
+                    if (btn) { btn.disabled = false; btn.textContent = 'Generate ' + messageType.replace('_', ' ').replace(/\w/g, l => l.toUpperCase()) + ' Intro Messages'; btn.style.background = '#10b981'; }
+                }
+            } catch (e) {
+                alert('Failed to generate intro messages: ' + e.message);
+                const btnId = 'generate' + messageType.replace('_', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'IntrosBtn';
+                const btn = document.getElementById(btnId);
+                if (btn) { btn.disabled = false; btn.textContent = 'Generate ' + messageType.replace('_', ' ').replace(/\w/g, l => l.toUpperCase()) + ' Intro Messages'; btn.style.background = '#10b981'; }
+            }
+        }
+        
+        // Function to determine match score color
+        function getMatchScoreColor(score) {
+            if (score >= 80) return '#10b981'; // green
+            if (score >= 60) return '#f59e0b'; // yellow
+            return '#ef4444'; // red
+        }
+        
+        // Apply color on page load and initialize checklist pill
+        document.addEventListener('DOMContentLoaded', function() {
+            const matchPercentage = document.querySelector('.match-percentage');
+            if (matchPercentage) {
+                const score = parseInt(matchPercentage.getAttribute('data-score') || matchPercentage.textContent);
+                matchPercentage.style.color = getMatchScoreColor(score);
+            }
+            
+            // Initialize checklist pill display
+            if (typeof updateChecklistPill === 'function') {
+                updateChecklistPill();
+            }
+            
+            // Initialize percentage bar widget
+            const percentageInput = document.getElementById('percentage-input');
+            const progressBar = document.getElementById('percentage-progress-bar');
+            const percentageText = document.getElementById('percentage-text-display');
+            
+            if (percentageInput && progressBar && percentageText) {
+                function updatePercentageBar() {
+                    const percentage = parseInt(percentageInput.value) || 0;
+                    const clampedPercentage = Math.max(0, Math.min(100, percentage));
+                    
+                    progressBar.style.width = clampedPercentage + '%';
+                    percentageText.textContent = clampedPercentage + '%';
+                    
+                    // Update color based on percentage
+                    if (clampedPercentage > 70) {
+                        progressBar.className = 'percentage-progress-fill green';
+                    } else {
+                        progressBar.className = 'percentage-progress-fill orange';
+                    }
+                }
+                
+                percentageInput.addEventListener('input', updatePercentageBar);
+                updatePercentageBar();
+            }
+        });
+        async function showAIStatus() { alert('AI Connected - Model: llama3:latest\nStatus: Operational'); return; } async function showAIStatus_original() {
+            try {
+                const response = await fetch('/api/check-ollama');
+                const data = await response.json();
+                alert(`AI Status: ${data.connected ? 'Connected' : 'Not Connected'}\nModel: ${data.current_model || 'N/A'}`);
+            } catch (error) {
+                console.error('AI Status Error:', error);
+            }
+        }
+    </script>
+    <!-- Shared Menu Injection -->
+    <script src="/static/js/shared-menu.js"></script>
+
+    <!-- Demo Data -->
+    <script src="/static/js/demo-data.js"></script>
+    <!-- Upgrade Handler -->
+    <script src="/static/js/upgrade-handler.js"></script>
+    <script>
+        function showUpgradeMessage() {
+            alert('Purchase Upgrade for Functionality');
+        }
+    </script>
+</body>
+</html>

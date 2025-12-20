@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Analytics - Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --border-light: #f3f4f6;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+        
+        .main-wrapper {
+            width: 100%;
+            margin: 0;
+            padding: var(--space-lg);
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+            padding-bottom: 10px; /* Space for fixed footer */
+        }
+        
+        /* Hero Header - Full Width */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            flex: 1;
+        }
+        
+        .hero-header-period {
+            display: flex;
+            align-items: center;
+        }
+        
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .back-link:hover {
+            color: #2563eb;
+        }
+        
+        .hero-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .hero-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .page-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px 32px;
+            width: 100%;
+            box-sizing: border-box;
+            position: fixed;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .footer-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #1f2937;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .footer-btn-primary {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        
+        .footer-btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .dashboard-grid {
+                gap: var(--space-sm);
+            }
+            
+            .metric-card {
+                min-width: 120px;
+                padding: var(--space-sm) 16px;
+            }
+            
+            .metric-value {
+                font-size: var(--font-xl);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                width: calc(100vw - 180px);
+                padding: var(--space-md);
+            }
+            
+            .dashboard-grid {
+                justify-content: flex-start;
+            }
+            
+            .metric-card {
+                min-width: 110px;
+                padding: var(--space-sm) 12px;
+            }
+            
+            .metric-value {
+                font-size: var(--font-lg);
+            }
+            
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--border-primary);
+            }
+            
+            .container {
+                width: 100%;
+                margin-left: 0;
+                padding: var(--space-md);
+            }
+            
+            .dashboard-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .metric-card {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .period-selector {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+            
+            .period-btn {
+                flex: 1;
+                min-width: 80px;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .tabs-header {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                min-width: 100px;
+                flex: 1;
+            }
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-primary);
+            z-index: 1000;
+            padding: var(--space-md) 0;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px var(--space-lg);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sidebar-menu a:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .sidebar-menu a.active {
+            background: var(--bg-active);
+            color: var(--text-primary);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            background: var(--bg-primary);
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .period-selector {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-sm);
+            background: var(--bg-primary);
+            padding: 4px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+        
+        .hero-header-period .period-selector {
+            margin: 0;
+        }
+        
+        .period-btn {
+            padding: 8px var(--space-md);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .period-btn:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
+        }
+        
+        .period-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+        
+        .tabs-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: var(--space-lg);
+            margin-left: 0px;
+            margin-right: var(--space-lg);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .tabs-header {
+            display: flex;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 14px var(--space-lg);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        
+        .tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+        
+        .tab-content {
+            padding: var(--space-xl);
+            display: none;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .metrics-grid {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+        
+        .dashboard-grid {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+        
+        .metric-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) 20px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            min-width: 140px;
+            flex: 0 0 auto;
+            text-align: center;
+        }
+        
+        .metric-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .metric-card h4 {
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            margin-bottom: 6px;
+        }
+        
+        .metric-value {
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+        
+        .content-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+            overflow: hidden;
+        }
+        
+        .content-card-header {
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .content-card-header:hover {
+            background: var(--bg-hover);
+        }
+        
+        .content-card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .content-card-header .collapse-icon {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        .content-card.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .content-card-body {
+            padding: var(--space-lg);
+            transition: max-height 0.3s ease;
+        }
+        
+        .content-card.collapsed .content-card-body {
+            display: none;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: var(--space-lg);
+            background: var(--bg-primary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+        
+        .chart-scroll-wrapper {
+            position: relative;
+            height: 380px;
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 5px;
+        }
+        
+        .chart-scroll-wrapper canvas {
+            min-width: 100%;
+        }
+        
+        .analytics-section {
+            margin-bottom: var(--space-xl);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Two-column grid layout for all tabs */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .analytics-grid .chart-container {
+            margin-bottom: 0;
+            min-width: 0; /* Allows grid items to shrink below content size */
+        }
+        
+        @media (max-width: 1200px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            color: var(--text-primary);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-primary);
+        }
+        
+        .skills-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-primary);
+        }
+        
+        .skills-table th,
+        .skills-table td {
+            padding: 12px var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .skills-table thead {
+            background: var(--bg-secondary);
+        }
+        
+        .skills-table th {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .skills-table tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px var(--space-lg);
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-header-top">
+            <a href="/dashboard" class="back-link">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <div class="hero-header-content-wrapper">
+                <img src="/static/images/icons/Analytics.png" alt="" class="hero-header-icon">
+                <div class="hero-header-text">
+                    <h1>Advanced Analytics & Reports</h1>
+                    <p class="hero-header-subtitle">Find trends on applications.</p>
+                </div>
+            </div>
+        </div>
+        <div class="hero-header-period">
+            <div class="period-selector">
+                <button class="period-btn" data-period="today" onclick="selectPeriod('today')">Today</button>
+                <button class="period-btn" data-period="7days" onclick="selectPeriod('7days')">7 Days</button>
+                <button class="period-btn active" data-period="30days" onclick="selectPeriod('30days')">30 Days</button>
+                <button class="period-btn" data-period="all" onclick="selectPeriod('all')">All Time</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-wrapper">
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab active" data-tab="trend" onclick="switchTab('trend')">Trend Analysis</button>
+                <button class="tab" data-tab="skills" onclick="switchTab('skills')">Skills Gap Analysis</button>
+                <button class="tab" data-tab="application" onclick="switchTab('application')">Application Analytics</button>
+            </div>
+            
+            <div id="tab-trend" class="tab-content active">
+                <div class="analytics-section">
+                    <h2 class="section-title">Trend Analysis</h2>
+                    
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">Application Velocity (Daily)</div>
+                            <canvas id="velocityChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Application Velocity (Cumulative)</div>
+                            <canvas id="velocityCumulativeChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Status Distribution</div>
+                            <canvas id="statusDistributionChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Work Type Distribution</div>
+                            <canvas id="workTypeChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Salary Range Distribution</div>
+                            <canvas id="salaryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab-skills" class="tab-content">
+                <div class="analytics-section">
+                    <h2 class="section-title">Skills Gap Analysis</h2>
+                    
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">Most Requested Skills (Top 20)</div>
+                            <canvas id="mostRequestedChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Unmatched Skills Between Resume and Jobs: Names and Job Count</div>
+                            <canvas id="commonUnmatchedSkillsChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Unmatched Technical Skills Between Resume and Jobs: Names and Job Count</div>
+                            <canvas id="commonUnmatchedTechnicalSkillsChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">Most Unmatched Skills (Top 20)</div>
+                            <canvas id="mostUnmatchedChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 10px;">
+                        <h3 style="font-size: 16px; font-weight: 600; color: #2d3748; margin: 0;">Skills You're Frequently Missing</h3>
+                    </div>
+                    <table class="skills-table" id="skill-gaps-table">
+                        <thead>
+                            <tr>
+                                <th>Skill</th>
+                                <th>Job Requirement</th>
+                                <th>Resume Evidence</th>
+                                <th>Match Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="4" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 10px; font-size: 16px; font-weight: 600; color: #2d3748;">Learning Priorities: Recommendations on What to Learn Next</h3>
+                    <p style="color: #718096; font-size: 14px; margin-bottom: 15px;">Prioritized skills based on frequency of appearance and match score impact to maximize your application success rate.</p>
+                    <table class="skills-table" id="learning-priorities-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Skill</th>
+                                <th>Priority Score</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="4" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+            
+            <div id="tab-application" class="tab-content">
+                <div class="analytics-section">
+                    <div class="dashboard-grid" id="application-metrics">
+                        <div class="loading">Loading metrics...</div>
+                    </div>
+                    
+                    <div class="analytics-grid">
+                        <div class="content-card">
+                            <div class="content-card-header" onclick="toggleCollapse(this)">
+                                <h3>Interview Conversion Funnel</h3>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="chart-container">
+                                    <canvas id="funnelChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-card">
+                            <div class="content-card-header" onclick="toggleCollapse(this)">
+                                <h3>Success by Match Score</h3>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="chart-container">
+                                    <canvas id="matchScoreChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="content-card">
+                            <div class="content-card-header" onclick="toggleCollapse(this)">
+                                <h3>Best Performing Day of Week</h3>
+                                <span class="collapse-icon">▼</span>
+                            </div>
+                            <div class="content-card-body">
+                                <div class="chart-container">
+                                    <canvas id="dayChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPeriod = '30days';
+        let currentGapPeriod = 'all';  // For skill gaps: 'daily', 'weekly', 'monthly', 'all'
+        let analyticsData = null;
+        let charts = {};
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnalyticsData();
+        });
+        
+        // Period selection
+        function selectPeriod(period) {
+            console.log('Selecting period:', period);
+            currentPeriod = period;
+            
+            // Update button states
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeButton = document.querySelector(`[data-period="${period}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            } else {
+                console.error('Could not find button for period:', period);
+            }
+            
+            // Reload data
+            loadAnalyticsData();
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        }
+        
+        // Load analytics data
+        async function loadAnalyticsData() {
+            try {
+                // Demo version - use real data from hunter app
+                // Wait for analytics data to load
+                let attempts = 0;
+                const maxAttempts = 50;
+                while (attempts < maxAttempts) {
+                    if (typeof window.DEMO_ANALYTICS_DATA !== 'undefined') {
+                        break;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                // Use real analytics data if available, otherwise fall back to demo data
+                let data;
+                if (typeof window.DEMO_ANALYTICS_DATA !== 'undefined' && window.DEMO_ANALYTICS_DATA.success) {
+                    data = window.DEMO_ANALYTICS_DATA;
+                } else {
+                    // Fallback to hardcoded demo data
+                    data = {
+                        success: true,
+                        period: currentPeriod,
+                        total_applications: 10,
+                    application_analytics: {
+                        response_rate: 30,
+                        time_to_response: { average_days: 5 },
+                        interview_conversion: {
+                            interview_rate: 10,
+                            offer_rate: 0,
+                            applied: 10,
+                            responded: 3,
+                            phone_screen: 1,
+                            interview: 1,
+                            offer: 0
+                        },
+                        success_by_match_score: {
+                            '70-79': 1,
+                            '80-89': 2,
+                            '90-100': 0
+                        }
+                    },
+                    trend_analysis: {
+                        work_type_distribution: {
+                            'Remote': 6,
+                            'Hybrid': 3,
+                            'On-site': 1
+                        },
+                        salary_tracking: {
+                            'average': 135000,
+                            'range': { 'min': 120000, 'max': 150000 }
+                        },
+                        status_progression: {
+                            'pending': 2,
+                            'applied': 5,
+                            'company response': 2,
+                            'scheduled interview': 1
+                        }
+                    },
+                    skills_gap_analysis: {
+                        most_requested_skills: [
+                            { skill: 'Python', count: 8, percentage: 80 },
+                            { skill: 'React', count: 6, percentage: 60 },
+                            { skill: 'AWS', count: 5, percentage: 50 },
+                            { skill: 'Docker', count: 4, percentage: 40 }
+                        ],
+                        missing_skills: [
+                            { skill: 'Kubernetes', count: 3 },
+                            { skill: 'GraphQL', count: 2 }
+                        ]
+                    }
+                    };
+                }
+                
+                // Original API call commented out for demo
+                // const url = `/api/analytics?period=${currentPeriod}&gap_period=${currentGapPeriod}`;
+                // console.log('Loading analytics data from:', url);
+                // const response = await fetch(url);
+                // 
+                // if (!response.ok) {
+                //     console.error('HTTP error:', response.status, response.statusText);
+                //     return;
+                // }
+                // 
+                // const data = await response.json();
+                console.log('Analytics API response:', {
+                    success: data.success,
+                    period: data.period,
+                    total_applications: data.total_applications
+                });
+                
+                if (data.success) {
+                    // API returns {success: true, period: ..., trend_analysis: ..., skills_gap_analysis: ...}
+                    // So we use data directly, not data.data
+                    analyticsData = data;
+                    console.log('Analytics data loaded:', {
+                        period: analyticsData.period,
+                        hasTrendAnalysis: !!analyticsData.trend_analysis,
+                        hasSkillsGapAnalysis: !!analyticsData.skills_gap_analysis,
+                        workTypeDist: !!analyticsData.trend_analysis?.work_type_distribution,
+                        salaryTracking: !!analyticsData.trend_analysis?.salary_tracking,
+                        mostRequested: !!analyticsData.skills_gap_analysis?.most_requested_skills
+                    });
+                    updateAllCharts();
+                } else {
+                    console.error('Failed to load analytics:', data.error);
+                    alert('Failed to load analytics: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                alert('Error loading analytics: ' + error.message);
+            }
+        }
+        
+        // Update all charts and metrics
+        function updateAllCharts() {
+            if (!analyticsData) {
+                console.error('No analytics data available for updateAllCharts');
+                return;
+            }
+            
+            console.log('Updating all charts with data structure:', {
+                hasTrendAnalysis: !!analyticsData.trend_analysis,
+                hasSkillsGapAnalysis: !!analyticsData.skills_gap_analysis,
+                keys: Object.keys(analyticsData)
+            });
+            
+            try {
+                updateApplicationMetrics();
+                updateApplicationCharts();
+                updateTrendCharts();
+                updateSkillsCharts();
+            } catch (error) {
+                console.error('Error updating charts:', error);
+            }
+        }
+        
+        // Update application metrics
+        function updateApplicationMetrics() {
+            const appAnalytics = analyticsData.application_analytics || {};
+            const metricsHtml = `
+                <div class="metric-card">
+                    <h4>Response Rate</h4>
+                    <div class="metric-value">${appAnalytics.response_rate || 0}%</div>
+                    <div class="metric-label">Applications with responses</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Average Time to Response</h4>
+                    <div class="metric-value">${Math.round(appAnalytics.time_to_response?.average_days || 0)}</div>
+                    <div class="metric-label">Days</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Interview Rate</h4>
+                    <div class="metric-value">${Math.round(appAnalytics.interview_conversion?.interview_rate || 0)}%</div>
+                    <div class="metric-label">From responses to interviews</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Offer Rate</h4>
+                    <div class="metric-value">${Math.round(appAnalytics.interview_conversion?.offer_rate || 0)}%</div>
+                    <div class="metric-label">From interviews to offers</div>
+                </div>
+            `;
+            document.getElementById('application-metrics').innerHTML = metricsHtml;
+        }
+        
+        // Update application analytics charts
+        function updateApplicationCharts() {
+            const appAnalytics = analyticsData.application_analytics || {};
+            
+            // Funnel Chart
+            if (charts.funnel) charts.funnel.destroy();
+            const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+            const conversion = appAnalytics.interview_conversion || {};
+            charts.funnel = new Chart(funnelCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Applied', 'Responded', 'Phone Screen', 'Interview', 'Offer'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [
+                            conversion.applied || 0,
+                            conversion.responded || 0,
+                            conversion.phone_screen || 0,
+                            conversion.interview || 0,
+                            conversion.offer || 0
+                        ],
+                        backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Match Score Chart
+            if (charts.matchScore) charts.matchScore.destroy();
+            const matchCtx = document.getElementById('matchScoreChart').getContext('2d');
+            const matchData = appAnalytics.success_by_match_score || {};
+            charts.matchScore = new Chart(matchCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(matchData),
+                    datasets: [
+                        {
+                            label: 'Response Rate',
+                            data: Object.values(matchData).map(d => d.response_rate || 0),
+                            backgroundColor: '#3b82f6'
+                        },
+                        {
+                            label: 'Interview Rate',
+                            data: Object.values(matchData).map(d => d.interview_rate || 0),
+                            backgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            // Best Performing Day Chart (by day of week only)
+            if (charts.bestDay) charts.bestDay.destroy();
+            const dayCtx = document.getElementById('dayChart').getContext('2d');
+            const bestDay = appAnalytics.best_performing_day || {};
+            const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const dayLabels = dayOrder.filter(day => bestDay[day]);
+            charts.bestDay = new Chart(dayCtx, {
+                type: 'bar',
+                data: {
+                    labels: dayLabels,
+                    datasets: [{
+                        label: 'Response Rate (%)',
+                        data: dayLabels.map(day => bestDay[day]?.response_rate || 0),
+                        backgroundColor: '#3b82f6'
+                    }, {
+                        label: 'Total Applications',
+                        data: dayLabels.map(day => bestDay[day]?.total_applications || 0),
+                        backgroundColor: '#ef4444',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            position: 'left'
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update trend charts
+        function updateTrendCharts() {
+            if (!analyticsData) {
+                console.error('No analytics data available');
+                return;
+            }
+            
+            const trends = analyticsData.trend_analysis || {};
+            console.log('Updating trend charts, trends data:', {
+                hasWorkType: !!trends.work_type_distribution,
+                hasSalary: !!trends.salary_tracking,
+                workTypeKeys: trends.work_type_distribution ? Object.keys(trends.work_type_distribution) : [],
+                salaryDist: trends.salary_tracking?.distribution ? Object.keys(trends.salary_tracking.distribution) : []
+            });
+            
+            // Velocity Chart (Daily)
+            if (charts.velocity) charts.velocity.destroy();
+            const velocityCanvas = document.getElementById('velocityChart');
+            if (!velocityCanvas) {
+                console.error('Velocity chart canvas not found');
+            } else {
+                const velCtx = velocityCanvas.getContext('2d');
+                const velocity = trends.application_velocity?.daily || [];
+                charts.velocity = new Chart(velCtx, {
+                type: 'line',
+                data: {
+                    labels: velocity.map(v => v.date),
+                    datasets: [{
+                        label: 'Applications Per Day',
+                        data: velocity.map(v => v.count),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+                });
+            }
+            
+            // Velocity Chart (Cumulative)
+            if (charts.velocityCumulative) charts.velocityCumulative.destroy();
+            const velocityCumulativeCanvas = document.getElementById('velocityCumulativeChart');
+            if (!velocityCumulativeCanvas) {
+                console.error('Velocity Cumulative chart canvas not found');
+            } else {
+                const velCumCtx = velocityCumulativeCanvas.getContext('2d');
+                const velocityCumulative = trends.application_velocity?.daily_cumulative || [];
+                charts.velocityCumulative = new Chart(velCumCtx, {
+                type: 'line',
+                data: {
+                    labels: velocityCumulative.map(v => v.date),
+                    datasets: [{
+                        label: 'Cumulative Applications',
+                        data: velocityCumulative.map(v => v.cumulative),
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+                });
+            }
+            
+            // Status Distribution Chart
+            if (charts.statusDist) charts.statusDist.destroy();
+            const statusCanvas = document.getElementById('statusDistributionChart');
+            if (!statusCanvas) {
+                console.error('Status Distribution chart canvas not found');
+            } else {
+                const statusCtx = statusCanvas.getContext('2d');
+                const statusDist = trends.status_distribution || {};
+                charts.statusDist = new Chart(statusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(statusDist),
+                        datasets: [{
+                            data: Object.values(statusDist),
+                            backgroundColor: ['#3b82f6', '#10b981', '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            // Company Type Analysis Chart (top 20)
+            if (charts.companyType) charts.companyType.destroy();
+            const companyTypeCanvas = document.getElementById('companyTypeChart');
+            if (!companyTypeCanvas) {
+                console.warn('Company Type chart canvas not found, skipping');
+            } else {
+                const companyTypeCtx = companyTypeCanvas.getContext('2d');
+                const companyType = trends.company_type_analysis || {};
+                const companyLabels = Object.keys(companyType).slice(0, 20);
+                charts.companyType = new Chart(companyTypeCtx, {
+                type: 'bar',
+                data: {
+                    labels: companyLabels,
+                    datasets: [
+                        {
+                            label: 'Response Rate',
+                            data: companyLabels.map(type => companyType[type]?.response_rate || 0),
+                            backgroundColor: '#3b82f6'
+                        },
+                        {
+                            label: 'Interview Rate',
+                            data: companyLabels.map(type => companyType[type]?.interview_rate || 0),
+                            backgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+                });
+            }
+            
+            // Work Type Distribution Chart (Remote, Hybrid, On-site)
+            if (charts.workType) charts.workType.destroy();
+            const workTypeCtx = document.getElementById('workTypeChart');
+            if (!workTypeCtx) {
+                console.error('Work Type chart canvas not found');
+            } else {
+                let workTypes = trends.work_type_distribution || {};
+                console.log('Work Type Distribution data:', workTypes);
+                
+                // Ensure workTypes is an object and has valid entries
+                if (!workTypes || typeof workTypes !== 'object' || Array.isArray(workTypes)) {
+                    console.warn('Work type distribution is not a valid object:', workTypes);
+                    workTypes = {};
+                }
+                
+                const workTypeLabels = Object.keys(workTypes).filter(wt => {
+                    const wtData = workTypes[wt];
+                    return wtData && typeof wtData === 'object' && typeof wtData.total === 'number' && wtData.total >= 0;
+                });
+                const workTypeData = workTypeLabels.map(wt => {
+                    const wtData = workTypes[wt];
+                    return (wtData && typeof wtData === 'object' && wtData.total) ? wtData.total : 0;
+                });
+                const workTypeResponseRates = workTypeLabels.map(wt => {
+                    const wtData = workTypes[wt];
+                    return (wtData && typeof wtData === 'object' && typeof wtData.response_rate === 'number') ? wtData.response_rate : 0;
+                });
+                const workTypeInterviewRates = workTypeLabels.map(wt => {
+                    const wtData = workTypes[wt];
+                    return (wtData && typeof wtData === 'object' && typeof wtData.interview_rate === 'number') ? wtData.interview_rate : 0;
+                });
+                
+                console.log('Work Type chart data:', {
+                    labels: workTypeLabels,
+                    data: workTypeData,
+                    responseRates: workTypeResponseRates,
+                    interviewRates: workTypeInterviewRates,
+                    hasData: workTypeData.some(d => d > 0)
+                });
+                
+                // Always create chart, even if empty
+                if (workTypeLabels.length > 0 && workTypeData.some(d => d > 0)) {
+                    charts.workType = new Chart(workTypeCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: workTypeLabels,
+                        datasets: [
+                            {
+                                label: 'Total Applications',
+                                data: workTypeData,
+                                backgroundColor: '#3b82f6',
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Response Rate (%)',
+                                data: workTypeResponseRates,
+                                backgroundColor: '#10b981',
+                                yAxisID: 'y1'
+                            },
+                            {
+                                label: 'Interview Rate (%)',
+                                data: workTypeInterviewRates,
+                                backgroundColor: '#ef4444',
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const index = context.dataIndex;
+                                        const workType = workTypeLabels[index];
+                                        const stats = workTypes[workType];
+                                        
+                                        if (context.datasetIndex === 0) {
+                                            // Total applications
+                                            return `Total: ${stats.total} application${stats.total !== 1 ? 's' : ''}`;
+                                        } else if (context.datasetIndex === 1) {
+                                            // Response rate
+                                            return `Response Rate: ${stats.response_rate.toFixed(1)}%`;
+                                        } else {
+                                            // Interview rate
+                                            return `Interview Rate: ${stats.interview_rate.toFixed(1)}%`;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Total Applications',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            y1: {
+                                beginAtZero: true,
+                                max: 100,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Rate (%)',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                });
+                } else {
+                    console.warn('No work type data available, showing empty state');
+                    charts.workType = new Chart(workTypeCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['No work type data available'],
+                            datasets: [{
+                                label: 'No Data',
+                                data: [0],
+                                backgroundColor: '#9ca3af'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Salary Distribution Chart (ordered ascending)
+            if (charts.salary) charts.salary.destroy();
+            const salaryCanvas = document.getElementById('salaryChart');
+            if (!salaryCanvas) {
+                console.error('Salary chart canvas not found');
+            } else {
+                const salaryCtx = salaryCanvas.getContext('2d');
+                const salaryTracking = trends.salary_tracking || {};
+                let salaryDist = salaryTracking.distribution || {};
+                console.log('Salary tracking data:', {
+                    hasTracking: !!trends.salary_tracking,
+                    hasDistribution: !!salaryTracking.distribution,
+                    distribution: salaryDist
+                });
+                
+                // Ensure salaryDist is an object
+                if (!salaryDist || typeof salaryDist !== 'object' || Array.isArray(salaryDist)) {
+                    console.warn('Salary distribution is not a valid object:', salaryDist);
+                    salaryDist = {};
+                }
+                
+                // Order keys ascending (already ordered from backend, but ensure it)
+                const salaryOrder = [
+                    '$0-50k', '$50k-75k', '$75k-100k', '$100k-125k', '$125k-150k',
+                    '$150k-200k', '$200k-220k', '$220k-230k', '$230k-250k',
+                    '$250k-270k', '$270k-300k', '$300k+'
+                ];
+                const orderedLabels = salaryOrder.filter(key => salaryDist[key] !== undefined && salaryDist[key] !== null);
+                const orderedValues = orderedLabels.map(key => {
+                    const val = salaryDist[key];
+                    return (typeof val === 'number' && val >= 0) ? val : 0;
+                });
+                
+                console.log('Salary chart data:', {
+                    labels: orderedLabels,
+                    values: orderedValues,
+                    hasData: orderedValues.some(v => v > 0)
+                });
+                
+                // Always create chart, even if empty
+                if (orderedLabels.length > 0) {
+                    charts.salary = new Chart(salaryCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: orderedLabels,
+                        datasets: [{
+                            label: 'Number of Jobs',
+                            data: orderedValues,
+                            backgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+                } else {
+                    console.warn('No salary data available, showing empty state');
+                    charts.salary = new Chart(salaryCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['No salary data available'],
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: [0],
+                                backgroundColor: '#cccccc'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        
+        // Update skills charts
+        function updateSkillsCharts() {
+            if (!analyticsData) {
+                console.error('No analytics data available');
+                return;
+            }
+            
+            const skills = analyticsData.skills_gap_analysis || {};
+            console.log('Updating skills charts, skills data:', {
+                hasMostRequested: !!skills.most_requested_skills,
+                hasSkillGaps: !!skills.skill_gaps,
+                hasLearningPriorities: !!skills.learning_priorities,
+                hasSkillsOverlap: !!skills.skills_overlap,
+                hasCommonUnmatched: !!skills.skills_overlap?.common_unmatched_skills,
+                hasCommonUnmatchedTechnical: !!skills.skills_overlap?.common_unmatched_technical_skills,
+                mostRequestedCount: skills.most_requested_skills?.length || 0,
+                skillGapsCount: skills.skill_gaps?.length || 0,
+                commonUnmatchedCount: skills.skills_overlap?.common_unmatched_skills?.length || 0,
+                commonUnmatchedTechnicalCount: skills.skills_overlap?.common_unmatched_technical_skills?.length || 0
+            });
+            
+            // Unmatched Skills Chart (Non-Technical) - Showing unmatched skill names and how many jobs they appear in
+            const overlapData = skills.skills_overlap || {};
+            
+            // Chart 1: Non-Technical Unmatched Skills
+            if (charts.commonUnmatchedSkills) charts.commonUnmatchedSkills.destroy();
+            const commonUnmatchedCanvas = document.getElementById('commonUnmatchedSkillsChart');
+            if (!commonUnmatchedCanvas) {
+                console.error('Common Unmatched Skills chart canvas not found');
+            } else {
+                const commonUnmatchedCtx = commonUnmatchedCanvas.getContext('2d');
+                let commonUnmatchedSkills = overlapData.common_unmatched_skills || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(commonUnmatchedSkills)) {
+                    console.warn('Common unmatched skills is not an array:', commonUnmatchedSkills);
+                    commonUnmatchedSkills = [];
+                }
+                
+                // Sort by job count (most common first) and take top 20
+                const topCommonUnmatchedSkills = commonUnmatchedSkills
+                    .filter(s => s && s.skill && typeof s.job_count === 'number')
+                    .slice(0, 20);
+                
+                console.log('Common Unmatched Skills (Non-Technical) data:', {
+                    total: commonUnmatchedSkills.length,
+                    top20: topCommonUnmatchedSkills.length,
+                    skills: topCommonUnmatchedSkills.map(s => ({skill: s.skill, job_count: s.job_count}))
+                });
+                
+                if (topCommonUnmatchedSkills.length > 0) {
+                    const commonUnmatchedLabels = topCommonUnmatchedSkills.map(s => s.skill);
+                    const commonUnmatchedValues = topCommonUnmatchedSkills.map(s => s.job_count);
+                    
+                    charts.commonUnmatchedSkills = new Chart(commonUnmatchedCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: commonUnmatchedLabels,
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: commonUnmatchedValues,
+                                backgroundColor: '#ef4444',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Jobs',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Skill Name',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            const skill = topCommonUnmatchedSkills[context[0].dataIndex];
+                                            return skill.skill;
+                                        },
+                                        label: function(context) {
+                                            const skill = topCommonUnmatchedSkills[context[0].dataIndex];
+                                            let label = `Appears in ${skill.job_count} job${skill.job_count !== 1 ? 's' : ''}`;
+                                            const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                            label += ` (${percentage.toFixed(1)}% of jobs)`;
+                                            if (skill.average_match_score_impact !== undefined && skill.average_match_score_impact !== null) {
+                                                label += `\nAvg match score impact: ${skill.average_match_score_impact.toFixed(1)}%`;
+                                            }
+                                            if (skill.applications && skill.applications.length > 0) {
+                                                label += '\n\nJobs:';
+                                                skill.applications.slice(0, 5).forEach(app => {
+                                                    label += `\n• ${app.company} - ${app.job_title}`;
+                                                });
+                                                if (skill.applications.length > 5) {
+                                                    label += `\n... and ${skill.applications.length - 5} more`;
+                                                }
+                                            }
+                                            return label;
+                                        },
+                                        afterBody: function(context) {
+                                            const skill = topCommonUnmatchedSkills[context[0].dataIndex];
+                                            if (skill.applications && skill.applications.length > 0) {
+                                                let jobsText = '\n\nJobs:';
+                                                skill.applications.forEach(app => {
+                                                    jobsText += `\n• ${app.company} - ${app.job_title}`;
+                                                });
+                                                return jobsText;
+                                            }
+                                            return null;
+                                        }
+                                    },
+                                    usePointStyle: true,
+                                    padding: 12
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // No common unmatched skills - create empty chart with message
+                    console.warn('No common unmatched skills data available, showing empty state');
+                    charts.commonUnmatchedSkills = new Chart(commonUnmatchedCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['No data available'],
+                        datasets: [{
+                            label: 'Number of Jobs',
+                            data: [0],
+                            backgroundColor: '#cccccc'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                }
+            }
+            
+            // Chart 2: Technical Unmatched Skills
+            if (charts.commonUnmatchedTechnicalSkills) charts.commonUnmatchedTechnicalSkills.destroy();
+            const commonUnmatchedTechnicalCanvas = document.getElementById('commonUnmatchedTechnicalSkillsChart');
+            if (!commonUnmatchedTechnicalCanvas) {
+                console.error('Common Unmatched Technical Skills chart canvas not found');
+            } else {
+                const commonUnmatchedTechnicalCtx = commonUnmatchedTechnicalCanvas.getContext('2d');
+                let commonUnmatchedTechnicalSkills = overlapData.common_unmatched_technical_skills || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(commonUnmatchedTechnicalSkills)) {
+                    console.warn('Common unmatched technical skills is not an array:', commonUnmatchedTechnicalSkills);
+                    commonUnmatchedTechnicalSkills = [];
+                }
+                
+                // Sort by job count (most common first) and take top 20
+                const topCommonUnmatchedTechnicalSkills = commonUnmatchedTechnicalSkills
+                    .filter(s => s && s.skill && typeof s.job_count === 'number')
+                    .slice(0, 20);
+                
+                console.log('Common Unmatched Technical Skills data:', {
+                    total: commonUnmatchedTechnicalSkills.length,
+                    top20: topCommonUnmatchedTechnicalSkills.length,
+                    skills: topCommonUnmatchedTechnicalSkills.map(s => ({skill: s.skill, job_count: s.job_count}))
+                });
+                
+                if (topCommonUnmatchedTechnicalSkills.length > 0) {
+                    const commonUnmatchedTechnicalLabels = topCommonUnmatchedTechnicalSkills.map(s => s.skill);
+                    const commonUnmatchedTechnicalValues = topCommonUnmatchedTechnicalSkills.map(s => s.job_count);
+                    
+                    charts.commonUnmatchedTechnicalSkills = new Chart(commonUnmatchedTechnicalCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: commonUnmatchedTechnicalLabels,
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: commonUnmatchedTechnicalValues,
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Jobs',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Skill Name',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            const skill = topCommonUnmatchedTechnicalSkills[context[0].dataIndex];
+                                            return skill.skill;
+                                        },
+                                        label: function(context) {
+                                            const skill = topCommonUnmatchedTechnicalSkills[context[0].dataIndex];
+                                            let label = `Appears in ${skill.job_count} job${skill.job_count !== 1 ? 's' : ''}`;
+                                            const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                            label += ` (${percentage.toFixed(1)}% of jobs)`;
+                                            if (skill.average_match_score_impact !== undefined && skill.average_match_score_impact !== null) {
+                                                label += `\nAvg match score impact: ${skill.average_match_score_impact.toFixed(1)}%`;
+                                            }
+                                            if (skill.applications && skill.applications.length > 0) {
+                                                label += '\n\nJobs:';
+                                                skill.applications.slice(0, 5).forEach(app => {
+                                                    label += `\n• ${app.company} - ${app.job_title}`;
+                                                });
+                                                if (skill.applications.length > 5) {
+                                                    label += `\n... and ${skill.applications.length - 5} more`;
+                                                }
+                                            }
+                                            return label;
+                                        }
+                                    },
+                                    usePointStyle: true,
+                                    padding: 12
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // No common unmatched technical skills - create empty chart with message
+                    console.warn('No common unmatched technical skills data available, showing empty state');
+                    charts.commonUnmatchedTechnicalSkills = new Chart(commonUnmatchedTechnicalCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['No data available'],
+                            datasets: [{
+                                label: 'Number of Jobs',
+                                data: [0],
+                                backgroundColor: '#cccccc'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Most Requested Skills Chart (Top 20 - readable visualization)
+            if (charts.mostRequested) charts.mostRequested.destroy();
+            const mostCanvas = document.getElementById('mostRequestedChart');
+            if (!mostCanvas) {
+                console.error('Most Requested chart canvas not found');
+            } else {
+                const mostCtx = mostCanvas.getContext('2d');
+                let mostRequested = skills.most_requested_skills || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(mostRequested)) {
+                    console.warn('Most requested skills is not an array:', mostRequested);
+                    mostRequested = [];
+                }
+                
+                mostRequested = mostRequested.slice(0, 20);
+                console.log('Most Requested Skills data:', {
+                    count: mostRequested.length,
+                    skills: mostRequested.map(s => s?.skill || 'invalid')
+                });
+            
+                if (mostRequested.length > 0 && mostRequested.every(s => s && s.skill && typeof s.frequency === 'number')) {
+                charts.mostRequested = new Chart(mostCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: mostRequested.map(s => s.skill),
+                        datasets: [{
+                            label: 'Frequency',
+                            data: mostRequested.map(s => s.frequency),
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        }]
+                    },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const skill = mostRequested[context[0].dataIndex];
+                                    return skill.skill;
+                                },
+                                label: function(context) {
+                                    const skill = mostRequested[context.dataIndex];
+                                    const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                    let label = `Frequency: ${skill.frequency} (${percentage.toFixed(1)}%)`;
+                                    if (skill.applications && skill.applications.length > 0) {
+                                        label += '\n\nApplications:';
+                                        skill.applications.slice(0, 5).forEach(app => {
+                                            label += `\n• ${app.company} - ${app.job_title}`;
+                                        });
+                                        if (skill.applications.length > 5) {
+                                            label += `\n... and ${skill.applications.length - 5} more`;
+                                        }
+                                    }
+                                    return label;
+                                },
+                                afterBody: function(context) {
+                                    const skill = mostRequested[context[0].dataIndex];
+                                    if (skill.applications && skill.applications.length > 0) {
+                                        let appsText = '\n\nApplications:';
+                                        skill.applications.slice(0, 5).forEach(app => {
+                                            appsText += `\n• ${app.company} - ${app.job_title}`;
+                                            appsText += `\n  ${app.url}`;
+                                        });
+                                        if (skill.applications.length > 5) {
+                                            appsText += `\n... and ${skill.applications.length - 5} more`;
+                                        }
+                                        return appsText;
+                                    }
+                                    return null;
+                                }
+                            },
+                            usePointStyle: true,
+                            padding: 12,
+                            displayColors: false
+                        }
+                    },
+                    onClick: function(event, elements) {
+                        if (elements.length > 0) {
+                            const element = elements[0];
+                            const skill = mostRequested[element.index];
+                            if (skill.applications && skill.applications.length > 0) {
+                                window.open(skill.applications[0].url, '_blank');
+                            }
+                        }
+                    }
+                }
+            });
+            } else {
+                console.warn('No most requested skills data available, showing empty state');
+                charts.mostRequested = new Chart(mostCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['No data available'],
+                        datasets: [{
+                            label: 'Frequency',
+                            data: [0],
+                            backgroundColor: '#cccccc'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+            }
+            
+            // Most Unmatched Skills Chart (Top 20) - Show skills and average count
+            if (charts.mostUnmatched) charts.mostUnmatched.destroy();
+            const unmatchedCanvas = document.getElementById('mostUnmatchedChart');
+            if (!unmatchedCanvas) {
+                console.error('Most Unmatched chart canvas not found');
+            } else {
+                const unmatchedCtx = unmatchedCanvas.getContext('2d');
+                let unmatched = skills.skill_gaps || [];
+                
+                // Ensure it's an array
+                if (!Array.isArray(unmatched)) {
+                    console.warn('Skill gaps is not an array:', unmatched);
+                    unmatched = [];
+                }
+                
+                unmatched = unmatched
+                    .filter(s => s && s.skill && typeof s.frequency === 'number')
+                    .slice(0, 20);
+                
+                console.log('Most Unmatched Skills data:', {
+                    count: unmatched.length,
+                    skills: unmatched.map(s => ({skill: s.skill, frequency: s.frequency}))
+                });
+                
+                // Calculate average count
+                const avgCount = unmatched.length > 0 
+                    ? (unmatched.reduce((sum, s) => sum + (s.frequency || 0), 0) / unmatched.length).toFixed(1)
+                    : 0;
+                
+                if (unmatched.length > 0) {
+                    charts.mostUnmatched = new Chart(unmatchedCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: unmatched.map(s => s.skill),
+                        datasets: [{
+                            label: 'Frequency',
+                            data: unmatched.map(s => s.frequency),
+                            backgroundColor: '#ef4444',
+                            borderRadius: 4
+                        }]
+                    },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            title: {
+                                display: true,
+                                text: `Frequency (Average: ${avgCount})`,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Skill Name',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const skill = unmatched[context[0].dataIndex];
+                                    return skill.skill;
+                                },
+                                label: function(context) {
+                                    const skill = unmatched[context.dataIndex];
+                                    const percentage = (skill.percentage !== undefined && skill.percentage !== null) ? skill.percentage : 0;
+                                    const impact = (skill.average_match_score_impact !== undefined && skill.average_match_score_impact !== null) ? skill.average_match_score_impact : 0;
+                                    let label = `Frequency: ${skill.frequency} (${percentage.toFixed(1)}%)`;
+                                    label += `\nAverage match score impact: ${impact.toFixed(1)}%`;
+                                    if (skill.applications && skill.applications.length > 0) {
+                                        label += '\n\nApplications:';
+                                        skill.applications.slice(0, 5).forEach(app => {
+                                            label += `\n• ${app.company} - ${app.job_title}`;
+                                        });
+                                        if (skill.applications.length > 5) {
+                                            label += `\n... and ${skill.applications.length - 5} more`;
+                                        }
+                                    }
+                                    return label;
+                                }
+                            },
+                            usePointStyle: true,
+                            padding: 12,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+                } else {
+                    console.warn('No most unmatched skills data available, showing empty state');
+                    charts.mostUnmatched = new Chart(unmatchedCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['No data available'],
+                            datasets: [{
+                                label: 'Frequency',
+                                data: [0],
+                                backgroundColor: '#cccccc'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Skill Gaps Table (with headers, top 20) - Open links in same window
+            let gaps = skills.skill_gaps || [];
+            
+            // Ensure it's an array
+            if (!Array.isArray(gaps)) {
+                console.warn('Skill gaps is not an array:', gaps);
+                gaps = [];
+            }
+            
+            gaps = gaps
+                .filter(gap => gap && gap.skill && typeof gap.frequency === 'number')
+                .slice(0, 20);
+            
+            console.log('Skill Gaps table data:', {
+                count: gaps.length,
+                skills: gaps.map(g => g.skill)
+            });
+            
+            let gapsHtml = '';
+            if (gaps.length > 0) {
+                gapsHtml = gaps.map(gap => {
+                    // Build application links (same window, no target="_blank")
+                    const appLinks = gap.applications && Array.isArray(gap.applications) && gap.applications.length > 0 
+                        ? gap.applications.map(app => {
+                            const url = app?.url || '#';
+                            const company = app?.company || 'Unknown';
+                            const jobTitle = app?.job_title || 'Unknown';
+                            return `<a href="${url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${company} - ${jobTitle}</a>`;
+                        }).join('')
+                        : 'No applications';
+                    const skill = gap.skill || 'Unknown';
+                    const frequency = gap.frequency || 0;
+                    const impact = (gap.average_match_score_impact !== undefined && gap.average_match_score_impact !== null) 
+                        ? gap.average_match_score_impact.toFixed(1) 
+                        : '0.0';
+                    return `
+                <tr>
+                    <td>${skill}</td>
+                    <td>Appears in ${frequency} job${frequency > 1 ? 's' : ''}</td>
+                    <td>Not demonstrated</td>
+                    <td>${impact}% impact</td>
+                </tr>
+                <tr style="background: #f8f9fa; border-top: 2px solid #e2e8f0;">
+                    <td colspan="4" style="padding: 10px 15px; font-size: 12px;">
+                        <strong style="color: #2d3748;">Applications (${gap.applications?.length || 0}):</strong><br>
+                        ${appLinks}
+                    </td>
+                </tr>`;
+                }).join('');
+            }
+            
+            const gapsTableBody = document.querySelector('#skill-gaps-table tbody');
+            if (gapsTableBody) {
+                gapsTableBody.innerHTML = gapsHtml || '<tr><td colspan="4" class="empty-state">No skill gaps identified</td></tr>';
+            } else {
+                console.error('Skill gaps table tbody not found');
+            }
+            
+            // Learning Priorities Table (with headers, top 20) - Open links in same window
+            let priorities = skills.learning_priorities || [];
+            
+            // Ensure it's an array
+            if (!Array.isArray(priorities)) {
+                console.warn('Learning priorities is not an array:', priorities);
+                priorities = [];
+            }
+            
+            priorities = priorities
+                .filter(p => p && p.skill && typeof p.priority_score === 'number')
+                .slice(0, 20);
+            
+            console.log('Learning Priorities table data:', {
+                count: priorities.length,
+                skills: priorities.map(p => p.skill)
+            });
+            
+            let prioritiesHtml = '';
+            if (priorities.length > 0) {
+                prioritiesHtml = priorities.map((p, i) => {
+                    // Build application links (same window, no target="_blank")
+                    const appLinks = p.applications && Array.isArray(p.applications) && p.applications.length > 0 
+                        ? p.applications.map(app => {
+                            const url = app?.url || '#';
+                            const company = app?.company || 'Unknown';
+                            const jobTitle = app?.job_title || 'Unknown';
+                            return `<a href="${url}" style="color: #667eea; text-decoration: underline; display: block; margin: 2px 0;">${company} - ${jobTitle}</a>`;
+                        }).join('')
+                        : 'No applications';
+                    const skill = p.skill || 'Unknown';
+                    const priorityScore = (p.priority_score !== undefined && p.priority_score !== null) 
+                        ? p.priority_score.toFixed(2) 
+                        : '0.00';
+                    const reason = p.reason || 'No reason provided';
+                    return `
+                <tr>
+                    <td>#${i + 1}</td>
+                    <td>${skill}</td>
+                    <td>${priorityScore}</td>
+                    <td>${reason}</td>
+                </tr>
+                <tr style="background: #f8f9fa; border-top: 2px solid #e2e8f0;">
+                    <td colspan="4" style="padding: 10px 15px; font-size: 12px;">
+                        <strong style="color: #2d3748;">Applications (${p.applications?.length || 0}):</strong><br>
+                        ${appLinks}
+                    </td>
+                </tr>`;
+                }).join('');
+            }
+            
+            const prioritiesTableBody = document.querySelector('#learning-priorities-table tbody');
+            if (prioritiesTableBody) {
+                prioritiesTableBody.innerHTML = prioritiesHtml || '<tr><td colspan="4" class="empty-state">No learning priorities identified</td></tr>';
+            } else {
+                console.error('Learning priorities table tbody not found');
+            }
+        }
+        
+        // Collapsible Card Functionality
+        function toggleCollapse(header) {
+            const card = header.closest('.content-card');
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
+    </script>
+    
+    <!-- Demo Data -->
+    <script src="/static/js/demo-data.js"></script>
+    <script src="/static/js/demo-analytics-data.js"></script>
+    <!-- Shared Sidebar Menu -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <!-- Footer -->
+    <div class="page-footer">
+        <div class="footer-buttons">
+            <a href="/new-application" class="footer-btn footer-btn-primary">New Application</a>
+            <a href="/new-application?resume=true" class="footer-btn">Manage Resume</a>
+        </div>
+    </div>
+</body>
+</html>
+

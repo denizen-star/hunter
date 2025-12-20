@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templating Guide - Job Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Menu Script -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+        
+        .page-header {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .page-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .page-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .page-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-lg);
+            border-bottom: 2px solid var(--border-primary);
+            padding-bottom: var(--space-md);
+        }
+        
+        .section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul, .section ol {
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+        
+        .section ul li, .section ol li {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            margin: var(--space-lg) 0;
+            border-radius: var(--radius-md);
+        }
+        
+        .info-box p {
+            margin-bottom: 0;
+            color: #1e40af;
+        }
+        
+        .workflow-diagram {
+            background: #f9fafb;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-xl);
+            margin: var(--space-lg) 0;
+            overflow-x: auto;
+        }
+        
+        .workflow-step {
+            background: var(--bg-primary);
+            border: 2px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            position: relative;
+        }
+        
+        .workflow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: var(--accent-blue);
+        }
+        
+        .workflow-step:last-child::after {
+            display: none;
+        }
+        
+        .workflow-step h4 {
+            color: var(--accent-blue);
+            margin-top: 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-lg) 0;
+        }
+        
+        .feature-card {
+            background: #f9fafb;
+            border-left: 4px solid var(--accent-blue);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+        }
+        
+        .feature-card h4 {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature-card p {
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .url-link {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: var(--space-sm);
+            transition: background 0.2s ease;
+        }
+        
+        .url-link:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .guide-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+        
+        .guide-link:hover {
+            border-bottom-color: var(--accent-blue);
+        }
+        
+        .delivery-method-list {
+            list-style: none;
+            margin: var(--space-md) 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        
+        .delivery-method-list li {
+            background: #f3f4f6;
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="page-header">
+            <div class="page-header-content-wrapper">
+                <img src="/static/images/icons/TemplatingGuide.jpg" alt="" class="page-header-icon">
+                <div class="page-header-text">
+                    <h1>Templating Guide</h1>
+                    <p>
+                        Learn how to create, manage, and use templates in Hunter to streamline your communication 
+                        and maintain consistency across your job search outreach.
+                    </p>
+                </div>
+            </div>
+            <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
+                Related guide: <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> (see Phase I, Step 9.2 and Phase III)
+            </p>
+        </div>
+        
+        <!-- Overview -->
+        <div class="section">
+            <h2>What Are Templates?</h2>
+            <p>
+                Templates in Hunter are reusable message formats that help you maintain consistent, professional 
+                communication across your job search. You can create templates for different communication types 
+                (LinkedIn connections, emails, messages) and insert them into notes, cover letters, or outreach messages.
+            </p>
+            
+            <div class="info-box">
+                <p><strong>Key Benefit:</strong> Templates save time, ensure consistency, and help you maintain professional standards across all your communications. Create once, use many times!</p>
+            </div>
+        </div>
+        
+        <!-- Templates Page Section -->
+        <div class="section">
+            <h2>Templates Page</h2>
+            <p><strong>URL:</strong> <a href="/templates" class="url-link">/templates</a></p>
+            
+            <div class="info-box">
+                <p><strong>When to Use:</strong> Visit the Templates page to create new templates, edit existing ones, organize templates by delivery method, or delete templates you no longer need.</p>
+            </div>
+            
+            <h3>Key Features</h3>
+            
+            <h4>Create New Templates</h4>
+            <p>Use the "Create New Template" card to add templates:</p>
+            <ol>
+                <li><strong>Select Delivery Method:</strong> Choose how the template will be used:
+                    <ul class="delivery-method-list">
+                        <li>LinkedIn Connection</li>
+                        <li>Email</li>
+                        <li>LinkedIn Inmail</li>
+                        <li>LinkedIn Message</li>
+                        <li>Text</li>
+                        <li>Phone</li>
+                        <li>Other</li>
+                    </ul>
+                </li>
+                <li><strong>Enter Title:</strong> Give your template a descriptive name (e.g., "Recruiter Intro Email", "Thank You Follow-up")</li>
+                <li><strong>Write Content:</strong> Use the rich text editor to format your message with:
+                    <ul>
+                        <li>Headers, bold, italic, underline</li>
+                        <li>Bulleted and numbered lists</li>
+                        <li>Links and formatting</li>
+                        <li>Colors and styling</li>
+                    </ul>
+                </li>
+                <li><strong>Save Template:</strong> Click "Save Template" to store it for future use</li>
+            </ol>
+            
+            <h4>Saved Templates</h4>
+            <p>Templates are organized by delivery method in collapsible groups:</p>
+            <ul>
+                <li><strong>Grouped Display:</strong> Templates grouped by delivery method (LinkedIn Connection, Email, etc.)</li>
+                <li><strong>Collapsible Groups:</strong> Click delivery method headers to expand/collapse template groups</li>
+                <li><strong>Template Counts:</strong> Each group shows how many templates it contains</li>
+                <li><strong>Collapsible Templates:</strong> Click individual template titles to view/edit content</li>
+                <li><strong>Delete Option:</strong> Each template has a delete button to remove unused templates</li>
+            </ul>
+            
+            <h3>Why Use the Templates Page?</h3>
+            <ul>
+                <li><strong>Centralized Management:</strong> All templates in one place for easy organization</li>
+                <li><strong>Rich Text Editing:</strong> Format templates with professional styling</li>
+                <li><strong>Delivery Method Organization:</strong> Group templates by use case for quick access</li>
+                <li><strong>Template Library:</strong> Build a library of proven message formats</li>
+                <li><strong>Consistency:</strong> Ensure all communications follow your professional standards</li>
+            </ul>
+        </div>
+        
+        <!-- Where Templates Can Be Used -->
+        <div class="section">
+            <h2>Where Can Templates Be Used?</h2>
+            
+            <div class="workflow-diagram">
+                <div class="workflow-step">
+                    <h4>Application Summary Pages</h4>
+                    <p>In the "Updates & Notes" tab of any job application summary page, you'll find an "Insert from Template" dropdown. Select a template to insert its content into the notes textbox for customization.</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>Networking Contact Pages</h4>
+                    <p>In the "Updates & Notes" tab of any networking contact summary page, use the "Insert from Template" dropdown to quickly add template content when documenting conversations or follow-ups.</p>
+                </div>
+            </div>
+            
+            <h3>Application Summary Pages</h3>
+            <p><strong>Location:</strong> Open any application from App Dash → Click "View Summary" → Go to "Updates & Notes" tab</p>
+            
+            <h4>How to Use Templates in Application Notes:</h4>
+            <ol>
+                <li><strong>Open Application Summary:</strong> Navigate to the application's detail page</li>
+                <li><strong>Go to Updates & Notes Tab:</strong> Click the "Updates & Notes" tab</li>
+                <li><strong>Find Template Dropdown:</strong> Look for "Insert from Template" dropdown above the notes textbox</li>
+                <li><strong>Select Template:</strong> Choose the appropriate template from the dropdown</li>
+                <li><strong>Template Inserts:</strong> Template content automatically populates the notes textbox</li>
+                <li><strong>Customize:</strong> Modify the template content with specific details (names, dates, company-specific info)</li>
+                <li><strong>Save:</strong> Add status if needed and click "Update" to save</li>
+            </ol>
+            
+            <div class="info-box">
+                <p><strong>Common Use Case:</strong> When updating an application status to "Contacted Someone", use the "Insert from Template" dropdown to quickly add a note about who you contacted and what you said, then customize it with specific details.</p>
+            </div>
+            
+            <h3>Networking Contact Pages</h3>
+            <p><strong>Location:</strong> Open any networking contact from Network Dash → Click contact tile → Go to "Updates & Notes" tab</p>
+            
+            <h4>How to Use Templates in Networking Notes:</h4>
+            <ol>
+                <li><strong>Open Contact Summary:</strong> Navigate to the networking contact's detail page</li>
+                <li><strong>Go to Updates & Notes Tab:</strong> Click the "Updates & Notes" tab</li>
+                <li><strong>Find Template Dropdown:</strong> Use "Insert from Template" dropdown in the notes section</li>
+                <li><strong>Select Template:</strong> Choose a template matching your communication type (LinkedIn, Email, etc.)</li>
+                <li><strong>Customize Content:</strong> Modify with contact-specific information</li>
+                <li><strong>Update Status:</strong> Change contact status if appropriate</li>
+                <li><strong>Save:</strong> Click "Update" to save the notes</li>
+            </ol>
+        </div>
+        
+        <!-- Why Use Templates -->
+        <div class="section">
+            <h2>Why Use Templates?</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Save Time</h4>
+                    <p>Don't rewrite similar messages repeatedly. Insert a template and customize it with specific details.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Maintain Consistency</h4>
+                    <p>Ensure all your communications follow the same professional tone and structure.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Reduce Errors</h4>
+                    <p>Pre-written templates reduce typos and ensure you include all important points.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Professional Standards</h4>
+                    <p>Build templates with proven messaging that works, then reuse them confidently.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Quick Personalization</h4>
+                    <p>Start with a template base, then add specific details to make each message unique.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Organize by Type</h4>
+                    <p>Group templates by delivery method to quickly find the right format for each situation.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Practices -->
+        <div class="section">
+            <h2>Best Practices for Templates</h2>
+            
+            <h3>Template Creation</h3>
+            <ul>
+                <li><strong>Use Placeholders:</strong> Include placeholders like [Company Name], [Recruiter Name], [Position] that you'll replace when using the template</li>
+                <li><strong>Keep It Generic:</strong> Write templates to be reusable across multiple situations</li>
+                <li><strong>Include Key Points:</strong> Ensure templates cover all important information (who you are, why you're reaching out, what you want)</li>
+                <li><strong>Professional Tone:</strong> Maintain consistent professional language across all templates</li>
+                <li><strong>Appropriate Length:</strong> Consider platform limits (e.g., LinkedIn connection requests have 300-character limit)</li>
+            </ul>
+            
+            <h3>Template Organization</h3>
+            <ul>
+                <li><strong>Clear Naming:</strong> Use descriptive names that indicate purpose (e.g., "Recruiter Follow-up Email", "Thank You After Interview")</li>
+                <li><strong>Group by Delivery:</strong> Assign appropriate delivery methods to organize templates logically</li>
+                <li><strong>Regular Review:</strong> Periodically review and update templates to keep them current</li>
+                <li><strong>Delete Unused:</strong> Remove templates you no longer use to keep the list manageable</li>
+            </ul>
+            
+            <h3>Template Usage</h3>
+            <ul>
+                <li><strong>Always Customize:</strong> Never send templates as-is. Always add specific details to personalize each message</li>
+                <li><strong>Replace Placeholders:</strong> Make sure to replace all placeholder text with actual information</li>
+                <li><strong>Review Before Sending:</strong> Always review customized templates before sending to ensure accuracy</li>
+                <li><strong>Match Delivery Method:</strong> Use templates with delivery methods that match how you're actually communicating</li>
+            </ul>
+        </div>
+        
+        <!-- Template Workflow -->
+        <div class="section">
+            <h2>Template Workflow</h2>
+            
+            <div class="workflow-diagram">
+                <div class="workflow-step">
+                    <h4>1. Create Template</h4>
+                    <p>Go to Templates page → Create New Template → Choose delivery method → Write content → Save</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>2. Use Template</h4>
+                    <p>Open Application or Contact → Updates & Notes tab → Select from "Insert from Template" dropdown</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>3. Customize</h4>
+                    <p>Template content appears in notes textbox → Replace placeholders → Add specific details → Personalize</p>
+                </div>
+                <div class="workflow-step">
+                    <h4>4. Save & Use</h4>
+                    <p>Copy customized content → Use in actual communication (LinkedIn, Email, etc.) → Update status → Save notes</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Common Template Types -->
+        <div class="section">
+            <h2>Common Template Types to Create</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>LinkedIn Connection Request</h4>
+                    <p>Template for initial LinkedIn connection requests. Keep under 300 characters. Include mutual interests or connection points.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Recruiter Intro Email</h4>
+                    <p>Professional introduction email to recruiters. Include your background, interest in the company, and position inquiry.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Hiring Manager Outreach</h4>
+                    <p>Direct outreach to hiring managers. More personal and specific than recruiter emails. Reference their work or company news.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Follow-up Email</h4>
+                    <p>Template for following up after initial contact. Thank them, reference previous conversation, and restate interest.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Thank You After Interview</h4>
+                    <p>Post-interview thank you message. Express gratitude, highlight key discussion points, and reinforce fit.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Status Update Note</h4>
+                    <p>Template for documenting status changes in Hunter. Include who contacted, what was discussed, and next steps.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Guides -->
+        <div class="section">
+            <h2>Related Guides</h2>
+            <p>Explore other guides to learn more about using Hunter:</p>
+            <ul>
+                <li><a href="/how-to-hunter" class="guide-link">How to Hunter?</a> - Complete workflow guide (templates are used in Phase I, Step 9.2 and Phase III)</li>
+                <li><a href="/tracking-guide" class="guide-link">Tracking Guide</a> - Learn about Reports, Analytics, and Daily Activities pages</li>
+                <li><a href="/dashes-guide" class="guide-link">Dashes Guide</a> - Learn about all dashboard pages and when to use each</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
