@@ -1008,7 +1008,21 @@ class DashboardGenerator:
             cards.forEach(card => {{
                 let show = false;
                 const companyElement = card.querySelector('.card-company');
-                const companyName = companyElement?.textContent.trim() || '';
+                // Extract company name - get text content and remove match score (e.g., "85%")
+                let companyName = '';
+                if (companyElement) {{
+                    // Get all text nodes, excluding the match score span
+                    const matchScoreSpan = companyElement.querySelector('.match-score');
+                    if (matchScoreSpan) {{
+                        // Clone the element, remove match score, then get text
+                        const clone = companyElement.cloneNode(true);
+                        const cloneMatchScore = clone.querySelector('.match-score');
+                        if (cloneMatchScore) cloneMatchScore.remove();
+                        companyName = clone.textContent.trim();
+                    }} else {{
+                        companyName = companyElement.textContent.trim();
+                    }}
+                }}
                 
                 // Simplified filtering for archived dashboard
                 if (isArchived) {{
@@ -1048,7 +1062,11 @@ class DashboardGenerator:
                 
                 // Company filtering (if company filter is active)
                 if (show && typeof currentCompanyFilter !== 'undefined' && currentCompanyFilter.length > 0) {{
-                    show = currentCompanyFilter.includes(companyName);
+                    // Case-insensitive comparison
+                    const companyNameLower = companyName.toLowerCase();
+                    show = currentCompanyFilter.some(filterCompany => 
+                        filterCompany.toLowerCase() === companyNameLower
+                    );
                 }}
                 
                 card.style.display = show ? '' : 'none';
@@ -1115,8 +1133,8 @@ class DashboardGenerator:
             const defaultFilter = isArchived ? 'all' : 'active';
             filterApplications(defaultFilter);
             
-            // Initialize company search if archived
-            if (isArchived && typeof allCompanies !== 'undefined') {{
+            // Initialize company search for both main and archived dashboards
+            if (typeof allCompanies !== 'undefined') {{
                 if (typeof updateSelectedCompaniesDisplay === 'function') {{
                     updateSelectedCompaniesDisplay();
                 }}
@@ -1404,10 +1422,8 @@ class DashboardGenerator:
                     <option value="company_asc">Company (A-Z)</option>
                     <option value="company_desc">Company (Z-A)</option>"""
         
-        # Add company search HTML if archived dashboard
-        company_search_html = ""
-        if is_archived:
-            company_search_html = f'''
+        # Add company search HTML for both main and archived dashboards
+        company_search_html = f'''
             <div class="search-filter-container" style="position: relative; min-width: 250px; margin-right: 16px;">
                 <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 4px 36px 4px 4px; border: 1px solid var(--border-primary); border-radius: 6px; background: #fff; min-height: 36px;">
                     <div id="selectedCompanies" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1;"></div>
