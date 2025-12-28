@@ -2498,6 +2498,58 @@ Format this as a professional research document that demonstrates thorough prepa
             'personnel': []
         }
     
+    def _convert_urls_to_links(self, text: str) -> str:
+        """Convert URLs in text to clickable HTML links"""
+        if not text:
+            return text
+        
+        # Pattern to match URLs (http, https, or www)
+        url_pattern = r'(https?://[^\s\)\]\}]+|www\.[^\s\)\]\}]+)'
+        
+        # Find all URLs and their positions
+        urls = []
+        for match in re.finditer(url_pattern, text):
+            url = match.group(0)
+            # Clean trailing punctuation
+            url = url.rstrip('.,;:!?)}]')
+            urls.append((match.start(), match.end(), url))
+        
+        # Build result by replacing URLs with links and escaping the rest
+        result_parts = []
+        last_end = 0
+        
+        for start, end, url in urls:
+            # Escape text before URL
+            result_parts.append(html.escape(text[last_end:start]))
+            
+            # Create link for URL
+            display_url = url
+            if url.startswith('www.'):
+                full_url = 'https://' + url
+            else:
+                full_url = url
+            
+            result_parts.append(f'<a href="{html.escape(full_url)}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">{html.escape(display_url)}</a>')
+            last_end = end
+        
+        # Add remaining text after last URL
+        result_parts.append(html.escape(text[last_end:]))
+        
+        return ''.join(result_parts)
+    
+    def _generate_raw_entry_html(self, application) -> str:
+        """Generate HTML for the raw entry tab with clickable links"""
+        raw_text = self._get_raw_job_description(application)
+        if not raw_text:
+            raw_text = "Original job description not found."
+        converted_text = self._convert_urls_to_links(raw_text)
+        # Use string concatenation to avoid issues with curly braces in content
+        return ('<h2>Raw Entry</h2>\n'
+                '<p style="color: #666; margin-bottom: 20px; font-size: 14px;">Original job description as provided during application creation:</p>\n'
+                '<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5; font-family: monospace;">' +
+                converted_text +
+                '</div>')
+    
     def _get_raw_job_description(self, application) -> str:
         """Get the raw, unprocessed job description text"""
         try:
@@ -3170,6 +3222,15 @@ Format this as a professional research document that demonstrates thorough prepa
         # Generate status tags HTML
         status_tags = self._get_status_tags(application)
         status_tags_html = ''.join([f'                    <span class="status-pill tag {tag_class}">{tag_name}</span>\n' for tag_name, tag_class in status_tags])
+        
+        # Generate raw entry HTML before f-string to avoid parsing issues
+        try:
+            raw_entry_html = self._generate_raw_entry_html(application)
+        except Exception as e:
+            # Fallback if there's an error generating raw entry
+            raw_entry_html = f'''<h2>Raw Entry</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Original job description as provided during application creation:</p>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5; font-family: monospace;">Error loading raw entry: {html.escape(str(e))}</div>'''
         
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -4502,11 +4563,7 @@ Format this as a professional research document that demonstrates thorough prepa
             </div>
         </div>
         
-        {self._generate_tab_content('raw-entry', 'Raw Entry', f'''
-            <h2>Raw Entry</h2>
-            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Original job description as provided during application creation:</p>
-            <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">{self._get_raw_job_description(application)}</pre>
-        ''', application.raw_job_description_path)}
+        {self._generate_tab_content('raw-entry', 'Raw Entry', raw_entry_html, application.raw_job_description_path)}
         
         {self._generate_tab_content('skills', 'Skills Analysis', f'''
             <h2>Skills Analysis</h2>
