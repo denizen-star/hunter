@@ -857,6 +857,58 @@
             setupJobDescriptionPasteHandler();
         });
         
+        // Intelligently trim trailing punctuation from URLs, preserving balanced parentheses/brackets/braces
+        function trimTrailingPunctuation(url) {
+            if (!url) {
+                return url;
+            }
+            
+            // Count opening and closing characters to check for balance
+            const openParens = (url.match(/\(/g) || []).length;
+            const closeParens = (url.match(/\)/g) || []).length;
+            const openBrackets = (url.match(/\[/g) || []).length;
+            const closeBrackets = (url.match(/\]/g) || []).length;
+            const openBraces = (url.match(/\{/g) || []).length;
+            const closeBraces = (url.match(/\}/g) || []).length;
+            
+            // If parentheses/brackets/braces appear balanced, they're likely part of the URL
+            let parensBalanced = openParens === closeParens;
+            let bracketsBalanced = openBrackets === closeBrackets;
+            let bracesBalanced = openBraces === closeBraces;
+            
+            let result = url;
+            let currentCloseParens = closeParens;
+            let currentCloseBrackets = closeBrackets;
+            let currentCloseBraces = closeBraces;
+            
+            // Remove only clearly sentence-ending punctuation from the end
+            while (result) {
+                const lastChar = result[result.length - 1];
+                if (lastChar.match(/[.,;:!?]/)) {
+                    // Always remove sentence-ending punctuation
+                    result = result.slice(0, -1);
+                } else if (lastChar === ')' && !parensBalanced) {
+                    // Only remove if unbalanced (likely sentence-ending)
+                    result = result.slice(0, -1);
+                    currentCloseParens--;
+                    parensBalanced = openParens === currentCloseParens;
+                } else if (lastChar === ']' && !bracketsBalanced) {
+                    result = result.slice(0, -1);
+                    currentCloseBrackets--;
+                    bracketsBalanced = openBrackets === currentCloseBrackets;
+                } else if (lastChar === '}' && !bracesBalanced) {
+                    result = result.slice(0, -1);
+                    currentCloseBraces--;
+                    bracesBalanced = openBraces === currentCloseBraces;
+                } else {
+                    // Stop if we hit a character that's part of the URL
+                    break;
+                }
+            }
+            
+            return result;
+        }
+        
         // Ensure URLs are preserved when pasting into job description and moved to bottom
         function setupJobDescriptionPasteHandler() {
             const jobDescriptionTextarea = document.getElementById('job_description');
@@ -897,13 +949,21 @@
                 }
                 
                 // 2. Extract from plain text using improved regex
-                // Better regex that handles URLs with punctuation, parentheses, and various formats
-                const urlRegex = /(https?:\/\/[^\s\)\]\}]+|www\.[^\s\)\]\}]+)/gi;
+                // Include parentheses, brackets, and braces as they can be part of URLs
+                // Stop at whitespace, angle brackets, quotes, or clearly sentence-ending punctuation
+                const urlRegex = /(https?:\/\/[^\s<>"]+|www\.[^\s<>"]+)/gi;
                 const textUrls = plainText.match(urlRegex);
                 if (textUrls) {
-                    textUrls.forEach(url => {
-                        // Clean up trailing punctuation that might have been captured
-                        url = url.replace(/[.,;:!?\)\]\}]$/, '');
+                    textUrls.forEach((url, index) => {
+                        // Find the position of this URL in the text to check what comes after
+                        const urlIndex = plainText.indexOf(url, index > 0 ? plainText.indexOf(textUrls[index - 1]) + textUrls[index - 1].length : 0);
+                        const afterUrl = plainText.substring(urlIndex + url.length, urlIndex + url.length + 1);
+                        
+                        // Only trim trailing punctuation if it's clearly sentence-ending
+                        if (afterUrl && (afterUrl.match(/\s/) || afterUrl.match(/[.,;:!?]/))) {
+                            url = trimTrailingPunctuation(url);
+                        }
+                        
                         if (url.trim()) {
                             foundUrls.add(url.trim());
                         }
@@ -913,8 +973,7 @@
                 // Convert Set to array and normalize URLs
                 const urls = Array.from(foundUrls).map(url => {
                     url = url.trim();
-                    // Remove trailing punctuation
-                    url = url.replace(/[.,;:!?\)\]\}]$/, '');
+                    // Smart trimming already done during extraction, just normalize
                     // Add https:// if it starts with www.
                     if (url.startsWith('www.')) {
                         url = 'https://' + url;
@@ -926,15 +985,25 @@
                 let textWithoutUrls = plainText;
                 if (urls.length > 0) {
                     // Find all URL matches with their exact positions
-                    const urlRegex = /(https?:\/\/[^\s\)\]\}]+|www\.[^\s\)\]\}]+)/gi;
+                    // Use the same improved regex that includes parentheses, brackets, and braces
+                    const urlRegex = /(https?:\/\/[^\s<>"]+|www\.[^\s<>"]+)/gi;
                     const matches = [];
                     let match;
                     
                     // Reset regex
                     urlRegex.lastIndex = 0;
                     while ((match = urlRegex.exec(plainText)) !== null) {
+                        let urlText = match[0];
+                        // Apply smart trimming if there's whitespace or punctuation after
+                        const matchEnd = match.index + urlText.length;
+                        if (matchEnd < plainText.length) {
+                            const nextChar = plainText[matchEnd];
+                            if (nextChar && (nextChar.match(/\s/) || nextChar.match(/[.,;:!?]/))) {
+                                urlText = trimTrailingPunctuation(urlText);
+                            }
+                        }
                         matches.push({
-                            text: match[0],
+                            text: urlText,
                             index: match.index
                         });
                     }
