@@ -150,15 +150,12 @@ class ContactCountCache:
                 'Contacted - No Response': 'Sent Email',
                 'Contacted - Replied': 'Connection Accepted',
                 'New Connection': 'Connection Accepted',
-                'To Research': 'Found Contact',
                 'Pending Reply': 'Sent Email',
                 'Connected - Initial': 'Connection Accepted',
-                'Cold/Archive': 'Cold/Inactive',
                 'Action Pending - You': 'In Conversation',
                 'Action Pending - Them': 'In Conversation',
                 'Nurture (1-3 Mo.)': 'Strong Connection',
-                'Nurture (4-6 Mo.)': 'Strong Connection',
-                'Inactive/Dormant': 'Dormant'
+                'Nurture (4-6 Mo.)': 'Strong Connection'
             }
             
             # Find highest status across all contacts

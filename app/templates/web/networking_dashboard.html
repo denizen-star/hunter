@@ -1046,7 +1046,7 @@
             grid.innerHTML = filtered.map(contact => createContactTile(contact)).join('');
         }
 
-        function getBadgeImagePath(badgeId) {
+        function getBadgeImagePath(badgeId, useJpeg = false) {
             const badgeNameMap = {
                 'deep_diver': 'DeepDiver',
                 'profile_magnet': 'ProfileMagnet',
@@ -1058,8 +1058,8 @@
                 'super_connector': 'SuperConnector'
             };
             const badgeName = badgeNameMap[badgeId] || '';
-            // Try .jpg first, fallback to .jpeg (browser will handle if image doesn't exist)
-            return `/static/images/badges/${badgeName}W.jpg`;
+            const extension = useJpeg ? '.jpeg' : '.jpg';
+            return `/static/images/badges/${badgeName}W${extension}`;
         }
         
         function createContactTile(contact) {
@@ -1072,12 +1072,13 @@
             let badgeHtml = '';
             if (contact.latest_badge) {
                 const badge = contact.latest_badge;
-                const imagePath = getBadgeImagePath(badge.badge_id);
+                const imagePathJpg = getBadgeImagePath(badge.badge_id, false);
+                const imagePathJpeg = getBadgeImagePath(badge.badge_id, true);
                 const tooltip = `${badge.badge_name} +${badge.badge_points}`;
                 badgeHtml = `
                     <div class="contact-badge-container">
                         <div class="contact-badge" title="${escapeHtml(tooltip)}" style="padding: 0; border: 2px solid transparent; border-radius: 8px; background: transparent; cursor: help; position: relative; display: flex; align-items: center; justify-content: center;">
-                            <img src="${imagePath}" alt="${escapeHtml(badge.badge_name)}" />
+                            <img src="${imagePathJpg}" alt="${escapeHtml(badge.badge_name)}" onerror="this.onerror=null; this.src='${imagePathJpeg}';" />
                         </div>
                     </div>
                 `;
