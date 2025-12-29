@@ -361,6 +361,14 @@ class NetworkingProcessor:
             write_text_file(html_content, status_path)
             print(f"✓ Created status update file: {status_path}")
         
+        # Invalidate contact count cache (includes badge data) when status changes
+        try:
+            from app.services.contact_count_cache import ContactCountCache
+            contact_cache = ContactCountCache()
+            contact_cache.invalidate_cache()
+        except Exception as e:
+            print(f"Warning: Could not invalidate contact count cache: {e}")
+        
         # Trigger badge calculation
         try:
             from app.services.badge_calculation_service import BadgeCalculationService

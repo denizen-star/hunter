@@ -1283,11 +1283,26 @@ def get_application_networking_contacts(app_id):
 def list_networking_contacts():
     """List all networking contacts"""
     try:
+        from app.services.badge_calculation_service import BadgeCalculationService
+        badge_service = BadgeCalculationService()
+        
         contacts = networking_processor.list_all_contacts()
         
-        return jsonify({
-            'success': True,
-                'contacts': [{
+        contact_list = []
+        for c in contacts:
+            # Get badge for this contact based on status
+            badge_id = badge_service.status_to_badge.get(c.status)
+            badge_data = None
+            if badge_id:
+                badge_def = badge_service.badge_definitions.get(badge_id)
+                if badge_def:
+                    badge_data = {
+                        'badge_id': badge_id,
+                        'badge_name': badge_def['name'],
+                        'badge_points': badge_def['points']
+                    }
+            
+            contact_list.append({
                 'id': c.id,
                 'person_name': c.person_name,
                 'company_name': c.company_name,
@@ -1304,8 +1319,13 @@ def list_networking_contacts():
                 'timing_color': c.get_timing_color_class(),
                 'next_step': c.get_next_step(),
                 'summary_path': str(c.summary_path) if c.summary_path else None,
-                'messages_path': str(c.messages_path) if c.messages_path else None
-            } for c in contacts],
+                'messages_path': str(c.messages_path) if c.messages_path else None,
+                'latest_badge': badge_data
+            })
+        
+        return jsonify({
+            'success': True,
+            'contacts': contact_list,
             'count': len(contacts)
         })
     except Exception as e:

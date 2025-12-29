@@ -394,11 +394,32 @@
             opacity: 1;
         }
         
+        .contact-company-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 4px 0;
+        }
         .contact-company {
             font-size: 15px;
             color: var(--text-secondary);
-            margin: 4px 0;
             font-weight: 500;
+            flex: 1;
+        }
+        .contact-badge-container {
+            display: flex;
+            align-items: center;
+            margin-left: var(--space-sm, 8px);
+        }
+        .contact-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-badge img {
+            width: 28px;
+            height: auto;
+            display: block;
         }
         
         .contact-title {
@@ -1025,11 +1046,42 @@
             grid.innerHTML = filtered.map(contact => createContactTile(contact)).join('');
         }
 
+        function getBadgeImagePath(badgeId) {
+            const badgeNameMap = {
+                'deep_diver': 'DeepDiver',
+                'profile_magnet': 'ProfileMagnet',
+                'qualified_lead': 'QualifiedLead',
+                'conversation_starter': 'ConversationStarter',
+                'scheduler_master': 'SchedulerMaster',
+                'rapport_builder': 'RapportBuilder',
+                'relationship_manager': 'RelationshipManager',
+                'super_connector': 'SuperConnector'
+            };
+            const badgeName = badgeNameMap[badgeId] || '';
+            // Try .jpg first, fallback to .jpeg (browser will handle if image doesn't exist)
+            return `/static/images/badges/${badgeName}W.jpg`;
+        }
+        
         function createContactTile(contact) {
             const matchScore = contact.match_score ? Math.round(contact.match_score) : 0;
             const flagIcon = contact.flagged ? '⚐' : '⚑';
             const flagClass = contact.flagged ? 'flagged' : '';
             const nextStep = contact.next_step || 'Review contact status and determine next action';
+            
+            // Generate badge HTML if contact has earned a badge
+            let badgeHtml = '';
+            if (contact.latest_badge) {
+                const badge = contact.latest_badge;
+                const imagePath = getBadgeImagePath(badge.badge_id);
+                const tooltip = `${badge.badge_name} +${badge.badge_points}`;
+                badgeHtml = `
+                    <div class="contact-badge-container">
+                        <div class="contact-badge" title="${escapeHtml(tooltip)}" style="padding: 0; border: 2px solid transparent; border-radius: 8px; background: transparent; cursor: help; position: relative; display: flex; align-items: center; justify-content: center;">
+                            <img src="${imagePath}" alt="${escapeHtml(badge.badge_name)}" />
+                        </div>
+                    </div>
+                `;
+            }
             
             return `
                 <div class="contact-tile timing-${contact.timing_color}">
@@ -1040,7 +1092,10 @@
                             <span class="flag ${flagClass}" onclick="toggleFlag('${contact.id}', ${!contact.flagged})">${flagIcon}</span>
                         </div>
                     </div>
-                    <div class="contact-company">${escapeHtml(contact.company_name)}</div>
+                    <div class="contact-company-row">
+                        <div class="contact-company">${escapeHtml(contact.company_name)}</div>
+                        ${badgeHtml}
+                    </div>
                     ${contact.job_title ? `<div class="contact-title">${escapeHtml(contact.job_title)}</div>` : ''}
                     <div class="status-badge">${escapeHtml(contact.status)}</div>
                     <div class="next-step-section">

@@ -1,6 +1,6 @@
 """Dashboard generation service"""
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 import re
 import time
 
@@ -619,11 +619,27 @@ class DashboardGenerator:
         .flag-btn.flagged {{
             opacity: 1;
         }}
+        .card-title-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }}
         .card-title {{
             font-size: var(--font-sm);
             color: var(--text-primary);
-            margin-bottom: var(--space-md);
             font-weight: var(--font-medium);
+            flex: 1;
+        }}
+        .card-badge-container {{
+            display: flex;
+            align-items: center;
+            margin-left: var(--space-sm);
+        }}
+        .card-badge {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }}
         .card-status-container {{
             display: flex;
@@ -1679,7 +1695,10 @@ class DashboardGenerator:
                 """
         
         # Get contact count (only display if > 0)
-        contact_count = self._get_contact_count_for_application(app)
+        # Use provided cache or load it (reuse same cache for badge lookup)
+        if contacts_cache is None:
+            contacts_cache = self._load_contacts_cache()
+        contact_count = self._get_contact_count_for_application(app, contacts_cache)
         contact_count_html = ""
         if contact_count > 0:
             contact_count_html = f"""
@@ -1687,6 +1706,12 @@ class DashboardGenerator:
                 👥 Contacts: {contact_count}
             </div>
             """
+        
+        # Get latest badge (read from cache - O(1) lookup, reuses same cache)
+        badge_data = self._get_latest_badge_for_application(app, contacts_cache)
+        badge_html = ""
+        if badge_data:
+            badge_html = self._generate_card_badge_html(badge_data)
         
         return f"""
         <div class="card" 
@@ -1705,7 +1730,10 @@ class DashboardGenerator:
                     {flag_icon}
                 </button>
             </div>
-            <div class="card-title">{app.job_title}</div>
+            <div class="card-title-row">
+                <div class="card-title">{app.job_title}</div>
+                {badge_html}
+            </div>
             <div class="card-status-container">
                 <span class="card-status status-{self._status_to_class(app.status)}">{app.status}</span>
                 {self._get_progress_pill_html(app)}
@@ -1845,6 +1873,86 @@ class DashboardGenerator:
             # If there's any error, return 0 (don't break dashboard generation)
             print(f"Warning: Could not count contacts for application {app.id if app else 'unknown'}: {e}")
             return 0
+    
+    def _get_latest_badge_for_application(self, app: Application, contacts_cache: dict = None) -> Optional[Dict]:
+        """Get latest earned badge for application using cached YAML data (O(1) lookup)"""
+        try:
+            if not app or not app.company:
+                return None
+            
+            app_company = app.company.lower().strip()
+            if not app_company:
+                return None
+            
+            # Use provided cache or load from YAML cache
+            if contacts_cache is None:
+                contacts_cache = self._load_contacts_cache()
+            
+            # O(1) dictionary lookup from YAML cache
+            return self.contact_count_cache.get_latest_badge(app_company, contacts_cache)
+        except Exception as e:
+            # If there's any error, return None (don't break dashboard generation)
+            print(f"Warning: Could not get badge for application {app.id if app else 'unknown'}: {e}")
+            return None
+    
+    def _get_badge_image_path(self, badge_id: str) -> str:
+        """Get the image path for a badge based on ID (earned badges use 'W' suffix)"""
+        badge_name_map = {
+            'deep_diver': 'DeepDiver',
+            'profile_magnet': 'ProfileMagnet',
+            'qualified_lead': 'QualifiedLead',
+            'conversation_starter': 'ConversationStarter',
+            'scheduler_master': 'SchedulerMaster',
+            'rapport_builder': 'RapportBuilder',
+            'relationship_manager': 'RelationshipManager',
+            'super_connector': 'SuperConnector'
+        }
+        suffix = 'W'  # Earned badges use 'W' (won) version
+        badge_name = badge_name_map.get(badge_id, '')
+        # Check which extension exists (.jpg or .jpeg)
+        static_path = Path(__file__).parent.parent.parent / 'static' / 'images' / 'badges'
+        jpg_path = static_path / f'{badge_name}{suffix}.jpg'
+        jpeg_path = static_path / f'{badge_name}{suffix}.jpeg'
+        
+        # Use .jpg if it exists, otherwise .jpeg
+        if jpg_path.exists():
+            extension = '.jpg'
+        elif jpeg_path.exists():
+            extension = '.jpeg'
+        else:
+            # Default to .jpg if neither exists (fallback)
+            extension = '.jpg'
+        return f'/static/images/badges/{badge_name}{suffix}{extension}'
+    
+    def _generate_card_badge_html(self, badge_data: Dict) -> str:
+        """Generate HTML for a single badge on application card (smaller size)"""
+        try:
+            badge_id = badge_data.get('badge_id')
+            badge_name = badge_data.get('badge_name', '')
+            badge_points = badge_data.get('badge_points', 0)
+            
+            if not badge_id:
+                return ''
+            
+            image_path = self._get_badge_image_path(badge_id)
+            tooltip_text = f"{badge_name} +{badge_points}"
+            
+            # Escape tooltip text for HTML
+            import html
+            tooltip_escaped = html.escape(tooltip_text)
+            
+            badge_name_escaped = html.escape(badge_name)
+            
+            return f'''
+            <div class="card-badge-container">
+                <div class="card-badge badge-unlocked" title="{tooltip_escaped}" style="padding: 0; border: 2px solid transparent; border-radius: 8px; background: transparent; cursor: help; position: relative; display: flex; align-items: center; justify-content: center;">
+                    <img src="{image_path}" alt="{badge_name_escaped}" style="width: 28px; height: auto; display: block;" />
+                </div>
+            </div>
+            '''
+        except Exception as e:
+            print(f"Warning: Could not generate badge HTML: {e}")
+            return ''
     
     def _get_latest_status_notes(self, app: Application) -> Optional[str]:
         """Get the latest status update notes for an application (optimized with early exit)"""
