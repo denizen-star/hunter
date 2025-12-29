@@ -6,6 +6,8 @@ import time
 
 from app.models.application import Application
 from app.services.job_processor import JobProcessor
+from app.services.networking_processor import NetworkingProcessor
+from app.services.contact_count_cache import ContactCountCache
 from app.utils.file_utils import get_data_path, ensure_dir_exists, write_text_file, read_text_file
 from app.utils.datetime_utils import format_for_display
 
@@ -27,6 +29,8 @@ class DashboardGenerator:
         self.output_dir = get_data_path('output')
         ensure_dir_exists(self.output_dir)
         self.job_processor = JobProcessor()
+        self.networking_processor = NetworkingProcessor()
+        self.contact_count_cache = ContactCountCache()
     
     def get_dashboard_path(self) -> Path:
         """Get the filesystem path to the main dashboard HTML file."""
@@ -94,7 +98,10 @@ class DashboardGenerator:
         """Generate the main dashboard HTML page."""
         applications = self.job_processor.list_all_applications()
         
-        html = self._create_dashboard_html(applications)
+        # Load contacts once for all cards (performance optimization)
+        contacts_cache = self._load_contacts_cache()
+        
+        html = self._create_dashboard_html(applications, contacts_cache=contacts_cache)
         
         dashboard_path = self.get_dashboard_path()
         write_text_file(html, dashboard_path)
@@ -105,7 +112,8 @@ class DashboardGenerator:
         """Generate the archived applications dashboard HTML page."""
         applications = self.job_processor.list_archived_applications()
         
-        html = self._create_dashboard_html(applications, is_archived=True)
+        # Archive dash doesn't need contact counts, so skip loading contacts for performance
+        html = self._create_dashboard_html(applications, is_archived=True, contacts_cache=None, skip_notes=True)
         
         dashboard_path = self.get_archived_dashboard_path()
         write_text_file(html, dashboard_path)
@@ -116,14 +124,17 @@ class DashboardGenerator:
         """Generate the progress dashboard HTML page"""
         applications = self.job_processor.list_all_applications()
         
-        html = self._create_progress_dashboard_html(applications)
+        # Load contacts once for all cards (performance optimization)
+        contacts_cache = self._load_contacts_cache()
+        
+        html = self._create_progress_dashboard_html(applications, contacts_cache=contacts_cache)
         
         dashboard_path = self.output_dir / 'progress.html'
         write_text_file(html, dashboard_path)
         
         print(f"Progress dashboard generated: {dashboard_path}")
     
-    def _create_dashboard_html(self, applications: List[Application], is_archived: bool = False) -> str:
+    def _create_dashboard_html(self, applications: List[Application], is_archived: bool = False, contacts_cache: dict = None, skip_notes: bool = False) -> str:
         """Create the HTML dashboard"""
         # For archived dashboard, only calculate 'all' and 'rejected' counts
         if is_archived:
@@ -168,7 +179,7 @@ class DashboardGenerator:
         js_is_archived = "true" if is_archived else "false"
 
         # Generate stat cards and filter interface
-        dashboard_html = self._create_dashboard_with_stats(applications, status_counts, is_archived=is_archived)
+        dashboard_html = self._create_dashboard_with_stats(applications, status_counts, is_archived=is_archived, contacts_cache=contacts_cache, skip_notes=skip_notes)
         
         # Set title and header text based on dashboard type
         if is_archived:
@@ -1327,7 +1338,7 @@ class DashboardGenerator:
 </html>"""
         return html
     
-    def _create_dashboard_with_stats(self, applications: List[Application], status_counts: dict, is_archived: bool = False) -> str:
+    def _create_dashboard_with_stats(self, applications: List[Application], status_counts: dict, is_archived: bool = False, contacts_cache: dict = None, skip_notes: bool = False) -> str:
         """Create dashboard with stat cards and filter buttons"""
         # Calculate counts for each status
         def count_status(*labels):
@@ -1399,9 +1410,10 @@ class DashboardGenerator:
         sorted_apps = sorted(applications, key=safe_datetime_sort_key, reverse=True)
         for app in sorted_apps:
             if is_archived:
+                # Archive dash doesn't need contact counts, so skip contacts_cache
                 cards_html += self._create_archived_application_card(app)
             else:
-                cards_html += self._create_application_card(app)
+                cards_html += self._create_application_card(app, contacts_cache=contacts_cache)
         
         # Get unique company names for search
         company_names = sorted(list(set([app.company for app in applications if app.company])))
@@ -1617,7 +1629,7 @@ class DashboardGenerator:
         </div>
         '''
     
-    def _create_application_card(self, app: Application) -> str:
+    def _create_application_card(self, app: Application, contacts_cache: dict = None) -> str:
         """Create HTML for a single application card"""
         # Generate proper URLs for summary and folder
         summary_link = "#"
@@ -1666,6 +1678,16 @@ class DashboardGenerator:
             </div>
                 """
         
+        # Get contact count (only display if > 0)
+        contact_count = self._get_contact_count_for_application(app)
+        contact_count_html = ""
+        if contact_count > 0:
+            contact_count_html = f"""
+            <div class="card-meta">
+                👥 Contacts: {contact_count}
+            </div>
+            """
+        
         return f"""
         <div class="card" 
              data-updated-at="{updated_at.isoformat()}" 
@@ -1697,6 +1719,7 @@ class DashboardGenerator:
             <div class="card-meta">
                 🔄 Updated: {format_for_display(app.status_updated_at)}
             </div>
+            {contact_count_html}
             {notes_html}
             <div class="card-actions">
                 <a href="{summary_link}" class="card-btn">View Summary →</a>
@@ -1728,12 +1751,13 @@ class DashboardGenerator:
         updated_at = app.status_updated_at or app.created_at
         applied_at = app.created_at
         
-        # Get rejected notes
+        # Get rejected notes (only for rejected status to avoid unnecessary file I/O)
         notes_html = ""
-        notes = self._get_latest_status_notes(app)
-        if notes:
-            display_notes = notes[:200] + "..." if len(notes) > 200 else notes
-            notes_html = f"""
+        if app.status.lower() == 'rejected':
+            notes = self._get_latest_status_notes(app)
+            if notes:
+                display_notes = notes[:200] + "..." if len(notes) > 200 else notes
+                notes_html = f"""
             <div class="card-notes">
                 <div class="card-notes-label">Rejection Notes:</div>
                 <div class="card-notes-text" title="{notes}">{display_notes}</div>
@@ -1791,9 +1815,49 @@ class DashboardGenerator:
         display_name = checklist_definitions.get(latest_item, latest_item)
         return f'<span class="card-progress-pill">{display_name}</span>'
     
-    def _get_latest_status_notes(self, app: Application) -> Optional[str]:
-        """Get the latest status update notes for an application"""
+    def _load_contacts_cache(self) -> dict:
+        """Load contact count cache from YAML file (fast) or regenerate if missing"""
         try:
+            # Use ContactCountCache service to get or regenerate cache
+            cache = self.contact_count_cache.get_or_regenerate_cache()
+            return cache
+        except Exception as e:
+            print(f"Warning: Could not load contact count cache: {e}")
+            return {}
+    
+    def _get_contact_count_for_application(self, app: Application, contacts_cache: dict = None) -> int:
+        """Get contact count for application using cached YAML data (O(1) lookup)"""
+        try:
+            if not app or not app.company:
+                return 0
+            
+            app_company = app.company.lower().strip()
+            if not app_company:
+                return 0
+            
+            # Use provided cache or load from YAML cache
+            if contacts_cache is None:
+                contacts_cache = self._load_contacts_cache()
+            
+            # O(1) dictionary lookup from YAML cache
+            return self.contact_count_cache.get_count(app_company, contacts_cache)
+        except Exception as e:
+            # If there's any error, return 0 (don't break dashboard generation)
+            print(f"Warning: Could not count contacts for application {app.id if app else 'unknown'}: {e}")
+            return 0
+    
+    def _get_latest_status_notes(self, app: Application) -> Optional[str]:
+        """Get the latest status update notes for an application (optimized with early exit)"""
+        try:
+            # Early exit if no folder path (can't have updates)
+            if not app.folder_path or not app.folder_path.exists():
+                return None
+            
+            # Check if updates directory exists before calling get_application_updates
+            updates_dir = app.folder_path / "updates"
+            if not updates_dir.exists():
+                return None
+            
             updates = self.job_processor.get_application_updates(app)
             
             if not updates:
@@ -1838,7 +1902,7 @@ class DashboardGenerator:
             # Silently fail - don't break dashboard if notes can't be extracted
             return None
     
-    def _create_progress_dashboard_html(self, applications: List[Application]) -> str:
+    def _create_progress_dashboard_html(self, applications: List[Application], contacts_cache: dict = None) -> str:
         """Create the progress dashboard HTML"""
         # Filter out rejected applications
         active_apps = [app for app in applications if app.status.lower() != 'rejected']
@@ -1880,7 +1944,7 @@ class DashboardGenerator:
         progress_counts['all'] = len(active_apps)
         
         # Generate tabs HTML
-        tabs_html = self._create_progress_tabs_html(active_apps, progress_groups, no_progress, progress_counts, checklist_definitions, progress_order)
+        tabs_html = self._create_progress_tabs_html(active_apps, progress_groups, no_progress, progress_counts, checklist_definitions, progress_order, contacts_cache=contacts_cache)
         
         total = len(active_apps)
         
@@ -2572,7 +2636,7 @@ class DashboardGenerator:
 </html>"""
         return html
     
-    def _create_progress_tabs_html(self, applications: List[Application], progress_groups: dict, no_progress: List[Application], progress_counts: dict, checklist_definitions: dict, progress_order: list) -> str:
+    def _create_progress_tabs_html(self, applications: List[Application], progress_groups: dict, no_progress: List[Application], progress_counts: dict, checklist_definitions: dict, progress_order: list, contacts_cache: dict = None) -> str:
         """Create the progress tabs HTML"""
         # Create tab headers
         tab_headers = ""
@@ -2618,7 +2682,7 @@ class DashboardGenerator:
         tab_contents = ""
         
         # 'all' tab
-        cards_html = ''.join([self._create_application_card(app) for app in applications])
+        cards_html = ''.join([self._create_application_card(app, contacts_cache=contacts_cache) for app in applications])
         tab_contents += f'''
             <div id="progress-all" class="tab-content" style="display: block;">
                 <div class="sort-controls">
@@ -2636,7 +2700,7 @@ class DashboardGenerator:
         
         # 'no_progress' tab
         if no_progress:
-            cards_html = ''.join([self._create_application_card(app) for app in no_progress])
+            cards_html = ''.join([self._create_application_card(app, contacts_cache=contacts_cache) for app in no_progress])
             tab_contents += f'''
                 <div id="progress-no_progress" class="tab-content" style="display: none;">
                     <div class="sort-controls">
@@ -2665,7 +2729,7 @@ class DashboardGenerator:
         for progress_key in progress_order:
             apps = progress_groups.get(progress_key, [])
             if apps:
-                cards_html = ''.join([self._create_application_card(app) for app in apps])
+                cards_html = ''.join([self._create_application_card(app, contacts_cache=contacts_cache) for app in apps])
                 display_name = checklist_definitions[progress_key]
                 count = progress_counts.get(progress_key, 0)
                 tab_contents += f'''

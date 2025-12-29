@@ -20,6 +20,7 @@ from app.services.analytics_generator import AnalyticsGenerator
 from app.services.networking_processor import NetworkingProcessor
 from app.services.networking_document_generator import NetworkingDocumentGenerator
 from app.services.activity_log_service import ActivityLogService
+from app.services.contact_count_cache import ContactCountCache
 from app.utils.datetime_utils import format_for_display
 from app.utils.file_utils import get_project_root, get_data_path
 from app.utils.cache_utils import is_cache_stale, get_cached_json, save_cached_json
@@ -57,6 +58,7 @@ activity_log_service = ActivityLogService()
 
 networking_processor = NetworkingProcessor()
 networking_doc_generator = NetworkingDocumentGenerator()
+contact_count_cache = ContactCountCache()
 
 # #region agent log
 # Debug logging disabled - .cursor directory has special protections
@@ -1175,6 +1177,39 @@ def create_networking_contact():
         # Save updated metadata with paths and match score
         networking_processor._save_contact_metadata(contact)
         
+        # Invalidate contact count cache (will regenerate on next dashboard load)
+        try:
+            contact_count_cache.invalidate_cache()
+        except Exception as e:
+            print(f"Warning: Could not invalidate contact count cache: {e}")
+        
+        # Update matching applications' status_updated_at
+        try:
+            from datetime import datetime
+            from app.utils.datetime_utils import get_est_now
+            applications = job_processor.list_all_applications()
+            updated_apps = []
+            for app in applications:
+                if app.company.lower().strip() == contact.company_name.lower().strip():
+                    app.status_updated_at = get_est_now()
+                    job_processor._save_application_metadata(app)
+                    updated_apps.append(app)
+            
+            # Regenerate dashboards in background if any applications were updated
+            if updated_apps:
+                import threading
+                def regenerate_dashboards():
+                    try:
+                        dashboard_generator.generate_index_page()
+                        dashboard_generator.generate_progress_dashboard()
+                        dashboard_generator.generate_archived_dashboard()
+                    except Exception as e:
+                        print(f"Warning: Could not regenerate dashboards: {e}")
+                threading.Thread(target=regenerate_dashboards, daemon=True).start()
+        except Exception as e:
+            # Don't fail the contact creation if application update fails
+            print(f"Warning: Could not update applications for contact creation: {e}")
+        
         # Generate summary URL
         summary_url = None
         if contact.summary_path:
@@ -1339,11 +1374,24 @@ def update_networking_status(contact_id):
         # Update status with notes
         networking_processor.update_contact_status(contact, status, notes)
         
+        # Invalidate contact count cache (will regenerate on next dashboard load)
+        try:
+            contact_count_cache.invalidate_cache()
+        except Exception as e:
+            print(f"Warning: Could not invalidate contact count cache: {e}")
+        
         # Check if contact's company matches any application and create timeline entry
         try:
+            from app.utils.datetime_utils import get_est_now
             applications = job_processor.list_all_applications()
+            updated_apps = []
             for app in applications:
                 if app.company.lower().strip() == contact.company_name.lower().strip():
+                    # Update application's status_updated_at
+                    app.status_updated_at = get_est_now()
+                    job_processor._save_application_metadata(app)
+                    updated_apps.append(app)
+                    
                     # Create networking timeline entry in matching application
                     job_processor.create_networking_timeline_entry(
                         app,
@@ -1353,6 +1401,18 @@ def update_networking_status(contact_id):
                     )
                     # Regenerate summary to include the new timeline entry
                     job_processor._regenerate_summary(app)
+            
+            # Regenerate dashboards in background if any applications were updated
+            if updated_apps:
+                import threading
+                def regenerate_dashboards():
+                    try:
+                        dashboard_generator.generate_index_page()
+                        dashboard_generator.generate_progress_dashboard()
+                        dashboard_generator.generate_archived_dashboard()
+                    except Exception as e:
+                        print(f"Warning: Could not regenerate dashboards: {e}")
+                threading.Thread(target=regenerate_dashboards, daemon=True).start()
         except Exception as e:
             # Don't fail the status update if timeline entry creation fails
             print(f"Warning: Could not create timeline entry for contact update: {e}")
@@ -1399,6 +1459,13 @@ def update_networking_details(contact_id):
             _location_provided=location_provided,
             _job_title_provided=job_title_provided
         )
+        
+        # Invalidate contact count cache if company name changed (will regenerate on next dashboard load)
+        # Note: We invalidate even if company didn't change, to be safe
+        try:
+            contact_count_cache.invalidate_cache()
+        except Exception as e:
+            print(f"Warning: Could not invalidate contact count cache: {e}")
         
         # Regenerate summary page to reflect updated contact details
         try:
@@ -1470,6 +1537,32 @@ def update_networking_details(contact_id):
             print(f"Warning: Could not regenerate summary page after update: {e}")
             import traceback
             traceback.print_exc()
+        
+        # Update matching applications' status_updated_at
+        try:
+            from app.utils.datetime_utils import get_est_now
+            applications = job_processor.list_all_applications()
+            updated_apps = []
+            for app in applications:
+                if app.company.lower().strip() == contact.company_name.lower().strip():
+                    app.status_updated_at = get_est_now()
+                    job_processor._save_application_metadata(app)
+                    updated_apps.append(app)
+            
+            # Regenerate dashboards in background if any applications were updated
+            if updated_apps:
+                import threading
+                def regenerate_dashboards():
+                    try:
+                        dashboard_generator.generate_index_page()
+                        dashboard_generator.generate_progress_dashboard()
+                        dashboard_generator.generate_archived_dashboard()
+                    except Exception as e:
+                        print(f"Warning: Could not regenerate dashboards: {e}")
+                threading.Thread(target=regenerate_dashboards, daemon=True).start()
+        except Exception as e:
+            # Don't fail the details update if application update fails
+            print(f"Warning: Could not update applications for contact details update: {e}")
         
         return jsonify({
             'success': True,
