@@ -34,25 +34,80 @@ Search by area and filter by:
 Browse results that match your criteria.
 
 #### Step 4: Capture Job Posting
-Copy the entire job posting and paste it into a new application in Hunter.
+
+    4.1 Select the Job Text Navigate to the job posting (e.g., on LinkedIn). Click and drag your mouse to highlight all text starting from the **Company Name** all the way to the end of the **Job Description**.
+
+    4.2 Copy to Clipboard Copy the highlighted text to your clipboard using the keyboard shortcut `Command + C` (Mac) or `Ctrl + C` (Windows).
+
+    4.3 Open the **HunterApp**
+
+    4.4 Open "**App Dash**" dashboard on the left panel
+
+    ![App Dashboard](../static/images/icons/AppDash.jpg)
+
+    4.5 Start a New Application In the top-right corner of the screen, click on the **+ New Application** link.
+
+    ![New Application Link Screenshot Placeholder]
+
+    4.6 Paste the Description Locate the **Job Description** * text box and paste your clipboard content using `Command + V` (Mac) or `Ctrl + V` (Windows).
 
 #### Step 5: Extract Key Info & Analyze
-Extract Position name, Company name, and Job link. Select "Analyze & Create Application."
+
+The text box includes features to help you quickly populate the required fields. Follow these steps to organize the data:
+
+![New Application Form](../static/images/icons/NewApplicationForm.jpg)
+
+    5.1 Set Position Name Highlight the job title within your pasted text and copy/paste it into the **Position Name** field.
+
+    5.2 Set Company Name Identify the employer and copy/paste it into the **Company Name** field.
+
+    5.3 Insert the Job Link Scroll to the bottom of the job description box where **HunterApp** has organized a list of links. Find the correct Job Link and paste it into the corresponding field.
+
+    5.4 Run the Analysis Once the fields are populated, select the **Analyze & Create Application** button to finalize your entry.
 
 #### Step 6: Start Application Form
 Open the job posting link and begin filling out the company's form.
 
-**6.1 Resume Upload:** Use "Connect with LinkedIn" if available; otherwise, upload an ATS-optimized resume (docx/PDF).
+    **6.1 Resume Upload:** Use "Connect with LinkedIn" if available; otherwise, upload an ATS-optimized resume (docx/PDF).
 
-**6.2 Job History:** Reference Excel file for dates, descriptions, and skill highlights.
+    **6.2 Job History:** Reference Excel file for dates, descriptions, and skill highlights.
 
-**6.3 Cover Letter Placeholder:** Continue form while Hunter finishes analysis.
+    **6.3 Cover Letter Placeholder:** Continue form while Hunter finishes analysis.
 
 #### Step 7: Review Match Score
-Check the Hunter % match based on AI skills extraction.
+Once the **system processed** your application you will see the **Application Summary** the summary will display the captured elements for:
+
+![Application Processed](../static/images/icons/App_processed.jpg)
+
+    7.1 Your **Match Score** in %
+
+    7.2 **Company Name - Position**
+
+    7.3 **Location**
+
+    7.4 **Salary Range**
+
+    7.5 **Application Date**
+
+    7.6 **Last Updated** (by job poster)
+
+    7.7 **Job Posting** Link
+
+    7.8 **View Summary** & **Create Another** buttons
 
 #### Step 8: Review Analysis
-Check the Summary, Skills, Research, and Qualifications tabs.
+
+    8.1 Click the **View Summary**
+
+    8.2 Navigate the tabs -
+        **Summary**,
+        **Raw Entry** (with links at the bottom),
+        **Skills**,
+        **Research**,
+        **Qualifications**,
+        etc.
+
+    8.3 Also check the **Networking** tab to see if you already have any contacts at this company - this helps you identify existing relationships before reaching out.
 
 #### Step 9: Update Status & Get Cover Letter
 Set status to "Applied" and select the bespoke cover letter from the Templates tab.

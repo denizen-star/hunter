@@ -271,6 +271,33 @@
             margin-bottom: var(--space-md);
         }
         
+        .section p.substep {
+            margin-left: var(--space-xl);
+        }
+        
+        .section code, .section kbd {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #374151;
+        }
+        
+        .section img.step-image {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: var(--space-md) auto;
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section img.step-image.smaller {
+            max-width: 66.67%;
+        }
+        
         .section ul, .section ol {
             margin-left: var(--space-lg);
             margin-bottom: var(--space-md);
@@ -472,32 +499,58 @@
             <p>Browse results that match your criteria.</p>
             
             <h4><span class="step-number">4</span>Capture Job Posting</h4>
-            <p>Copy the entire job posting and paste it into a new application in Hunter.</p>
+            <p class="substep"><strong>4.1 Select the Job Text</strong> Navigate to the job posting (e.g., on LinkedIn). Click and drag your mouse to highlight all text starting from the <strong>Company Name</strong> all the way to the end of the <strong>Job Description</strong>.</p>
+            <p class="substep"><strong>4.2 Copy to Clipboard</strong> Copy the highlighted text to your clipboard using the keyboard shortcut <kbd>Command + C</kbd> (Mac) or <kbd>Ctrl + C</kbd> (Windows).</p>
+            <p class="substep"><strong>4.3 Open the HunterApp</strong><img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></p>
+            <p class="substep"><strong>4.4 Open "App Dash"</strong> dashboard on the left panel<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></p>
+            <img src="/static/images/icons/AppDash.jpg" alt="App Dashboard" class="step-image">
+            <p class="substep"><strong>4.5 Start a New Application</strong> In the top-right corner of the screen, click on the <strong>+ New Application</strong> link.<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></p>
+            <!-- ![New Application Link Screenshot Placeholder] -->
+            <p class="substep"><strong>4.6 Paste the Description</strong> Locate the <strong>Job Description</strong> * text box and paste your clipboard content using <kbd>Command + V</kbd> (Mac) or <kbd>Ctrl + V</kbd> (Windows).<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></p>
             
             <h4><span class="step-number">5</span>Extract Key Info & Analyze<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
-            <p><strong>5.1 Position name,</strong></p>
-            <p><strong>5.2 Company name, and</strong></p>
-            <p><strong>5.3 Job link.</strong> Select</p>
-            <p><strong>5.4 "Analyze & Create Application."</strong></p>
+            <p>The text box includes features to help you quickly populate the required fields. Follow these steps to organize the data:</p>
+            <img src="/static/images/icons/NewApplicationForm.jpg" alt="New Application Form" class="step-image smaller">
+            <p class="substep"><strong>5.1 Set Position Name</strong> Highlight the job title within your pasted text and copy/paste it into the <strong>Position Name</strong> field.</p>
+            <p class="substep"><strong>5.2 Set Company Name</strong> Identify the employer and copy/paste it into the <strong>Company Name</strong> field.</p>
+            <p class="substep"><strong>5.3 Insert the Job Link</strong> Scroll to the bottom of the job description box where <strong>HunterApp</strong> has organized a list of links. Find the correct Job Link and paste it into the corresponding field.</p>
+            <p class="substep"><strong>5.4 Run the Analysis</strong> Once the fields are populated, select the <strong>Analyze & Create Application</strong> button to finalize your entry.</p>
             
-            <h4><span class="step-number">6</span>Start Application Form<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
+            <h4><span class="step-number">6</span>Start Application Form<svg class="hunter-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Open in new window"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></h4>
             <p>Open the job posting link and begin filling out the company's form.</p>
-            <p><strong>6.1 Resume Upload:</strong> Use "Connect with LinkedIn" if available; otherwise, upload an ATS-optimized resume (docx/PDF).</p>
-            <p><strong>6.2 Job History:</strong> Reference Excel file for dates, descriptions, and skill highlights.</p>
-            <p><strong>6.3 Cover Letter Placeholder:</strong> Continue form while Hunter finishes analysis.</p>
+            <p class="substep"><strong>6.1 Resume Upload:</strong> Use "Connect with LinkedIn" if available; otherwise, upload an ATS-optimized resume (docx/PDF).</p>
+            <p class="substep"><strong>6.2 Job History:</strong> Reference Excel file for dates, descriptions, and skill highlights.</p>
+            <p class="substep"><strong>6.3 Cover Letter Placeholder:</strong> Continue form while Hunter finishes analysis.</p>
             
             <h4><span class="step-number">7</span>Review Match Score<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
-            <p>Check the Hunter % match based on AI skills extraction.</p>
+            <p>Once the <strong>system processed</strong> your application you will see the <strong>Application Summary</strong> the summary will display the captured elements for:</p>
+            <img src="/static/images/icons/App_processed.jpg" alt="Application Processed" class="step-image">
+            <p class="substep"><strong>7.1 Your Match Score</strong> in %</p>
+            <p class="substep"><strong>7.2 Company Name - Position</strong></p>
+            <p class="substep"><strong>7.3 Location</strong></p>
+            <p class="substep"><strong>7.4 Salary Range</strong></p>
+            <p class="substep"><strong>7.5 Application Date</strong></p>
+            <p class="substep"><strong>7.6 Last Updated</strong> (by job poster)</p>
+            <p class="substep"><strong>7.7 Job Posting</strong> Link</p>
+            <p class="substep"><strong>7.8 View Summary</strong> & <strong>Create Another</strong> buttons</p>
             
             <h4><span class="step-number">8</span>Review Analysis<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
-            <p>Check the Summary, Skills, Research, and Qualifications tabs. Also check the <strong>Networking tab</strong> to see if you already have any contacts at this company - this helps you identify existing relationships before reaching out.</p>
+            <p class="substep"><strong>8.1 Click the View Summary</strong></p>
+            <p class="substep"><strong>8.2 Navigate the tabs -</strong><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<strong>Summary</strong>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<strong>Raw Entry</strong> (with links at the bottom),<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<strong>Skills</strong>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<strong>Research</strong>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<strong>Qualifications</strong>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;etc.</p>
+            <p class="substep"><strong>8.3 Also check the Networking tab</strong> to see if you already have any contacts at this company - this helps you identify existing relationships before reaching out.</p>
             
             <h4><span class="step-number">9</span>Update Status & Get Cover Letter<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
             <p>Go to Updates Tab</p>
-            <p><strong>9.1 Select status to "Applied"</strong></p>
-            <p><strong>9.2 Write cover letter or select from Insert from template dropdown the bespoke cover letter created by Hunter.</strong> <a href="/templating-guide" class="guide-link">Learn more about templates →</a></p>
-            <p><strong>9.3 Modify and personalize the cover letter on screen</strong></p>
-            <p><strong>9.4 Copy the content of the textbox by clicking the copy button<img src="/static/images/copy-button.png" alt="Copy button" class="copy-button-img"> on the top right box</strong></p>
+            <p class="substep"><strong>9.1 Select status to "Applied"</strong></p>
+            <p class="substep"><strong>9.2 Write cover letter or select from Insert from template dropdown the bespoke cover letter created by Hunter.</strong> <a href="/templating-guide" class="guide-link">Learn more about templates →</a></p>
+            <p class="substep"><strong>9.3 Modify and personalize the cover letter on screen</strong></p>
+            <p class="substep"><strong>9.4 Copy the content of the textbox by clicking the copy button<img src="/static/images/copy-button.png" alt="Copy button" class="copy-button-img"> on the top right box</strong></p>
             
             <h4><span class="step-number">10</span>Copy to Google Docs</h4>
             <p>Paste the cover letter text into a Google Docs template.</p>
@@ -509,9 +562,9 @@
             <p>Save as PDF and attach to the job submission.</p>
             
             <h4><span class="step-number">13</span>Document Submission<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
-            <p><strong>13.1 Copy the final cover letter back into Hunter's notes</strong></p>
-            <p><strong>13.2 Ensure status is "Applied."</strong></p>
-            <p><strong>13.3 Click "Update" button</strong></p>
+            <p class="substep"><strong>13.1 Copy the final cover letter back into Hunter's notes</strong></p>
+            <p class="substep"><strong>13.2 Ensure status is "Applied."</strong></p>
+            <p class="substep"><strong>13.3 Click "Update" button</strong></p>
             
             <h4><span class="step-number">14</span>Verify Confirmation</h4>
             <p>Check email for receipts or verification requirements.</p>
@@ -546,12 +599,12 @@
             
             <h4><span class="step-number">8</span>Create Networking Contact in Hunter<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
             <p>In Hunter, go to "Network Dash" → "New Contact" and create a networking contact with the recruiter's information.</p>
-            <p><strong>8.1 Person Name:</strong> Enter the recruiter's full name (required)</p>
-            <p><strong>8.2 Company Name:</strong> Enter their current company (required)</p>
-            <p><strong>8.3 Job Title:</strong> Enter their position (optional)</p>
-            <p><strong>8.4 LinkedIn URL:</strong> Paste their LinkedIn profile URL (optional)</p>
-            <p><strong>8.5 Profile Details:</strong> Paste their resume, LinkedIn profile text, or articles (required)</p>
-            <p><strong>8.6 Choose Processing Type:</strong> Select one of two options:</p>
+            <p class="substep"><strong>8.1 Person Name:</strong> Enter the recruiter's full name (required)</p>
+            <p class="substep"><strong>8.2 Company Name:</strong> Enter their current company (required)</p>
+            <p class="substep"><strong>8.3 Job Title:</strong> Enter their position (optional)</p>
+            <p class="substep"><strong>8.4 LinkedIn URL:</strong> Paste their LinkedIn profile URL (optional)</p>
+            <p class="substep"><strong>8.5 Profile Details:</strong> Paste their resume, LinkedIn profile text, or articles (required)</p>
+            <p class="substep"><strong>8.6 Choose Processing Type:</strong> Select one of two options:</p>
             <div style="background: #f9fafb; border-left: 4px solid var(--accent-blue); padding: var(--space-md); margin: var(--space-md) 0; border-radius: var(--radius-md);">
                 <p style="margin-bottom: var(--space-sm);"><strong>Full AI Processing</strong> - Complete analysis including match scoring, research, multiple message templates, and detailed insights (5-6 minutes)</p>
                 <p style="margin-bottom: 0; margin-left: var(--space-md); font-size: 14px; color: var(--text-secondary);">Best for: Important contacts, hiring managers, or when you need comprehensive insights and all message templates</p>
@@ -563,10 +616,10 @@
             
             <h4><span class="step-number">9</span>Review AI-Generated Messages<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
             <p>Open the networking contact's summary page and go to the "Messages" tab. Review the 4 AI-generated messages:</p>
-            <p><strong>9.1 Initial connection request</strong> (<300 characters)</p>
-            <p><strong>9.2 Meeting invitation</strong></p>
-            <p><strong>9.3 Thank you message</strong></p>
-            <p><strong>9.4 Consulting services offer</strong></p>
+            <p class="substep"><strong>9.1 Initial connection request</strong> (<300 characters)</p>
+            <p class="substep"><strong>9.2 Meeting invitation</strong></p>
+            <p class="substep"><strong>9.3 Thank you message</strong></p>
+            <p class="substep"><strong>9.4 Consulting services offer</strong></p>
             
             <h4><span class="step-number">10</span>Select & Copy Connection Message</h4>
             <p>Select and copy the initial connection request message (the first one, under 300 characters).</p>
@@ -582,10 +635,10 @@
             
             <h4><span class="step-number">14</span>View Contacts in Application Summary<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
             <p>All networking contacts are automatically linked to applications when their company name matches. To view contacts for a specific job:</p>
-            <p><strong>14.1 Open the application's summary page</strong> from the <a href="/dashes-guide" class="guide-link">dashboard</a></p>
-            <p><strong>14.2 Click the "Networking" tab</strong> to see all contacts at that company</p>
-            <p><strong>14.3 View contact details</strong> by clicking on any contact card to open their full summary in a popup overlay</p>
-            <p><strong>14.4 Create new contacts</strong> directly from the application page using the "Create New Contact" button (pre-fills the company name)</p>
+            <p class="substep"><strong>14.1 Open the application's summary page</strong> from the <a href="/dashes-guide" class="guide-link">dashboard</a></p>
+            <p class="substep"><strong>14.2 Click the "Networking" tab</strong> to see all contacts at that company</p>
+            <p class="substep"><strong>14.3 View contact details</strong> by clicking on any contact card to open their full summary in a popup overlay</p>
+            <p class="substep"><strong>14.4 Create new contacts</strong> directly from the application page using the "Create New Contact" button (pre-fills the company name)</p>
             <div style="background: #f0fdf4; border-left: 4px solid var(--accent-green); padding: var(--space-md); margin: var(--space-md) 0; border-radius: var(--radius-md);">
                 <p style="margin-bottom: 0; font-size: 14px; color: #065f46;"><strong>Note:</strong> The Networking tab automatically shows all contacts with matching company names. No manual linking required! Use this tab to quickly see who you've connected with at each company and track your networking progress for each application.</p>
             </div>
@@ -635,10 +688,10 @@
             
             <h4><span class="step-number">13</span>Update Networking Contact<img src="/static/favicon.svg" alt="Hunter" class="hunter-favicon" title="In Hunter App"></h4>
             <p>In the networking contact's "Updates & Notes" tab:</p>
-            <p><strong>13.1 Copy the sent email content into the notes</strong></p>
-            <p><strong>13.2 Add the email address with a timestamp</strong></p>
-            <p><strong>13.3 Update status</strong> (e.g., "Contacted - Replied" if they respond, or "In Conversation" if you're actively exchanging messages)</p>
-            <p><strong>13.4 Click "Update" button</strong></p>
+            <p class="substep"><strong>13.1 Copy the sent email content into the notes</strong></p>
+            <p class="substep"><strong>13.2 Add the email address with a timestamp</strong></p>
+            <p class="substep"><strong>13.3 Update status</strong> (e.g., "Contacted - Replied" if they respond, or "In Conversation" if you're actively exchanging messages)</p>
+            <p class="substep"><strong>13.4 Click "Update" button</strong></p>
             
             <h4><span class="step-number">14</span>Track Follow-up</h4>
             <p>Set a reminder to follow up in 5–7 days, or use the contact's Google Calendar integration button to schedule a follow-up reminder.</p>
