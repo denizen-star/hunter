@@ -30,10 +30,10 @@
 
     const helpItems = [
         { href: '/how-to-hunter.html', label: 'How to Hunter?', icon: 'HowtoHunter.jpg' },
-        { href: '/tracking-guide.html', label: 'Tracking', icon: 'TrackingGuide.jpg' },
         { href: '/dashes-guide.html', label: 'Dashes', icon: 'DashesGuide.jpg' },
         { href: '/templating-guide.html', label: 'Templating', icon: 'TemplatingGuide.jpg' },
-        { href: '/rewards.html', label: 'Rewards', icon: 'Rewards.png' }
+        { href: '/rewards.html', label: 'Rewards', icon: 'Rewards.png' },
+        { href: '/tracking-guide.html', label: 'Tracking', icon: 'TrackingGuide.jpg' }
     ];
 
     // Determine active menu item based on current path
@@ -73,38 +73,21 @@
         
         let menuHTML = `
         <div class="sidebar">
-            <ul class="sidebar-menu sidebar-menu-main">
         `;
 
-        // Main navigation items
-        mainItems.forEach(item => {
-            const isActive = item.href === activePath || 
-                           (item.href !== '#' && window.location.pathname.startsWith(item.href));
-            const activeClass = isActive ? 'active' : '';
-            const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
-            const iconHTML = item.icon ? `<img src="/static/images/icons/${item.icon}" alt="" class="nav-icon">` : '';
-            
-            menuHTML += `
-                <li>
-                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
-                </li>
-            `;
-        });
-
-        // Admin section (collapsible)
+        // Help section (expanded by default) - FIRST
         menuHTML += `
-            </ul>
-            <div class="sidebar-admin-section">
-                <div class="sidebar-section-header" onclick="toggleSection('admin')">
-                    <span class="sidebar-section-label">Admin</span>
+            <div class="sidebar-help-section">
+                <div class="sidebar-section-header" onclick="toggleSection('help')">
+                    <span class="sidebar-section-label">Help</span>
                     <svg class="sidebar-section-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
-                <ul class="sidebar-menu sidebar-menu-admin sidebar-section-collapsed" id="admin-section">
+                <ul class="sidebar-menu sidebar-menu-help sidebar-section-expanded" id="help-section">
         `;
 
-        adminItems.forEach(item => {
+        helpItems.forEach(item => {
             const isActive = item.href === activePath || 
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
@@ -121,18 +104,52 @@
         menuHTML += `
                 </ul>
             </div>
-            
-            <div class="sidebar-help-section">
-                <div class="sidebar-section-header" onclick="toggleSection('help')">
-                    <span class="sidebar-section-label">Help</span>
+        `;
+
+        // Main section (expanded by default) - SECOND
+        menuHTML += `
+            <div class="sidebar-main-section">
+                <div class="sidebar-section-header" onclick="toggleSection('main')">
+                    <span class="sidebar-section-label">Main</span>
                     <svg class="sidebar-section-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
-                <ul class="sidebar-menu sidebar-menu-help sidebar-section-collapsed" id="help-section">
+                <ul class="sidebar-menu sidebar-menu-main sidebar-section-expanded" id="main-section">
         `;
 
-        helpItems.forEach(item => {
+        mainItems.forEach(item => {
+            const isActive = item.href === activePath || 
+                           (item.href !== '#' && window.location.pathname.startsWith(item.href));
+            const activeClass = isActive ? 'active' : '';
+            const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
+            const iconHTML = item.icon ? `<img src="/static/images/icons/${item.icon}" alt="" class="nav-icon">` : '';
+            
+            menuHTML += `
+                <li>
+                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
+                </li>
+            `;
+        });
+
+        menuHTML += `
+                </ul>
+            </div>
+        `;
+
+        // Admin section (collapsed by default) - THIRD
+        menuHTML += `
+            <div class="sidebar-admin-section">
+                <div class="sidebar-section-header" onclick="toggleSection('admin')">
+                    <span class="sidebar-section-label">Admin</span>
+                    <svg class="sidebar-section-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <ul class="sidebar-menu sidebar-menu-admin sidebar-section-collapsed" id="admin-section">
+        `;
+
+        adminItems.forEach(item => {
             const isActive = item.href === activePath || 
                            (item.href !== '#' && window.location.pathname.startsWith(item.href));
             const activeClass = isActive ? 'active' : '';
@@ -224,7 +241,6 @@
         }
         
         .sidebar-menu-main {
-            flex: 1;
             overflow-y: auto;
         }
         
@@ -276,7 +292,8 @@
         }
 
         .sidebar-admin-section,
-        .sidebar-help-section {
+        .sidebar-help-section,
+        .sidebar-main-section {
             padding-top: 24px;
             border-top: 1px solid #e5e7eb;
             flex-shrink: 0;
@@ -335,6 +352,9 @@
         `;
     }
 
+    // Track Help's state before Admin opens
+    let helpWasExpandedBeforeAdmin = true;
+
     // Toggle section visibility
     function toggleSection(sectionName) {
         const section = document.getElementById(sectionName + '-section');
@@ -344,14 +364,52 @@
 
         const isCollapsed = section.classList.contains('sidebar-section-collapsed');
         
-        if (isCollapsed) {
-            section.classList.remove('sidebar-section-collapsed');
-            section.classList.add('sidebar-section-expanded');
-            header.setAttribute('data-expanded', 'true');
+        // Special handling for Admin section
+        if (sectionName === 'admin') {
+            const helpSection = document.getElementById('help-section');
+            const helpHeader = helpSection ? helpSection.previousElementSibling : null;
+            
+            if (isCollapsed) {
+                // Admin is opening - collapse Help if it's expanded
+                if (helpSection && helpHeader) {
+                    const helpIsExpanded = helpSection.classList.contains('sidebar-section-expanded');
+                    if (helpIsExpanded) {
+                        helpWasExpandedBeforeAdmin = true;
+                        helpSection.classList.remove('sidebar-section-expanded');
+                        helpSection.classList.add('sidebar-section-collapsed');
+                        helpHeader.setAttribute('data-expanded', 'false');
+                    } else {
+                        helpWasExpandedBeforeAdmin = false;
+                    }
+                }
+                
+                // Open Admin
+                section.classList.remove('sidebar-section-collapsed');
+                section.classList.add('sidebar-section-expanded');
+                header.setAttribute('data-expanded', 'true');
+            } else {
+                // Admin is closing - restore Help if it was expanded before
+                section.classList.remove('sidebar-section-expanded');
+                section.classList.add('sidebar-section-collapsed');
+                header.setAttribute('data-expanded', 'false');
+                
+                if (helpWasExpandedBeforeAdmin && helpSection && helpHeader) {
+                    helpSection.classList.remove('sidebar-section-collapsed');
+                    helpSection.classList.add('sidebar-section-expanded');
+                    helpHeader.setAttribute('data-expanded', 'true');
+                }
+            }
         } else {
-            section.classList.remove('sidebar-section-expanded');
-            section.classList.add('sidebar-section-collapsed');
-            header.setAttribute('data-expanded', 'false');
+            // Normal toggle for other sections (Help, Main)
+            if (isCollapsed) {
+                section.classList.remove('sidebar-section-collapsed');
+                section.classList.add('sidebar-section-expanded');
+                header.setAttribute('data-expanded', 'true');
+            } else {
+                section.classList.remove('sidebar-section-expanded');
+                section.classList.add('sidebar-section-collapsed');
+                header.setAttribute('data-expanded', 'false');
+            }
         }
     }
 
@@ -381,12 +439,21 @@
         // Set initial collapsed state for sections
         const adminHeader = document.querySelector('#admin-section').previousElementSibling;
         const helpHeader = document.querySelector('#help-section').previousElementSibling;
+        const mainHeader = document.querySelector('#main-section').previousElementSibling;
         
+        // Admin: collapsed by default
         if (adminHeader) {
             adminHeader.setAttribute('data-expanded', 'false');
         }
+        
+        // Help: expanded by default
         if (helpHeader) {
-            helpHeader.setAttribute('data-expanded', 'false');
+            helpHeader.setAttribute('data-expanded', 'true');
+        }
+        
+        // Main: expanded by default
+        if (mainHeader) {
+            mainHeader.setAttribute('data-expanded', 'true');
         }
 
         // Handle showAIStatus function if it doesn't exist

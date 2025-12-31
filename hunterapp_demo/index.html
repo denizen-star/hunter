@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0; url=/how-to-hunter.html">
     <title>Job Application Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <!-- Google Fonts - Poppins -->
@@ -707,8 +708,18 @@
             font-weight: bold;
         }
     </style>
+    <script>
+        // Redirect to how-to-hunter.html on page load
+        if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+            window.location.replace('/how-to-hunter.html');
+        }
+    </script>
 </head>
 <body>
+    <!-- Redirecting to How to Hunter guide... -->
+    <div style="text-align: center; padding: 50px; font-family: var(--font-family);">
+        <p>Redirecting to <a href="/how-to-hunter.html">How to Hunter?</a>...</p>
+    </div>
     <!-- Shared sidebar is injected by static/js/shared-menu.js -->
     
     <!-- Hero Header -->
