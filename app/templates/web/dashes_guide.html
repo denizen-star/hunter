@@ -277,6 +277,39 @@
             font-weight: 500;
             color: var(--text-secondary);
         }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin: var(--space-lg) 0;
+        }
+        
+        .two-column-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .two-column-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-md);
+            margin-top: var(--space-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .two-column.second-row {
+            background: #f9fafb;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-md);
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -287,13 +320,12 @@
                 <div class="page-header-text">
                     <h1>Dashes Guide</h1>
                     <p>
-                        Learn about Hunter's dashboard pages and when to use each one. Each dashboard provides a different 
-                        view of your job search pipeline and networking contacts to help you stay organized and focused.
+                        Quick guide to Hunter's dashboard pages.
                     </p>
                 </div>
             </div>
             <p style="margin-top: var(--space-md); font-size: 14px; color: var(--text-secondary);">
-                Related guides: <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
+                <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
                 <a href="/tracking-guide" class="guide-link">Tracking Guide</a>
             </p>
         </div>
@@ -301,14 +333,11 @@
         <!-- Overview -->
         <div class="section">
             <h2>Dashboard Overview</h2>
-            <p>
-                Hunter provides four specialized dashboards, each designed for a specific purpose in managing your job search:
-            </p>
             
             <div class="dashboard-grid">
                 <div class="dashboard-card">
                     <h4>📊 App Dash</h4>
-                    <p><strong>Purpose:</strong> Main dashboard for managing all job applications</p>
+                    <p><strong>Purpose:</strong> App Dash for managing all job applications</p>
                     <p><strong>Use When:</strong> Daily application management and status tracking</p>
                     <a href="/dashboard" class="url-link">Open App Dash</a>
                 </div>
@@ -341,48 +370,43 @@
             <h2>App Dash (Application Dashboard)</h2>
             <p><strong>URL:</strong> <a href="/dashboard" class="url-link">/dashboard</a></p>
             
-            <div class="info-box">
-                <p><strong>When to Use:</strong> This is your primary dashboard for daily job application management. Use it daily to track application statuses, sort applications, view match scores, and navigate to application details.</p>
-            </div>
-            
             <h3>Key Features</h3>
             
+            <div class="two-column">
+                <div class="two-column-item">
+                    <h4>Application Cards</h4>
+                    <p>Each application is displayed as a card showing:</p>
+                    <ul>
+                        <li><strong>Company Name:</strong> With match score percentage displayed next to it (e.g., "85%")</li>
+                        <li><strong>Job Title:</strong> Position name with networking contact badge (if applicable)</li>
+                        <li><strong>Flag Button:</strong> Click to mark important applications for quick access via the "Flagged" tab</li>
+                        <li><strong>Achievement Badge:</strong> Icon reward for max accomplished networking badge</li>
+                        <li><strong>Metadata:</strong> Applied Date (📅), Posted Date (📋), Last Updated Date (🔄)</li>
+                        <li><strong>Contact Count:</strong> Shows number of networking contacts (👥) if you have contacts at this company</li>
+                        <li><strong>View Summary Button:</strong> Click to open detailed application summary page</li>
+                    </ul>
+                </div>
+                <div class="two-column-item">
+                    <img src="/static/images/icons/appcard.jpg" alt="Application Card Example">
+                </div>
+            </div>
+            
+            <div class="two-column second-row">
+                <div class="two-column-item">
             <h4>Tabbed Interface</h4>
             <p>The dashboard organizes applications into status tabs:</p>
             <ul class="tab-list">
                 <li>Active (default) - All applications except rejected</li>
-                <li>All - Complete list of all applications</li>
                 <li>Pending - Applications not yet submitted</li>
                 <li>Applied - Submitted applications</li>
                 <li>Contacted - Applications where you've contacted someone</li>
                 <li>Hiring Mgr - Applications where you contacted a hiring manager</li>
                 <li>Interviewed - Applications in interview process</li>
                 <li>Offered - Applications with job offers</li>
-                <li>Rejected - Rejected applications</li>
                 <li>Accepted - Accepted offers</li>
             </ul>
-            <p><strong>Dynamic Counts:</strong> Each tab shows the number of applications in parentheses (e.g., "Applied (15)")</p>
-            
-            <h4>Advanced Sorting</h4>
-            <p>Each tab has independent sorting options. Sort by:</p>
-            <ul>
-                <li><strong>Updated Timestamp:</strong> Newest/Oldest first - see most recently updated applications</li>
-                <li><strong>Applied Timestamp:</strong> Newest/Oldest first - see most recently applied</li>
-                <li><strong>Job Posted Date:</strong> Newest/Oldest first - prioritize fresher job postings</li>
-                <li><strong>Match Percentage:</strong> Highest/Lowest first - focus on best matches or address weaker ones</li>
-            </ul>
-            <p><strong>Independent Sorting:</strong> Each tab remembers its own sort preference. Sort "Applied" by Match % while keeping "Interviewed" sorted by Updated date.</p>
-            
-            <h4>Application Cards</h4>
-            <p>Each application is displayed as a card showing:</p>
-            <ul>
-                <li><strong>Company Name & Job Title</strong></li>
-                <li><strong>Match Score:</strong> Prominently displayed percentage (e.g., "85%")</li>
-                <li><strong>Status Badge:</strong> Color-coded pill showing current status</li>
-                <li><strong>Metadata:</strong> Applied Date, Posted Date (📋 icon), Last Updated Date</li>
-                <li><strong>View Summary Button:</strong> Click to open detailed application summary page</li>
-            </ul>
-            
+                </div>
+                <div class="two-column-item">
             <h4>Statistics Cards</h4>
             <p>Top of dashboard shows quick stats:</p>
             <ul>
@@ -392,24 +416,17 @@
                 <li>Interviewed Count</li>
                 <li>And more status-specific counts</li>
             </ul>
+                    <p><strong>Dynamic Counts:</strong> Each tab shows the number of applications in parentheses (e.g., "Applied (15)")</p>
+                </div>
+            </div>
             
-            <h3>Why Use App Dash?</h3>
+            <h4>Advanced Sorting</h4>
             <ul>
-                <li><strong>Daily Management:</strong> Your go-to page for day-to-day application tracking</li>
-                <li><strong>Quick Navigation:</strong> Fast access to any application via organized tabs</li>
-                <li><strong>Status Focus:</strong> Quickly see what needs attention in each status category</li>
-                <li><strong>Match Score Visibility:</strong> Instantly see which applications have best match scores</li>
-                <li><strong>Flexible Sorting:</strong> Organize applications how you need them for different tasks</li>
+                <li>Updated Timestamp (Newest/Oldest)</li>
+                <li>Applied Timestamp (Newest/Oldest)</li>
+                <li>Job Posted Date (Newest/Oldest)</li>
+                <li>Match Percentage (Highest/Lowest)</li>
             </ul>
-            
-            <h3>How to Use App Dash</h3>
-            <ol>
-                <li><strong>Start with Active Tab:</strong> This shows all in-flight applications (everything except rejected) - your main working view</li>
-                <li><strong>Review Status Tabs:</strong> Check each status tab to see applications in different stages</li>
-                <li><strong>Use Sorting:</strong> Sort by Match % to prioritize high-scoring applications, or by Updated to see what needs attention</li>
-                <li><strong>Click Cards:</strong> Click "View Summary" on any card to see full application details</li>
-                <li><strong>Track Progress:</strong> Move applications through tabs as their status changes</li>
-            </ol>
         </div>
         
         <!-- Network Dash Section -->
@@ -417,71 +434,53 @@
             <h2>Network Dash (Networking Dashboard)</h2>
             <p><strong>URL:</strong> <a href="/networking" class="url-link">/networking</a></p>
             
-            <div class="info-box">
-                <p><strong>When to Use:</strong> Use daily or weekly to manage networking contacts, track relationship progress, identify contacts needing follow-up, and review networking pipeline.</p>
-            </div>
-            
             <h3>Key Features</h3>
             
-            <h4>Status Filters</h4>
-            <p>Filter contacts by their current relationship status:</p>
-            <ul>
-                <li><strong>To Research:</strong> Contacts identified but research not complete</li>
-                <li><strong>Contacted:</strong> Initial outreach sent (LinkedIn connection or email)</li>
-                <li><strong>In Conversation:</strong> Actively exchanging messages</li>
-                <li><strong>Meetings:</strong> Meetings scheduled or completed</li>
-                <li><strong>New Connection:</strong> Successful initial conversation complete</li>
-                <li><strong>Nurture:</strong> Ongoing relationship maintenance</li>
-                <li><strong>Referral Partner:</strong> Strong advocates and referral sources</li>
-                <li><strong>Cold/Archive:</strong> Inactive contacts</li>
+            <div class="two-column">
+                <div class="two-column-item">
+                    <h4>Contact Tiles</h4>
+                    <ul>
+                        <li>Person Name & Company</li>
+                        <li>Job Title</li>
+                        <li>Status Badge</li>
+                        <li>Match Score</li>
+                        <li>Timing Indicator (color-coded border)</li>
+                        <li>Next Step suggestion</li>
+                        <li>View Button</li>
             </ul>
+                </div>
+                <div class="two-column-item">
+                    <img src="/static/images/icons/NetworkCard.jpg" alt="Network Contact Card Example">
+                </div>
+            </div>
             
-            <h4>Timing Filters</h4>
-            <p>Filter by days since last update to identify contacts needing attention:</p>
-            <ul>
-                <li><strong>All:</strong> Show all contacts regardless of timing</li>
-                <li><strong>Recent:</strong> Updated in last 7 days (green border)</li>
-                <li><strong>Needs Activity:</strong> 8-15 days since update (yellow border)</li>
-                <li><strong>Approaching:</strong> 15-30 days since update (yellow border)</li>
-                <li><strong>Overdue:</strong> 30-60 days since update (red border) - for "Contacted" status</li>
-                <li><strong>Nurture:</strong> 60-90 days (blue border) - scheduled future contact</li>
-                <li><strong>Cold:</strong> 90+ days (gray border) - for prospecting statuses</li>
+            <div class="two-column second-row">
+                <div class="two-column-item">
+                    <h4>Status Filters</h4>
+                    <ul>
+                        <li>To Research</li>
+                        <li>Contacted</li>
+                        <li>In Conversation</li>
+                        <li>Meetings</li>
+                        <li>New Connection</li>
+                        <li>Nurture</li>
+                        <li>Referral Partner</li>
+                        <li>Cold/Archive</li>
             </ul>
-            
-            <h4>Contact Tiles</h4>
-            <p>Each contact displayed as a tile showing:</p>
-            <ul>
-                <li><strong>Person Name & Company:</strong> Contact identification</li>
-                <li><strong>Job Title:</strong> Their current position</li>
-                <li><strong>Status Badge:</strong> Current relationship status</li>
-                <li><strong>Match Score:</strong> Skill overlap percentage with your resume</li>
-                <li><strong>Timing Indicator:</strong> Color-coded left border based on days since update</li>
-                <li><strong>Next Step:</strong> Suggested action based on status and timing</li>
-                <li><strong>Dates:</strong> Created date and last updated timestamp</li>
-                <li><strong>View Button:</strong> Click to open full contact summary page</li>
+                </div>
+                <div class="two-column-item">
+                    <h4>Timing Filters</h4>
+                    <ul>
+                        <li>All</li>
+                        <li>Recent (7 days, green)</li>
+                        <li>Needs Activity (8-15 days, yellow)</li>
+                        <li>Approaching (15-30 days, yellow)</li>
+                        <li>Overdue (30-60 days, red)</li>
+                        <li>Nurture (60-90 days, blue)</li>
+                        <li>Cold (90+ days, gray)</li>
             </ul>
-            
-            <h4>Create New Contact</h4>
-            <p>"New Contact" button to quickly add networking contacts from the dashboard.</p>
-            
-            <h3>Why Use Network Dash?</h3>
-            <ul>
-                <li><strong>Relationship Management:</strong> Track all professional relationships in one place</li>
-                <li><strong>Follow-up Tracking:</strong> Timing filters help identify contacts needing attention</li>
-                <li><strong>Status Overview:</strong> Quickly see where each relationship stands</li>
-                <li><strong>Pipeline Management:</strong> Manage networking pipeline similar to job application pipeline</li>
-                <li><strong>Color-Coded Urgency:</strong> Visual indicators show which contacts need immediate attention</li>
-            </ul>
-            
-            <h3>How to Use Network Dash</h3>
-            <ol>
-                <li><strong>Choose Status Filter:</strong> Select the relationship phase you want to focus on</li>
-                <li><strong>Apply Timing Filter:</strong> Use timing filters to find contacts needing follow-up</li>
-                <li><strong>Review Contact Tiles:</strong> Check match scores and next step suggestions</li>
-                <li><strong>Take Action:</strong> Click contacts with overdue timing or high match scores</li>
-                <li><strong>Update Status:</strong> Move contacts through status filters as relationships progress</li>
-                <li><strong>Create New Contacts:</strong> Use "New Contact" button to add contacts from company research</li>
-            </ol>
+                </div>
+            </div>
         </div>
         
         <!-- Progress Dash Section -->
@@ -489,47 +488,24 @@
             <h2>Progress Dash (Progress Dashboard)</h2>
             <p><strong>URL:</strong> <a href="/progress" class="url-link">/progress</a></p>
             
-            <div class="info-box">
-                <p><strong>When to Use:</strong> Use weekly or bi-weekly for strategic pipeline reviews. Perfect for assessing overall progress, identifying bottlenecks, understanding conversion rates between stages, and planning next steps.</p>
-            </div>
-            
             <h3>Key Features</h3>
             
             <h4>Unified Progress View</h4>
-            <p>The Progress Dashboard provides a comprehensive view of your entire job search pipeline, showing:</p>
             <ul>
-                <li><strong>Pipeline Stages:</strong> Visual representation of applications moving through stages</li>
-                <li><strong>Conversion Metrics:</strong> How many applications convert from each stage to the next</li>
-                <li><strong>Bottleneck Identification:</strong> See where applications tend to get stuck</li>
-                <li><strong>Progress Trends:</strong> How your pipeline health changes over time</li>
+                <li>Displays the card views from <strong>App and Network Dash</strong> in one view</li>
+                <li>Pipeline Stages visualization</li>
+                <li>Conversion Metrics</li>
+                <li>Bottleneck Identification</li>
+                <li>Progress Trends</li>
             </ul>
             
             <h4>Stage Analysis</h4>
-            <p>Analyze progress through key stages:</p>
             <ul>
-                <li><strong>Application Submission:</strong> How many applications you've submitted</li>
-                <li><strong>Response Rate:</strong> Percentage receiving company responses</li>
-                <li><strong>Interview Conversion:</strong> How many responses lead to interviews</li>
-                <li><strong>Offer Rate:</strong> Interview-to-offer conversion</li>
+                <li>Application Submission count</li>
+                <li>Response Rate</li>
+                <li>Interview Conversion</li>
+                <li>Offer Rate</li>
             </ul>
-            
-            <h3>Why Use Progress Dash?</h3>
-            <ul>
-                <li><strong>Strategic Planning:</strong> Understand where to focus efforts based on conversion rates</li>
-                <li><strong>Bottleneck Detection:</strong> Identify stages where applications stall</li>
-                <li><strong>Progress Tracking:</strong> See overall health and momentum of your job search</li>
-                <li><strong>Goal Setting:</strong> Set realistic targets based on conversion metrics</li>
-                <li><strong>Weekly Reviews:</strong> Perfect for weekly pipeline health checks</li>
-            </ul>
-            
-            <h3>How to Use Progress Dash</h3>
-            <ol>
-                <li><strong>Review Pipeline Health:</strong> Check overall progress and conversion rates</li>
-                <li><strong>Identify Bottlenecks:</strong> Look for stages with low conversion rates</li>
-                <li><strong>Assess Trends:</strong> See if your pipeline is improving over time</li>
-                <li><strong>Plan Actions:</strong> Use insights to focus efforts on areas needing improvement</li>
-                <li><strong>Set Targets:</strong> Establish goals for each pipeline stage</li>
-            </ol>
         </div>
         
         <!-- Archive Dash Section -->
@@ -537,80 +513,25 @@
             <h2>Archive Dash (Archived Dashboard)</h2>
             <p><strong>URL:</strong> <a href="/archived" class="url-link">/archived</a></p>
             
-            <div class="info-box">
-                <p><strong>When to Use:</strong> Use occasionally to review rejected applications, analyze rejection patterns, or reference past applications. Helps keep main dashboard focused on active opportunities.</p>
-            </div>
-            
             <h3>Key Features</h3>
             
             <h4>Rejected Applications</h4>
-            <p>The Archive Dashboard shows all applications with "Rejected" status, including:</p>
             <ul>
-                <li><strong>Complete Application History:</strong> All rejected applications for reference</li>
-                <li><strong>Same Card View:</strong> Same application cards as main dashboard for consistency</li>
-                <li><strong>Full Details Access:</strong> Can still view full summaries and documents</li>
-                <li><strong>Search & Sort:</strong> Sort and organize archived applications like active ones</li>
+                <li>Complete application history</li>
+                <li>Same card view as App Dash</li>
+                <li>Full details access</li>
+                <li>Search & Sort</li>
             </ul>
-            
-            <h3>Why Use Archive Dash?</h3>
-            <ul>
-                <li><strong>Keep Main Dashboard Clean:</strong> Separates active pipeline from closed opportunities</li>
-                <li><strong>Pattern Analysis:</strong> Review rejections to identify patterns or common issues</li>
-                <li><strong>Historical Reference:</strong> Access past applications and documents when needed</li>
-                <li><strong>Focus on Active:</strong> Main dashboard stays focused on opportunities still in play</li>
-                <li><strong>Learning Opportunities:</strong> Review rejections to improve future applications</li>
-            </ul>
-            
-            <h3>How to Use Archive Dash</h3>
-            <ol>
-                <li><strong>Review Rejections:</strong> Periodically check archived applications</li>
-                <li><strong>Analyze Patterns:</strong> Look for common themes in rejected applications</li>
-                <li><strong>Reference Past Work:</strong> Use archived applications as reference for similar roles</li>
-                <li><strong>Learn & Improve:</strong> Identify what might have led to rejections to improve future applications</li>
-            </ol>
-            
-            <div class="warning-box">
-                <p><strong>Note:</strong> Applications are automatically moved to Archive Dash when their status is set to "Rejected". You don't need to manually archive them.</p>
-            </div>
-        </div>
-        
-        <!-- Dashboard Workflow -->
-        <div class="section">
-            <h2>Dashboard Workflow</h2>
-            
-            <div class="workflow-diagram">
-                <div class="workflow-step">
-                    <h4>Daily: Use App Dash</h4>
-                    <p>Start each day with App Dash to see all active applications. Use the "Active" tab by default to focus on in-flight opportunities. Sort by Updated date to see what needs attention.</p>
-                </div>
-                <div class="workflow-step">
-                    <h4>Daily: Check Network Dash</h4>
-                    <p>Review Network Dash using timing filters to identify contacts needing follow-up. Focus on "Overdue" or "Needs Activity" contacts to maintain relationships.</p>
-                </div>
-                <div class="workflow-step">
-                    <h4>Weekly: Review Progress Dash</h4>
-                    <p>Weekly review of Progress Dash to assess pipeline health, identify bottlenecks, and plan strategic improvements for the coming week.</p>
-                </div>
-                <div class="workflow-step">
-                    <h4>Occasionally: Check Archive Dash</h4>
-                    <p>Periodically review Archive Dash to analyze rejection patterns and learn from past applications.</p>
-                </div>
-            </div>
-            
-            <div class="info-box">
-                <p><strong>Pro Tip:</strong> Set App Dash as your browser homepage or bookmark it. Use Network Dash daily for relationship management. Reserve Progress Dash for strategic weekly reviews. Keep Archive Dash for occasional analysis.</p>
-            </div>
         </div>
         
         <!-- Related Guides -->
         <div class="section">
             <h2>Related Guides</h2>
-            <p>Explore other guides to learn more about using Hunter:</p>
-            <ul>
-                <li><a href="/how-to-hunter" class="guide-link">How to Hunter?</a> - Complete workflow guide for job hunting with Hunter</li>
-                <li><a href="/tracking-guide" class="guide-link">Tracking Guide</a> - Learn about Reports, Analytics, and Daily Activities pages</li>
-                <li><a href="/templating-guide" class="guide-link">Templating Guide</a> - Create and use templates for consistent communication</li>
-            </ul>
+            <p>
+                <a href="/how-to-hunter" class="guide-link">How to Hunter?</a> | 
+                <a href="/tracking-guide" class="guide-link">Tracking Guide</a> | 
+                <a href="/templating-guide" class="guide-link">Templating Guide</a>
+            </p>
         </div>
     </div>
 </body>
