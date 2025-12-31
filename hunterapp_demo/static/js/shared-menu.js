@@ -13,7 +13,7 @@
 
     // Menu configuration
     const mainItems = [
-        { href: '/index.html', label: 'App Dash', icon: 'AppDash.jpg' },
+        { href: '/dashboard.html', label: 'App Dash', icon: 'AppDash.jpg' },
         { href: '/networking.html', label: 'Network Dash', icon: 'NetworkDash.jpg' },
         { href: '/progress.html', label: 'Progress Dash', icon: 'ProgressDash.png' },
         { href: '/reports.html', label: 'Reports', icon: 'Reports.png' },
@@ -54,14 +54,14 @@
 
         // Check for partial matches (e.g., /applications/* should highlight dashboard)
         if (path.startsWith('/applications/')) {
-            return '/index.html';
+            return '/dashboard.html';
         }
         if (path.startsWith('/networking/')) {
             return '/networking.html';
         }
-        // Handle root path
-        if (path === '/' || path === '/index.html') {
-            return '/index.html';
+        // Handle root path and index.html (both redirect to dashboard)
+        if (path === '/' || path === '/index.html' || path === '/dashboard.html') {
+            return '/dashboard.html';
         }
 
         return path;
