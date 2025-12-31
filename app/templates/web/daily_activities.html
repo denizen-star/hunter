@@ -76,8 +76,14 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             gap: 8px;
+        }
+        
+        .hero-header-top .button-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
         
         .hero-header-content {
@@ -87,7 +93,8 @@
             flex: 1;
         }
         
-        .print-button {
+        .print-button,
+        .send-digest-button {
             background: var(--accent-blue);
             color: #ffffff;
             border: none;
@@ -103,12 +110,25 @@
             font-family: var(--font-family);
         }
         
-        .print-button:hover {
+        .print-button:hover,
+        .send-digest-button:hover {
             background: var(--accent-blue-hover);
         }
         
-        .print-button:active {
+        .print-button:active,
+        .send-digest-button:active {
             transform: translateY(1px);
+        }
+        
+        .send-digest-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .hero-header-top .button-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
         
         .back-link {
@@ -626,12 +646,20 @@
                     </div>
                 </div>
             </div>
-            <button class="print-button" onclick="window.print()" title="Print this page">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                </svg>
-                Print
-            </button>
+            <div class="button-group">
+                <button class="send-digest-button" id="send-digest-btn" onclick="sendDigest()" title="Generate and send daily digest">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Send Digest
+                </button>
+                <button class="print-button" onclick="window.print()" title="Print this page">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    Print
+                </button>
+            </div>
         </div>
         <div class="hero-header-search-row">
             <div class="search-filter-container" style="position: relative; min-width: 250px;">
@@ -662,6 +690,73 @@
         </div>
     </div>
     
+    <script>
+        async function sendDigest() {
+            const btn = document.getElementById('send-digest-btn');
+            const originalText = btn.innerHTML;
+            
+            // Disable button and show loading state
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Generating...
+            `;
+            
+            try {
+                const response = await fetch('/api/digest/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    btn.innerHTML = `
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Sent!
+                    `;
+                    btn.style.background = '#10b981';
+                    
+                    // Show success message
+                    if (data.message) {
+                        alert(data.message);
+                    }
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Failed to generate digest');
+                }
+            } catch (error) {
+                console.error('Error generating digest:', error);
+                btn.innerHTML = `
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Error
+                `;
+                btn.style.background = '#ef4444';
+                alert('Error generating digest: ' + error.message);
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                }, 3000);
+            }
+        }
+    </script>
     <script>
         let allActivities = [];
         let companies = [];
@@ -1075,6 +1170,72 @@
                 
             } catch (error) {
                 console.error('AI Status Error:', error);
+            }
+        }
+        
+        async function sendDigest() {
+            const btn = document.getElementById('send-digest-btn');
+            const originalText = btn.innerHTML;
+            
+            // Disable button and show loading state
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Generating...
+            `;
+            
+            try {
+                const response = await fetch('/api/digest/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    btn.innerHTML = `
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Sent!
+                    `;
+                    btn.style.background = '#10b981';
+                    
+                    // Show success message
+                    if (data.message) {
+                        alert(data.message);
+                    }
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                    }, 3000);
+                } else {
+                    throw new Error(data.error || 'Failed to generate digest');
+                }
+            } catch (error) {
+                console.error('Error generating digest:', error);
+                btn.innerHTML = `
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Error
+                `;
+                btn.style.background = '#ef4444';
+                alert('Error generating digest: ' + error.message);
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                }, 3000);
             }
         }
     </script>
