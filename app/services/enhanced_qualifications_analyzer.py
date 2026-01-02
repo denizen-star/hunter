@@ -56,11 +56,12 @@ class EnhancedQualificationsAnalyzer:
         preliminary_analysis = self.preliminary_matcher.generate_preliminary_analysis(job_description)
         
         # Step 2: Create focused AI prompt based on preliminary results
-        print("🤖 Creating focused AI analysis prompt...")
+        from app.utils.message_logger import log_message
+        log_message(46, "🤖 Creating focused AI analysis prompt...")
         ai_context = self.preliminary_matcher.create_ai_prompt_context(job_description, preliminary_analysis)
         
         # Step 3: Run AI analysis with focused prompt
-        print("🧠 Running AI analysis with preliminary context...")
+        log_message(47, "🧠 Running AI analysis with preliminary context...")
         ai_analysis = self._run_focused_ai_analysis(
             job_description, 
             resume_content, 
@@ -458,8 +459,9 @@ if __name__ == "__main__":
     """
     
     result = analyzer.analyze_qualifications_enhanced(sample_job, sample_resume)
-    print(f"Enhanced Analysis Complete!")
-    print(f"Match Score: {result.match_score}%")
-    print(f"Strong Matches: {len(result.strong_matches)}")
-    print(f"Missing Skills: {len(result.missing_skills)}")
-    print(f"Recommendations: {len(result.recommendations)}")
+    from app.utils.message_logger import log_message
+    log_message(80, f"Enhanced Analysis Complete!")
+    log_message(81, f"Match Score: {result.match_score}%")
+    log_message(82, f"Strong Matches: {len(result.strong_matches)}")
+    log_message(83, f"Missing Skills: {len(result.missing_skills)}")
+    log_message(84, f"Recommendations: {len(result.recommendations)}")

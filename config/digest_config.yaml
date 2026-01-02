@@ -1,0 +1,17 @@
+# Daily Digest Configuration
+
+# Email settings (optional)
+email:
+  enabled: false  # Set to true to enable email delivery
+  smtp_server: smtp.gmail.com
+  smtp_port: 587
+  sender_email: ""  # Your email address
+  sender_password: ""  # Your email password or app-specific password
+  recipient_email: ""  # Where to send the digest
+  subject: "Daily Job Hunt Digest"
+
+# Output options
+output:
+  include_skills_analysis: false  # Set to true to include skills gap analysis (slower)
+  include_full_analytics: true  # Include full analytics metrics
+

@@ -26,9 +26,10 @@ class AIAnalyzer:
         self.tech_extractor = SimpleTechExtractor()  # Initialize simple tech extractor
         
         # Initialize enhanced analyzer if available
+        from app.utils.message_logger import log_message
         if ENHANCED_ANALYZER_AVAILABLE:
             self.enhanced_analyzer = EnhancedQualificationsAnalyzer()
-            print("✅ Enhanced Qualifications Analyzer loaded - using preliminary matching + focused AI analysis")
+            log_message(27, "✅ Enhanced Qualifications Analyzer loaded - using preliminary matching + focused AI analysis")
         else:
             self.enhanced_analyzer = None
             print("⚠️ Enhanced Qualifications Analyzer not available - using standard AI analysis")

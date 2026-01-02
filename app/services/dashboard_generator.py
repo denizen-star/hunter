@@ -98,6 +98,9 @@ class DashboardGenerator:
         """Generate the main dashboard HTML page."""
         applications = self.job_processor.list_all_applications()
         
+        # Filter out rejected applications (they should only appear in archived dashboard)
+        applications = [app for app in applications if not self._status_matches(app.status, 'rejected')]
+        
         # Load contacts once for all cards (performance optimization)
         contacts_cache = self._load_contacts_cache()
         
@@ -110,7 +113,16 @@ class DashboardGenerator:
     
     def generate_archived_dashboard(self) -> None:
         """Generate the archived applications dashboard HTML page."""
-        applications = self.job_processor.list_archived_applications()
+        # Get applications from archived directory
+        archived_apps = self.job_processor.list_archived_applications()
+        
+        # Also get rejected applications from main applications directory
+        all_apps = self.job_processor.list_all_applications()
+        rejected_apps = [app for app in all_apps if self._status_matches(app.status, 'rejected')]
+        
+        # Combine both lists (avoid duplicates by checking IDs)
+        archived_ids = {app.id for app in archived_apps}
+        applications = archived_apps + [app for app in rejected_apps if app.id not in archived_ids]
         
         # Archive dash doesn't need contact counts, so skip loading contacts for performance
         html = self._create_dashboard_html(applications, is_archived=True, contacts_cache=None, skip_notes=True)
@@ -123,6 +135,9 @@ class DashboardGenerator:
     def generate_progress_dashboard(self) -> None:
         """Generate the progress dashboard HTML page"""
         applications = self.job_processor.list_all_applications()
+        
+        # Filter out rejected applications (they should only appear in archived dashboard)
+        applications = [app for app in applications if not self._status_matches(app.status, 'rejected')]
         
         # Load contacts once for all cards (performance optimization)
         contacts_cache = self._load_contacts_cache()

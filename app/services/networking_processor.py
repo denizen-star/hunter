@@ -171,7 +171,8 @@ class NetworkingProcessor:
         except Exception as e:
             print(f"Warning: Could not log networking contact creation activity: {e}")
         
-        print(f"✓ Created networking contact: {person_name} at {company_name}")
+        from app.utils.message_logger import log_message
+        log_message(32, f"✓ Created networking contact: {person_name} at {company_name}")
         return contact
     
     def list_all_contacts(self) -> List[NetworkingContact]:
@@ -424,7 +425,8 @@ class NetworkingProcessor:
                     messages,
                     research_content
                 )
-                print(f"✓ Regenerated contact summary with updated badges")
+                from app.utils.message_logger import log_message
+                log_message(34, f"✓ Regenerated contact summary with updated badges")
         except Exception as e:
             print(f"Warning: Could not regenerate contact summary: {e}")
             import traceback
@@ -444,7 +446,8 @@ class NetworkingProcessor:
         except Exception as e:
             print(f"Warning: Could not log networking status change activity: {e}")
         
-        print(f"✓ Updated contact status to: {status}")
+        from app.utils.message_logger import log_message
+        log_message(33, f"✓ Updated contact status to: {status}")
     
     def update_contact_details(
         self,

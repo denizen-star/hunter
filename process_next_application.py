@@ -138,7 +138,8 @@ def process_application(app_id, company, job_title, job_url=None):
     print(f"📋 Application loaded: {application.company} - {application.job_title}")
     
     # 1. Generate structured research section
-    print("\n1️⃣ Generating Research Section...")
+    from app.utils.message_logger import log_message
+    log_message(87, "\n1️⃣ Generating Research Section...")
     research_path = generate_structured_research(
         application.folder_path, 
         company, 
@@ -156,7 +157,8 @@ def process_application(app_id, company, job_title, job_url=None):
         return False
     
     # 2. Generate hiring manager intro messages
-    print("\n2️⃣ Generating Hiring Manager Intro Messages...")
+    from app.utils.message_logger import log_message
+    log_message(88, "\n2️⃣ Generating Hiring Manager Intro Messages...")
     try:
         # Load qualifications for intro message generation
         if application.qualifications_path and Path(application.qualifications_path).exists():

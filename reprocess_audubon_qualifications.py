@@ -16,7 +16,8 @@ from app.services.resume_manager import ResumeManager
 
 def reprocess_audubon_qualifications():
     """Regenerate qualifications analysis for Audubon application"""
-    print("🔄 Regenerating qualifications for National Audubon Society application...")
+    from app.utils.message_logger import log_message
+    log_message(89, "🔄 Regenerating qualifications for National Audubon Society application...")
     print("=" * 80)
     
     # Initialize services
@@ -37,7 +38,8 @@ def reprocess_audubon_qualifications():
         print("❌ National Audubon Society application not found!")
         return False
     
-    print(f"✓ Found application: {audubon_app.company} - {audubon_app.job_title}")
+    from app.utils.message_logger import log_message
+    log_message(90, f"✓ Found application: {audubon_app.company} - {audubon_app.job_title}")
     print(f"  Folder: {audubon_app.folder_path}")
     
     # Load job description and resume
@@ -48,11 +50,11 @@ def reprocess_audubon_qualifications():
     job_description = read_text_file(audubon_app.job_description_path)
     resume = resume_manager.get_resume_for_job(audubon_app)
     
-    print(f"✓ Loaded job description ({len(job_description)} characters)")
-    print(f"✓ Loaded resume ({len(resume.content)} characters)")
+    log_message(91, f"✓ Loaded job description ({len(job_description)} characters)")
+    log_message(92, f"✓ Loaded resume ({len(resume.content)} characters)")
     
     # Regenerate qualifications analysis
-    print("\n📊 Regenerating qualifications analysis with Job Engine V2...")
+    log_message(93, "\n📊 Regenerating qualifications analysis with Job Engine V2...")
     print("   (This will use the updated matching logic with critical requirements checking)")
     
     try:
@@ -69,13 +71,14 @@ def reprocess_audubon_qualifications():
         print(f"   Missing Skills: {len(qualifications.missing_skills)}")
         
         # Regenerate summary page with new qualifications
-        print("\n📄 Regenerating summary page...")
+        from app.utils.message_logger import log_message
+        log_message(95, "\n📄 Regenerating summary page...")
         doc_generator.generate_summary_page(audubon_app, qualifications)
-        print("✅ Summary page regenerated!")
+        log_message(96, "✅ Summary page regenerated!")
         
         # Update application metadata
         job_processor._save_application_metadata(audubon_app)
-        print("✅ Application metadata updated!")
+        log_message(97, "✅ Application metadata updated!")
         
         print("\n" + "=" * 80)
         print("🎉 Reprocessing complete!")

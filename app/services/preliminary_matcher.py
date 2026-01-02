@@ -460,12 +460,21 @@ class PreliminaryMatcher:
         if not config.get('console_logging', True):
             return
         
+        from app.utils.message_logger import log_message
         print("🚀 Job Engine V2 Active")
         phases = config.get('phases', {})
         for phase_key, phase_config in phases.items():
             status = "✅" if phase_config.get('enabled', False) else "❌"
             desc = phase_config.get('description', phase_key)
-            print(f"   {desc}: {status}")
+            # Map phase descriptions to message IDs
+            message_id = None
+            if 'Frequency Analysis' in desc:
+                message_id = 51
+            elif 'Critical Requirements' in desc:
+                message_id = 52
+            elif 'Hard Skills' in desc:
+                message_id = 53
+            log_message(message_id, f"   {desc}: {status}")
     
     def _extract_job_skills_v1(self, job_description: str) -> List[str]:
         """Extract skills using Job Engine V1 (legacy method) - extracted for fallback"""
@@ -931,24 +940,25 @@ class PreliminaryMatcher:
         job_desc_lower = job_description.lower()
         
         # NEW: Step 2c.0 - Frequency Analysis (Word Cloud) - Phase 1.1
+        from app.utils.message_logger import log_message
         frequent_skills = {}
         if v2_config.get('phases', {}).get('phase_1_frequency_analysis', {}).get('enabled', False):
             if v2_config.get('console_logging', True):
-                print("📊 Job Engine V2 - Phase 1.1: Frequency Analysis active")
+                log_message(67, "📊 Job Engine V2 - Phase 1.1: Frequency Analysis active")
             frequent_skills = self._extract_frequent_skills(job_description)
         
         # NEW: Step 2c.1 - Critical Requirements (Highlighting, not blocking) - Phase 1.2
         critical_requirements = {}
         if v2_config.get('phases', {}).get('phase_1_critical_requirements', {}).get('enabled', False):
             if v2_config.get('console_logging', True):
-                print("🎯 Job Engine V2 - Phase 1.2: Critical Requirements Highlighting active")
+                log_message(68, "🎯 Job Engine V2 - Phase 1.2: Critical Requirements Highlighting active")
             critical_requirements = self._identify_critical_requirements(job_description)
         
         # NEW: Step 2c.2 - Hard Skills from Sections - Phase 2.1
         hard_skills = []
         if v2_config.get('phases', {}).get('phase_2_hard_skills', {}).get('enabled', False):
             if v2_config.get('console_logging', True):
-                print("🔧 Job Engine V2 - Phase 2.1: Hard Skills Extraction active")
+                log_message(69, "🔧 Job Engine V2 - Phase 2.1: Hard Skills Extraction active")
             hard_skills = self._extract_hard_skills_from_sections(job_description)
         
         # Continue with existing V1 logic (always run for compatibility)
@@ -1733,9 +1743,10 @@ if __name__ == "__main__":
     - Business intelligence tools like Tableau
     """
     
+    from app.utils.message_logger import log_message
     analysis = matcher.generate_preliminary_analysis(sample_job)
-    print("Preliminary Analysis Results:")
-    print(f"Match Score: {analysis['preliminary_match_score']}%")
-    print(f"Exact Matches: {len(analysis['exact_matches'])}")
-    print(f"Partial Matches: {len(analysis['partial_matches'])}")
-    print(f"AI Focus Areas: {analysis['ai_focus_areas']}")
+    log_message(75, "Preliminary Analysis Results:")
+    log_message(76, f"Match Score: {analysis['preliminary_match_score']}%")
+    log_message(77, f"Exact Matches: {len(analysis['exact_matches'])}")
+    log_message(78, f"Partial Matches: {len(analysis['partial_matches'])}")
+    log_message(79, f"AI Focus Areas: {analysis['ai_focus_areas']}")

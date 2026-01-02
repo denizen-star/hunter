@@ -32,18 +32,19 @@ class DocumentGenerator:
         )
         
         # 2. Generate company research
-        print("  → Generating company research...")
+        from app.utils.message_logger import log_message
+        log_message(37, "  → Generating company research...")
         self.generate_research(application)
         
         # 3. Generate cover letter
-        print("  → Generating cover letter...")
+        log_message(38, "  → Generating cover letter...")
         self.generate_cover_letter(application, qualifications, resume.full_name)
         
         # 3.5. Intro messages (deferred) - generated on demand from the Cover Letter tab
-        print("  → Skipping intro messages (deferred; generate from Cover Letter tab if needed)")
+        log_message(39, "  → Skipping intro messages (deferred; generate from Cover Letter tab if needed)")
         
         # 4. Customized resume (deferred) - generated on demand from the Resume tab
-        print("  → Skipping customized resume (deferred; generate from Resume tab if needed)")
+        log_message(40, "  → Skipping customized resume (deferred; generate from Resume tab if needed)")
         
         # 5. Generate summary HTML page
         print("  → Generating summary page...")
@@ -192,7 +193,8 @@ class DocumentGenerator:
         cover_letter = re.sub(r'[ ]{2,}', ' ', cover_letter)
         
         # Scan and improve the cover letter: fix grammar and remove repetitive phrases
-        print("  → Scanning cover letter for grammar and repetitive phrases...")
+        from app.utils.message_logger import log_message
+        log_message(42, "  → Scanning cover letter for grammar and repetitive phrases...")
         cover_letter = self.ai_analyzer.scan_and_improve_cover_letter(cover_letter)
         
         # Save to file
@@ -290,7 +292,8 @@ IMPORTANT:
 Format this as a professional research document that demonstrates thorough preparation and genuine interest in {application.company} specifically."""
 
             # Generate research content using AI
-            print(f"  🤖 Generating structured research for {application.company}...")
+            from app.utils.message_logger import log_message
+            log_message(43, f"  🤖 Generating structured research for {application.company}...")
             research_content = self.ai_analyzer._call_ollama(research_prompt)
             
             # Save to file
@@ -301,7 +304,8 @@ Format this as a professional research document that demonstrates thorough prepa
             
             write_text_file(research_content, research_path)
             application.research_path = research_path
-            print(f"  ✅ Research file generated: {research_path}")
+            from app.utils.message_logger import log_message
+            log_message(26, f"  ✅ Research file generated: {research_path}")
             
         except Exception as e:
             print(f"  ❌ Error generating research file: {e}")
@@ -429,10 +433,11 @@ Format this as a professional research document that demonstrates thorough prepa
             )
             
             # Save summary - reuse existing file if it exists, otherwise create new one
+            from app.utils.message_logger import log_message
             if application.summary_path and Path(application.summary_path).exists():
                 # Update existing summary file
                 summary_path = Path(application.summary_path)
-                print(f"✓ Updating existing summary page: {summary_path.name}")
+                log_message(30, f"✓ Updating existing summary page: {summary_path.name}")
             else:
                 # Create new summary file with timestamp
                 timestamp = format_datetime_for_filename()
@@ -441,7 +446,7 @@ Format this as a professional research document that demonstrates thorough prepa
                 
                 summary_filename = f"{timestamp}-Summary-{company_clean}-{job_title_clean}.html"
                 summary_path = application.folder_path / summary_filename
-                print(f"✓ Creating new summary page: {summary_filename}")
+                log_message(31, f"✓ Creating new summary page: {summary_filename}")
             
             write_text_file(summary_html, summary_path)
             application.summary_path = summary_path
@@ -1515,8 +1520,9 @@ Format this as a professional research document that demonstrates thorough prepa
         """Generate HTML for company research section"""
         try:
             # If application has a research_path, read from that file instead of generating new research
+            from app.utils.message_logger import log_message
             if application and hasattr(application, 'research_path') and application.research_path and Path(application.research_path).exists():
-                print(f"📖 Reading AI-generated research from: {application.research_path}")
+                log_message(44, f"📖 Reading AI-generated research from: {application.research_path}")
                 research_content = read_text_file(application.research_path)
                 return self._convert_markdown_research_to_html(research_content)
             
@@ -1865,7 +1871,8 @@ Format this as a professional research document that demonstrates thorough prepa
                 # research_data['website'] = f"https://www.{company_clean}.com"
             
         except Exception as e:
-            print(f"Error in company research: {e}")
+            from app.utils.message_logger import log_message
+            log_message(57, f"Error in company research: {e}")
             import traceback
             traceback.print_exc()
             # Fall back to placeholder data if search fails
@@ -1906,7 +1913,8 @@ Format this as a professional research document that demonstrates thorough prepa
             - Focus on factual, verifiable information
             """
             
-            print(f"🔍 Generating comprehensive research for {company_name}...")
+            from app.utils.message_logger import log_message
+            log_message(54, f"🔍 Generating comprehensive research for {company_name}...")
             
             # Get AI research response
             research_response = ai_analyzer._call_ollama(research_prompt, system_prompt="You are a company research specialist. Provide accurate, specific information about companies. If you don't know specific details, say 'Information not readily available' rather than making up generic content.")
@@ -2056,7 +2064,8 @@ Format this as a professional research document that demonstrates thorough prepa
     def _get_company_news(self, company_name: str) -> list:
         """Get latest news about the company using real web search"""
         try:
-            print(f"🔍 Searching for real news about {company_name}...")
+            from app.utils.message_logger import log_message
+            log_message(55, f"🔍 Searching for real news about {company_name}...")
             
             # Perform actual web search for company news
             search_query = f"{company_name} latest news 2024 financial business"
@@ -2074,9 +2083,10 @@ Format this as a professional research document that demonstrates thorough prepa
                     data = response.json()
                     
                     # Parse DuckDuckGo results
+                    from app.utils.message_logger import log_message
                     news_items = self._parse_duckduckgo_results(data, company_name)
                     if news_items:
-                        print(f"✅ Found {len(news_items)} news items for {company_name}")
+                        log_message(28, f"✅ Found {len(news_items)} news items for {company_name}")
                         return news_items
                 
                 # If DuckDuckGo doesn't work, try a different approach
@@ -2216,7 +2226,8 @@ Format this as a professional research document that demonstrates thorough prepa
     def _get_company_personnel(self, company_name: str) -> list:
         """Get key personnel with data-related titles using real web search"""
         try:
-            print(f"🔍 Searching for key personnel at {company_name}...")
+            from app.utils.message_logger import log_message
+            log_message(56, f"🔍 Searching for key personnel at {company_name}...")
             
             # Perform actual web search for company personnel
             search_query = f"{company_name} executives leadership team CEO CTO Chief Data Officer"
@@ -2233,9 +2244,10 @@ Format this as a professional research document that demonstrates thorough prepa
                     data = response.json()
                     
                     # Parse DuckDuckGo results for personnel
+                    from app.utils.message_logger import log_message
                     personnel = self._parse_duckduckgo_personnel_results(data, company_name)
                     if personnel:
-                        print(f"✅ Found {len(personnel)} key personnel for {company_name}")
+                        log_message(29, f"✅ Found {len(personnel)} key personnel for {company_name}")
                         return personnel
                 
                 # If DuckDuckGo doesn't work, use fallback

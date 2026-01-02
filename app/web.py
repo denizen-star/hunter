@@ -344,11 +344,21 @@ def recent_applications():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+def _is_rejected_status(status: str) -> bool:
+    """Check if a status indicates the application was rejected"""
+    if not status:
+        return False
+    normalized = normalize_status_label(status)
+    return normalized == 'rejected'
+
 @app.route('/api/applications', methods=['GET'])
 def get_all_applications():
     """Get all applications for dashboard cards"""
     try:
         applications = job_processor.list_all_applications()
+        
+        # Filter out rejected applications (they should only appear in archived dashboard)
+        applications = [app for app in applications if not _is_rejected_status(app.status)]
         
         # Filter by flagged status if requested
         flagged_filter = request.args.get('flagged', '').lower()
@@ -700,6 +710,9 @@ def list_applications():
     """List all applications"""
     try:
         applications = job_processor.list_all_applications()
+        
+        # Filter out rejected applications (they should only appear in archived dashboard)
+        applications = [app for app in applications if not _is_rejected_status(app.status)]
         
         app_list = []
         for app in applications:
@@ -2518,6 +2531,51 @@ def get_daily_activities():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/digest/generate', methods=['POST'])
+def generate_digest():
+    """Generate daily digest and optionally send via email"""
+    try:
+        import sys
+        from pathlib import Path
+        
+        # Import the digest generator
+        sys.path.insert(0, str(get_project_root()))
+        from scripts.generate_daily_digest import DailyDigestGenerator
+        
+        # Initialize generator
+        generator = DailyDigestGenerator()
+        
+        # Generate digest for today
+        digest_path = generator.generate_digest()
+        
+        # Try to send email if configured
+        email_sent = False
+        email_message = ""
+        try:
+            email_sent = generator.send_email(digest_path)
+            if email_sent:
+                email_message = "Digest generated and emailed successfully."
+            else:
+                email_message = "Digest generated. Email not configured or disabled."
+        except Exception as e:
+            email_message = f"Digest generated. Email failed: {str(e)}"
+        
+        return jsonify({
+            'success': True,
+            'message': email_message or 'Digest generated successfully.',
+            'digest_path': str(digest_path),
+            'email_sent': email_sent
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/templates', methods=['GET'])
 def get_templates():
