@@ -3442,40 +3442,89 @@ Format this as a professional research document that demonstrates thorough prepa
             border-color: #d1d5db;
         }}
         
-        /* Pill-styled dropdowns for application status update form */
-        #statusUpdateForm #new_status,
-        #statusUpdateForm #template_selector {{
+        /* Minimalist dropdowns for application status update form */
+        .dropdown-minimal {{
+            position: relative;
+            display: inline-block;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select {{
             width: auto;
             max-width: fit-content;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 16px;
-            border-radius: 20px;
+            padding: 2px 30px 2px 0;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: transparent;
+            border-radius: 0;
             font-size: 11px;
             height: 20px;
-            border: 0.5px solid #d1d5db;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all 0.2s ease;
+            box-shadow: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            transition: all 0.3s ease;
         }}
         
-        #statusUpdateForm #new_status:hover,
-        #statusUpdateForm #template_selector:hover {{
-            border-color: #9ca3af;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        #statusUpdateForm .dropdown-minimal select:hover {{
+            border-bottom-color: #6699ff;
         }}
         
-        #statusUpdateForm #new_status:focus,
-        #statusUpdateForm #template_selector:focus {{
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+        #statusUpdateForm .dropdown-minimal select:focus {{
+            border-bottom-color: #6699ff;
             outline: none;
+            box-shadow: none;
         }}
         
         #statusUpdateForm label[for="new_status"],
         #statusUpdateForm label[for="template_selector"] {{
-            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+            margin-right: 8px;
+            white-space: nowrap;
             line-height: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal {{
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }}
+        
+        /* Position Copy button at top right of notes editor */
+        #statusUpdateForm div[style*="position: relative"] {{
+            position: relative;
+        }}
+        
+        #statusUpdateForm #status_notes {{
+            padding-right: 80px;
+        }}
+        
+        #statusUpdateForm #status_notes .ql-editor {{
+            padding-right: 80px;
+        }}
+        
+        /* Copy button styling */
+        .copy-btn {{
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }}
+        
+        .copy-btn:hover {{
+            background: #f3f4f6;
         }}
         
         .btn-primary {{
@@ -4734,31 +4783,34 @@ Format this as a professional research document that demonstrates thorough prepa
             <!-- Update Status Form -->
             <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
                 <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
-                    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <label for="new_status" style="display: inline-block; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #333;">Status:</label>
-                        <select id="new_status" required>
-                            <option value="">-- Select Status --</option>
-                            <option value="Pending">⏳ Pending</option>
-                            <option value="Applied">✉️ Applied</option>
-                            <option value="Contacted Someone">👥 Contacted Someone</option>
-                            <option value="Company Response">🏢 Company Response</option>
-                            <option value="Scheduled Interview">🗓️ Scheduled Interview</option>
-                            <option value="Interview Notes">📝 Interview Notes</option>
-                            <option value="Interview - Follow Up">🔁 Interview - Follow Up</option>
-                            <option value="Offered">🎉 Offered</option>
-                            <option value="Rejected">❌ Rejected</option>
-                            <option value="Accepted">✅ Accepted</option>
-                        </select>
+                    <div style="margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <label for="new_status" style="margin: 0; padding: 0; white-space: nowrap; font-weight: 600; color: #333; line-height: 20px;">Status:</label>
+                        <div class="dropdown-minimal" style="margin: 0;">
+                            <select id="new_status" required>
+                                <option value="">-- Select Status --</option>
+                                <option value="Pending">⏳ Pending</option>
+                                <option value="Applied">✉️ Applied</option>
+                                <option value="Contacted Someone">👥 Contacted Someone</option>
+                                <option value="Company Response">🏢 Company Response</option>
+                                <option value="Scheduled Interview">🗓️ Scheduled Interview</option>
+                                <option value="Interview Notes">📝 Interview Notes</option>
+                                <option value="Interview - Follow Up">🔁 Interview - Follow Up</option>
+                                <option value="Offered">🎉 Offered</option>
+                                <option value="Rejected">❌ Rejected</option>
+                                <option value="Accepted">✅ Accepted</option>
+                            </select>
+                        </div>
                         
-                        <label for="template_selector" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #333;">Template:</label>
-                        <select id="template_selector">
-                            <option value="">-- Select Template --</option>
-                        </select>
-                        
-                        <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Copy</button>
+                        <label for="template_selector" style="margin: 0; padding: 0; white-space: nowrap; font-weight: 600; color: #333; line-height: 20px;">Template:</label>
+                        <div class="dropdown-minimal" style="margin: 0;">
+                            <select id="template_selector">
+                                <option value="">-- Select Template --</option>
+                            </select>
+                        </div>
                     </div>
                     
-                    <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 15px; position: relative;">
+                        <button type="button" onclick="copyStatusNotes(this)" class="copy-btn" style="position: absolute; top: 0; right: 0; z-index: 10;">Copy Notes</button>
                         <div id="status_notes" placeholder="Add notes about this status update..."></div>
                     </div>
                     

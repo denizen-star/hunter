@@ -712,41 +712,63 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0;
+            gap: 12px;
+            row-gap: 12px;
         }}
         
-        #statusUpdateForm > div.form-group:first-child > * {{
-            vertical-align: middle;
+        #statusUpdateForm > div.form-group:first-child label {{
+            margin: 0;
+            padding: 0;
+            margin-right: 8px;
+            white-space: nowrap;
+            line-height: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
         }}
         
-        /* Pill-styled dropdowns for status update form */
-        #statusUpdateForm #status,
-        #statusUpdateForm #messageTemplate {{
+        #statusUpdateForm > div.form-group:first-child .dropdown-minimal {{
+            margin: 0;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }}
+        
+        /* Minimalist dropdowns for status update form */
+        .dropdown-minimal {{
+            position: relative;
+            display: inline-block;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select {{
             width: auto;
             max-width: fit-content;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 16px;
-            border-radius: 20px;
+            padding: 2px 30px 2px 0;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: transparent;
+            border-radius: 0;
             font-size: 11px;
             height: 20px;
-            border: 0.5px solid #d1d5db;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all 0.2s ease;
+            box-shadow: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            transition: all 0.3s ease;
         }}
         
-        #statusUpdateForm #status:hover,
-        #statusUpdateForm #messageTemplate:hover {{
-            border-color: #9ca3af;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        #statusUpdateForm .dropdown-minimal select:hover {{
+            border-bottom-color: #6699ff;
         }}
         
-        #statusUpdateForm #status:focus,
-        #statusUpdateForm #messageTemplate:focus {{
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+        #statusUpdateForm .dropdown-minimal select:focus {{
+            border-bottom-color: #6699ff;
             outline: none;
+            box-shadow: none;
         }}
         
         .btn {{
@@ -1121,35 +1143,39 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                 
                 <form id="statusUpdateForm">
                     <div class="form-group">
-                        <label for="status" style="display: inline-block; margin-right: 12px; vertical-align: middle;">Select Status</label>
-                        <select id="status" name="status" required>
-                            <option value="">-- Select Status --</option>
-                            <optgroup label="Prospecting">
-                                <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
-                                <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
-                            </optgroup>
-                            <optgroup label="Outreach">
-                                <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
-                                <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
-                                <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
-                            </optgroup>
-                            <optgroup label="Engagement">
-                                <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
-                                <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
-                                <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
-                            </optgroup>
-                            <optgroup label="Nurture">
-                                <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
-                                <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
-                                <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
-                            </optgroup>
-                        </select>
+                        <label for="status">Select Status</label>
+                        <div class="dropdown-minimal">
+                            <select id="status" name="status" required>
+                                <option value="">-- Select Status --</option>
+                                <optgroup label="Prospecting">
+                                    <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
+                                    <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
+                                </optgroup>
+                                <optgroup label="Outreach">
+                                    <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
+                                    <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
+                                    <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
+                                </optgroup>
+                                <optgroup label="Engagement">
+                                    <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
+                                    <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
+                                    <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
+                                </optgroup>
+                                <optgroup label="Nurture">
+                                    <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
+                                    <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
+                                    <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
+                                </optgroup>
+                            </select>
+                        </div>
                         
                         <!-- Message Templates Dropdown -->
-                        <label for="messageTemplate" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
-                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
-                            <option value="">-- Select a Message Template --</option>
-                        </select>
+                        <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
+                        <div class="dropdown-minimal">
+                            <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                                <option value="">-- Select a Message Template --</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -2522,41 +2548,63 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0;
+            gap: 12px;
+            row-gap: 12px;
         }}
         
-        #statusUpdateForm > div.form-group:first-child > * {{
-            vertical-align: middle;
+        #statusUpdateForm > div.form-group:first-child label {{
+            margin: 0;
+            padding: 0;
+            margin-right: 8px;
+            white-space: nowrap;
+            line-height: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
         }}
         
-        /* Pill-styled dropdowns for status update form */
-        #statusUpdateForm #status,
-        #statusUpdateForm #messageTemplate {{
+        #statusUpdateForm > div.form-group:first-child .dropdown-minimal {{
+            margin: 0;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }}
+        
+        /* Minimalist dropdowns for status update form */
+        .dropdown-minimal {{
+            position: relative;
+            display: inline-block;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select {{
             width: auto;
             max-width: fit-content;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 16px;
-            border-radius: 20px;
+            padding: 2px 30px 2px 0;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: transparent;
+            border-radius: 0;
             font-size: 11px;
             height: 20px;
-            border: 0.5px solid #d1d5db;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all 0.2s ease;
+            box-shadow: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            transition: all 0.3s ease;
         }}
         
-        #statusUpdateForm #status:hover,
-        #statusUpdateForm #messageTemplate:hover {{
-            border-color: #9ca3af;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        #statusUpdateForm .dropdown-minimal select:hover {{
+            border-bottom-color: #6699ff;
         }}
         
-        #statusUpdateForm #status:focus,
-        #statusUpdateForm #messageTemplate:focus {{
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+        #statusUpdateForm .dropdown-minimal select:focus {{
+            border-bottom-color: #6699ff;
             outline: none;
+            box-shadow: none;
         }}
         
         .btn {{
@@ -2971,35 +3019,39 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 
                 <form id="statusUpdateForm">
                     <div class="form-group">
-                        <label for="status" style="display: inline-block; margin-right: 12px; vertical-align: middle;">Select Status</label>
-                        <select id="status" name="status" required>
-                            <option value="">-- Select Status --</option>
-                            <optgroup label="Prospecting">
-                                <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
-                                <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
-                            </optgroup>
-                            <optgroup label="Outreach">
-                                <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
-                                <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
-                                <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
-                            </optgroup>
-                            <optgroup label="Engagement">
-                                <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
-                                <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
-                                <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
-                            </optgroup>
-                            <optgroup label="Nurture">
-                                <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
-                                <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
-                                <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
-                            </optgroup>
-                        </select>
+                        <label for="status">Select Status</label>
+                        <div class="dropdown-minimal">
+                            <select id="status" name="status" required>
+                                <option value="">-- Select Status --</option>
+                                <optgroup label="Prospecting">
+                                    <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
+                                    <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
+                                </optgroup>
+                                <optgroup label="Outreach">
+                                    <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
+                                    <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
+                                    <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
+                                </optgroup>
+                                <optgroup label="Engagement">
+                                    <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
+                                    <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
+                                    <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
+                                </optgroup>
+                                <optgroup label="Nurture">
+                                    <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
+                                    <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
+                                    <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
+                                </optgroup>
+                            </select>
+                        </div>
                         
                         <!-- Message Templates Dropdown -->
-                        <label for="messageTemplate" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
-                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
-                            <option value="">-- Select a Message Template --</option>
-                        </select>
+                        <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
+                        <div class="dropdown-minimal">
+                            <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                                <option value="">-- Select a Message Template --</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">

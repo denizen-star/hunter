@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Dropdown Designs - Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #1f2937;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .section {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: #f9fafb;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        
+        .section-desc {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .dropdown-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .dropdown-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        /* Style 1: Modern Gradient Border */
+        .dropdown-gradient {
+            position: relative;
+            width: 100%;
+        }
+        
+        .dropdown-gradient select {
+            width: 100%;
+            padding: 14px 50px 14px 16px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-gradient select:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .dropdown-gradient select:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* Style 2: Icon-Based with Pills */
+        .dropdown-icon-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .dropdown-icon-pills select {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 45px 12px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%239ca3af' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-icon-pills select:hover {
+            border-color: #667eea;
+            background-color: #f3f4f6;
+        }
+        
+        .dropdown-icon-pills select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Style 3: Card-Based Selection */
+        .dropdown-card {
+            position: relative;
+        }
+        
+        .dropdown-card select {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border: none;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%236b7280' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .dropdown-card select:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+        
+        .dropdown-card select:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Style 4: Minimalist with Accent Line */
+        .dropdown-minimal {
+            position: relative;
+        }
+        
+        .dropdown-minimal select {
+            width: 100%;
+            padding: 12px 40px 12px 0;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 500;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236699ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-minimal select:hover {
+            border-bottom-color: #6699ff;
+        }
+        
+        .dropdown-minimal select:focus {
+            outline: none;
+            border-bottom-color: #6699ff;
+        }
+        
+        /* Style 5: Glassmorphism */
+        .dropdown-glass {
+            position: relative;
+        }
+        
+        .dropdown-glass select {
+            width: 100%;
+            padding: 14px 50px 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-glass select:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+        
+        .dropdown-glass select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Style 6: Bold with Shadow */
+        .dropdown-bold {
+            position: relative;
+        }
+        
+        .dropdown-bold select {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border: 2px solid #1f2937;
+            border-radius: 10px;
+            background: white;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%231f2937' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0 #1f2937;
+        }
+        
+        .dropdown-bold select:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #1f2937;
+        }
+        
+        .dropdown-bold select:focus {
+            outline: none;
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 #1f2937;
+        }
+        
+        /* Style 7: Soft Rounded with Icon Background */
+        .dropdown-soft {
+            position: relative;
+        }
+        
+        .dropdown-soft select {
+            width: 100%;
+            padding: 14px 50px 14px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 16px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-soft select:hover {
+            border-color: #9ca3af;
+            background: linear-gradient(to bottom, #ffffff 0%, #f3f4f6 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .dropdown-soft select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Preview Box */
+        .preview-box {
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+        
+        .preview-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .recommendation {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation-text {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modern Dropdown Design Options</h1>
+        <p class="subtitle">Wireframe showcasing modern dropdown styles for Hunter application selectors</p>
+        
+        <!-- Template Category Selector -->
+        <div class="section">
+            <div class="section-title">1. Template Category Selector (#template_category)</div>
+            <div class="section-desc">Classifies templates as Applications, Networking, or All</div>
+            
+            <div class="dropdown-group">
+                <div style="grid-column: 1 / -1;">
+                    <label class="dropdown-label">Selected Style: Minimalist with #6699FF Accent</label>
+                    <div class="dropdown-minimal">
+                        <select>
+                            <option value="All">All Templates</option>
+                            <option value="Applications">Applications</option>
+                            <option value="Networking">Networking</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Selected Design</div>
+                <div class="recommendation-text">Minimalist style with #6699FF underline accent - Clean, modern, and unobtrusive. Perfect for maintaining focus on content while providing clear visual feedback.</div>
+            </div>
+        </div>
+        
+        <!-- Template Delivery Method Selector -->
+        <div class="section">
+            <div class="section-title">2. Template Delivery Method Selector (#delivery_method)</div>
+            <div class="section-desc">Selects delivery method for templates (Email, LinkedIn Connection, etc.)</div>
+            
+            <div class="dropdown-group">
+                <div style="grid-column: 1 / -1;">
+                    <label class="dropdown-label">Selected Style: Minimalist with #6699FF Accent</label>
+                    <div class="dropdown-minimal">
+                        <select>
+                            <option value="">Select Delivery Method</option>
+                            <option value="LinkedIn Connection">LinkedIn Connection</option>
+                            <option value="Email">Email</option>
+                            <option value="LinkedIn Inmail">LinkedIn Inmail</option>
+                            <option value="LinkedIn Message">LinkedIn Message</option>
+                            <option value="Text">Text</option>
+                            <option value="Phone">Phone</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Selected Design</div>
+                <div class="recommendation-text">Minimalist style with #6699FF underline accent - Clean and consistent with the overall design system.</div>
+            </div>
+        </div>
+        
+        <!-- Application Status Selector -->
+        <div class="section">
+            <div class="section-title">3. Application Status Selector (#new_status)</div>
+            <div class="section-desc">Updates application status (Pending, Applied, Contacted Someone, etc.)</div>
+            
+            <div class="dropdown-group">
+                <div style="grid-column: 1 / -1;">
+                    <label class="dropdown-label">Selected Style: Minimalist with #6699FF Accent</label>
+                    <div class="dropdown-minimal">
+                        <select>
+                            <option value="">-- Select Status --</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Applied">Applied</option>
+                            <option value="Contacted Someone">Contacted Someone</option>
+                            <option value="Company Response">Company Response</option>
+                            <option value="Scheduled Interview">Scheduled Interview</option>
+                            <option value="Interview Notes">Interview Notes</option>
+                            <option value="Interview - Follow Up">Interview - Follow Up</option>
+                            <option value="Offered">Offered</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Accepted">Accepted</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Selected Design</div>
+                <div class="recommendation-text">Minimalist style with #6699FF underline accent - Clean and professional, perfect for status updates without visual clutter.</div>
+            </div>
+        </div>
+        
+        <!-- Application Template Inserter -->
+        <div class="section">
+            <div class="section-title">4. Application Template Inserter (#template_selector)</div>
+            <div class="section-desc">Inserts template content into notes editor</div>
+            
+            <div class="dropdown-group">
+                <div style="grid-column: 1 / -1;">
+                    <label class="dropdown-label">Selected Style: Minimalist with #6699FF Accent</label>
+                    <div class="dropdown-minimal">
+                        <select>
+                            <option value="">-- Select Template --</option>
+                            <option value="template1">Follow-up Email Template</option>
+                            <option value="template2">Thank You Note</option>
+                            <option value="template3">Interview Preparation</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Selected Design</div>
+                <div class="recommendation-text">Minimalist style with #6699FF underline accent - Unobtrusive and elegant for template selection.</div>
+            </div>
+        </div>
+        
+        <!-- Networking Contact Status Selector -->
+        <div class="section">
+            <div class="section-title">5. Networking Contact Status Selector (#status)</div>
+            <div class="section-desc">Updates networking contact status (Found Contact, Sent Email, In Conversation, etc.)</div>
+            
+            <div class="dropdown-group">
+                <div style="grid-column: 1 / -1;">
+                    <label class="dropdown-label">Selected Style: Minimalist with #6699FF Accent</label>
+                    <div class="dropdown-minimal">
+                        <select>
+                            <option value="">-- Select Status --</option>
+                            <optgroup label="Prospecting">
+                                <option value="Found Contact">Found Contact</option>
+                                <option value="Sent LinkedIn Connection">Sent LinkedIn Connection</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Sent Email">Sent Email</option>
+                                <option value="Connection Accepted">Connection Accepted</option>
+                                <option value="Cold/Inactive">Cold/Inactive</option>
+                            </optgroup>
+                            <optgroup label="Engagement">
+                                <option value="In Conversation">In Conversation</option>
+                                <option value="Meeting Scheduled">Meeting Scheduled</option>
+                                <option value="Meeting Complete">Meeting Complete</option>
+                            </optgroup>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection">Strong Connection</option>
+                                <option value="Referral Partner">Referral Partner</option>
+                                <option value="Dormant">Dormant</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Selected Design</div>
+                <div class="recommendation-text">Minimalist style with #6699FF underline accent - Consistent with application status selector for unified user experience.</div>
+            </div>
+        </div>
+        
+        <!-- Networking Message Template Selector -->
+        <div class="section">
+            <div class="section-title">6. Networking Message Template Selector (#messageTemplate)</div>
+            <div class="section-desc">Loads message templates into notes editor</div>
+            
+            <div class="dropdown-group">
+                <div style="grid-column: 1 / -1;">
+                    <label class="dropdown-label">Selected Style: Minimalist with #6699FF Accent</label>
+                    <div class="dropdown-minimal">
+                        <select>
+                            <option value="">-- Select a Message Template --</option>
+                            <option value="template1">LinkedIn Connection Request</option>
+                            <option value="template2">Follow-up Message</option>
+                            <option value="template3">Thank You Note</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-title">Selected Design</div>
+                <div class="recommendation-text">Minimalist style with #6699FF underline accent - Clean and consistent with all other dropdowns in the system.</div>
+            </div>
+        </div>
+        
+        <!-- Overall Design System -->
+        <div class="section">
+            <div class="section-title">Design System Summary</div>
+            <div class="section-desc">Recommended cohesive design approach</div>
+            
+            <div class="recommendation" style="margin-top: 0;">
+                <div class="recommendation-title">Unified Design Language</div>
+                <div class="recommendation-text">
+                    <strong>All Dropdowns:</strong> Minimalist style with #6699FF underline accent<br><br>
+                    <strong>Design Characteristics:</strong>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Clean, borderless design with bottom underline</li>
+                        <li>#6699FF accent color for hover and focus states</li>
+                        <li>Transparent background for minimal visual weight</li>
+                        <li>2px underline that transitions to accent color on interaction</li>
+                        <li>Custom dropdown arrow in accent color</li>
+                    </ul>
+                    <strong>Color Palette:</strong> #6699FF for accent, #e5e7eb for default underline, #1f2937 for text<br><br>
+                    <strong>Interactions:</strong> Smooth 0.3s transitions, underline color change on hover/focus, custom arrow indicator
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

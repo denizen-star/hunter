@@ -291,30 +291,66 @@
             font-family: var(--font-family);
         }
         
-        /* Oval-shaped, smaller dropdowns for template form */
-        #templateForm .form-group select {
+        /* Minimalist dropdowns for template form */
+        .dropdown-minimal {
+            position: relative;
+            display: inline-block;
+        }
+        
+        #templateForm .form-group .dropdown-minimal select {
             width: auto;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 16px;
-            border-radius: 20px;
+            padding: 2px 30px 2px 0;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: transparent;
+            border-radius: 0;
             font-size: 11px;
             height: 20px;
-            border: 0.5px solid #d1d5db;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all 0.2s ease;
+            box-shadow: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            transition: all 0.3s ease;
         }
         
-        #templateForm .form-group select:hover {
-            border-color: #9ca3af;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        #templateForm .form-group .dropdown-minimal select:hover {
+            border-bottom-color: #6699ff;
         }
         
-        #templateForm .form-group select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+        #templateForm .form-group .dropdown-minimal select:focus {
+            border-bottom-color: #6699ff;
             outline: none;
+            box-shadow: none;
+        }
+        
+        /* Alignment for template form group with dropdowns */
+        #templateForm .form-group:nth-child(2) {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        #templateForm .form-group:nth-child(2) label {
+            margin: 0;
+            padding: 0;
+            margin-right: 8px;
+            white-space: nowrap;
+            line-height: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        #templateForm .form-group:nth-child(2) .dropdown-minimal {
+            margin: 0;
+            height: 20px;
+            display: flex;
+            align-items: center;
         }
         
         #templateForm .form-group label {
@@ -657,23 +693,27 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="template_category" style="display: inline-block; margin-right: 12px; vertical-align: middle;">Category</label>
-                    <select id="template_category" required>
-                        <option value="All">All</option>
-                        <option value="Applications">Applications</option>
-                        <option value="Networking">Networking</option>
-                    </select>
-                    <label for="delivery_method" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle;">Delivery Method</label>
-                    <select id="delivery_method" required>
-                        <option value="">Delivery Method</option>
-                        <option value="LinkedIn Connection">LinkedIn Connection</option>
-                        <option value="Email">Email</option>
-                        <option value="Other">Other</option>
-                        <option value="LinkedIn Inmail">LinkedIn Inmail</option>
-                        <option value="LinkedIn Message">LinkedIn Message</option>
-                        <option value="Text">Text</option>
-                        <option value="Phone">Phone</option>
-                    </select>
+                    <label for="template_category">Category</label>
+                    <div class="dropdown-minimal">
+                        <select id="template_category" required>
+                            <option value="All">All</option>
+                            <option value="Applications">Applications</option>
+                            <option value="Networking">Networking</option>
+                        </select>
+                    </div>
+                    <label for="delivery_method">Delivery Method</label>
+                    <div class="dropdown-minimal">
+                        <select id="delivery_method" required>
+                            <option value="">Delivery Method</option>
+                            <option value="LinkedIn Connection">LinkedIn Connection</option>
+                            <option value="Email">Email</option>
+                            <option value="Other">Other</option>
+                            <option value="LinkedIn Inmail">LinkedIn Inmail</option>
+                            <option value="LinkedIn Message">LinkedIn Message</option>
+                            <option value="Text">Text</option>
+                            <option value="Phone">Phone</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <div class="form-group">
