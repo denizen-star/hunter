@@ -21,7 +21,8 @@ class TemplateManager:
         self,
         title: str,
         delivery_method: str,
-        content: str
+        content: str,
+        category: str = "All"
     ) -> Dict:
         """Create a new template"""
         template_id = format_datetime_for_filename(get_est_now())
@@ -32,6 +33,7 @@ class TemplateManager:
             'id': template_id,
             'title': title,
             'delivery_method': delivery_method,
+            'category': category,
             'created_at': now.isoformat(),
             'created_at_display': format_for_display(now),
             'content_file': f'{template_id}.html'
@@ -62,6 +64,10 @@ class TemplateManager:
             else:
                 template['content'] = ''
             
+            # Ensure category is set (default to "All" for backward compatibility)
+            if 'category' not in template:
+                template['category'] = 'All'
+            
             # Ensure created_at_display is set (reformat if needed)
             if 'created_at_display' not in template or not template['created_at_display']:
                 try:
@@ -78,6 +84,16 @@ class TemplateManager:
         
         return templates
     
+    def list_templates_by_category(self, category: str) -> List[Dict]:
+        """List templates filtered by category (returns templates where category matches or category is 'All')"""
+        all_templates = self.list_templates()
+        filtered = []
+        for template in all_templates:
+            template_category = template.get('category', 'All')
+            if template_category == category or template_category == 'All':
+                filtered.append(template)
+        return filtered
+    
     def get_template(self, template_id: str) -> Optional[Dict]:
         """Get a specific template by ID"""
         templates = self._load_templates_meta()
@@ -90,6 +106,10 @@ class TemplateManager:
                     template['content'] = read_text_file(content_path)
                 else:
                     template['content'] = ''
+                
+                # Ensure category is set (default to "All" for backward compatibility)
+                if 'category' not in template:
+                    template['category'] = 'All'
                 
                 # Ensure created_at_display is set
                 if 'created_at_display' not in template or not template['created_at_display']:

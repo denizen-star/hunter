@@ -1,0 +1,319 @@
+company_counts:
+  aarons:
+    contact_ids:
+    - 20251212174323-Hody Crouch-Aarons
+    count: 1
+    latest_badge: null
+  airops:
+    contact_ids:
+    - 20251215130844-Tatiana Fernandez (F)-AirOps
+    - 20251215112919-Tatiana Fernandez-AirOps
+    count: 2
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
+  airpay:
+    contact_ids:
+    - 20251229122802-Cyle Jurvelin-AirPay
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  andersen labs:
+    contact_ids:
+    - 20251212172012-Darwin Robinson-Andersen Labs
+    count: 1
+    latest_badge: null
+  angi:
+    contact_ids:
+    - 20251215142119-Jason Chapman-Angi
+    count: 1
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
+  broadridge:
+    contact_ids:
+    - 20251214212715-Delia Șipoș-Broadridge
+    count: 1
+    latest_badge: null
+  centene corporation:
+    contact_ids:
+    - 20251215152257-Marijane Nothum-Centene Corporation
+    - 20251215151110-Tom Meads-Centene Corporation
+    count: 2
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  charlie health:
+    contact_ids:
+    - 20251229130724-Dominique Luke-Charlie Health
+    - 20251229130231-Douglas Guidi-Charlie Health
+    count: 2
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  comcast:
+    contact_ids:
+    - 20251212142652-Andy Clyne-Comcast
+    - 20251212141059-Andrew Clyne-Comcast
+    count: 2
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
+  current:
+    contact_ids:
+    - 20251215135753-Ian Sautner-Current
+    - 20251215135340-Janine Rubin-Current
+    count: 2
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  elastic:
+    contact_ids:
+    - 20251214203720-Danika Okerstrom-Elastic
+    - 20251214200203-Isam N-Elastic
+    count: 2
+    latest_badge: null
+  equifax:
+    contact_ids:
+    - 20251212173150-Harald Schneider-Equifax
+    count: 1
+    latest_badge: null
+  ericsson:
+    contact_ids:
+    - 20260102142054-Martin Eriksson-Ericsson
+    count: 1
+    latest_badge: null
+  gemini:
+    contact_ids:
+    - 20251229120217-Makendra Jeanty-Gemini
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  global holdings:
+    contact_ids:
+    - 20251212164609-Keri Byrd-Global Holdings
+    count: 1
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
+  greystar:
+    contact_ids:
+    - 20251218162924-Alison Donnelly-Greystar
+    - 20251218162750-Luke Moore-Greystar
+    - 20251218162627-Jasmine McFadden-Greystar
+    - 20251218160326-Brittney Barney-Greystar
+    - 20251218160249-James Rodgriguez-Greystar
+    count: 5
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  invesco ltd:
+    contact_ids:
+    - 20251212120845-Test Eisenberg-Invesco Ltd
+    - 20251212113832-Liran Eisenberg-Invesco Ltd
+    count: 2
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  jpmorganchase:
+    contact_ids:
+    - 20251215100515-Matthew Fuss-JPMorganChase
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  justanswer:
+    contact_ids:
+    - 20251212172843-Jason Ballengee-JustAnswer
+    count: 1
+    latest_badge: null
+  justtest:
+    contact_ids:
+    - 20251214195314-Kervin Crzay-JustTest
+    - 20251212172843-Jason Ballengee-JustTest
+    count: 2
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
+  leeds:
+    contact_ids:
+    - 20251218154303-Christian Frisone-Leeds
+    count: 1
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
+  lhh:
+    contact_ids:
+    - 20251218105048-Danielle Beck-LHH
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  mayo clinic:
+    contact_ids:
+    - 20260102143211-Phil Fiero-Mayo Clinic
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  medallia:
+    contact_ids:
+    - 20251217093540-Rickey Antoine-Medallia
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  meridianlink:
+    contact_ids:
+    - 20251215113815-Yelena Nikolov-MeridianLink
+    count: 1
+    latest_badge:
+      badge_id: rapport_builder
+      badge_name: Rapport Builder
+      badge_points: 50
+  mutual of omaha:
+    contact_ids:
+    - 20260102151248-Lorenzo Ball Jr-Mutual of Omaha
+    count: 1
+    latest_badge: null
+  new york life insurance company:
+    contact_ids:
+    - 20260102135200-Dmitry Goodman-New York Life Insurance Company
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  norwegian cruise line holdings ltd:
+    contact_ids:
+    - 20251218121739-Nicola A. Watson-Norwegian Cruise Line Holdings Ltd
+    count: 1
+    latest_badge: null
+  paramount:
+    contact_ids:
+    - 20251217163608-Agness Daszykowski-Paramount
+    count: 1
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
+  picnichealth:
+    contact_ids:
+    - 20251217150014-Jeanne Sanchez-PicnicHealth
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  rakuten:
+    contact_ids:
+    - 20251215114634-Lindsey Dornberger-Rakuten
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  savills north america:
+    contact_ids:
+    - 20251229122335-Sangeetha S-Savills North America
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  spot & tango:
+    contact_ids:
+    - 20251229121823-Morgan Keiper-Spot & Tango
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  stabile search:
+    contact_ids:
+    - 20251216140529-Matt Stabile-Stabile Search
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  stripe:
+    contact_ids:
+    - 20251216154421-Heather Calderone-Stripe
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  sumitomo pharma america, inc.:
+    contact_ids:
+    - 20260102133722-Erica Lindgren-Sumitomo Pharma America, Inc.
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+  supra:
+    contact_ids:
+    - 20260102150047-Reuben George-Supra
+    count: 1
+    latest_badge: null
+  the human resource, llc:
+    contact_ids:
+    - 20260102150916-Tiffany Goodyear-The Human Resource, LLC
+    count: 1
+    latest_badge:
+      badge_id: scheduler_master
+      badge_name: Scheduler Master
+      badge_points: 30
+  together for talent:
+    contact_ids:
+    - 20251214185347-Joe doe-Together for Talent
+    count: 1
+    latest_badge: null
+  uplight:
+    contact_ids:
+    - 20251218150931-Allison Pamplin-Uplight
+    count: 1
+    latest_badge: null
+  w talent:
+    contact_ids:
+    - 20251215094726-Frankie Scott-W Talent
+    count: 1
+    latest_badge: null
+  zeal network se:
+    contact_ids:
+    - 20260102140440-Pier Martin-Zeal Network SE
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  zocdoc:
+    contact_ids:
+    - 20251212165622-Meaghan Fenton-Zocdoc
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
+last_updated: '2026-01-02T16:09:12.711549-05:00'

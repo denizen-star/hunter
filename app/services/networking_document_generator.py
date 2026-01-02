@@ -707,6 +707,48 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             resize: vertical;
         }}
         
+        /* Vertical alignment for status update form first form-group */
+        #statusUpdateForm > div.form-group:first-child {{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0;
+        }}
+        
+        #statusUpdateForm > div.form-group:first-child > * {{
+            vertical-align: middle;
+        }}
+        
+        /* Pill-styled dropdowns for status update form */
+        #statusUpdateForm #status,
+        #statusUpdateForm #messageTemplate {{
+            width: auto;
+            max-width: fit-content;
+            display: inline-block;
+            min-width: 200px;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            height: 20px;
+            border: 0.5px solid #d1d5db;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }}
+        
+        #statusUpdateForm #status:hover,
+        #statusUpdateForm #messageTemplate:hover {{
+            border-color: #9ca3af;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }}
+        
+        #statusUpdateForm #status:focus,
+        #statusUpdateForm #messageTemplate:focus {{
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }}
+        
         .btn {{
             padding: 10px 20px;
             font-size: 14px;
@@ -1079,7 +1121,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                 
                 <form id="statusUpdateForm">
                     <div class="form-group">
-                        <label for="status">Select Status</label>
+                        <label for="status" style="display: inline-block; margin-right: 12px; vertical-align: middle;">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
                             <optgroup label="Prospecting">
@@ -1102,6 +1144,12 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                                 <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
                             </optgroup>
                         </select>
+                        
+                        <!-- Message Templates Dropdown -->
+                        <label for="messageTemplate" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
+                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                            <option value="">-- Select a Message Template --</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -1117,18 +1165,6 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                         </div>
                         <div id="editor" style="background: white; min-height: 150px;"></div>
                         <input type="hidden" id="notes" name="notes">
-                        
-                        <!-- Message Templates Dropdown -->
-                        <div style="margin-top: 16px; display: flex; gap: 12px; align-items: center;">
-                            <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
-                            <select id="messageTemplate" onchange="loadMessageIntoEditor()" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-width: 250px; flex: 1;">
-                                <option value="">-- Select a Message Template --</option>
-                                <option value="connection">1. Connection Request</option>
-                                <option value="meeting">2. Meeting Invitation</option>
-                                <option value="thankyou">3. Thank You Message</option>
-                                <option value="consulting">4. Consulting Services Offer</option>
-                            </select>
-                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
@@ -1189,6 +1225,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         document.addEventListener('DOMContentLoaded', () => {{
             loadTimeline();
             initializeEditor();
+            loadNetworkingTemplates();
         }});
         
         // Initialize Quill Rich Text Editor
@@ -1253,6 +1290,75 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             }}
         }}
         
+        // Templates cache
+        let networkingTemplatesCache = [];
+        
+        // Load networking templates from API
+        async function loadNetworkingTemplates() {{
+            try {{
+                const resp = await fetch('/api/templates?category=Networking');
+                const data = await resp.json();
+                if (!data.success) return;
+                
+                // Filter templates to only show Networking or All category
+                networkingTemplatesCache = (data.templates || []).filter(t => {{
+                    const category = t.category || 'All';
+                    return category === 'Networking' || category === 'All';
+                }});
+                
+                const select = document.getElementById('messageTemplate');
+                if (!select) return;
+                
+                // Define delivery method order (same as applications)
+                const deliveryMethodOrder = [
+                    'Cover Letter',
+                    'LinkedIn Connection',
+                    'Email',
+                    'Other',
+                    'Intro',
+                    'LinkedIn Inmail',
+                    'LinkedIn Message',
+                    'Text',
+                    'Phone'
+                ];
+                
+                // Sort templates by delivery method order, then by title
+                networkingTemplatesCache.sort((a, b) => {{
+                    const aMethod = a.delivery_method || '';
+                    const bMethod = b.delivery_method || '';
+                    const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                    const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                    
+                    // If both have delivery methods, sort by order
+                    if (aIndex !== -1 && bIndex !== -1) {{
+                        if (aIndex !== bIndex) {{
+                            return aIndex - bIndex;
+                        }}
+                    }} else if (aIndex !== -1) {{
+                        return -1; // a comes first
+                    }} else if (bIndex !== -1) {{
+                        return 1; // b comes first
+                    }}
+                    
+                    // Within same delivery method, sort by title
+                    return (a.title || '').localeCompare(b.title || '');
+                }});
+                
+                // Populate dropdown with "Delivery Method - Template Title" format
+                select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                for (const template of networkingTemplatesCache) {{
+                    const option = document.createElement('option');
+                    option.value = template.id;
+                    const method = template.delivery_method || '';
+                    const title = template.title || 'Template';
+                    option.textContent = method ? (method + ' - ' + title) : title;
+                    select.appendChild(option);
+                }}
+            }} catch (error) {{
+                console.error('Error loading networking templates:', error);
+            }}
+        }}
+        
         // Load message template into editor
         function loadMessageIntoEditor() {{
             if (!quill) return;
@@ -1264,21 +1370,15 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                 return;
             }}
             
-            // Get message from Messages tab
-            const messageElement = document.getElementById(selectedValue + '-message');
-            if (!messageElement) {{
-                console.error('Message element not found:', selectedValue);
+            // Find template in cache
+            const template = networkingTemplatesCache.find(t => t.id === selectedValue);
+            if (!template) {{
+                console.error('Template not found:', selectedValue);
                 return;
             }}
             
-            const text = messageElement.textContent.trim();
-            
-            // Convert plain text to HTML paragraphs for Quill
-            const paragraphs = text.split('\\n\\n').filter(p => p.trim());
-            const htmlContent = paragraphs.map(p => `<p>${{p.trim().replace(/\\n/g, '<br>')}}</p>`).join('');
-            
-            // Set the editor content
-            quill.root.innerHTML = htmlContent || `<p>${{text}}</p>`;
+            // Set the editor content with template HTML
+            quill.root.innerHTML = template.content || '';
         }}
         
         // Copy editor content to clipboard
@@ -2417,6 +2517,48 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             resize: vertical;
         }}
         
+        /* Vertical alignment for status update form first form-group */
+        #statusUpdateForm > div.form-group:first-child {{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0;
+        }}
+        
+        #statusUpdateForm > div.form-group:first-child > * {{
+            vertical-align: middle;
+        }}
+        
+        /* Pill-styled dropdowns for status update form */
+        #statusUpdateForm #status,
+        #statusUpdateForm #messageTemplate {{
+            width: auto;
+            max-width: fit-content;
+            display: inline-block;
+            min-width: 200px;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            height: 20px;
+            border: 0.5px solid #d1d5db;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }}
+        
+        #statusUpdateForm #status:hover,
+        #statusUpdateForm #messageTemplate:hover {{
+            border-color: #9ca3af;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }}
+        
+        #statusUpdateForm #status:focus,
+        #statusUpdateForm #messageTemplate:focus {{
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }}
+        
         .btn {{
             padding: 10px 20px;
             font-size: 14px;
@@ -2829,7 +2971,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 
                 <form id="statusUpdateForm">
                     <div class="form-group">
-                        <label for="status">Select Status</label>
+                        <label for="status" style="display: inline-block; margin-right: 12px; vertical-align: middle;">Select Status</label>
                         <select id="status" name="status" required>
                             <option value="">-- Select Status --</option>
                             <optgroup label="Prospecting">
@@ -2852,6 +2994,12 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                                 <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
                             </optgroup>
                         </select>
+                        
+                        <!-- Message Templates Dropdown -->
+                        <label for="messageTemplate" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
+                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                            <option value="">-- Select a Message Template --</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -2867,18 +3015,6 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                         </div>
                         <div id="editor" style="background: white; min-height: 150px;"></div>
                         <input type="hidden" id="notes" name="notes">
-                        
-                        <!-- Message Templates Dropdown -->
-                        <div style="margin-top: 16px; display: flex; gap: 12px; align-items: center;">
-                            <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
-                            <select id="messageTemplate" onchange="loadMessageIntoEditor()" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-width: 250px; flex: 1;">
-                                <option value="">-- Select a Message Template --</option>
-                                <option value="connection">1. Connection Request</option>
-                                <option value="meeting">2. Meeting Invitation</option>
-                                <option value="thankyou">3. Thank You Message</option>
-                                <option value="consulting">4. Consulting Services Offer</option>
-                            </select>
-                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
@@ -2930,6 +3066,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         document.addEventListener('DOMContentLoaded', () => {{
             loadTimeline();
             initializeEditor();
+            loadNetworkingTemplates();
         }});
         
         // Initialize Quill Rich Text Editor
@@ -2994,6 +3131,75 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             }}
         }}
         
+        // Templates cache
+        let networkingTemplatesCache = [];
+        
+        // Load networking templates from API
+        async function loadNetworkingTemplates() {{
+            try {{
+                const resp = await fetch('/api/templates?category=Networking');
+                const data = await resp.json();
+                if (!data.success) return;
+                
+                // Filter templates to only show Networking or All category
+                networkingTemplatesCache = (data.templates || []).filter(t => {{
+                    const category = t.category || 'All';
+                    return category === 'Networking' || category === 'All';
+                }});
+                
+                const select = document.getElementById('messageTemplate');
+                if (!select) return;
+                
+                // Define delivery method order (same as applications)
+                const deliveryMethodOrder = [
+                    'Cover Letter',
+                    'LinkedIn Connection',
+                    'Email',
+                    'Other',
+                    'Intro',
+                    'LinkedIn Inmail',
+                    'LinkedIn Message',
+                    'Text',
+                    'Phone'
+                ];
+                
+                // Sort templates by delivery method order, then by title
+                networkingTemplatesCache.sort((a, b) => {{
+                    const aMethod = a.delivery_method || '';
+                    const bMethod = b.delivery_method || '';
+                    const aIndex = deliveryMethodOrder.indexOf(aMethod);
+                    const bIndex = deliveryMethodOrder.indexOf(bMethod);
+                    
+                    // If both have delivery methods, sort by order
+                    if (aIndex !== -1 && bIndex !== -1) {{
+                        if (aIndex !== bIndex) {{
+                            return aIndex - bIndex;
+                        }}
+                    }} else if (aIndex !== -1) {{
+                        return -1; // a comes first
+                    }} else if (bIndex !== -1) {{
+                        return 1; // b comes first
+                    }}
+                    
+                    // Within same delivery method, sort by title
+                    return (a.title || '').localeCompare(b.title || '');
+                }});
+                
+                // Populate dropdown with "Delivery Method - Template Title" format
+                select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                for (const template of networkingTemplatesCache) {{
+                    const option = document.createElement('option');
+                    option.value = template.id;
+                    const method = template.delivery_method || '';
+                    const title = template.title || 'Template';
+                    option.textContent = method ? (method + ' - ' + title) : title;
+                    select.appendChild(option);
+                }}
+            }} catch (error) {{
+                console.error('Error loading networking templates:', error);
+            }}
+        }}
+        
         // Load message template into editor
         function loadMessageIntoEditor() {{
             if (!quill) return;
@@ -3005,21 +3211,15 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 return;
             }}
             
-            // Get message from Messages tab
-            const messageElement = document.getElementById(selectedValue + '-message');
-            if (!messageElement) {{
-                console.error('Message element not found:', selectedValue);
+            // Find template in cache
+            const template = networkingTemplatesCache.find(t => t.id === selectedValue);
+            if (!template) {{
+                console.error('Template not found:', selectedValue);
                 return;
             }}
             
-            const text = messageElement.textContent.trim();
-            
-            // Convert plain text to HTML paragraphs for Quill
-            const paragraphs = text.split('\\n\\n').filter(p => p.trim());
-            const htmlContent = paragraphs.map(p => `<p>${{p.trim().replace(/\\n/g, '<br>')}}</p>`).join('');
-            
-            // Set the editor content
-            quill.root.innerHTML = htmlContent || `<p>${{text}}</p>`;
+            // Set the editor content with template HTML
+            quill.root.innerHTML = template.content || '';
         }}
         
         // Copy editor content to clipboard

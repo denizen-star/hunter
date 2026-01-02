@@ -269,6 +269,15 @@
             font-size: var(--font-sm);
         }
         
+        /* Reduced font size for template form labels and help text */
+        #templateForm .form-group label {
+            font-size: 12px;
+        }
+        
+        #templateForm .form-group small {
+            font-size: 11px;
+        }
+        
         .form-group input,
         .form-group select {
             width: 100%;
@@ -280,6 +289,42 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             font-family: var(--font-family);
+        }
+        
+        /* Oval-shaped, smaller dropdowns for template form */
+        #templateForm .form-group select {
+            width: auto;
+            display: inline-block;
+            min-width: 200px;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            height: 20px;
+            border: 0.5px solid #d1d5db;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+        
+        #templateForm .form-group select:hover {
+            border-color: #9ca3af;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        
+        #templateForm .form-group select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+        
+        #templateForm .form-group label {
+            vertical-align: middle;
+            line-height: 20px;
+        }
+        
+        /* Font size for Title input field */
+        #templateForm #template_title {
+            font-size: 11px;
         }
         
         .form-group input:focus,
@@ -294,6 +339,15 @@
             margin-top: var(--space-xs);
             color: var(--text-secondary);
             font-size: var(--font-xs);
+        }
+        
+        /* Reduced font size for template form labels and help text */
+        #templateForm .form-group label {
+            font-size: 12px;
+        }
+        
+        #templateForm .form-group small {
+            font-size: 11px;
         }
         
         .quill-editor {
@@ -597,9 +651,21 @@
             <div class="card-content collapsed">
                 <form id="templateForm" onsubmit="submitTemplate(event)">
                 <div class="form-group">
-                    <label for="delivery_method">Delivery Method</label>
+                    <label for="template_title">Title</label>
+                    <input type="text" id="template_title" placeholder="Enter template title..." required>
+                    <small>Give your template a descriptive name</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="template_category" style="display: inline-block; margin-right: 12px; vertical-align: middle;">Category</label>
+                    <select id="template_category" required>
+                        <option value="All">All</option>
+                        <option value="Applications">Applications</option>
+                        <option value="Networking">Networking</option>
+                    </select>
+                    <label for="delivery_method" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle;">Delivery Method</label>
                     <select id="delivery_method" required>
-                        <option value="">-- Select Delivery Method --</option>
+                        <option value="">Delivery Method</option>
                         <option value="LinkedIn Connection">LinkedIn Connection</option>
                         <option value="Email">Email</option>
                         <option value="Other">Other</option>
@@ -608,12 +674,6 @@
                         <option value="Text">Text</option>
                         <option value="Phone">Phone</option>
                     </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="template_title">Title</label>
-                    <input type="text" id="template_title" placeholder="Enter template title..." required>
-                    <small>Give your template a descriptive name</small>
                 </div>
                 
                 <div class="form-group">
@@ -802,6 +862,7 @@
             const deliveryMethod = document.getElementById('delivery_method').value;
             const title = document.getElementById('template_title').value;
             const content = quillEditor.root.innerHTML;
+            const category = document.getElementById('template_category').value;
             
             if (!deliveryMethod || !title || !content || content === '<p><br></p>') {
                 showStatus('Please fill in all fields', 'error');
@@ -817,7 +878,8 @@
                     body: JSON.stringify({
                         delivery_method: deliveryMethod,
                         title: title,
-                        content: content
+                        content: content,
+                        category: category
                     })
                 });
                 

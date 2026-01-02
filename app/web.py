@@ -2579,9 +2579,13 @@ def generate_digest():
 
 @app.route('/api/templates', methods=['GET'])
 def get_templates():
-    """Get all templates"""
+    """Get all templates, optionally filtered by category"""
     try:
-        templates = template_manager.list_templates()
+        category = request.args.get('category')
+        if category:
+            templates = template_manager.list_templates_by_category(category)
+        else:
+            templates = template_manager.list_templates()
         return jsonify({
             'success': True,
             'templates': templates
@@ -2597,6 +2601,7 @@ def create_template():
         title = data.get('title')
         delivery_method = data.get('delivery_method')
         content = data.get('content')
+        category = data.get('category', 'All')  # Default to 'All' for backward compatibility
         
         if not all([title, delivery_method, content]):
             return jsonify({
@@ -2604,7 +2609,7 @@ def create_template():
                 'error': 'Missing required fields: title, delivery_method, content'
             }), 400
         
-        template = template_manager.create_template(title, delivery_method, content)
+        template = template_manager.create_template(title, delivery_method, content, category)
         
         return jsonify({
             'success': True,

@@ -95,3 +95,17 @@ templates:
   delivery_method: LinkedIn Connection
   id: '20251211130705'
   title: Practical 250
+- category: Networking
+  content_file: 20260102154618.html
+  created_at: '2026-01-02T15:46:18.863169-05:00'
+  created_at_display: Jan 02, 2026 03:46 PM EST
+  delivery_method: LinkedIn Message
+  id: '20260102154618'
+  title: Follow up Recruiter LinkedIn acceptance
+- category: Networking
+  content_file: 20260102154902.html
+  created_at: '2026-01-02T15:49:02.447216-05:00'
+  created_at_display: Jan 02, 2026 03:49 PM EST
+  delivery_method: LinkedIn Message
+  id: '20260102154902'
+  title: Follow up Leader LinkedIn Acceptance

@@ -3442,6 +3442,42 @@ Format this as a professional research document that demonstrates thorough prepa
             border-color: #d1d5db;
         }}
         
+        /* Pill-styled dropdowns for application status update form */
+        #statusUpdateForm #new_status,
+        #statusUpdateForm #template_selector {{
+            width: auto;
+            max-width: fit-content;
+            display: inline-block;
+            min-width: 200px;
+            padding: 2px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            height: 20px;
+            border: 0.5px solid #d1d5db;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }}
+        
+        #statusUpdateForm #new_status:hover,
+        #statusUpdateForm #template_selector:hover {{
+            border-color: #9ca3af;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }}
+        
+        #statusUpdateForm #new_status:focus,
+        #statusUpdateForm #template_selector:focus {{
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }}
+        
+        #statusUpdateForm label[for="new_status"],
+        #statusUpdateForm label[for="template_selector"] {{
+            vertical-align: middle;
+            line-height: 20px;
+        }}
+        
         .btn-primary {{
             background: #3b82f6;
             color: #ffffff;
@@ -4695,13 +4731,12 @@ Format this as a professional research document that demonstrates thorough prepa
         {self._generate_networking_tab_html(application)}
         
         <div id="updates" class="tab-content">
-            <h2>Updates</h2>
-            
             <!-- Update Status Form -->
             <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
                 <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
-                    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-                        <select id="new_status" required style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label for="new_status" style="display: inline-block; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #333;">Status:</label>
+                        <select id="new_status" required>
                             <option value="">-- Select Status --</option>
                             <option value="Pending">⏳ Pending</option>
                             <option value="Applied">✉️ Applied</option>
@@ -4714,28 +4749,21 @@ Format this as a professional research document that demonstrates thorough prepa
                             <option value="Rejected">❌ Rejected</option>
                             <option value="Accepted">✅ Accepted</option>
                         </select>
+                        
+                        <label for="template_selector" style="display: inline-block; margin-left: 24px; margin-right: 12px; vertical-align: middle; font-weight: 600; color: #333;">Template:</label>
+                        <select id="template_selector">
+                            <option value="">-- Select Template --</option>
+                        </select>
+                        
                         <button type="button" onclick="copyStatusNotes(this)" style="background: #667eea; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Copy</button>
-                        <button type="button" id="clearTemplateBtn" style="background: #e9ecef; color: #333; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Clear</button>
                     </div>
                     
                     <div style="margin-bottom: 15px;">
                         <div id="status_notes" placeholder="Add notes about this status update..."></div>
                     </div>
                     
-                    <!-- Template Inserter -->
-                    <div style="margin: 18px 0; padding: 12px; background: #ffffff; border: 1px dashed #cdd6e1; border-radius: 10px;">
-                        <label for="template_selector" style="display: block; margin-bottom: 6px; font-weight: 600; color: #333;">
-                            Insert from Template
-                        </label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <select id="template_selector" style="flex: 1; padding: 10px; border: 1px solid #d0d7de; border-radius: 8px; font-size: 14px; background: #f8fafc;">
-                                <option value="">-- Select Template --</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                            <small style="color: #6c757d;">Selecting a template will populate the Notes editor. You can freely edit the text.</small>
-                            <small id="status_notes_character_count" style="color: #6c757d; margin-left: 10px;">0 characters</small>
-                        </div>
+                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 8px;">
+                        <small id="status_notes_character_count" style="color: #6c757d;">0 characters</small>
                     </div>
                     
                     <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
@@ -4918,26 +4946,8 @@ Format this as a professional research document that demonstrates thorough prepa
                 // Load templates and wire interactions
                 loadTemplates();
                 const selector = document.getElementById('template_selector');
-                const clearBtn = document.getElementById('clearTemplateBtn');
                 if (selector) {{
                     selector.addEventListener('change', onTemplateSelected);
-                }}
-                if (clearBtn) {{
-                    clearBtn.addEventListener('click', function() {{
-                        if (quillEditor) {{
-                            quillEditor.setContents([]);
-                            quillEditor.focus();
-                            updateStatusNotesCharacterCount();
-                        }}
-                        const sel = document.getElementById('template_selector');
-                        if (sel) {{ sel.value = ''; }}
-                        
-                        // Hide percentage widget when template is cleared
-                        const widgetContainer = document.getElementById('percentage-widget-container');
-                        if (widgetContainer) {{
-                            widgetContainer.style.display = 'none';
-                        }}
-                    }});
                 }}
             }} else {{
                 console.error('❌ Quill.js not loaded');
@@ -4949,10 +4959,14 @@ Format this as a professional research document that demonstrates thorough prepa
         
         async function loadTemplates() {{
             try {{
-                const resp = await fetch('/api/templates');
+                const resp = await fetch('/api/templates?category=Applications');
                 const data = await resp.json();
                 if (!data.success) return;
-                templatesCache = data.templates || [];
+                // Filter templates to only show Applications or All category
+                templatesCache = (data.templates || []).filter(t => {{
+                    const category = t.category || 'All';
+                    return category === 'Applications' || category === 'All';
+                }});
                 const selector = document.getElementById('template_selector');
                 if (!selector) return;
                 
