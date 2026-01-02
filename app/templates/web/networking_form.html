@@ -563,6 +563,249 @@ You can use Markdown formatting:
         const transitionMatchScoreContainer = document.getElementById('transitionMatchScoreContainer');
         const transitionProcessingType = document.getElementById('transitionProcessingType');
 
+        // Intelligently trim trailing punctuation from URLs, preserving balanced parentheses/brackets/braces
+        function trimTrailingPunctuation(url) {
+            if (!url) {
+                return url;
+            }
+            
+            // Count opening and closing characters to check for balance
+            const openParens = (url.match(/\(/g) || []).length;
+            const closeParens = (url.match(/\)/g) || []).length;
+            const openBrackets = (url.match(/\[/g) || []).length;
+            const closeBrackets = (url.match(/\]/g) || []).length;
+            const openBraces = (url.match(/\{/g) || []).length;
+            const closeBraces = (url.match(/\}/g) || []).length;
+            
+            // If parentheses/brackets/braces appear balanced, they're likely part of the URL
+            let parensBalanced = openParens === closeParens;
+            let bracketsBalanced = openBrackets === closeBrackets;
+            let bracesBalanced = openBraces === closeBraces;
+            
+            let result = url;
+            let currentCloseParens = closeParens;
+            let currentCloseBrackets = closeBrackets;
+            let currentCloseBraces = closeBraces;
+            
+            // Remove only clearly sentence-ending punctuation from the end
+            while (result) {
+                const lastChar = result[result.length - 1];
+                if (lastChar.match(/[.,;:!?]/)) {
+                    // Always remove sentence-ending punctuation
+                    result = result.slice(0, -1);
+                } else if (lastChar === ')' && !parensBalanced) {
+                    // Only remove if unbalanced (likely sentence-ending)
+                    result = result.slice(0, -1);
+                    currentCloseParens--;
+                    parensBalanced = openParens === currentCloseParens;
+                } else if (lastChar === ']' && !bracketsBalanced) {
+                    result = result.slice(0, -1);
+                    currentCloseBrackets--;
+                    bracketsBalanced = openBrackets === currentCloseBrackets;
+                } else if (lastChar === '}' && !bracesBalanced) {
+                    result = result.slice(0, -1);
+                    currentCloseBraces--;
+                    bracesBalanced = openBraces === currentCloseBraces;
+                } else {
+                    // Stop if we hit a character that's part of the URL
+                    break;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Ensure URLs are preserved when pasting into profile details and moved to bottom
+        function setupProfileDetailsPasteHandler() {
+            const profileDetailsTextarea = document.getElementById('profileDetails');
+            
+            if (!profileDetailsTextarea) {
+                return;
+            }
+            
+            profileDetailsTextarea.addEventListener('paste', (event) => {
+                // Get clipboard data
+                const clipboardData = event.clipboardData || window.clipboardData;
+                if (!clipboardData) {
+                    return;
+                }
+                
+                // Get both HTML and plain text
+                const htmlData = clipboardData.getData('text/html');
+                const plainText = clipboardData.getData('text/plain');
+                
+                if (!plainText) {
+                    return;
+                }
+                
+                // Extract URLs from multiple sources
+                const foundUrls = new Set();
+                
+                // 1. Extract from HTML links if available
+                if (htmlData) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = htmlData;
+                    const links = tempDiv.querySelectorAll('a[href]');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('www.'))) {
+                            foundUrls.add(href.trim());
+                        }
+                    });
+                }
+                
+                // 2. Extract from plain text using improved regex
+                // Include parentheses, brackets, and braces as they can be part of URLs
+                // Stop at whitespace, angle brackets, quotes, or clearly sentence-ending punctuation
+                const urlRegex = /(https?:\/\/[^\s<>"]+|www\.[^\s<>"]+)/gi;
+                const textUrls = plainText.match(urlRegex);
+                if (textUrls) {
+                    textUrls.forEach((url, index) => {
+                        // Find the position of this URL in the text to check what comes after
+                        const urlIndex = plainText.indexOf(url, index > 0 ? plainText.indexOf(textUrls[index - 1]) + textUrls[index - 1].length : 0);
+                        const afterUrl = plainText.substring(urlIndex + url.length, urlIndex + url.length + 1);
+                        
+                        // Only trim trailing punctuation if it's clearly sentence-ending
+                        if (afterUrl && (afterUrl.match(/\s/) || afterUrl.match(/[.,;:!?]/))) {
+                            url = trimTrailingPunctuation(url);
+                        }
+                        
+                        if (url.trim()) {
+                            foundUrls.add(url.trim());
+                        }
+                    });
+                }
+                
+                // Convert Set to array and normalize URLs
+                const urls = Array.from(foundUrls).map(url => {
+                    url = url.trim();
+                    // Smart trimming already done during extraction, just normalize
+                    // Add https:// if it starts with www.
+                    if (url.startsWith('www.')) {
+                        url = 'https://' + url;
+                    }
+                    return url;
+                }).filter(url => url.length > 0);
+                
+                // Remove URLs from the text while preserving formatting
+                let textWithoutUrls = plainText;
+                if (urls.length > 0) {
+                    // Find all URL matches with their exact positions
+                    // Use the same improved regex that includes parentheses, brackets, and braces
+                    const urlRegex = /(https?:\/\/[^\s<>"]+|www\.[^\s<>"]+)/gi;
+                    const matches = [];
+                    let match;
+                    
+                    // Reset regex
+                    urlRegex.lastIndex = 0;
+                    while ((match = urlRegex.exec(plainText)) !== null) {
+                        let urlText = match[0];
+                        // Apply smart trimming if there's whitespace or punctuation after
+                        const matchEnd = match.index + urlText.length;
+                        if (matchEnd < plainText.length) {
+                            const nextChar = plainText[matchEnd];
+                            if (nextChar && (nextChar.match(/\s/) || nextChar.match(/[.,;:!?]/))) {
+                                urlText = trimTrailingPunctuation(urlText);
+                            }
+                        }
+                        matches.push({
+                            text: urlText,
+                            index: match.index
+                        });
+                    }
+                    
+                    // Also check for HTML link text
+                    if (htmlData) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = htmlData;
+                        const links = tempDiv.querySelectorAll('a[href]');
+                        links.forEach(link => {
+                            const linkText = link.textContent.trim();
+                            if (linkText) {
+                                const index = plainText.indexOf(linkText);
+                                if (index !== -1) {
+                                    // Check if not already in matches
+                                    const alreadyFound = matches.some(m => 
+                                        index >= m.index && index < m.index + m.text.length
+                                    );
+                                    if (!alreadyFound && (linkText.startsWith('http') || linkText.startsWith('www.'))) {
+                                        matches.push({
+                                            text: linkText,
+                                            index: index
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Sort by index descending to remove from end to start
+                    matches.sort((a, b) => b.index - a.index);
+                    
+                    // Remove each URL, preserving formatting
+                    matches.forEach(m => {
+                        const start = m.index;
+                        const end = start + m.text.length;
+                        const before = textWithoutUrls.substring(0, start);
+                        const after = textWithoutUrls.substring(end);
+                        
+                        // Check if URL is on its own line
+                        const lineStartIdx = before.lastIndexOf('\n');
+                        const lineEndIdx = after.indexOf('\n');
+                        const lineBefore = lineStartIdx === -1 ? before : before.substring(lineStartIdx + 1);
+                        const lineAfter = lineEndIdx === -1 ? after : after.substring(0, lineEndIdx);
+                        const fullLine = (lineBefore + m.text + lineAfter).trim();
+                        
+                        if (fullLine === m.text.trim()) {
+                            // URL is on its own line - remove the line
+                            const hasNewlineBefore = before.endsWith('\n');
+                            const hasNewlineAfter = after.startsWith('\n');
+                            
+                            if (hasNewlineBefore && hasNewlineAfter) {
+                                // Remove one newline to avoid double
+                                textWithoutUrls = before.slice(0, -1) + after;
+                            } else {
+                                textWithoutUrls = before + after;
+                            }
+                        } else {
+                            // URL is inline - just remove it
+                            textWithoutUrls = before + after;
+                        }
+                    });
+                    
+                    // Clean up excessive blank lines
+                    textWithoutUrls = textWithoutUrls.replace(/\n{3,}/g, '\n\n');
+                }
+                
+                // Prepare the final text: formatted text + URLs at bottom
+                let finalText = textWithoutUrls.trim();
+                if (urls.length > 0) {
+                    // Add separator and URLs at the bottom
+                    if (finalText && !finalText.endsWith('\n')) {
+                        finalText += '\n\n';
+                    } else if (finalText) {
+                        finalText += '\n';
+                    }
+                    finalText += '--- Links ---\n';
+                    // Remove duplicates (in case normalization created duplicates)
+                    const uniqueUrls = [...new Set(urls)];
+                    finalText += uniqueUrls.join('\n\n');
+                }
+                
+                // Prevent default paste and insert our processed text
+                event.preventDefault();
+                
+                const textarea = event.target;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const currentText = textarea.value;
+                
+                // Insert the processed text at cursor position
+                textarea.value = currentText.substring(0, start) + finalText + currentText.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start + finalText.length;
+            });
+        }
+
         function showTransitionScreen(data) {
             // Hide form
             document.querySelector('.container').style.display = 'none';
@@ -665,6 +908,11 @@ You can use Markdown formatting:
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Contact';
             }
+        });
+
+        // Setup paste handler for profile details on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            setupProfileDetailsPasteHandler();
         });
     </script>
     <!-- Shared Menu Injection -->

@@ -1,6 +1,7 @@
 """Document generation service for networking contacts"""
 import json
 import html
+import re
 from pathlib import Path
 from typing import Dict, Optional
 from datetime import datetime, timedelta
@@ -17,6 +18,45 @@ class NetworkingDocumentGenerator:
     def __init__(self):
         self.networking_analyzer = NetworkingAnalyzer()
         self.ai_analyzer = AIAnalyzer()
+    
+    def _convert_urls_to_links(self, text: str) -> str:
+        """Convert URLs in text to clickable HTML links"""
+        if not text:
+            return text
+        
+        # Pattern to match URLs (http, https, or www)
+        url_pattern = r'(https?://[^\s\)\]\}]+|www\.[^\s\)\]\}]+)'
+        
+        # Find all URLs and their positions
+        urls = []
+        for match in re.finditer(url_pattern, text):
+            url = match.group(0)
+            # Clean trailing punctuation
+            url = url.rstrip('.,;:!?)}]')
+            urls.append((match.start(), match.end(), url))
+        
+        # Build result by replacing URLs with links and escaping the rest
+        result_parts = []
+        last_end = 0
+        
+        for start, end, url in urls:
+            # Escape text before URL
+            result_parts.append(html.escape(text[last_end:start]))
+            
+            # Create link for URL
+            display_url = url
+            if url.startswith('www.'):
+                full_url = 'https://' + url
+            else:
+                full_url = url
+            
+            result_parts.append(f'<a href="{html.escape(full_url)}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">{html.escape(display_url)}</a>')
+            last_end = end
+        
+        # Add remaining text after last URL
+        result_parts.append(html.escape(text[last_end:]))
+        
+        return ''.join(result_parts)
     
     def generate_all_documents(
         self,
@@ -307,6 +347,9 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         raw_profile = ""
         if contact.raw_profile_path and contact.raw_profile_path.exists():
             raw_profile = read_text_file(contact.raw_profile_path)
+        
+        # Convert URLs to clickable links
+        raw_profile_html = self._convert_urls_to_links(raw_profile) if raw_profile else 'No raw profile available'
         
         # Get standard messages with placeholders replaced
         standard_messages = self._get_standard_networking_messages()
@@ -976,7 +1019,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                     <h2>Raw Profile Details</h2>
                 </div>
                 <div class="section-content">
-                <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">{raw_profile or 'No raw profile available'}</pre>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5; font-family: monospace;">{raw_profile_html}</div>
                 </div>
             </div>
         </div>
@@ -2034,6 +2077,9 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         if contact.raw_profile_path and contact.raw_profile_path.exists():
             raw_profile = read_text_file(contact.raw_profile_path)
         
+        # Convert URLs to clickable links
+        raw_profile_html = self._convert_urls_to_links(raw_profile) if raw_profile else 'No raw profile available'
+        
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2648,7 +2694,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     <h2>Raw Profile Details</h2>
                 </div>
                 <div class="section-content">
-                <pre>{raw_profile}</pre>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5; font-family: monospace;">{raw_profile_html}</div>
                 </div>
             </div>
         </div>
