@@ -111,6 +111,17 @@ class PreliminaryMatcher:
         # Normalize job description
         job_desc_lower = job_description.lower()
         
+        # Check if Job Engine V2 is enabled and get V2 data
+        v2_config = self._load_job_engine_v2_config()
+        frequent_skills = {}
+        critical_requirements = {}
+        
+        if v2_config.get('enabled', False):
+            if v2_config.get('phases', {}).get('phase_1_frequency_analysis', {}).get('enabled', False):
+                frequent_skills = self._extract_frequent_skills(job_description)
+            if v2_config.get('phases', {}).get('phase_1_critical_requirements', {}).get('enabled', False):
+                critical_requirements = self._identify_critical_requirements(job_description)
+        
         # Initialize results
         matches = {
             'exact_matches': [],
@@ -121,7 +132,9 @@ class PreliminaryMatcher:
             'total_required': 0,
             'matched_count': 0,
             'missing_count': 0,
-            'match_details': {}
+            'match_details': {},
+            'frequent_skills': frequent_skills,  # V2: Frequency data
+            'critical_requirements': critical_requirements  # V2: Critical requirements
         }
         
         # Extract job skills first
@@ -253,28 +266,65 @@ class PreliminaryMatcher:
             base_score = (matched_job_skills / total_job_skills) * 100
             
             # Check for CRITICAL missing requirements (education, domain expertise)
-            # These should severely penalize the score regardless of other matches
-            # CRITICAL: Only apply severe penalties for truly critical requirements
-            # Mathematics/Statistics are common in data roles and shouldn't trigger severe penalties
-            critical_requirements = []
-            education_keywords = ['phd', 'doctorate', 'master', 'bachelor', 'degree', 'abd']
-            # Only scientific domain expertise that's truly required (not common data science skills)
-            # Mathematics/Statistics are standard for analytics roles - treat as regular skills
-            domain_keywords = ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics', 'molecular biology']
+            # Use V2 critical requirements if available, otherwise fall back to pattern matching
+            critical_requirements_list = []
             
-            for unmatched_skill in matches['unmatched_job_skills']:
-                skill_lower = unmatched_skill.lower()
-                is_education = any(edu in skill_lower for edu in education_keywords)
-                is_domain = any(domain in skill_lower for domain in domain_keywords)
-                if is_education or is_domain:
-                    critical_requirements.append(unmatched_skill)
+            if matches.get('critical_requirements') and any(matches['critical_requirements'].values()):
+                # Use V2 critical requirements data
+                for category, items in matches['critical_requirements'].items():
+                    for item in items:
+                        if item.get('is_critical', False):
+                            skill_name = item.get('skill', '')
+                            # Check if this critical skill is missing AND candidate doesn't meet the requirement
+                            if skill_name and skill_name not in [m['skill'] for m in matches['exact_matches']]:
+                                # Check if candidate actually meets the requirement (e.g., 15+ years meets 10+ years)
+                                meets_requirement = False
+                                if category == 'years_experience':
+                                    meets_requirement = self._check_candidate_meets_requirement('years_experience', skill_name)
+                                elif category == 'education':
+                                    meets_requirement = self._check_candidate_meets_requirement('education', skill_name)
+                                
+                                # Only add to penalty list if candidate doesn't meet the requirement
+                                if not meets_requirement:
+                                    critical_requirements_list.append(skill_name)
+            else:
+                # Fall back to V1 pattern matching
+                education_keywords = ['phd', 'doctorate', 'master', 'bachelor', 'degree', 'abd']
+                # Only scientific domain expertise that's truly required (not common data science skills)
+                # Mathematics/Statistics are standard for analytics roles - treat as regular skills
+                domain_keywords = ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics', 'molecular biology']
+                
+                for unmatched_skill in matches['unmatched_job_skills']:
+                    skill_lower = unmatched_skill.lower()
+                    is_education = any(edu in skill_lower for edu in education_keywords)
+                    is_domain = any(domain in skill_lower for domain in domain_keywords)
+                    if is_education or is_domain:
+                        critical_requirements_list.append(unmatched_skill)
             
             # If critical requirements are missing, apply severe penalty
-            if critical_requirements:
+            if critical_requirements_list:
                 # Each critical requirement is worth 30-50% penalty
                 # Missing PhD alone should drop score significantly
-                critical_penalty = min(70, len(critical_requirements) * 30)  # Cap at 70% penalty
+                critical_penalty = min(70, len(critical_requirements_list) * 30)  # Cap at 70% penalty
                 base_score = max(0, base_score - critical_penalty)
+            
+            # V2: Apply frequency-based weighting if available
+            if matches.get('frequent_skills') and frequent_skills:
+                # Weight high-frequency skills more heavily
+                # Skills mentioned more frequently are more important
+                max_frequency = max(frequent_skills.values()) if frequent_skills.values() else 1
+                frequency_weight = 1.0
+                
+                # Check if unmatched skills include high-frequency terms
+                for unmatched_skill in matches['unmatched_job_skills']:
+                    skill_lower = unmatched_skill.lower()
+                    # Check if this skill or its components appear frequently
+                    for freq_skill, freq_count in frequent_skills.items():
+                        if freq_skill in skill_lower or skill_lower in freq_skill:
+                            # High-frequency missing skills get additional penalty
+                            frequency_penalty = (freq_count / max_frequency) * 5  # Up to 5% additional penalty
+                            base_score = max(0, base_score - frequency_penalty)
+                            break
             
             # Check if candidate is overqualified (has significantly more skills than required)
             # FIX: Only count truly critical missing skills, not all unmatched skills
@@ -392,8 +442,38 @@ class PreliminaryMatcher:
         
         return matches
     
-    def _extract_job_skills_from_description(self, job_description: str) -> List[str]:
-        """Extract skills mentioned in job description"""
+    def _load_job_engine_v2_config(self) -> Dict:
+        """Load Job Engine V2 configuration from YAML file"""
+        config_path = Path(__file__).parent.parent.parent / "data" / "config" / "job_engine_v2.yaml"
+        if config_path.exists():
+            try:
+                with open(config_path, 'r') as f:
+                    config = yaml.safe_load(f)
+                    return config.get('job_engine_v2', {})
+            except Exception as e:
+                print(f"⚠️  Warning: Could not load Job Engine V2 config: {e}")
+                return {'enabled': False, 'console_logging': True, 'phases': {}}
+        return {'enabled': False, 'console_logging': True, 'phases': {}}
+    
+    def _log_engine_status(self, config: Dict) -> None:
+        """Log which engine and phases are active"""
+        if not config.get('console_logging', True):
+            return
+        
+        print("🚀 Job Engine V2 Active")
+        phases = config.get('phases', {})
+        for phase_key, phase_config in phases.items():
+            status = "✅" if phase_config.get('enabled', False) else "❌"
+            desc = phase_config.get('description', phase_key)
+            print(f"   {desc}: {status}")
+    
+    def _extract_job_skills_v1(self, job_description: str) -> List[str]:
+        """Extract skills using Job Engine V1 (legacy method) - extracted for fallback"""
+        # This is the original V1 logic extracted for backward compatibility
+        return self._extract_job_skills_from_description_v1_impl(job_description)
+    
+    def _extract_job_skills_from_description_v1_impl(self, job_description: str) -> List[str]:
+        """V1 implementation - original extraction logic"""
         job_skills = []
         job_desc_lower = job_description.lower()
         
@@ -505,6 +585,10 @@ class PreliminaryMatcher:
              re.search(r'\bdata\s+products?\b', job_desc_lower, re.IGNORECASE)) and 
             'Data Strategy' not in job_skills):
             job_skills.append('Data Strategy')
+        
+        # Extract Program Management (often paired with Data Strategy or in job titles)
+        if re.search(r'\bprogram\s+management\b', job_desc_lower, re.IGNORECASE) and 'Program Management' not in job_skills:
+            job_skills.append('Program Management')
         
         # If job mentions "BI tools", "visualization", or "data visualization" → extract "Data Visualization"
         if ((re.search(r'\bbi\s+tools?\b', job_desc_lower, re.IGNORECASE) or 
@@ -823,6 +907,368 @@ class PreliminaryMatcher:
         consolidated_skills = self._consolidate_similar_skills(filtered_skills)
         
         return consolidated_skills
+    
+    def _extract_job_skills_from_description(self, job_description: str) -> List[str]:
+        """
+        Extract skills mentioned in job description.
+        Supports both Job Engine V1 (legacy) and Job Engine V2 (advanced) based on configuration.
+        """
+        # Check if Job Engine V2 is enabled
+        v2_config = self._load_job_engine_v2_config()
+        
+        if not v2_config.get('enabled', False):
+            # Use V1 (legacy) engine
+            if v2_config.get('console_logging', True):
+                print("⚙️  Job Engine V1 Active (Legacy)")
+            return self._extract_job_skills_v1(job_description)
+        
+        # Job Engine V2 is enabled - log status
+        if v2_config.get('console_logging', True):
+            self._log_engine_status(v2_config)
+        
+        # Start V2 extraction
+        job_skills = []
+        job_desc_lower = job_description.lower()
+        
+        # NEW: Step 2c.0 - Frequency Analysis (Word Cloud) - Phase 1.1
+        frequent_skills = {}
+        if v2_config.get('phases', {}).get('phase_1_frequency_analysis', {}).get('enabled', False):
+            if v2_config.get('console_logging', True):
+                print("📊 Job Engine V2 - Phase 1.1: Frequency Analysis active")
+            frequent_skills = self._extract_frequent_skills(job_description)
+        
+        # NEW: Step 2c.1 - Critical Requirements (Highlighting, not blocking) - Phase 1.2
+        critical_requirements = {}
+        if v2_config.get('phases', {}).get('phase_1_critical_requirements', {}).get('enabled', False):
+            if v2_config.get('console_logging', True):
+                print("🎯 Job Engine V2 - Phase 1.2: Critical Requirements Highlighting active")
+            critical_requirements = self._identify_critical_requirements(job_description)
+        
+        # NEW: Step 2c.2 - Hard Skills from Sections - Phase 2.1
+        hard_skills = []
+        if v2_config.get('phases', {}).get('phase_2_hard_skills', {}).get('enabled', False):
+            if v2_config.get('console_logging', True):
+                print("🔧 Job Engine V2 - Phase 2.1: Hard Skills Extraction active")
+            hard_skills = self._extract_hard_skills_from_sections(job_description)
+        
+        # Continue with existing V1 logic (always run for compatibility)
+        # This ensures all existing patterns still work
+        v1_skills = self._extract_job_skills_from_description_v1_impl(job_description)
+        job_skills.extend(v1_skills)
+        
+        # Add V2-specific skills (from hard skills extraction)
+        for skill in hard_skills:
+            if skill not in job_skills:
+                job_skills.append(skill)
+        
+        # Note: frequency_skills and critical_requirements are used in find_skill_matches()
+        # for weighting and penalties, not for skill extraction
+        
+        # Deduplicate and consolidate
+        consolidated_skills = self._consolidate_similar_skills(job_skills)
+        
+        return consolidated_skills
+    
+    def _extract_frequent_skills(self, job_description: str, min_frequency: int = 2) -> Dict[str, int]:
+        """
+        Extract skills by frequency analysis (Word Cloud approach).
+        Only counts frequencies of known skills from taxonomy and job skills database.
+        Identifies most important requirements by counting repetitions of actual skills.
+        
+        Args:
+            job_description: Full job description text
+            min_frequency: Minimum number of mentions to include (default: 2)
+        
+        Returns:
+            Dictionary mapping skill -> frequency count (only for known skills)
+        """
+        # Build set of all known skills from taxonomy and job skills database
+        known_skills_set = set()
+        
+        # Load skills from taxonomy (canonical names + aliases)
+        taxonomy_path = Path(__file__).parent.parent.parent / "data" / "config" / "skill_normalization.yaml"
+        if taxonomy_path.exists():
+            try:
+                with open(taxonomy_path, 'r') as f:
+                    taxonomy_data = yaml.safe_load(f)
+                    skills_data = taxonomy_data.get('skills', {})
+                    for skill_key, skill_info in skills_data.items():
+                        # Add canonical name
+                        canonical = skill_info.get('canonical', skill_key)
+                        if isinstance(canonical, str):
+                            known_skills_set.add(canonical.lower())
+                        # Add all aliases
+                        aliases = skill_info.get('aliases', [])
+                        for alias in aliases:
+                            if isinstance(alias, str):
+                                known_skills_set.add(alias.lower())
+            except Exception as e:
+                print(f"⚠️  Warning: Could not load skills taxonomy: {e}")
+        
+        # Load skills from job skills markdown
+        if self.job_skills_path.exists():
+            job_skills_content = read_text_file(self.job_skills_path)
+            for category, skills in self.job_skills.items():
+                for skill in skills:
+                    # Normalize skill name
+                    normalized = self.skill_normalizer.normalize(skill, fuzzy=True)
+                    if normalized:
+                        known_skills_set.add(normalized.lower())
+                    # Also add original (lowercased)
+                    known_skills_set.add(skill.lower())
+        
+        # Now count frequencies of only known skills in job description
+        job_desc_lower = job_description.lower()
+        skill_frequencies = {}
+        
+        # Count each known skill
+        for skill in known_skills_set:
+            # Create pattern to match the skill (word boundaries)
+            # Handle multi-word skills
+            skill_pattern = r'\b' + re.escape(skill) + r'\b'
+            matches = len(re.findall(skill_pattern, job_desc_lower, re.IGNORECASE))
+            if matches >= min_frequency:
+                skill_frequencies[skill] = matches
+        
+        return skill_frequencies
+    
+    def _identify_critical_requirements(self, job_description: str) -> Dict[str, List[Dict[str, any]]]:
+        """
+        Identify critical requirements that should be highlighted (not used for blocking).
+        Supports career pivots by flagging missing critical skills but allowing evaluation to continue.
+        
+        Args:
+            job_description: Full job description text
+        
+        Returns:
+            Dictionary with categories: 'education', 'certifications', 'domain_expertise', 
+            'years_experience', 'specific_skills'
+            Each item includes: {'skill': str, 'is_critical': bool, 'highlight_reason': str}
+        """
+        critical = {
+            'education': [],
+            'certifications': [],
+            'domain_expertise': [],
+            'years_experience': [],
+            'specific_skills': []
+        }
+        
+        job_desc_lower = job_description.lower()
+        
+        # Enhanced patterns for critical requirements
+        # Check if we're in a "Required Qualifications" section context
+        required_section_context = re.search(r'required\s+(?:qualifications?|skills?|experience)', job_desc_lower, re.IGNORECASE)
+        
+        # Education requirements - check both explicit "required" patterns and section context
+        education_patterns = [
+            (r'\b(?:required|must have|non-negotiable|essential).*?(?:ph\.?d\.?|phd|doctorate)\b', 'PhD', 'Required in job description'),
+            (r'\b(?:required|must have|non-negotiable|essential).*?(?:master\'?s?\s+degree|m\.?s\.?|m\.?a\.?)\b', "Master's Degree", 'Required in job description'),
+            (r'\b(?:required|must have|non-negotiable|essential).*?(?:bachelor\'?s?\s+degree|b\.?s\.?|b\.?a\.?)\b', "Bachelor's Degree", 'Required in job description'),
+        ]
+        
+        # If in required section, also check for education without explicit "required" keyword
+        if required_section_context:
+            education_patterns.extend([
+                (r'\b(?:ph\.?d\.?|phd|doctorate)\b', 'PhD', 'Required in Required Qualifications section'),
+                (r'\bmaster[\'\u2019]?s?\s+degree\b', "Master's Degree", 'Required in Required Qualifications section'),
+                (r'\bbachelor[\'\u2019]?s?\s+degree\b', "Bachelor's Degree", 'Required in Required Qualifications section'),
+            ])
+        
+        for pattern, skill_name, reason in education_patterns:
+            if re.search(pattern, job_description, re.IGNORECASE):
+                # Avoid duplicates
+                if not any(item['skill'] == skill_name for item in critical['education']):
+                    critical['education'].append({
+                        'skill': skill_name,
+                        'is_critical': True,
+                        'highlight_reason': reason
+                    })
+        
+        # Years of experience requirements
+        years_patterns = [
+            (r'\b(?:required|must have|non-negotiable|essential).*?(\d+)\+?\s*years?\s+(?:of\s+)?(?:experience|exp)\b', 'years_experience'),
+            (r'\bminimum\s+of\s+(\d+)\+?\s*years?\s+(?:of\s+)?(?:experience|exp)\b', 'years_experience'),
+        ]
+        
+        # If in required section, also check for years without explicit "required" keyword
+        if required_section_context:
+            years_patterns.append((r'\b(\d+)\+?\s*years?\s+(?:of\s+)?(?:directly\s+)?(?:relevant\s+)?(?:work\s+)?(?:experience|exp)\b', 'years_experience'))
+        
+        for pattern, category in years_patterns:
+            matches = re.finditer(pattern, job_description, re.IGNORECASE)
+            for match in matches:
+                years = match.group(1)
+                skill_name = f"{years}+ years experience"
+                # Avoid duplicates
+                if not any(item['skill'] == skill_name for item in critical['years_experience']):
+                    critical['years_experience'].append({
+                        'skill': skill_name,
+                        'is_critical': True,
+                        'highlight_reason': 'Minimum experience requirement specified'
+                    })
+        
+        # Certifications
+        cert_patterns = [
+            (r'\b(?:required|must have|non-negotiable|essential).*?(?:aws\s+certified|aws\s+certification)\b', 'AWS Certification', 'Required certification'),
+            (r'\b(?:required|must have|non-negotiable|essential).*?(?:pmp|certified\s+project\s+manager)\b', 'PMP Certification', 'Required certification'),
+            (r'\b(?:required|must have|non-negotiable|essential).*?(?:cdmp|data\s+management\s+professional)\b', 'CDMP', 'Required certification'),
+        ]
+        
+        for pattern, cert_name, reason in cert_patterns:
+            if re.search(pattern, job_description, re.IGNORECASE):
+                critical['certifications'].append({
+                    'skill': cert_name,
+                    'is_critical': True,
+                    'highlight_reason': reason
+                })
+        
+        # Domain expertise (already partially handled, but enhance)
+        domain_keywords = ['biology', 'chemistry', 'physics', 'genetics', 'biochemistry', 'immunology', 'bioinformatics', 'molecular biology']
+        for domain in domain_keywords:
+            if re.search(rf'\b(?:required|must have|non-negotiable|essential).*?{domain}\b', job_description, re.IGNORECASE):
+                critical['domain_expertise'].append({
+                    'skill': domain.title(),
+                    'is_critical': True,
+                    'highlight_reason': 'Required domain expertise'
+                })
+        
+        return critical
+    
+    def _extract_hard_skills_from_sections(self, job_description: str) -> List[str]:
+        """
+        Extract hard skills (technical nouns) from specific sections.
+        
+        Focus on:
+        - "Required Qualifications" section
+        - "Must-Have Skills" section
+        - "Technical Requirements" section
+        - Bullet points starting with technical terms
+        
+        Args:
+            job_description: Full job description text
+        
+        Returns:
+            List of hard skills extracted from structured sections
+        """
+        hard_skills = []
+        job_desc_lower = job_description.lower()
+        
+        # Define section markers
+        required_sections = [
+            r'required\s+qualifications?',
+            r'required\s+skills?',
+            r'must[- ]have\s+(?:technical\s+)?skills?',
+            r'technical\s+requirements?',
+            r'required\s+experience',
+            r'essential\s+qualifications?',
+            r'essential\s+skills?'
+        ]
+        
+        # Find sections and extract skills from them
+        for section_pattern in required_sections:
+            # Find the section
+            section_match = re.search(rf'{section_pattern}.*?(?=\n\n|\n##|\n###|$)', job_description, re.IGNORECASE | re.DOTALL)
+            if section_match:
+                section_text = section_match.group(0)
+                section_lower = section_text.lower()
+                
+                # Extract technologies from this section using SimpleTechExtractor
+                section_techs = self.tech_extractor.extract_technologies(section_text)
+                for tech in section_techs:
+                    if tech not in hard_skills:
+                        hard_skills.append(tech)
+                
+                # Extract skills from bullet points in this section
+                bullet_points = re.findall(r'[•\-\*]\s*(.+?)(?=\n|$)', section_text, re.MULTILINE)
+                for bullet in bullet_points:
+                    # Check if bullet contains technical terms
+                    bullet_lower = bullet.lower()
+                    # Extract potential technical skills (capitalized words, technical terms)
+                    tech_terms = re.findall(r'\b[A-Z][a-zA-Z]*(?:\s+[A-Z][a-zA-Z]*)*\b', bullet)
+                    for term in tech_terms:
+                        if len(term) > 2 and term.lower() not in ['the', 'and', 'or', 'for', 'with']:
+                            normalized = self.skill_normalizer.normalize(term, fuzzy=True)
+                            if normalized and normalized not in hard_skills:
+                                hard_skills.append(normalized)
+        
+        return hard_skills
+    
+    def _check_candidate_meets_requirement(self, requirement_type: str, requirement_value: str) -> bool:
+        """
+        Check if candidate meets a critical requirement (years of experience, education).
+        
+        Args:
+            requirement_type: 'years_experience' or 'education'
+            requirement_value: The requirement value (e.g., "10+ years experience", "Master's Degree")
+        
+        Returns:
+            True if candidate meets the requirement, False otherwise
+        """
+        # Load base resume to check candidate qualifications
+        base_resume_path = Path(__file__).parent.parent.parent / "resumes" / "base_resume.md"
+        if not base_resume_path.exists():
+            return False  # Can't verify, assume doesn't meet (conservative)
+        
+        try:
+            resume_content = read_text_file(base_resume_path).lower()
+        except Exception:
+            return False
+        
+        if requirement_type == 'years_experience':
+            # Extract years from requirement (e.g., "10+ years" -> 10)
+            years_match = re.search(r'(\d+)\+?\s*years?', requirement_value.lower())
+            if not years_match:
+                return False
+            
+            required_years = int(years_match.group(1))
+            
+            # Extract candidate's years of experience from resume
+            # Look for patterns like "15 years", "over 15 years", "15+ years", etc.
+            candidate_years_patterns = [
+                r'(\d+)\+?\s*years?\s+(?:of\s+)?(?:experience|expertise|professional)',
+                r'over\s+(\d+)\s+years?',
+                r'more\s+than\s+(\d+)\s+years?',
+                r'(\d+)\+?\s*years?\s+in',
+            ]
+            
+            max_candidate_years = 0
+            for pattern in candidate_years_patterns:
+                matches = re.finditer(pattern, resume_content, re.IGNORECASE)
+                for match in matches:
+                    years = int(match.group(1))
+                    max_candidate_years = max(max_candidate_years, years)
+            
+            # Candidate meets requirement if they have >= required years
+            return max_candidate_years >= required_years
+        
+        elif requirement_type == 'education':
+            # Check if candidate has equivalent or higher education
+            # Education hierarchy: PhD > Master's > Bachelor's
+            
+            requirement_lower = requirement_value.lower()
+            resume_lower = resume_content.lower()
+            
+            # Check for PhD requirement
+            if 'phd' in requirement_lower or 'doctorate' in requirement_lower:
+                return 'phd' in resume_lower or 'doctorate' in resume_lower or 'ph.d' in resume_lower
+            
+            # Check for Master's requirement
+            elif "master" in requirement_lower:
+                # Candidate meets if they have Master's, PhD, or equivalent
+                return ('master' in resume_lower or 'm.s' in resume_lower or 
+                       'm.a' in resume_lower or 'mba' in resume_lower or
+                       'phd' in resume_lower or 'doctorate' in resume_lower)
+            
+            # Check for Bachelor's requirement
+            elif "bachelor" in requirement_lower:
+                # Candidate meets if they have Bachelor's, Master's, PhD, or equivalent
+                return ('bachelor' in resume_lower or 'b.s' in resume_lower or 
+                       'b.a' in resume_lower or 'degree' in resume_lower or
+                       'master' in resume_lower or 'phd' in resume_lower)
+            
+            return False
+        
+        return False
     
     def _is_skill_matched(self, job_skill: str, matched_skills: set) -> bool:
         """Check if a job skill matches any candidate skill (optimized with cache)"""

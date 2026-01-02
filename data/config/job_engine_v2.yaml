@@ -1,0 +1,17 @@
+job_engine_v2:
+  enabled: true  # Master switch for Job Engine V2 (set to true to enable)
+  console_logging: true  # Show engine status in console
+  
+  phases:
+    phase_1_frequency_analysis:
+      enabled: true
+      description: "Word Cloud Scan (Frequency Analysis)"
+    
+    phase_1_critical_requirements:
+      enabled: true
+      description: "Critical Requirements Highlighting"
+    
+    phase_2_hard_skills:
+      enabled: true
+      description: "Hard Skills from Sections"
+
