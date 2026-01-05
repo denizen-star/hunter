@@ -42,6 +42,14 @@ company_counts:
       badge_id: profile_magnet
       badge_name: Profile Magnet
       badge_points: 3
+  attentive:
+    contact_ids:
+    - 20260105150624-Margho Dunnahoo-Kirsch-Attentive
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   broadridge:
     contact_ids:
     - 20251214212715-Delia Șipoș-Broadridge
@@ -138,12 +146,16 @@ company_counts:
   invesco ltd:
     contact_ids:
     - 20251212120845-Test Eisenberg-Invesco Ltd
-    - 20251212113832-Liran Eisenberg-Invesco Ltd
-    count: 2
+    count: 1
+    latest_badge: null
+  invesco us:
+    contact_ids:
+    - 20251212113832-Liran Eisenberg-Invesco US
+    count: 1
     latest_badge:
-      badge_id: deep_diver
-      badge_name: Deep Diver
-      badge_points: 10
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
   jpmorganchase:
     contact_ids:
     - 20251215100515-Matthew Fuss-JPMorganChase
@@ -360,4 +372,4 @@ company_counts:
       badge_id: deep_diver
       badge_name: Deep Diver
       badge_points: 10
-last_updated: '2026-01-05T14:49:40.751338-05:00'
+last_updated: '2026-01-05T15:57:27.033565-05:00'
