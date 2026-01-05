@@ -380,6 +380,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
+    <script src="/static/js/custom-dropdown.js"></script>
     
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -745,30 +746,159 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             max-width: fit-content;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 30px 2px 0;
+            padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: transparent;
-            border-radius: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
             font-size: 11px;
             height: 20px;
-            box-shadow: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
             background-repeat: no-repeat;
-            background-position: right center;
+            background-position: right center, center;
             transition: all 0.3s ease;
         }}
         
         #statusUpdateForm .dropdown-minimal select:hover {{
             border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
         }}
         
         #statusUpdateForm .dropdown-minimal select:focus {{
             border-bottom-color: #6699ff;
             outline: none;
-            box-shadow: none;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }}
+        
+        /* Style dropdown options */
+        #statusUpdateForm .dropdown-minimal select option {{
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            color: #1f2937;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select option:hover {{
+            background: #f3f4f6;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select option:checked {{
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
+        }}
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {{
+            position: relative;
+            display: inline-block;
+            width: auto;
+            min-width: 200px;
+        }}
+        
+        .custom-dropdown-selected {{
+            width: 100%;
+            padding: 2px 30px 2px 8px;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            font-size: 11px;
+            height: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }}
+        
+        .custom-dropdown-selected::after {{
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+        }}
+        
+        .custom-dropdown-selected:hover {{
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
+        }}
+        
+        .custom-dropdown.open .custom-dropdown-selected {{
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }}
+        
+        .custom-dropdown-options {{
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+        }}
+        
+        .custom-dropdown.open .custom-dropdown-options {{
+            display: block;
+        }}
+        
+        .custom-dropdown-optgroup {{
+            border-bottom: 1px solid #e5e7eb;
+        }}
+        
+        .custom-dropdown-optgroup:last-child {{
+            border-bottom: none;
+        }}
+        
+        .custom-dropdown-optgroup-label {{
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            background: #f9fafb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .custom-dropdown-option {{
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #1f2937;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            margin: 2px 4px;
+        }}
+        
+        .custom-dropdown-option:hover,
+        .custom-dropdown-option.highlighted {{
+            background: #f3f4f6;
+        }}
+        
+        .custom-dropdown-option.selected {{
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
+        }}
+        
+        .custom-dropdown-option.selected:hover {{
+            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
         }}
         
         .btn {{
@@ -1145,36 +1275,36 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                     <div class="form-group">
                         <label for="status">Select Status</label>
                         <div class="dropdown-minimal">
-                            <select id="status" name="status" required>
-                                <option value="">-- Select Status --</option>
-                                <optgroup label="Prospecting">
-                                    <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
-                                    <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
-                                </optgroup>
-                                <optgroup label="Outreach">
-                                    <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
-                                    <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
-                                    <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
-                                </optgroup>
-                                <optgroup label="Engagement">
-                                    <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
-                                    <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
-                                    <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
-                                </optgroup>
-                                <optgroup label="Nurture">
-                                    <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
-                                    <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
-                                    <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
-                                </optgroup>
-                            </select>
+                        <select id="status" name="status" required>
+                            <option value="">-- Select Status --</option>
+                            <optgroup label="Prospecting">
+                                <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
+                                <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
+                                <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
+                                <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
+                            </optgroup>
+                            <optgroup label="Engagement">
+                                <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
+                                <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
+                                <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
+                            </optgroup>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
+                                <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
+                                <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
+                            </optgroup>
+                        </select>
                         </div>
                         
                         <!-- Message Templates Dropdown -->
                         <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
                         <div class="dropdown-minimal">
-                            <select id="messageTemplate" onchange="loadMessageIntoEditor()">
-                                <option value="">-- Select a Message Template --</option>
-                            </select>
+                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                            <option value="">-- Select a Message Template --</option>
+                        </select>
                         </div>
                     </div>
                     
@@ -1247,11 +1377,49 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         const contactId = '{contact.id}';
         let quill;
         
+        // Custom dropdown instances
+        let statusDropdown, messageTemplateDropdown;
+        
         // Load timeline on page load
         document.addEventListener('DOMContentLoaded', () => {{
             loadTimeline();
             initializeEditor();
-            loadNetworkingTemplates();
+            
+            // Initialize custom dropdowns after a short delay to ensure DOM is ready
+            setTimeout(() => {{
+                // Initialize custom dropdowns
+                const statusSelect = document.getElementById('status');
+                const messageTemplateSelect = document.getElementById('messageTemplate');
+                
+                if (statusSelect) {{
+                    try {{
+                        statusDropdown = new CustomDropdown(statusSelect);
+                        console.log('Status dropdown initialized');
+                    }} catch (e) {{
+                        console.error('Failed to initialize status dropdown:', e);
+                    }}
+                }} else {{
+                    console.warn('Status select element not found');
+                }}
+                
+                if (messageTemplateSelect) {{
+                    try {{
+                        messageTemplateDropdown = new CustomDropdown(messageTemplateSelect, {{
+                            onSelect: (value, text) => {{
+                                loadMessageIntoEditor(value);
+                            }}
+                        }});
+                        console.log('Message template dropdown initialized');
+                    }} catch (e) {{
+                        console.error('Failed to initialize message template dropdown:', e);
+                    }}
+                }} else {{
+                    console.warn('Message template select element not found');
+                }}
+                
+                // Load templates after dropdowns are initialized
+                loadNetworkingTemplates();
+            }}, 200);
         }});
         
         // Initialize Quill Rich Text Editor
@@ -1322,18 +1490,33 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         // Load networking templates from API
         async function loadNetworkingTemplates() {{
             try {{
-                const resp = await fetch('/api/templates?category=Networking');
+                console.log('Loading networking templates...');
+                const resp = await fetch('/api/templates');
+                if (!resp.ok) {{
+                    console.error('Failed to fetch networking templates:', resp.status, resp.statusText);
+                    return;
+                }}
                 const data = await resp.json();
-                if (!data.success) return;
+                if (!data.success) {{
+                    console.warn('Networking templates API returned unsuccessful response:', data);
+                    return;
+                }}
                 
-                // Filter templates to only show Networking or All category
+                console.log('Received templates from API:', data.templates?.length || 0);
+                
+                // Filter templates to show Networking, Applications, or All category
                 networkingTemplatesCache = (data.templates || []).filter(t => {{
                     const category = t.category || 'All';
-                    return category === 'Networking' || category === 'All';
+                    return category === 'Networking' || category === 'Applications' || category === 'All';
                 }});
                 
+                console.log('Filtered networking templates:', networkingTemplatesCache.length);
+                
                 const select = document.getElementById('messageTemplate');
-                if (!select) return;
+                if (!select) {{
+                    console.warn('Message template selector element not found');
+                    return;
+                }}
                 
                 // Define delivery method order (same as applications)
                 const deliveryMethodOrder = [
@@ -1370,15 +1553,46 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                     return (a.title || '').localeCompare(b.title || '');
                 }});
                 
-                // Populate dropdown with "Delivery Method - Template Title" format
-                select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                // Build options array for custom dropdown
+                const options = [{{ value: '', text: '-- Select a Message Template --' }}];
                 for (const template of networkingTemplatesCache) {{
-                    const option = document.createElement('option');
-                    option.value = template.id;
                     const method = template.delivery_method || '';
                     const title = template.title || 'Template';
-                    option.textContent = method ? (method + ' - ' + title) : title;
-                    select.appendChild(option);
+                    options.push({{
+                        value: template.id,
+                        text: method ? (method + ' - ' + title) : title
+                    }});
+                }}
+                
+                // Update custom dropdown if it exists
+                if (messageTemplateDropdown && typeof messageTemplateDropdown.updateOptions === 'function') {{
+                    console.log('Updating networking custom dropdown with', options.length, 'options');
+                    try {{
+                        messageTemplateDropdown.updateOptions(options);
+                    }} catch (e) {{
+                        console.error('Error updating custom dropdown:', e);
+                        // Fallback to direct select update
+                        updateSelectDirectly();
+                    }}
+                }} else {{
+                    console.warn('messageTemplateDropdown not initialized or updateOptions not available, using fallback');
+                    updateSelectDirectly();
+                }}
+                
+                function updateSelectDirectly() {{
+                    // Show the select element if it was hidden
+                    if (select.style.display === 'none') {{
+                        select.style.display = '';
+                    }}
+                    select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                    for (const template of networkingTemplatesCache) {{
+                        const option = document.createElement('option');
+                        option.value = template.id;
+                        const method = template.delivery_method || '';
+                        const title = template.title || 'Template';
+                        option.textContent = method ? (method + ' - ' + title) : title;
+                        select.appendChild(option);
+                    }}
                 }}
             }} catch (error) {{
                 console.error('Error loading networking templates:', error);
@@ -1386,11 +1600,14 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         }}
         
         // Load message template into editor
-        function loadMessageIntoEditor() {{
+        function loadMessageIntoEditor(selectedValue) {{
             if (!quill) return;
             
+            // Get value from custom dropdown or fallback to select element
+            if (!selectedValue) {{
             const select = document.getElementById('messageTemplate');
-            const selectedValue = select.value;
+                selectedValue = messageTemplateDropdown ? messageTemplateDropdown.getValue() : (select ? select.value : '');
+            }}
             
             if (!selectedValue) {{
                 return;
@@ -1460,7 +1677,8 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             
             const updateBtn = document.getElementById('updateBtn');
             const updateAlert = document.getElementById('updateAlert');
-            const status = document.getElementById('status').value;
+            // Get status from custom dropdown or fallback to select element
+            const status = statusDropdown ? statusDropdown.getValue() : document.getElementById('status').value;
             
             // Get HTML content from Quill editor
             const notes = quill.root.innerHTML;
@@ -1505,9 +1723,13 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                     }}
                     
                     // Update dropdown selection
+                    if (statusDropdown) {{
+                        statusDropdown.setValue(status);
+                    }} else {{
                     const statusSelect = document.getElementById('status');
                     if (statusSelect) {{
                         statusSelect.value = status;
+                        }}
                     }}
                     
                     // Clear editor
@@ -2220,6 +2442,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
+    <script src="/static/js/custom-dropdown.js"></script>
     
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -2581,30 +2804,159 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             max-width: fit-content;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 30px 2px 0;
+            padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: transparent;
-            border-radius: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
             font-size: 11px;
             height: 20px;
-            box-shadow: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
             background-repeat: no-repeat;
-            background-position: right center;
+            background-position: right center, center;
             transition: all 0.3s ease;
         }}
         
         #statusUpdateForm .dropdown-minimal select:hover {{
             border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
         }}
         
         #statusUpdateForm .dropdown-minimal select:focus {{
             border-bottom-color: #6699ff;
             outline: none;
-            box-shadow: none;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }}
+        
+        /* Style dropdown options */
+        #statusUpdateForm .dropdown-minimal select option {{
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            color: #1f2937;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select option:hover {{
+            background: #f3f4f6;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select option:checked {{
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
+        }}
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {{
+            position: relative;
+            display: inline-block;
+            width: auto;
+            min-width: 200px;
+        }}
+        
+        .custom-dropdown-selected {{
+            width: 100%;
+            padding: 2px 30px 2px 8px;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            font-size: 11px;
+            height: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }}
+        
+        .custom-dropdown-selected::after {{
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+        }}
+        
+        .custom-dropdown-selected:hover {{
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
+        }}
+        
+        .custom-dropdown.open .custom-dropdown-selected {{
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }}
+        
+        .custom-dropdown-options {{
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+        }}
+        
+        .custom-dropdown.open .custom-dropdown-options {{
+            display: block;
+        }}
+        
+        .custom-dropdown-optgroup {{
+            border-bottom: 1px solid #e5e7eb;
+        }}
+        
+        .custom-dropdown-optgroup:last-child {{
+            border-bottom: none;
+        }}
+        
+        .custom-dropdown-optgroup-label {{
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            background: #f9fafb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .custom-dropdown-option {{
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #1f2937;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            margin: 2px 4px;
+        }}
+        
+        .custom-dropdown-option:hover,
+        .custom-dropdown-option.highlighted {{
+            background: #f3f4f6;
+        }}
+        
+        .custom-dropdown-option.selected {{
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
+        }}
+        
+        .custom-dropdown-option.selected:hover {{
+            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
         }}
         
         .btn {{
@@ -3021,36 +3373,36 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     <div class="form-group">
                         <label for="status">Select Status</label>
                         <div class="dropdown-minimal">
-                            <select id="status" name="status" required>
-                                <option value="">-- Select Status --</option>
-                                <optgroup label="Prospecting">
-                                    <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
-                                    <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
-                                </optgroup>
-                                <optgroup label="Outreach">
-                                    <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
-                                    <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
-                                    <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
-                                </optgroup>
-                                <optgroup label="Engagement">
-                                    <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
-                                    <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
-                                    <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
-                                </optgroup>
-                                <optgroup label="Nurture">
-                                    <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
-                                    <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
-                                    <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
-                                </optgroup>
-                            </select>
+                        <select id="status" name="status" required>
+                            <option value="">-- Select Status --</option>
+                            <optgroup label="Prospecting">
+                                <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
+                                <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
+                            </optgroup>
+                            <optgroup label="Outreach">
+                                <option value="Sent Email" {"selected" if contact.status in ["Sent Email", "Pending Reply"] else ""}>Sent Email</option>
+                                <option value="Connection Accepted" {"selected" if contact.status in ["Connection Accepted", "Connected - Initial"] else ""}>Connection Accepted</option>
+                                <option value="Cold/Inactive" {"selected" if contact.status == "Cold/Inactive" else ""}>Cold/Inactive</option>
+                            </optgroup>
+                            <optgroup label="Engagement">
+                                <option value="In Conversation" {"selected" if contact.status == "In Conversation" else ""}>In Conversation</option>
+                                <option value="Meeting Scheduled" {"selected" if contact.status == "Meeting Scheduled" else ""}>Meeting Scheduled</option>
+                                <option value="Meeting Complete" {"selected" if contact.status == "Meeting Complete" else ""}>Meeting Complete</option>
+                            </optgroup>
+                            <optgroup label="Nurture">
+                                <option value="Strong Connection" {"selected" if contact.status == "Strong Connection" else ""}>Strong Connection</option>
+                                <option value="Referral Partner" {"selected" if contact.status == "Referral Partner" else ""}>Referral Partner</option>
+                                <option value="Dormant" {"selected" if contact.status == "Dormant" else ""}>Dormant</option>
+                            </optgroup>
+                        </select>
                         </div>
                         
                         <!-- Message Templates Dropdown -->
                         <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
                         <div class="dropdown-minimal">
-                            <select id="messageTemplate" onchange="loadMessageIntoEditor()">
-                                <option value="">-- Select a Message Template --</option>
-                            </select>
+                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                            <option value="">-- Select a Message Template --</option>
+                        </select>
                         </div>
                     </div>
                     
@@ -3114,11 +3466,49 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         const contactId = '{contact.id}';
         let quill;
         
+        // Custom dropdown instances
+        let statusDropdown, messageTemplateDropdown;
+        
         // Load timeline on page load
         document.addEventListener('DOMContentLoaded', () => {{
             loadTimeline();
             initializeEditor();
-            loadNetworkingTemplates();
+            
+            // Initialize custom dropdowns after a short delay to ensure DOM is ready
+            setTimeout(() => {{
+                // Initialize custom dropdowns
+                const statusSelect = document.getElementById('status');
+                const messageTemplateSelect = document.getElementById('messageTemplate');
+                
+                if (statusSelect) {{
+                    try {{
+                        statusDropdown = new CustomDropdown(statusSelect);
+                        console.log('Status dropdown initialized');
+                    }} catch (e) {{
+                        console.error('Failed to initialize status dropdown:', e);
+                    }}
+                }} else {{
+                    console.warn('Status select element not found');
+                }}
+                
+                if (messageTemplateSelect) {{
+                    try {{
+                        messageTemplateDropdown = new CustomDropdown(messageTemplateSelect, {{
+                            onSelect: (value, text) => {{
+                                loadMessageIntoEditor(value);
+                            }}
+                        }});
+                        console.log('Message template dropdown initialized');
+                    }} catch (e) {{
+                        console.error('Failed to initialize message template dropdown:', e);
+                    }}
+                }} else {{
+                    console.warn('Message template select element not found');
+                }}
+                
+                // Load templates after dropdowns are initialized
+                loadNetworkingTemplates();
+            }}, 200);
         }});
         
         // Initialize Quill Rich Text Editor
@@ -3189,18 +3579,33 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         // Load networking templates from API
         async function loadNetworkingTemplates() {{
             try {{
-                const resp = await fetch('/api/templates?category=Networking');
+                console.log('Loading networking templates...');
+                const resp = await fetch('/api/templates');
+                if (!resp.ok) {{
+                    console.error('Failed to fetch networking templates:', resp.status, resp.statusText);
+                    return;
+                }}
                 const data = await resp.json();
-                if (!data.success) return;
+                if (!data.success) {{
+                    console.warn('Networking templates API returned unsuccessful response:', data);
+                    return;
+                }}
                 
-                // Filter templates to only show Networking or All category
+                console.log('Received templates from API:', data.templates?.length || 0);
+                
+                // Filter templates to show Networking, Applications, or All category
                 networkingTemplatesCache = (data.templates || []).filter(t => {{
                     const category = t.category || 'All';
-                    return category === 'Networking' || category === 'All';
+                    return category === 'Networking' || category === 'Applications' || category === 'All';
                 }});
                 
+                console.log('Filtered networking templates:', networkingTemplatesCache.length);
+                
                 const select = document.getElementById('messageTemplate');
-                if (!select) return;
+                if (!select) {{
+                    console.warn('Message template selector element not found');
+                    return;
+                }}
                 
                 // Define delivery method order (same as applications)
                 const deliveryMethodOrder = [
@@ -3237,15 +3642,46 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     return (a.title || '').localeCompare(b.title || '');
                 }});
                 
-                // Populate dropdown with "Delivery Method - Template Title" format
-                select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                // Build options array for custom dropdown
+                const options = [{{ value: '', text: '-- Select a Message Template --' }}];
                 for (const template of networkingTemplatesCache) {{
-                    const option = document.createElement('option');
-                    option.value = template.id;
                     const method = template.delivery_method || '';
                     const title = template.title || 'Template';
-                    option.textContent = method ? (method + ' - ' + title) : title;
-                    select.appendChild(option);
+                    options.push({{
+                        value: template.id,
+                        text: method ? (method + ' - ' + title) : title
+                    }});
+                }}
+                
+                // Update custom dropdown if it exists
+                if (messageTemplateDropdown && typeof messageTemplateDropdown.updateOptions === 'function') {{
+                    console.log('Updating networking custom dropdown with', options.length, 'options');
+                    try {{
+                        messageTemplateDropdown.updateOptions(options);
+                    }} catch (e) {{
+                        console.error('Error updating custom dropdown:', e);
+                        // Fallback to direct select update
+                        updateSelectDirectly();
+                    }}
+                }} else {{
+                    console.warn('messageTemplateDropdown not initialized or updateOptions not available, using fallback');
+                    updateSelectDirectly();
+                }}
+                
+                function updateSelectDirectly() {{
+                    // Show the select element if it was hidden
+                    if (select.style.display === 'none') {{
+                        select.style.display = '';
+                    }}
+                    select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                    for (const template of networkingTemplatesCache) {{
+                        const option = document.createElement('option');
+                        option.value = template.id;
+                        const method = template.delivery_method || '';
+                        const title = template.title || 'Template';
+                        option.textContent = method ? (method + ' - ' + title) : title;
+                        select.appendChild(option);
+                    }}
                 }}
             }} catch (error) {{
                 console.error('Error loading networking templates:', error);
@@ -3253,11 +3689,14 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         }}
         
         // Load message template into editor
-        function loadMessageIntoEditor() {{
+        function loadMessageIntoEditor(selectedValue) {{
             if (!quill) return;
             
+            // Get value from custom dropdown or fallback to select element
+            if (!selectedValue) {{
             const select = document.getElementById('messageTemplate');
-            const selectedValue = select.value;
+                selectedValue = messageTemplateDropdown ? messageTemplateDropdown.getValue() : (select ? select.value : '');
+            }}
             
             if (!selectedValue) {{
                 return;
@@ -3327,7 +3766,8 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             
             const updateBtn = document.getElementById('updateBtn');
             const updateAlert = document.getElementById('updateAlert');
-            const status = document.getElementById('status').value;
+            // Get status from custom dropdown or fallback to select element
+            const status = statusDropdown ? statusDropdown.getValue() : document.getElementById('status').value;
             
             // Get HTML content from Quill editor
             const notes = quill.root.innerHTML;
@@ -3372,9 +3812,13 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     }}
                     
                     // Update dropdown selection
+                    if (statusDropdown) {{
+                        statusDropdown.setValue(status);
+                    }} else {{
                     const statusSelect = document.getElementById('status');
                     if (statusSelect) {{
                         statusSelect.value = status;
+                        }}
                     }}
                     
                     // Clear editor

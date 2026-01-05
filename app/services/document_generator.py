@@ -3260,6 +3260,7 @@ Format this as a professional research document that demonstrates thorough prepa
     <!-- Quill.js Rich Text Editor -->
     <link href="/static/css/quill.snow.css" rel="stylesheet">
     <script src="/static/js/quill.min.js"></script>
+    <script src="/static/js/custom-dropdown.js"></script>
     
     <style>
         :root {{
@@ -3453,30 +3454,48 @@ Format this as a professional research document that demonstrates thorough prepa
             max-width: fit-content;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 30px 2px 0;
+            padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: transparent;
-            border-radius: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
             font-size: 11px;
             height: 20px;
-            box-shadow: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
             background-repeat: no-repeat;
-            background-position: right center;
+            background-position: right center, center;
             transition: all 0.3s ease;
         }}
         
         #statusUpdateForm .dropdown-minimal select:hover {{
             border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
         }}
         
         #statusUpdateForm .dropdown-minimal select:focus {{
             border-bottom-color: #6699ff;
             outline: none;
-            box-shadow: none;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }}
+        
+        /* Style dropdown options */
+        #statusUpdateForm .dropdown-minimal select option {{
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            color: #1f2937;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select option:hover {{
+            background: #f3f4f6;
+        }}
+        
+        #statusUpdateForm .dropdown-minimal select option:checked {{
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
         }}
         
         #statusUpdateForm label[for="new_status"],
@@ -3495,6 +3514,117 @@ Format this as a professional research document that demonstrates thorough prepa
             height: 20px;
             display: flex;
             align-items: center;
+        }}
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {{
+            position: relative;
+            display: inline-block;
+            width: auto;
+            min-width: 200px;
+        }}
+        
+        .custom-dropdown-selected {{
+            width: 100%;
+            padding: 2px 30px 2px 8px;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            font-size: 11px;
+            height: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }}
+        
+        .custom-dropdown-selected::after {{
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+        }}
+        
+        .custom-dropdown-selected:hover {{
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
+        }}
+        
+        .custom-dropdown.open .custom-dropdown-selected {{
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }}
+        
+        .custom-dropdown-options {{
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+        }}
+        
+        .custom-dropdown.open .custom-dropdown-options {{
+            display: block;
+        }}
+        
+        .custom-dropdown-optgroup {{
+            border-bottom: 1px solid #e5e7eb;
+        }}
+        
+        .custom-dropdown-optgroup:last-child {{
+            border-bottom: none;
+        }}
+        
+        .custom-dropdown-optgroup-label {{
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            background: #f9fafb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .custom-dropdown-option {{
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #1f2937;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            margin: 2px 4px;
+        }}
+        
+        .custom-dropdown-option:hover,
+        .custom-dropdown-option.highlighted {{
+            background: #f3f4f6;
+        }}
+        
+        .custom-dropdown-option.selected {{
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
+        }}
+        
+        .custom-dropdown-option.selected:hover {{
+            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
         }}
         
         /* Position Copy button at top right of notes editor */
@@ -4994,33 +5124,57 @@ Format this as a professional research document that demonstrates thorough prepa
                 }}, true);
                 
                 console.log('✅ Quill editor initialized successfully');
-
-                // Load templates and wire interactions
-                loadTemplates();
-                const selector = document.getElementById('template_selector');
-                if (selector) {{
-                    selector.addEventListener('change', onTemplateSelected);
-                }}
             }} else {{
                 console.error('❌ Quill.js not loaded');
             }}
+            
+            // Initialize custom dropdowns (declare at function scope so loadTemplates can access)
+            const statusSelect = document.getElementById('new_status');
+            const templateSelect = document.getElementById('template_selector');
+            
+            if (statusSelect) {{
+                statusDropdown = new CustomDropdown(statusSelect);
+            }}
+            if (templateSelect) {{
+                templateDropdown = new CustomDropdown(templateSelect, {{
+                    onSelect: (value, text) => {{
+                        onTemplateSelected(value);
+                    }}
+                }});
+            }}
+            
+            // Load templates after a short delay to ensure dropdowns are initialized
+            setTimeout(() => {{
+                loadTemplates();
+            }}, 100);
         }});
         
         // Templates cache
         let templatesCache = [];
+        let statusDropdown, templateDropdown;
         
         async function loadTemplates() {{
             try {{
                 const resp = await fetch('/api/templates?category=Applications');
+                if (!resp.ok) {{
+                    console.error('Failed to fetch templates:', resp.status, resp.statusText);
+                    return;
+                }}
                 const data = await resp.json();
-                if (!data.success) return;
+                if (!data.success) {{
+                    console.warn('Templates API returned unsuccessful response:', data);
+                    return;
+                }}
                 // Filter templates to only show Applications or All category
                 templatesCache = (data.templates || []).filter(t => {{
                     const category = t.category || 'All';
                     return category === 'Applications' || category === 'All';
                 }});
                 const selector = document.getElementById('template_selector');
-                if (!selector) return;
+                if (!selector) {{
+                    console.warn('Template selector element not found');
+                    return;
+                }}
                 
                 // Define delivery method order
                 const deliveryMethodOrder = [
@@ -5083,16 +5237,33 @@ Format this as a professional research document that demonstrates thorough prepa
                     return (a.title || '').localeCompare(b.title || '');
                 }});
                 
-                // Populate options with delivery method first
-                selector.innerHTML = '<option value="">-- Select Template --</option>';
+                // Build options array for custom dropdown
+                const options = [{{ value: '', text: '-- Select Template --' }}];
                 for (const t of templatesCache) {{
                     const baseTitle = t.title || 'Template';
                     const method = t.delivery_method || '';
                     const label = method ? (method + ' - ' + baseTitle) : baseTitle;
-                    const opt = document.createElement('option');
-                    opt.value = t.id || ((t.title || '') + '|' + (t.delivery_method || ''));
-                    opt.textContent = label;
-                    selector.appendChild(opt);
+                    options.push({{
+                        value: t.id || ((t.title || '') + '|' + (t.delivery_method || '')),
+                        text: label
+                    }});
+                }}
+                
+                // Update custom dropdown if it exists
+                if (templateDropdown) {{
+                    templateDropdown.updateOptions(options);
+                }} else {{
+                    // Fallback: update select element directly
+                    selector.innerHTML = '<option value="">-- Select Template --</option>';
+                    for (const t of templatesCache) {{
+                        const baseTitle = t.title || 'Template';
+                        const method = t.delivery_method || '';
+                        const label = method ? (method + ' - ' + baseTitle) : baseTitle;
+                        const opt = document.createElement('option');
+                        opt.value = t.id || ((t.title || '') + '|' + (t.delivery_method || ''));
+                        opt.textContent = label;
+                        selector.appendChild(opt);
+                    }}
                 }}
             }} catch (e) {{
                 console.warn('Failed to load templates', e);
@@ -5144,8 +5315,8 @@ Format this as a professional research document that demonstrates thorough prepa
             return items;
         }}
         
-        function onTemplateSelected(event) {{
-            const value = event.target.value;
+        function onTemplateSelected(templateId) {{
+            const value = templateId;
             
             // Show/hide percentage widget based on template selection
             const widgetContainer = document.getElementById('percentage-widget-container');
@@ -5356,7 +5527,8 @@ Format this as a professional research document that demonstrates thorough prepa
         async function submitStatusUpdate(event) {{
             event.preventDefault();
             
-            const status = document.getElementById('new_status').value;
+            // Get status from custom dropdown or fallback to select element
+            const status = statusDropdown ? statusDropdown.getValue() : document.getElementById('new_status').value;
             // Get HTML content from Quill editor
             const notes = quillEditor ? quillEditor.root.innerHTML : '';
             const messageDiv = document.getElementById('status-message');

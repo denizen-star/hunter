@@ -301,30 +301,48 @@
             width: auto;
             display: inline-block;
             min-width: 200px;
-            padding: 2px 30px 2px 0;
+            padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: transparent;
-            border-radius: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
             font-size: 11px;
             height: 20px;
-            box-shadow: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
             background-repeat: no-repeat;
-            background-position: right center;
+            background-position: right center, center;
             transition: all 0.3s ease;
         }
         
         #templateForm .form-group .dropdown-minimal select:hover {
             border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
         }
         
         #templateForm .form-group .dropdown-minimal select:focus {
             border-bottom-color: #6699ff;
             outline: none;
-            box-shadow: none;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }
+        
+        /* Style dropdown options */
+        #templateForm .form-group .dropdown-minimal select option {
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            color: #1f2937;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        #templateForm .form-group .dropdown-minimal select option:hover {
+            background: #f3f4f6;
+        }
+        
+        #templateForm .form-group .dropdown-minimal select option:checked {
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
         }
         
         /* Alignment for template form group with dropdowns */
@@ -356,6 +374,117 @@
         #templateForm .form-group label {
             vertical-align: middle;
             line-height: 20px;
+        }
+        
+        /* Custom Dropdown Styles */
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+            width: auto;
+            min-width: 200px;
+        }
+        
+        .custom-dropdown-selected {
+            width: 100%;
+            padding: 2px 30px 2px 8px;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            font-size: 11px;
+            height: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .custom-dropdown-selected::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+        }
+        
+        .custom-dropdown-selected:hover {
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.15);
+        }
+        
+        .custom-dropdown.open .custom-dropdown-selected {
+            border-bottom-color: #6699ff;
+            box-shadow: 0 2px 6px rgba(102, 153, 255, 0.2);
+        }
+        
+        .custom-dropdown-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .custom-dropdown.open .custom-dropdown-options {
+            display: block;
+        }
+        
+        .custom-dropdown-optgroup {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .custom-dropdown-optgroup:last-child {
+            border-bottom: none;
+        }
+        
+        .custom-dropdown-optgroup-label {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            background: #f9fafb;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .custom-dropdown-option {
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #1f2937;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            margin: 2px 4px;
+        }
+        
+        .custom-dropdown-option:hover,
+        .custom-dropdown-option.highlighted {
+            background: #f3f4f6;
+        }
+        
+        .custom-dropdown-option.selected {
+            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            color: white;
+        }
+        
+        .custom-dropdown-option.selected:hover {
+            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
         }
         
         /* Font size for Title input field */
@@ -745,6 +874,9 @@
     <script>
         let quillEditor;
         
+        // Initialize custom dropdowns
+        let categoryDropdown, deliveryMethodDropdown;
+        
         // Initialize Quill editor
         document.addEventListener('DOMContentLoaded', function() {
             quillEditor = new Quill('#template_content', {
@@ -761,21 +893,48 @@
                 }
             });
             
+            // Initialize custom dropdowns
+            const categorySelect = document.getElementById('template_category');
+            const deliveryMethodSelect = document.getElementById('delivery_method');
+            
+            if (categorySelect) {
+                categoryDropdown = new CustomDropdown(categorySelect);
+            }
+            if (deliveryMethodSelect) {
+                deliveryMethodDropdown = new CustomDropdown(deliveryMethodSelect);
+            }
+            
             loadTemplates();
         });
         
         async function loadTemplates() {
             try {
                 const response = await fetch('/api/templates');
+                
+                if (!response.ok) {
+                    // Try to get error message from response
+                    let errorMessage = `HTTP error! status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        // If response is not JSON, use status text
+                        errorMessage = response.statusText || errorMessage;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success) {
                     displayTemplates(result.templates);
                 } else {
-                    showStatus('Error loading templates: ' + result.error, 'error');
+                    showStatus('Error loading templates: ' + (result.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
-                showStatus('Error loading templates: ' + error.message, 'error');
+                console.error('Error loading templates:', error);
+                const errorMessage = error.message || 'Failed to load templates. Please check your connection and try again.';
+                showStatus('Error loading templates: ' + errorMessage, 'error');
             }
         }
         
@@ -899,10 +1058,11 @@
         async function submitTemplate(event) {
             event.preventDefault();
             
-            const deliveryMethod = document.getElementById('delivery_method').value;
+            // Get values from custom dropdowns or fallback to select elements
+            const deliveryMethod = deliveryMethodDropdown ? deliveryMethodDropdown.getValue() : document.getElementById('delivery_method').value;
             const title = document.getElementById('template_title').value;
             const content = quillEditor.root.innerHTML;
-            const category = document.getElementById('template_category').value;
+            const category = categoryDropdown ? categoryDropdown.getValue() : document.getElementById('template_category').value;
             
             if (!deliveryMethod || !title || !content || content === '<p><br></p>') {
                 showStatus('Please fill in all fields', 'error');
@@ -923,6 +1083,19 @@
                     })
                 });
                 
+                if (!response.ok) {
+                    // Try to get error message from response
+                    let errorMessage = `HTTP error! status: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        // If response is not JSON, use status text
+                        errorMessage = response.statusText || errorMessage;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success) {
@@ -932,16 +1105,26 @@
                     document.getElementById('templateForm').reset();
                     quillEditor.setContents([]);
                     
+                    // Reset custom dropdowns
+                    if (categoryDropdown) {
+                        categoryDropdown.setValue('');
+                    }
+                    if (deliveryMethodDropdown) {
+                        deliveryMethodDropdown.setValue('');
+                    }
+                    
                     // Reload templates
                     loadTemplates();
                     
                     // Scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
-                    showStatus('Error: ' + result.error, 'error');
+                    showStatus('Error: ' + (result.error || 'Failed to save template'), 'error');
                 }
             } catch (error) {
-                showStatus('Error: ' + error.message, 'error');
+                console.error('Error saving template:', error);
+                const errorMessage = error.message || 'Failed to save template. Please check your connection and try again.';
+                showStatus('Error: ' + errorMessage, 'error');
             }
         }
         
@@ -1076,6 +1259,7 @@
     </script>
     
     <!-- Shared Sidebar Menu -->
+    <script src="/static/js/custom-dropdown.js"></script>
     <script src="/static/js/shared-menu.js"></script>
     
     <!-- Footer -->
