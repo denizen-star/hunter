@@ -295,7 +295,8 @@ Use this research information to personalize the cover letter with specific deta
 4. Keep all the original content and meaning - only improve clarity and remove repetition
 5. Do NOT change the structure, salutation, or closing format
 6. Do NOT add new content - only refine what exists
-7. CRITICAL: Remove any references to "current role", "current position", "current job", or similar phrases. When such references exist, either:
+7. CRITICAL: Preserve the "Compatibility Score" section exactly as it appears - do NOT modify, remove, or reformat it
+8. CRITICAL: Remove any references to "current role", "current position", "current job", or similar phrases. When such references exist, either:
    - Replace with a specific company name from the resume, OR
    - Replace with company size/type reference (e.g., "at a Fortune 500 company"), OR
    - Remove the reference entirely and focus on achievements and skills
@@ -307,6 +308,7 @@ Return the improved cover letter with:
 - All grammatical errors corrected
 - Repetitive phrases removed or rephrased
 - All "current role/position/job" references removed or replaced as specified above
+- The "Compatibility Score" section preserved exactly as it appears
 - Natural flow maintained
 - Original meaning and structure preserved
 

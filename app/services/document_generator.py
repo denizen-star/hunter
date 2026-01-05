@@ -166,14 +166,31 @@ class DocumentGenerator:
         # Insert compatibility text after "Dear Hiring Manager," using new format
         features_count = qualifications.features_compared if qualifications.features_compared > 0 else (len(qualifications.strong_matches) + len(qualifications.missing_skills))
         strong_matches_str = ', '.join(qualifications.strong_matches) if qualifications.strong_matches else 'core strengths'
-        compatibility_text = f"\n\nMy profile shows a {qualifications.match_score:.0f}% compatibility score with the role, and {application.company} verified through weighted scoring methodology: Technical Skills (40%), Tools (30%), Experience (15%), and Soft Skills (10%) across {features_count} requirements. My strongest matched capabilities include {strong_matches_str}."
         
-        if "Dear Hiring Manager," in cover_letter:
-            # Insert after "Dear Hiring Manager," 
-            cover_letter = cover_letter.replace("Dear Hiring Manager,", "Dear Hiring Manager," + compatibility_text)
-        elif "Dear Hiring Manager" in cover_letter:
-            # Handle case without comma
-            cover_letter = cover_letter.replace("Dear Hiring Manager", "Dear Hiring Manager," + compatibility_text)
+        # Determine compatibility level (50%+ = High)
+        compatibility_level = "High" if qualifications.match_score > 50 else "Moderate"
+        
+        # New format: Compatibility Score header + Application Snapshot bullets
+        compatibility_text = f"\n\nCompatibility Score - {qualifications.match_score:.0f}%\n\nApplication Snapshot\n•   My profile shows a {compatibility_level} compatibility score with the role, and {application.company} across {features_count} requirements. \n• My strongest matched capabilities include {strong_matches_str}"
+        
+        # Check if compatibility text is already present (to avoid duplicates)
+        if "Compatibility Score -" not in cover_letter:
+            # Try multiple salutation patterns to insert compatibility text
+            if "Dear Hiring Manager," in cover_letter:
+                # Insert after "Dear Hiring Manager," 
+                cover_letter = cover_letter.replace("Dear Hiring Manager,", "Dear Hiring Manager," + compatibility_text)
+            elif "Dear Hiring Manager" in cover_letter:
+                # Handle case without comma
+                cover_letter = cover_letter.replace("Dear Hiring Manager", "Dear Hiring Manager," + compatibility_text)
+            elif re.search(r'^Dear\s+[A-Z][a-z]+', cover_letter, re.MULTILINE):
+                # Handle other "Dear [Name]" formats - insert after first "Dear" line
+                match = re.search(r'^(Dear\s+[A-Z][a-z]+[^\n]*)', cover_letter, re.MULTILINE)
+                if match:
+                    salutation = match.group(1)
+                    cover_letter = cover_letter.replace(salutation, salutation + compatibility_text, 1)
+            else:
+                # If no salutation found, insert at the beginning after any leading whitespace
+                cover_letter = compatibility_text + "\n\n" + cover_letter.lstrip()
         
         # Remove the word "Scala" (case-insensitive) from cover letter - user prefers not to mention Scala
         # Use word boundaries to match only whole words, not parts of other words like "scalable"
@@ -192,10 +209,32 @@ class DocumentGenerator:
         # Clean up any double spaces created by removals
         cover_letter = re.sub(r'[ ]{2,}', ' ', cover_letter)
         
+        # Store compatibility text to re-insert after scanning if needed
+        compatibility_present_before = "Compatibility Score -" in cover_letter
+        
         # Scan and improve the cover letter: fix grammar and remove repetitive phrases
         from app.utils.message_logger import log_message
         log_message(42, "  → Scanning cover letter for grammar and repetitive phrases...")
         cover_letter = self.ai_analyzer.scan_and_improve_cover_letter(cover_letter)
+        
+        # Re-insert compatibility text if it was removed during scanning
+        if compatibility_present_before and "Compatibility Score -" not in cover_letter:
+            # Re-insert after salutation
+            if "Dear Hiring Manager," in cover_letter:
+                cover_letter = cover_letter.replace("Dear Hiring Manager,", "Dear Hiring Manager," + compatibility_text, 1)
+            elif "Dear Hiring Manager" in cover_letter:
+                cover_letter = cover_letter.replace("Dear Hiring Manager", "Dear Hiring Manager," + compatibility_text, 1)
+            elif re.search(r'^Dear\s+[A-Z][a-z]+', cover_letter, re.MULTILINE):
+                match = re.search(r'^(Dear\s+[A-Z][a-z]+[^\n]*)', cover_letter, re.MULTILINE)
+                if match:
+                    salutation = match.group(1)
+                    cover_letter = cover_letter.replace(salutation, salutation + compatibility_text, 1)
+        
+        # Remove ALL leading whitespace (spaces and tabs) from the start of any line (after AI processing)
+        # Split into lines, strip leading whitespace from each, then rejoin
+        lines = cover_letter.split('\n')
+        cleaned_lines = [line.lstrip(' \t') if line.strip() else line for line in lines]
+        cover_letter = '\n'.join(cleaned_lines)
         
         # Save to file
         name_clean = candidate_name.replace(' ', '')
@@ -419,6 +458,11 @@ Format this as a professional research document that demonstrates thorough prepa
                 final_qualifications = loaded_qualifications
             qual_content = final_qualifications.detailed_analysis
             cover_letter_content = read_text_file(application.cover_letter_path) if application.cover_letter_path else ""
+            # Remove leading whitespace from cover letter if it exists
+            if cover_letter_content:
+                lines = cover_letter_content.split('\n')
+                cleaned_lines = [line.lstrip(' \t') if line.strip() else line for line in lines]
+                cover_letter_content = '\n'.join(cleaned_lines)
             resume_content = read_text_file(application.custom_resume_path) if application.custom_resume_path else ""
             
             # Generate summary
@@ -716,6 +760,12 @@ Format this as a professional research document that demonstrates thorough prepa
         """Format cover letter text with proper paragraph breaks and HTML formatting"""
         if not cover_letter_text:
             return ''
+        
+        # Remove ALL leading whitespace (spaces and tabs) from the start of any line
+        # Split into lines, strip leading whitespace from each, then rejoin
+        lines = cover_letter_text.split('\n')
+        cleaned_lines = [line.lstrip(' \t') if line.strip() else line for line in lines]
+        cover_letter_text = '\n'.join(cleaned_lines)
         
         # Remove any residual signature or placeholder blocks before formatting
         cover_letter_text = re.sub(r'\n\s*Sincerely[^\n]*?(?:\n.*)?$', '', cover_letter_text, flags=re.IGNORECASE | re.DOTALL).strip()

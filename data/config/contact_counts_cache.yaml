@@ -4,6 +4,14 @@ company_counts:
     - 20251212174323-Hody Crouch-Aarons
     count: 1
     latest_badge: null
+  actus actuarial search:
+    contact_ids:
+    - 20260105105215-Angeloue Morada-Actus Actuarial Search
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   airops:
     contact_ids:
     - 20251215130844-Tatiana Fernandez (F)-AirOps
@@ -91,6 +99,14 @@ company_counts:
     - 20260102142054-Martin Eriksson-Ericsson
     count: 1
     latest_badge: null
+  flex:
+    contact_ids:
+    - 20260105141911-Craig Tullin-Flex
+    count: 1
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
   gemini:
     contact_ids:
     - 20251229120217-Makendra Jeanty-Gemini
@@ -166,6 +182,15 @@ company_counts:
       badge_id: qualified_lead
       badge_name: Qualified Lead
       badge_points: 15
+  lpl financial:
+    contact_ids:
+    - 20260105134031-Justin Cressy-LPL Financial
+    - 20260105133437-Ruslan Z-LPL Financial
+    count: 2
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
   mayo clinic:
     contact_ids:
     - 20260102143211-Phil Fiero-Mayo Clinic
@@ -224,6 +249,14 @@ company_counts:
       badge_id: qualified_lead
       badge_name: Qualified Lead
       badge_points: 15
+  pitchbook:
+    contact_ids:
+    - 20260105125639-Malia Jorgensen-PitchBook
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   rakuten:
     contact_ids:
     - 20251215114634-Lindsey Dornberger-Rakuten
@@ -235,6 +268,14 @@ company_counts:
   savills north america:
     contact_ids:
     - 20251229122335-Sangeetha S-Savills North America
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  simpro software:
+    contact_ids:
+    - 20260105124322-Liam Stott-Simpro Software
     count: 1
     latest_badge:
       badge_id: qualified_lead
@@ -299,7 +340,10 @@ company_counts:
     contact_ids:
     - 20251215094726-Frankie Scott-W Talent
     count: 1
-    latest_badge: null
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
   zeal network se:
     contact_ids:
     - 20260102140440-Pier Martin-Zeal Network SE
@@ -316,4 +360,4 @@ company_counts:
       badge_id: deep_diver
       badge_name: Deep Diver
       badge_points: 10
-last_updated: '2026-01-02T17:00:44.095782-05:00'
+last_updated: '2026-01-05T14:49:40.751338-05:00'
