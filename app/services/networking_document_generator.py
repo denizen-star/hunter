@@ -726,6 +726,13 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             height: 20px;
             display: flex;
             align-items: center;
+            font-size: 13px;
+            font-weight: normal;
+        }}
+        
+        #statusUpdateForm label[for="messageTemplate"] {{
+            font-size: 13px;
+            font-weight: normal;
         }}
         
         #statusUpdateForm > div.form-group:first-child .dropdown-minimal {{
@@ -749,16 +756,16 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             font-size: 11px;
             height: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right center, center;
+            background-position: right center;
             transition: all 0.3s ease;
         }}
         
@@ -775,7 +782,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         
         /* Style dropdown options */
         #statusUpdateForm .dropdown-minimal select option {{
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             color: #1f2937;
             padding: 8px 12px;
             border-radius: 6px;
@@ -786,7 +793,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         }}
         
         #statusUpdateForm .dropdown-minimal select option:checked {{
-            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            background: #6699ff;
             color: white;
         }}
         
@@ -798,14 +805,20 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             min-width: 200px;
         }}
         
+        /* Message Templates dropdown specific width */
+        #statusUpdateForm .dropdown-minimal:has(select#messageTemplate) .custom-dropdown,
+        #statusUpdateForm label[for="messageTemplate"] + .dropdown-minimal .custom-dropdown {{
+            min-width: 400px;
+        }}
+        
         .custom-dropdown-selected {{
             width: 100%;
             padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 13px;
             height: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
@@ -845,7 +858,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             top: 100%;
             left: 0;
             right: 0;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             margin-top: 4px;
@@ -879,12 +892,13 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         
         .custom-dropdown-option {{
             padding: 8px 12px;
-            font-size: 11px;
-            color: #1f2937;
+            font-size: 13px;
+            color: #111827;
             cursor: pointer;
             transition: all 0.2s ease;
             border-radius: 6px;
             margin: 2px 4px;
+            font-weight: normal;
         }}
         
         .custom-dropdown-option:hover,
@@ -893,18 +907,18 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         }}
         
         .custom-dropdown-option.selected {{
-            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            background: #6699ff;
             color: white;
         }}
         
         .custom-dropdown-option.selected:hover {{
-            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
+            background: #5a8ae6;
         }}
         
         .btn {{
             padding: 10px 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: normal;
             border-radius: 8px;
             border: none;
             cursor: pointer;
@@ -951,12 +965,14 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         }}
         
         .timeline-status {{
+            font-size: 13px;
+            font-weight: normal;
             display: inline-block;
             padding: 6px 12px;
             background: #3b82f6;
             color: white;
             border-radius: 6px;
-            font-weight: 600;
+            font-weight: normal;
             font-size: 13px;
         }}
         
@@ -1043,7 +1059,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
         .template-btn {{
             padding: 6px 12px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: normal;
             border-radius: 6px;
             border: 1px solid #d1d5db;
             background: white;
@@ -1276,7 +1292,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                         <label for="status">Select Status</label>
                         <div class="dropdown-minimal">
                         <select id="status" name="status" required>
-                            <option value="">-- Select Status --</option>
+                            <option value="">Select Status</option>
                             <optgroup label="Prospecting">
                                 <option value="Found Contact" {"selected" if contact.status in ["Found Contact", "To Research"] else ""}>Found Contact</option>
                                 <option value="Sent LinkedIn Connection" {"selected" if contact.status in ["Sent LinkedIn Connection", "Ready to Connect"] else ""}>Sent LinkedIn Connection</option>
@@ -1298,36 +1314,37 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                             </optgroup>
                         </select>
                         </div>
-                        
-                        <!-- Message Templates Dropdown -->
-                        <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
-                        <div class="dropdown-minimal">
-                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
-                            <option value="">-- Select a Message Template --</option>
-                        </select>
-                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="notes" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Notes</span>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button type="button" class="template-btn" onclick="insertTemplate('connection')">Connection Request</button>
+                                <button type="button" class="template-btn" onclick="insertTemplate('followup')">Follow-up</button>
+                                <button type="button" class="template-btn" onclick="insertTemplate('meeting')">Meeting Notes</button>
+                                <button type="button" class="template-btn" onclick="insertTemplate('thankyou')">Thank You</button>
+                            </div>
                             <button type="button" onclick="copyEditorContent()" class="copy-btn" style="padding: 6px 12px; font-size: 12px;">Copy Notes</button>
-                        </label>
-                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                            <button type="button" class="template-btn" onclick="insertTemplate('connection')">Connection Request</button>
-                            <button type="button" class="template-btn" onclick="insertTemplate('followup')">Follow-up</button>
-                            <button type="button" class="template-btn" onclick="insertTemplate('meeting')">Meeting Notes</button>
-                            <button type="button" class="template-btn" onclick="insertTemplate('thankyou')">Thank You</button>
                         </div>
                         <div id="editor" style="background: white; min-height: 150px;"></div>
                         <input type="hidden" id="notes" name="notes">
+                    </div>
+                    
+                    <!-- Message Templates Dropdown -->
+                    <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                        <label for="messageTemplate" style="display: flex; align-items: center; margin: 0;">Message Templates:</label>
+                        <div class="dropdown-minimal" style="display: flex; align-items: center;">
+                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                            <option value="">Select a Message Template</option>
+                        </select>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
                 </form>
                 
                 <div class="timeline" id="timeline">
-                    <h2>Status History</h2>
+                    <h2 style="font-weight: normal;">Status History</h2>
                     <div id="timelineContent">
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
@@ -1554,7 +1571,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                 }});
                 
                 // Build options array for custom dropdown
-                const options = [{{ value: '', text: '-- Select a Message Template --' }}];
+                const options = [{{ value: '', text: 'Select a Message Template' }}];
                 for (const template of networkingTemplatesCache) {{
                     const method = template.delivery_method || '';
                     const title = template.title || 'Template';
@@ -1584,7 +1601,7 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
                     if (select.style.display === 'none') {{
                         select.style.display = '';
                     }}
-                    select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                    select.innerHTML = '<option value="">Select a Message Template</option>';
                     for (const template of networkingTemplatesCache) {{
                         const option = document.createElement('option');
                         option.value = template.id;
@@ -2784,6 +2801,13 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             height: 20px;
             display: flex;
             align-items: center;
+            font-size: 13px;
+            font-weight: normal;
+        }}
+        
+        #statusUpdateForm label[for="messageTemplate"] {{
+            font-size: 13px;
+            font-weight: normal;
         }}
         
         #statusUpdateForm > div.form-group:first-child .dropdown-minimal {{
@@ -2807,16 +2831,16 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             font-size: 11px;
             height: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right center, center;
+            background-position: right center;
             transition: all 0.3s ease;
         }}
         
@@ -2833,7 +2857,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         
         /* Style dropdown options */
         #statusUpdateForm .dropdown-minimal select option {{
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             color: #1f2937;
             padding: 8px 12px;
             border-radius: 6px;
@@ -2844,7 +2868,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         }}
         
         #statusUpdateForm .dropdown-minimal select option:checked {{
-            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            background: #6699ff;
             color: white;
         }}
         
@@ -2856,14 +2880,20 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             min-width: 200px;
         }}
         
+        /* Message Templates dropdown specific width */
+        #statusUpdateForm .dropdown-minimal:has(select#messageTemplate) .custom-dropdown,
+        #statusUpdateForm label[for="messageTemplate"] + .dropdown-minimal .custom-dropdown {{
+            min-width: 400px;
+        }}
+        
         .custom-dropdown-selected {{
             width: 100%;
             padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 13px;
             height: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
@@ -2903,7 +2933,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             top: 100%;
             left: 0;
             right: 0;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             margin-top: 4px;
@@ -2937,12 +2967,13 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         
         .custom-dropdown-option {{
             padding: 8px 12px;
-            font-size: 11px;
-            color: #1f2937;
+            font-size: 13px;
+            color: #111827;
             cursor: pointer;
             transition: all 0.2s ease;
             border-radius: 6px;
             margin: 2px 4px;
+            font-weight: normal;
         }}
         
         .custom-dropdown-option:hover,
@@ -2951,18 +2982,18 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         }}
         
         .custom-dropdown-option.selected {{
-            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            background: #6699ff;
             color: white;
         }}
         
         .custom-dropdown-option.selected:hover {{
-            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
+            background: #5a8ae6;
         }}
         
         .btn {{
             padding: 10px 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: normal;
             border-radius: 8px;
             border: none;
             cursor: pointer;
@@ -3009,12 +3040,14 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         }}
         
         .timeline-status {{
+            font-size: 13px;
+            font-weight: normal;
             display: inline-block;
             padding: 6px 12px;
             background: #3b82f6;
             color: white;
             border-radius: 6px;
-            font-weight: 600;
+            font-weight: normal;
             font-size: 13px;
         }}
         
@@ -3101,7 +3134,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
         .template-btn {{
             padding: 6px 12px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: normal;
             border-radius: 6px;
             border: 1px solid #d1d5db;
             background: white;
@@ -3396,36 +3429,37 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                             </optgroup>
                         </select>
                         </div>
-                        
-                        <!-- Message Templates Dropdown -->
-                        <label for="messageTemplate" style="font-weight: 600; color: #1f2937; font-size: 14px;">Message Templates:</label>
-                        <div class="dropdown-minimal">
-                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
-                            <option value="">-- Select a Message Template --</option>
-                        </select>
-                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="notes" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Notes</span>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button type="button" class="template-btn" onclick="insertTemplate('connection')">Connection Request</button>
+                                <button type="button" class="template-btn" onclick="insertTemplate('followup')">Follow-up</button>
+                                <button type="button" class="template-btn" onclick="insertTemplate('meeting')">Meeting Notes</button>
+                                <button type="button" class="template-btn" onclick="insertTemplate('thankyou')">Thank You</button>
+                            </div>
                             <button type="button" onclick="copyEditorContent()" class="copy-btn" style="padding: 6px 12px; font-size: 12px;">Copy Notes</button>
-                        </label>
-                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                            <button type="button" class="template-btn" onclick="insertTemplate('connection')">Connection Request</button>
-                            <button type="button" class="template-btn" onclick="insertTemplate('followup')">Follow-up</button>
-                            <button type="button" class="template-btn" onclick="insertTemplate('meeting')">Meeting Notes</button>
-                            <button type="button" class="template-btn" onclick="insertTemplate('thankyou')">Thank You</button>
                         </div>
                         <div id="editor" style="background: white; min-height: 150px;"></div>
                         <input type="hidden" id="notes" name="notes">
+                    </div>
+                    
+                    <!-- Message Templates Dropdown -->
+                    <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                        <label for="messageTemplate" style="display: flex; align-items: center; margin: 0;">Message Templates:</label>
+                        <div class="dropdown-minimal" style="display: flex; align-items: center;">
+                        <select id="messageTemplate" onchange="loadMessageIntoEditor()">
+                            <option value="">Select a Message Template</option>
+                        </select>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary" id="updateBtn">Update Status</button>
                 </form>
                 
                 <div class="timeline" id="timeline">
-                    <h2>Status History</h2>
+                    <h2 style="font-weight: normal;">Status History</h2>
                     <div id="timelineContent">
                         <p style="color: #6b7280;">Loading timeline...</p>
                     </div>
@@ -3643,7 +3677,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                 }});
                 
                 // Build options array for custom dropdown
-                const options = [{{ value: '', text: '-- Select a Message Template --' }}];
+                const options = [{{ value: '', text: 'Select a Message Template' }}];
                 for (const template of networkingTemplatesCache) {{
                     const method = template.delivery_method || '';
                     const title = template.title || 'Template';
@@ -3673,7 +3707,7 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
                     if (select.style.display === 'none') {{
                         select.style.display = '';
                     }}
-                    select.innerHTML = '<option value="">-- Select a Message Template --</option>';
+                    select.innerHTML = '<option value="">Select a Message Template</option>';
                     for (const template of networkingTemplatesCache) {{
                         const option = document.createElement('option');
                         option.value = template.id;

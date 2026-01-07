@@ -3507,16 +3507,16 @@ Format this as a professional research document that demonstrates thorough prepa
             padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             font-size: 11px;
             height: 20px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E"), linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236699ff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right center, center;
+            background-position: right center;
             transition: all 0.3s ease;
         }}
         
@@ -3533,7 +3533,7 @@ Format this as a professional research document that demonstrates thorough prepa
         
         /* Style dropdown options */
         #statusUpdateForm .dropdown-minimal select option {{
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             color: #1f2937;
             padding: 8px 12px;
             border-radius: 6px;
@@ -3544,7 +3544,7 @@ Format this as a professional research document that demonstrates thorough prepa
         }}
         
         #statusUpdateForm .dropdown-minimal select option:checked {{
-            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            background: #6699ff;
             color: white;
         }}
         
@@ -3558,6 +3558,7 @@ Format this as a professional research document that demonstrates thorough prepa
             height: 20px;
             display: flex;
             align-items: center;
+            font-size: 13px;
         }}
         
         #statusUpdateForm .dropdown-minimal {{
@@ -3574,12 +3575,22 @@ Format this as a professional research document that demonstrates thorough prepa
             min-width: 200px;
         }}
         
+        /* Template dropdown specific width - target the dropdown-minimal container that contains template_selector */
+        #statusUpdateForm .dropdown-minimal:has(select#template_selector) .custom-dropdown {{
+            min-width: 600px;
+        }}
+        
+        /* Fallback for browsers that don't support :has() - use adjacent sibling selector */
+        #statusUpdateForm label[for="template_selector"] + .dropdown-minimal .custom-dropdown {{
+            min-width: 600px;
+        }}
+        
         .custom-dropdown-selected {{
             width: 100%;
             padding: 2px 30px 2px 8px;
             border: none;
             border-bottom: 2px solid #e5e7eb;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             font-size: 11px;
             height: 20px;
@@ -3621,7 +3632,7 @@ Format this as a professional research document that demonstrates thorough prepa
             top: 100%;
             left: 0;
             right: 0;
-            background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+            background: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             margin-top: 4px;
@@ -3655,12 +3666,13 @@ Format this as a professional research document that demonstrates thorough prepa
         
         .custom-dropdown-option {{
             padding: 8px 12px;
-            font-size: 11px;
-            color: #1f2937;
+            font-size: 13px;
+            color: #111827;
             cursor: pointer;
             transition: all 0.2s ease;
             border-radius: 6px;
             margin: 2px 4px;
+            font-weight: normal;
         }}
         
         .custom-dropdown-option:hover,
@@ -3669,25 +3681,17 @@ Format this as a professional research document that demonstrates thorough prepa
         }}
         
         .custom-dropdown-option.selected {{
-            background: linear-gradient(to bottom, #6699ff 0%, #5a8ae6 100%);
+            background: #6699ff;
             color: white;
         }}
         
         .custom-dropdown-option.selected:hover {{
-            background: linear-gradient(to bottom, #5a8ae6 0%, #4a7ae6 100%);
+            background: #5a8ae6;
         }}
         
-        /* Position Copy button at top right of notes editor */
-        #statusUpdateForm div[style*="position: relative"] {{
+        /* Position Copy button at top right of Row 1 (Status dropdown row) */
+        #statusUpdateForm > div:first-child {{
             position: relative;
-        }}
-        
-        #statusUpdateForm #status_notes {{
-            padding-right: 80px;
-        }}
-        
-        #statusUpdateForm #status_notes .ql-editor {{
-            padding-right: 80px;
         }}
         
         /* Copy button styling */
@@ -4963,11 +4967,12 @@ Format this as a professional research document that demonstrates thorough prepa
             <!-- Update Status Form -->
             <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
                 <form id="statusUpdateForm" onsubmit="submitStatusUpdate(event)">
-                    <div style="margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px;">
-                        <label for="new_status" style="margin: 0; padding: 0; white-space: nowrap; font-weight: 600; color: #333; line-height: 20px;">Status:</label>
+                    <!-- Row 1: Status dropdown with Copy Notes button aligned to the right -->
+                    <div style="margin-bottom: 15px; position: relative; display: flex; align-items: center; gap: 12px;">
+                        <label for="new_status" style="margin: 0; padding: 0; white-space: nowrap; color: #333; line-height: 20px;">Status:</label>
                         <div class="dropdown-minimal" style="margin: 0;">
                             <select id="new_status" required>
-                                <option value="">-- Select Status --</option>
+                                <option value="">Select Status</option>
                                 <option value="Pending">⏳ Pending</option>
                                 <option value="Applied">✉️ Applied</option>
                                 <option value="Contacted Someone">👥 Contacted Someone</option>
@@ -4980,26 +4985,30 @@ Format this as a professional research document that demonstrates thorough prepa
                                 <option value="Accepted">✅ Accepted</option>
                             </select>
                         </div>
-                        
-                        <label for="template_selector" style="margin: 0; padding: 0; white-space: nowrap; font-weight: 600; color: #333; line-height: 20px;">Template:</label>
-                        <div class="dropdown-minimal" style="margin: 0;">
-                            <select id="template_selector">
-                                <option value="">-- Select Template --</option>
-                            </select>
-                        </div>
+                        <button type="button" onclick="copyStatusNotes(this)" class="copy-btn" style="position: absolute; top: 0; right: 0; z-index: 10;">Copy Notes</button>
                     </div>
                     
-                    <div style="margin-bottom: 15px; position: relative;">
-                        <button type="button" onclick="copyStatusNotes(this)" class="copy-btn" style="position: absolute; top: 0; right: 0; z-index: 10;">Copy Notes</button>
+                    <!-- Row 2: Notes editor -->
+                    <div style="margin-bottom: 15px;">
                         <div id="status_notes" placeholder="Add notes about this status update..."></div>
                     </div>
                     
-                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 8px;">
+                    <!-- Row 3: Template dropdown and character count on same line -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <label for="template_selector" style="margin: 0; padding: 0; white-space: nowrap; color: #333; line-height: 20px;">Template:</label>
+                            <div class="dropdown-minimal" style="margin: 0;">
+                                <select id="template_selector">
+                                    <option value="">Select Template</option>
+                                </select>
+                            </div>
+                        </div>
                         <small id="status_notes_character_count" style="color: #6c757d;">0 characters</small>
                     </div>
                     
+                    <!-- Row 4: Update button -->
                     <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                        <button type="submit" id="updateStatusBtn" style="background: #d97706; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        <button type="submit" id="updateStatusBtn" style="background: #d97706; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.3s;">
                             <span id="btnText">Update</span>
                         </button>
                         
@@ -5288,7 +5297,7 @@ Format this as a professional research document that demonstrates thorough prepa
                 }});
                 
                 // Build options array for custom dropdown
-                const options = [{{ value: '', text: '-- Select Template --' }}];
+                const options = [{{ value: '', text: 'Select Template' }}];
                 for (const t of templatesCache) {{
                     const baseTitle = t.title || 'Template';
                     const method = t.delivery_method || '';
@@ -5304,7 +5313,7 @@ Format this as a professional research document that demonstrates thorough prepa
                     templateDropdown.updateOptions(options);
                 }} else {{
                     // Fallback: update select element directly
-                    selector.innerHTML = '<option value="">-- Select Template --</option>';
+                    selector.innerHTML = '<option value="">Select Template</option>';
                     for (const t of templatesCache) {{
                         const baseTitle = t.title || 'Template';
                         const method = t.delivery_method || '';
