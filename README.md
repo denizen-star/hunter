@@ -13,11 +13,14 @@ An intelligent job application management system that uses local AI (Ollama) to 
 
 ## ✨ Key Features
 
-- **AI-Powered Matching**: Local AI analyzes job descriptions and resumes
-- **Automated Documents**: Generates cover letters, tailored resumes, and analyses
-- **Application Tracking**: Dashboard with status management and notes
-- **Privacy-First**: 100% local processing, no cloud services
-- **Modern Interface**: Clean web UI with tabbed dashboard
+- **AI-Powered Matching**: Local AI analyzes job descriptions and resumes for match scoring
+- **Automated Documents**: Generates cover letters, tailored resumes, and detailed analyses
+- **Application Tracking**: Comprehensive dashboard with status management, notes, and progress tracking
+- **Unified Search**: Search and filter all applications and contacts from a single interface (v12.0.0)
+- **Networking Contacts**: Track professional networking contacts with AI-generated research and messages
+- **Progress Dashboard**: Visual overview of your entire job search pipeline
+- **Privacy-First**: 100% local processing, no cloud services required
+- **Modern Interface**: Clean web UI with icon-driven navigation and responsive design
 
 ## 🚀 Quick Start
 
@@ -54,7 +57,16 @@ Open **http://localhost:51003** in your browser.
 
 For complete documentation, installation guides, troubleshooting, and API reference, see the **[docs/](docs/)** folder.
 
+## 🎯 Main Dashboards
+
+- **App Dash**: Job applications dashboard with status cards and filtering
+- **Network Dash**: Networking contacts dashboard for relationship management
+- **Progress Dash**: Combined view of applications and contacts with activity tracking
+- **Search**: Unified search across all applications and contacts (v12.0.0)
+- **Reports**: Analytics and reporting on your job search activity
+- **Analytics**: Detailed insights and metrics
+
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: October 21, 2025
+**Version**: 12.0.0  
+**Last Updated**: January 8, 2026
