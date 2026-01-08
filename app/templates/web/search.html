@@ -287,10 +287,44 @@
             border-radius: 16px;
             font-size: 12px;
             font-weight: 500;
-            background: var(--bg-active);
-            color: var(--text-secondary);
             text-transform: capitalize;
         }
+        
+        /* Application Status Colors (matching App Dash) */
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-applied { background: #dbeafe; color: #1e40af; }
+        .status-contacted-someone { background: #f3f4f6; color: #6b7280; }
+        .status-contacted-hiring-manager { background: #fee2e2; color: #991b1b; }
+        .status-company-response { background: #eff6ff; color: #1e40af; }
+        .status-scheduled-interview { background: #fef3c7; color: #92400e; }
+        .status-interviewed { background: #d1fae5; color: #065f46; }
+        .status-interview-notes { background: #d1fae5; color: #065f46; }
+        .status-interview-follow-up { background: #fce7f3; color: #9f1239; }
+        .status-interview-followup { background: #fce7f3; color: #9f1239; }
+        .status-offered { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-accepted { background: #d1fae5; color: #065f46; }
+        
+        /* Contact Status Colors (matching networking workflow) */
+        .status-found-contact { background: #dbeafe; color: #1e40af; }
+        .status-to-research { background: #dbeafe; color: #1e40af; }
+        .status-sent-linkedin-connection { background: #fef3c7; color: #92400e; }
+        .status-ready-to-connect { background: #fef3c7; color: #92400e; }
+        .status-sent-email { background: #eff6ff; color: #1e40af; }
+        .status-pending-reply { background: #eff6ff; color: #1e40af; }
+        .status-connection-accepted { background: #d1fae5; color: #065f46; }
+        .status-connected-initial { background: #d1fae5; color: #065f46; }
+        .status-in-conversation { background: #d1fae5; color: #065f46; }
+        .status-meeting-scheduled { background: #fef3c7; color: #92400e; }
+        .status-meeting-complete { background: #d1fae5; color: #065f46; }
+        .status-strong-connection { background: #d1fae5; color: #065f46; }
+        .status-referral-partner { background: #d1fae5; color: #065f46; }
+        .status-cold-inactive { background: #f3f4f6; color: #6b7280; }
+        .status-dormant { background: #f3f4f6; color: #6b7280; }
+        .status-inactive-dormant { background: #f3f4f6; color: #6b7280; }
+        
+        /* Default status (fallback) */
+        .status-default { background: #f3f4f6; color: #6b7280; }
         
         .item-updated {
             color: var(--text-secondary);
@@ -412,6 +446,29 @@
             return div.innerHTML;
         }
         
+        function getStatusClass(status, type) {
+            if (!status) return 'status-default';
+            
+            // Normalize status string
+            const normalized = status.toLowerCase()
+                .replace(/&/g, 'and')
+                .replace(/\//g, '-')
+                .replace(/\(/g, '')
+                .replace(/\)/g, '')
+                .replace(/'/g, '')
+                .replace(/\./g, '')
+                .replace(/,/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            
+            // Check if status class exists
+            const statusClass = `status-${normalized}`;
+            
+            // Return the class (CSS will handle if it doesn't exist, fallback to default)
+            return statusClass;
+        }
+        
         function renderList(items) {
             const container = document.getElementById('list-items');
             
@@ -426,6 +483,7 @@
                 const name = escapeHtml(item.name);
                 const detailUrl = escapeHtml(item.detail_url);
                 const status = escapeHtml(item.status);
+                const statusClass = getStatusClass(item.status, item.type);
                 const matchScore = formatMatchScore(item.match_score);
                 const lastUpdated = formatDate(item.last_updated);
                 
@@ -437,7 +495,7 @@
                         </div>
                         <div class="item-match-score">${matchScore}</div>
                         <div class="item-status">
-                            <span class="status-badge">${status}</span>
+                            <span class="status-badge ${statusClass}">${status}</span>
                         </div>
                         <div class="item-updated">${lastUpdated}</div>
                     </div>

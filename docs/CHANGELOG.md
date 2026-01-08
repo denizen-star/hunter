@@ -1,5 +1,27 @@
 # Changelog
 
+## Version 12.1.0 - January 8, 2026
+
+### 🎨 Enhanced Reports Styling & Color Consistency
+
+**Visual Improvements:**
+- **Chart Container Backgrounds**: All chart containers now have a consistent mid-gray background (#808080)
+- **Chart Text Colors**: All chart text (labels, legends, tooltips, axis ticks) now use light yellow/cream color (#FDFBD4) for better contrast
+- **Category Colors**: Networking category colors now properly display in all charts:
+  - Prospecting: Light blue (#dbeafe)
+  - Outreach: Very light blue (#eff6ff)
+  - Engagement: Yellow (#fef3c7)
+  - Nurture: Light green (#d1fae5)
+- **Status Color Consistency**: All status colors across reports now match the App Dash colors
+- **Unified Color System**: Created `getColor()` function that handles both status and category colors
+
+**Files Changed:**
+- `app/templates/web/reports.html` - Enhanced chart styling, category color mapping, and consistent status colors
+- `app/templates/web/search.html` - Status color definitions for search page
+- `docs/STATUS_COLORS.md` - New documentation file for status color reference
+
+**Impact:** Reports now have a cohesive, professional appearance with consistent colors across all charts and proper category color representation.
+
 ## Version 12.0.0 - January 8, 2026
 
 ### 🔍 Unified Search & List View (MAJOR RELEASE)

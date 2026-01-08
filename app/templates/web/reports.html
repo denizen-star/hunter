@@ -580,7 +580,7 @@
             height: 350px;
             width: 100%;
             margin-bottom: var(--space-md);
-            background: var(--bg-primary);
+            background: #808080;
             padding: var(--space-md);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-primary);
@@ -591,6 +591,7 @@
         .chart-container canvas {
             max-width: 100%;
             height: 100% !important;
+            background-color: #808080;
         }
         
         .chart-timestamp {
@@ -1188,6 +1189,53 @@
             document.getElementById('stats-summary').innerHTML = summaryHtml;
         }
         
+        // Get status color (matching App Dash colors)
+        function getStatusColor(status) {
+            const statusLower = (status || '').toLowerCase().trim();
+            const statusColors = {
+                'pending': '#fef3c7',
+                'applied': '#dbeafe',
+                'contacted someone': '#f3f4f6',
+                'contacted hiring manager': '#fee2e2',
+                'company response': '#eff6ff',
+                'scheduled interview': '#fef3c7',
+                'interviewed': '#d1fae5',
+                'interview notes': '#d1fae5',
+                'interview - follow up': '#fce7f3',
+                'interview follow up': '#fce7f3',
+                'interview-follow-up': '#fce7f3',
+                'interview-followup': '#fce7f3',
+                'offered': '#d1fae5',
+                'rejected': '#fee2e2',
+                'accepted': '#d1fae5',
+                'withdrawn': '#f3f4f6'
+            };
+            return statusColors[statusLower] || '#f3f4f6'; // Default gray
+        }
+        
+        // Get category color (matching max status color in each category)
+        function getCategoryColor(category) {
+            const categoryLower = (category || '').toLowerCase().trim();
+            const categoryColors = {
+                'prospecting': '#dbeafe',  // light blue - from "To Research" status
+                'outreach': '#eff6ff',      // very light blue - from "Pending Reply" status
+                'engagement': '#fef3c7',     // yellow - from "Meeting Scheduled" status
+                'nurture': '#d1fae5'         // light green - from "Referral Partner" status
+            };
+            return categoryColors[categoryLower] || '#f3f4f6'; // Default gray
+        }
+        
+        // Get color for either status or category
+        function getColor(key) {
+            // First check if it's a category
+            const categoryColor = getCategoryColor(key);
+            if (categoryColor !== '#f3f4f6' || key.toLowerCase() in ['prospecting', 'outreach', 'engagement', 'nurture']) {
+                return categoryColor;
+            }
+            // Otherwise treat as status
+            return getStatusColor(key);
+        }
+        
         // Update applications by status chart
         function updateApplicationsByStatusChart(data) {
             if (typeof Chart === 'undefined') {
@@ -1227,12 +1275,23 @@
             
             const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
             const values = Object.values(data);
-            const colors = [
-                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
-                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
-            ];
+            // Use status or category colors matching App Dash
+            const colors = Object.keys(data).map(key => getColor(key));
             
             console.log('Applications by Status Chart Data:', { labels, values, data });
+            
+            // Plugin to draw mid-gray background
+            const backgroundPlugin = {
+                id: 'background',
+                beforeDraw: (chart) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = '#808080';
+                    ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
+                    ctx.restore();
+                }
+            };
             
             try {
                 window.applicationsByStatusChart = new Chart(ctx, {
@@ -1242,24 +1301,43 @@
                         datasets: [{
                             label: 'Applications',
                             data: values,
-                            backgroundColor: colors.slice(0, labels.length),
-                            borderColor: colors.slice(0, labels.length),
+                            backgroundColor: colors,
+                            borderColor: colors,
                             borderWidth: 1
                         }]
                     },
+                    plugins: [backgroundPlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            tooltip: {
+                                titleColor: '#FDFBD4',
+                                bodyColor: '#FDFBD4',
+                                borderColor: '#FDFBD4',
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)'
                             }
                         },
                         scales: {
+                            x: {
+                                ticks: {
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
+                                }
+                            },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
                                 }
                             }
                         }
@@ -1314,12 +1392,23 @@
             
             const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
             const values = Object.values(data);
-            const colors = [
-                '#3b82f6', '#10b981', '#6366f1', '#8b5cf6', 
-                '#ec4899', '#f59e0b', '#14b8a6', '#06b6d4'
-            ];
+            // Use status or category colors matching App Dash
+            const colors = Object.keys(data).map(key => getColor(key));
             
             console.log('Status Changes Chart Data:', { labels, values, data });
+            
+            // Plugin to draw mid-gray background
+            const backgroundPlugin = {
+                id: 'background',
+                beforeDraw: (chart) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = '#808080';
+                    ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
+                    ctx.restore();
+                }
+            };
             
             try {
                 window.statusChangesChart = new Chart(ctx, {
@@ -1329,24 +1418,43 @@
                         datasets: [{
                             label: 'Status Changes',
                             data: values,
-                            backgroundColor: colors.slice(0, labels.length),
-                            borderColor: colors.slice(0, labels.length),
+                            backgroundColor: colors,
+                            borderColor: colors,
                             borderWidth: 1
                         }]
                     },
+                    plugins: [backgroundPlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            tooltip: {
+                                titleColor: '#FDFBD4',
+                                bodyColor: '#FDFBD4',
+                                borderColor: '#FDFBD4',
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)'
                             }
                         },
                         scales: {
+                            x: {
+                                ticks: {
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
+                                }
+                            },
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
                                 }
                             }
                         }
@@ -1387,19 +1495,10 @@
                 return;
             }
             
-            // Get status color mapping
-            const statusColors = {
-                'pending': '#fbbf24',
-                'applied': '#3b82f6',
-                'contacted someone': '#6b7280',
-                'company response': '#3b82f6',
-                'scheduled interview': '#fbbf24',
-                'interview notes': '#10b981',
-                'interview - follow up': '#ec4899',
-                'offered': '#10b981',
-                'rejected': '#ef4444',
-                'accepted': '#10b981'
-            };
+            // Helper function to get color (handles both status and category)
+            function getStatusColorForChart(key) {
+                return getColor(key);
+            }
             
             // Prepare datasets
             const datasets = [];
@@ -1419,12 +1518,25 @@
                 datasets.push({
                     label: status.charAt(0).toUpperCase() + status.slice(1),
                     data: counts,
-                    borderColor: statusColors[status] || '#6b7280',
+                    borderColor: getStatusColorForChart(status),
                     backgroundColor: 'transparent',
                     tension: 0.4,
                     borderWidth: 2
                 });
             });
+            
+            // Plugin to draw mid-gray background
+            const backgroundPlugin = {
+                id: 'background',
+                beforeDraw: (chart) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = '#808080';
+                    ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
+                    ctx.restore();
+                }
+            };
             
             try {
                 window.dailyActivitiesChart = new Chart(ctx, {
@@ -1433,6 +1545,7 @@
                         labels: allDates,
                         datasets: datasets
                     },
+                    plugins: [backgroundPlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
@@ -1443,9 +1556,16 @@
                         plugins: {
                             legend: {
                                 display: true,
-                                position: 'top'
+                                position: 'top',
+                                labels: {
+                                    color: '#FDFBD4'
+                                }
                             },
                             tooltip: {
+                                titleColor: '#FDFBD4',
+                                bodyColor: '#FDFBD4',
+                                borderColor: '#FDFBD4',
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
                                 callbacks: {
                                     title: function(context) {
                                         const date = context[0].label;
@@ -1463,13 +1583,21 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
                                 }
                             },
                             x: {
                                 ticks: {
                                     maxRotation: 45,
-                                    minRotation: 45
+                                    minRotation: 45,
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
                                 }
                             }
                         }
@@ -1506,19 +1634,10 @@
                 return;
             }
             
-            // Get status color mapping
-            const statusColors = {
-                'pending': '#fbbf24',
-                'applied': '#3b82f6',
-                'contacted someone': '#6b7280',
-                'company response': '#3b82f6',
-                'scheduled interview': '#fbbf24',
-                'interview notes': '#10b981',
-                'interview - follow up': '#ec4899',
-                'offered': '#10b981',
-                'rejected': '#ef4444',
-                'accepted': '#10b981'
-            };
+            // Helper function to get color (handles both status and category)
+            function getStatusColorForChart(key) {
+                return getColor(key);
+            }
             
             // Prepare datasets
             const datasets = [];
@@ -1538,12 +1657,25 @@
                 datasets.push({
                     label: status.charAt(0).toUpperCase() + status.slice(1),
                     data: counts,
-                    borderColor: statusColors[status] || '#6b7280',
+                    borderColor: getStatusColorForChart(status),
                     backgroundColor: 'transparent',
                     tension: 0.4,
                     borderWidth: 2
                 });
             });
+            
+            // Plugin to draw mid-gray background
+            const backgroundPlugin = {
+                id: 'background',
+                beforeDraw: (chart) => {
+                    const ctx = chart.canvas.getContext('2d');
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = '#808080';
+                    ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
+                    ctx.restore();
+                }
+            };
             
             try {
                 window.cumulativeActivitiesChart = new Chart(ctx, {
@@ -1552,6 +1684,7 @@
                         labels: allDates,
                         datasets: datasets
                     },
+                    plugins: [backgroundPlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
@@ -1562,9 +1695,16 @@
                         plugins: {
                             legend: {
                                 display: true,
-                                position: 'top'
+                                position: 'top',
+                                labels: {
+                                    color: '#FDFBD4'
+                                }
                             },
                             tooltip: {
+                                titleColor: '#FDFBD4',
+                                bodyColor: '#FDFBD4',
+                                borderColor: '#FDFBD4',
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
                                 callbacks: {
                                     title: function(context) {
                                         const date = context[0].label;
@@ -1582,13 +1722,21 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
                                 }
                             },
                             x: {
                                 ticks: {
                                     maxRotation: 45,
-                                    minRotation: 45
+                                    minRotation: 45,
+                                    color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
                                 }
                             }
                         }
@@ -1699,11 +1847,16 @@
                 const totalPoints = data.total_points || 0;
                 const badgesByCategory = data.badges_by_category || {};
                 
+                // Category colors based on max status color in each category
+                // Prospecting: Found Contact, To Research -> max: To Research = #dbeafe
+                // Outreach: Sent LinkedIn Connection, Sent Email, Pending Reply -> max: Pending Reply = #eff6ff
+                // Engagement: Connection Accepted, In Conversation, Meeting Scheduled -> max: Meeting Scheduled = #fef3c7
+                // Nurture: Meeting Complete, Strong Connection, Referral Partner -> max: Referral Partner = #d1fae5
                 const categories = [
-                    { id: 'prospecting', name: 'Prospecting', color: '#3b82f6' },
-                    { id: 'outreach', name: 'Outreach', color: '#10b981' },
-                    { id: 'engagement', name: 'Engagement', color: '#f59e0b' },
-                    { id: 'nurture', name: 'Nurture', color: '#8b5cf6' }
+                    { id: 'prospecting', name: 'Prospecting', color: '#dbeafe' },
+                    { id: 'outreach', name: 'Outreach', color: '#eff6ff' },
+                    { id: 'engagement', name: 'Engagement', color: '#fef3c7' },
+                    { id: 'nurture', name: 'Nurture', color: '#d1fae5' }
                 ];
                 
                 const categoryCards = categories.map(cat => {
