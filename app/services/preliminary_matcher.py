@@ -26,6 +26,8 @@ class PreliminaryMatcher:
         self.skill_normalizer = SkillNormalizer()
         # Initialize technology extractor (comprehensive 157+ technologies)
         self.tech_extractor = SimpleTechExtractor()
+        # Load skill equivalency mappings
+        self.skill_equivalencies = self._load_skill_equivalencies()
         self.load_skills_data()
         self._build_normalization_cache()
     
@@ -44,6 +46,19 @@ class PreliminaryMatcher:
         """Initialize empty cache - normalize lazily as needed"""
         self._normalized_candidate_skills_cache = {}
         self._normalized_candidate_skills_set = set()
+    
+    def _load_skill_equivalencies(self) -> Dict[str, List[str]]:
+        """Load skill equivalency mappings from YAML file"""
+        equivalencies_path = Path(__file__).parent.parent.parent / "data" / "config" / "skill_equivalencies.yaml"
+        if equivalencies_path.exists():
+            try:
+                with open(equivalencies_path, 'r') as f:
+                    data = yaml.safe_load(f)
+                    return data.get('equivalencies', {})
+            except Exception as e:
+                print(f"⚠️  Warning: Could not load skill equivalencies: {e}")
+                return {}
+        return {}
     
     def _get_normalized_skill(self, skill_name: str) -> str:
         """Get normalized skill from cache, or normalize and cache if not present"""
@@ -238,11 +253,40 @@ class PreliminaryMatcher:
         all_candidate_skill_names = set(self.candidate_skills.keys())
         
         for job_skill in job_skills_found:
+            # Check if this job skill was already matched in the first pass (candidate -> job)
+            already_matched = False
+            for exact_match in matches['exact_matches']:
+                if exact_match.get('job_skill', '').lower() == job_skill.lower():
+                    already_matched = True
+                    matched_job_skills += 1
+                    break
+            if already_matched:
+                continue
+            for partial_match in matches['partial_matches']:
+                if partial_match.get('job_skill', '').lower() == job_skill.lower():
+                    already_matched = True
+                    matched_job_skills += 1
+                    break
+            if already_matched:
+                continue
+            
             # Phase 1: Quick check against skills already found in job description
             if self._is_skill_matched(job_skill, matched_skills):
                 matched_job_skills += 1
+                # Find the matching candidate skill and categorize as exact or partial
+                matched_candidate_skill = self._find_exact_candidate_skill(job_skill, matched_skills)
+                if matched_candidate_skill:
+                    self._add_match_if_not_duplicate(job_skill, matched_candidate_skill, matches)
             # Phase 2: If not found, check against ALL candidate skills (for cases like "strategy" -> "Business Strategy")
+            # This also checks equivalencies (e.g., "Data Engineering" -> "ETL", "Data Pipelines")
             elif self._is_skill_matched(job_skill, all_candidate_skill_names):
+                matched_job_skills += 1
+                # Find the matching candidate skill and categorize as exact or partial
+                matched_candidate_skill = self._find_exact_candidate_skill(job_skill, all_candidate_skill_names)
+                if matched_candidate_skill:
+                    self._add_match_if_not_duplicate(job_skill, matched_candidate_skill, matches)
+            # Phase 3: Check equivalencies in reverse - if job skill has equivalents, check if candidate has those equivalents
+            elif self._check_equivalency_match(job_skill, all_candidate_skill_names):
                 matched_job_skills += 1
             else:
                 unmatched_job_skills_list.append(job_skill)
@@ -480,6 +524,75 @@ class PreliminaryMatcher:
         """Extract skills using Job Engine V1 (legacy method) - extracted for fallback"""
         # This is the original V1 logic extracted for backward compatibility
         return self._extract_job_skills_from_description_v1_impl(job_description)
+    
+    def _extract_job_skills_via_ai(self, job_description: str) -> List[str]:
+        """
+        Extract ALL skills from job description using AI.
+        This extracts both predefined and domain-specific skills that may not be in the database.
+        
+        Returns:
+            List of extracted skills (strings)
+        """
+        try:
+            from app.services.ai_analyzer import AIAnalyzer
+            from app.utils.prompts import get_prompt
+            
+            ai_analyzer = AIAnalyzer()
+            
+            # Get the AI extraction prompt
+            prompt = get_prompt('job_skill_extraction', job_description=job_description)
+            
+            # Call AI to extract skills
+            response = ai_analyzer._call_ollama(prompt)
+            
+            # Parse the response - extract skills from lines
+            extracted_skills = []
+            job_desc_lower = job_description.lower()
+            
+            # Clean response - remove common meta-text patterns
+            response = re.sub(r'(?:here is|below is|following are).*?skills?:?\s*', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'extracted.*?skills?:?\s*', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'list of skills?:?\s*', '', response, flags=re.IGNORECASE)
+            
+            for line in response.split('\n'):
+                line = line.strip()
+                # Skip empty lines and lines that are clearly meta-text
+                if not line:
+                    continue
+                # Skip lines that are clearly explanations or meta-text
+                if any(meta in line.lower() for meta in ['here is', 'below is', 'following', 'extracted', 'list of skills', 'return format', 'format:', 'example:', 'job description:']):
+                    continue
+                # Skip markdown headers and formatting
+                if line.startswith('#') or line.startswith('*') or line.startswith('-') or line.startswith('|'):
+                    continue
+                # Remove numbering if present (e.g., "1. Python" -> "Python")
+                line = re.sub(r'^\d+[\.\)]\s*', '', line)
+                # Remove bullet points and other prefixes
+                line = re.sub(r'^[-*••]\s*', '', line)
+                # Remove colons at end (e.g., "Skills:" -> "Skills")
+                line = re.sub(r':\s*$', '', line)
+                line = line.strip()
+                # Must be at least 2 characters and not be common stop words
+                if line and len(line) > 1 and line.lower() not in ['skills', 'requirements', 'qualifications', 'responsibilities']:
+                    # Validate that it looks like a skill name (not a sentence)
+                    if len(line) <= 80 and not line.endswith('.'):  # Skills are usually short, not sentences
+                        # CRITICAL: Validate that the skill is actually mentioned in the job description
+                        # This prevents AI from hallucinating skills that aren't in the JD
+                        skill_words = line.lower().split()
+                        # Extract key words (2+ characters) from the skill
+                        key_words = [w for w in skill_words if len(w) > 1]
+                        if key_words:
+                            # Check if at least 50% of key words appear in the job description
+                            matching_words = sum(1 for word in key_words if re.search(r'\b' + re.escape(word) + r'\b', job_desc_lower))
+                            if matching_words >= max(1, len(key_words) * 0.5):  # At least 50% match or at least 1 word for short skills
+                                extracted_skills.append(line)
+            
+            return extracted_skills
+            
+        except Exception as e:
+            # If AI extraction fails, return empty list (fallback to pattern-based extraction)
+            print(f"⚠️  Warning: AI skill extraction failed: {e}")
+            return []
     
     def _extract_job_skills_from_description_v1_impl(self, job_description: str) -> List[str]:
         """V1 implementation - original extraction logic"""
@@ -749,6 +862,42 @@ class PreliminaryMatcher:
         if re.search(r'\bdata\s+modeling\b', job_desc_lower, re.IGNORECASE) and 'Data Modeling' not in job_skills:
             job_skills.append('Data Modeling')
         
+        # Extract product vision
+        if re.search(r'\bproduct\s+vision\b', job_desc_lower, re.IGNORECASE) and 'Product Vision' not in job_skills:
+            job_skills.append('Product Vision')
+        
+        # Extract business insights
+        if re.search(r'\bbusiness\s+insights?\b', job_desc_lower, re.IGNORECASE) and 'Business Insights' not in job_skills:
+            job_skills.append('Business Insights')
+        
+        # Extract data manipulation
+        if re.search(r'\bdata\s+manipulation\b', job_desc_lower, re.IGNORECASE) and 'Data Manipulation' not in job_skills:
+            job_skills.append('Data Manipulation')
+        
+        # Extract "translate complex data" capability
+        if re.search(r'\btranslate.*?complex.*?data\b', job_desc_lower, re.IGNORECASE) and 'Translate Complex Data' not in job_skills:
+            job_skills.append('Translate Complex Data')
+        
+        # Extract "actionable" - capability to provide actionable insights
+        if re.search(r'\bactionable\b', job_desc_lower, re.IGNORECASE) and 'Actionable Insights' not in job_skills:
+            job_skills.append('Actionable Insights')
+        
+        # Extract "data engineering roles" or data engineering experience
+        if re.search(r'\bdata\s+engineering\s+roles?\b', job_desc_lower, re.IGNORECASE) and 'Data Engineering Roles' not in job_skills:
+            job_skills.append('Data Engineering Roles')
+        
+        # Extract excellent communication skills
+        if re.search(r'\bexcellent\s+communication\s+skills?\b', job_desc_lower, re.IGNORECASE) and 'Excellent Communication Skills' not in job_skills:
+            job_skills.append('Excellent Communication Skills')
+        
+        # Extract stakeholder engagement/influence
+        if re.search(r'\bstakeholder.*?(?:engagement|influence|communication)\b', job_desc_lower, re.IGNORECASE) and 'Stakeholder Engagement' not in job_skills:
+            job_skills.append('Stakeholder Engagement')
+        
+        # Extract "engage and influence stakeholders"
+        if re.search(r'\bengage.*?influence.*?stakeholder\b', job_desc_lower, re.IGNORECASE) and 'Stakeholder Engagement' not in job_skills:
+            job_skills.append('Stakeholder Engagement')
+        
         # Extract data engineering processes
         if re.search(r'\bingestion\b', job_desc_lower, re.IGNORECASE) and 'Data Ingestion' not in job_skills:
             job_skills.append('Data Ingestion')
@@ -919,28 +1068,70 @@ class PreliminaryMatcher:
     
     def _extract_job_skills_from_description(self, job_description: str) -> List[str]:
         """
-        Extract skills mentioned in job description.
+        Extract skills mentioned in job description using hybrid approach.
+        Uses AI extraction (comprehensive) + pattern-based extraction (predefined skills) + normalization.
         Supports both Job Engine V1 (legacy) and Job Engine V2 (advanced) based on configuration.
         """
+        job_skills = []
+        
+        # Step 1: AI-based extraction (extracts ALL skills, including domain-specific)
+        # BUT: Validate that skills are actually in the JD before adding them
+        from app.utils.message_logger import log_message
+        job_desc_lower = job_description.lower()
+        ai_extracted_skills = self._extract_job_skills_via_ai(job_description)
+        if ai_extracted_skills and len(ai_extracted_skills) > 0:
+            print(f"🤖 AI extracted {len(ai_extracted_skills)} candidate skills from job description")
+            
+            # CRITICAL: Validate that each AI-extracted skill is actually mentioned in the JD
+            # This prevents AI from hallucinating skills from previous extractions
+            validated_ai_skills = []
+            for skill in ai_extracted_skills:
+                # Normalize skill for validation
+                normalized = self.skill_normalizer.normalize(skill, fuzzy=True)
+                skill_to_check = normalized.lower() if normalized else skill.lower()
+                
+                # Extract key words from skill (2+ characters)
+                skill_words = skill_to_check.split()
+                key_words = [w for w in skill_words if len(w) > 2]
+                
+                if key_words:
+                    # Validate: at least 50% of key words must appear in JD, OR the full skill phrase appears
+                    matching_words = sum(1 for word in key_words if re.search(r'\b' + re.escape(word) + r'\b', job_desc_lower))
+                    full_phrase_match = re.search(r'\b' + re.escape(skill_to_check) + r'\b', job_desc_lower, re.IGNORECASE)
+                    
+                    if full_phrase_match or matching_words >= max(1, len(key_words) * 0.5):
+                        # Skill is validated - normalize and add
+                        if normalized:
+                            validated_ai_skills.append(normalized)
+                        else:
+                            validated_ai_skills.append(skill)
+            
+            if validated_ai_skills:
+                print(f"✓ Validated {len(validated_ai_skills)}/{len(ai_extracted_skills)} AI-extracted skills against JD")
+                job_skills.extend(validated_ai_skills)
+        
         # Check if Job Engine V2 is enabled
         v2_config = self._load_job_engine_v2_config()
         
         if not v2_config.get('enabled', False):
-            # Use V1 (legacy) engine
+            # Use V1 (legacy) engine for pattern-based extraction
             if v2_config.get('console_logging', True):
                 print("⚙️  Job Engine V1 Active (Legacy)")
-            return self._extract_job_skills_v1(job_description)
+            v1_skills = self._extract_job_skills_v1(job_description)
+            job_skills.extend(v1_skills)
+            
+            # Deduplicate and consolidate similar skills
+            job_skills = self._consolidate_similar_skills(job_skills)
+            return job_skills
         
         # Job Engine V2 is enabled - log status
         if v2_config.get('console_logging', True):
             self._log_engine_status(v2_config)
         
         # Start V2 extraction
-        job_skills = []
         job_desc_lower = job_description.lower()
         
         # NEW: Step 2c.0 - Frequency Analysis (Word Cloud) - Phase 1.1
-        from app.utils.message_logger import log_message
         frequent_skills = {}
         if v2_config.get('phases', {}).get('phase_1_frequency_analysis', {}).get('enabled', False):
             if v2_config.get('console_logging', True):
@@ -1297,37 +1488,32 @@ class PreliminaryMatcher:
         job_skill_normalized = job_skill_normalized.replace('-', ' ').replace('_', ' ')
         job_skill_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_normalized).strip()
         
-        # Define skill equivalence mappings
+        # Combine hardcoded equivalences with loaded equivalency mappings
+        # Start with legacy hardcoded mappings for backward compatibility
         skill_equivalences = {
             'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],
             'amazon kinesis': ['aws', 'kinesis', 'streaming', 'data streaming'],
             'amazon q': ['aws', 'ai', 'artificial intelligence', 'machine learning'],
             'budget management': ['financial management', 'budget', 'financial', 'management', 'leadership'],
             'financial management': ['budget management', 'financial', 'budget', 'management', 'leadership'],
-            'product strategy': ['strategy', 'strategic', 'product', 'business strategy', 'data strategy', 'planning'],                                                                                                                              
-            'strategy': ['strategic', 'business strategy', 'data strategy', 'product strategy', 'planning'],                                                    
-            'data strategy': ['strategy', 'strategic', 'product strategy', 'business strategy', 'planning'],
             'insights': ['insight', 'analytics', 'data insights', 'business insights'],                                                                         
-            'data analytics': ['analytics', 'data analytics', 'product analytics', 'business analytics'],
-            'analytics': ['data analytics', 'product analytics', 'business analytics', 'insights'],
-            'data engineering': ['data warehousing', 'etl', 'data pipeline', 'data processing', 'pipelines', 'data pipelines', 'data engineering pipelines'],
-            'pipelines': ['data engineering', 'data pipelines', 'data pipeline', 'etl', 'data processing'],
-            'data pipelines': ['data engineering', 'pipelines', 'data pipeline', 'etl'],
-            'modeling': ['data modeling', 'data models', 'modeling techniques', 'data model'],
-            'data modeling': ['modeling', 'data models', 'modeling techniques', 'data model'],
-            'communication': ['communication skills', 'excellent communication', 'strong communication', 'excellent communication skills', 'strong communication skills'],
-            'communication skills': ['communication', 'excellent communication', 'strong communication'],
-            'excellent communication skills': ['communication', 'communication skills', 'strong communication skills'],
-            'strong communication skills': ['communication', 'communication skills', 'excellent communication skills'],
-            'cloud platforms': ['aws', 'azure', 'gcp', 'cloud'],
-            'snowflake': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
-            'bigquery': ['data warehousing', 'cloud data warehouse', 'analytics platform'],
             'paid advertising': ['advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
             'advertising platforms': ['paid advertising', 'digital marketing', 'google ads', 'meta', 'amazon ads'],
             'problem solving': ['problem-solving', 'problem-solving skills', 'problem solving skills'],
             'problem-solving': ['problem solving', 'problem-solving skills', 'problem solving skills'],
             'problem-solving skills': ['problem solving', 'problem-solving'],
         }
+        
+        # Add loaded equivalency mappings (from YAML file)
+        # Normalize keys and values to lowercase for matching
+        for key, values in self.skill_equivalencies.items():
+            key_normalized = key.lower().strip()
+            values_normalized = [v.lower().strip() for v in values]
+            if key_normalized not in skill_equivalences:
+                skill_equivalences[key_normalized] = values_normalized
+            else:
+                # Merge with existing values
+                skill_equivalences[key_normalized].extend(values_normalized)
         
         # Performance optimization: Use lazy cache - normalize only when needed
         for candidate_skill in matched_skills:
@@ -1360,17 +1546,154 @@ class PreliminaryMatcher:
                     return True
             
             # Check for skill equivalences (only if direct match failed)
+            # First check if job skill has equivalents defined
             if job_skill_normalized in skill_equivalences:
                 for equivalent in skill_equivalences[job_skill_normalized]:
-                    if equivalent in candidate_skill_normalized:
-                        return True
-            
-            # Check reverse equivalences (only if direct match failed)
-            for skill_key, equivalents in skill_equivalences.items():
-                if job_skill_normalized in equivalents and skill_key in candidate_skill_normalized:
-                    return True
+                    equivalent_normalized = equivalent.lower().strip().replace('-', ' ').replace('_', ' ')
+                    equivalent_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', equivalent_normalized).strip()
                     
+                    # Check if equivalent matches candidate skill (exact match preferred)
+                    if equivalent_normalized == candidate_skill_normalized:
+                        return True
+                    # Also check if equivalent is contained in candidate skill or vice versa
+                    if len(equivalent_normalized) > 2 and len(candidate_skill_normalized) > 2:
+                        if equivalent_normalized in candidate_skill_normalized or candidate_skill_normalized in equivalent_normalized:
+                            return True
+            
+            # Also check reverse: if candidate skill has equivalents, check if job skill matches any equivalent
+            if candidate_skill_normalized in skill_equivalences:
+                for equivalent in skill_equivalences[candidate_skill_normalized]:
+                    equivalent_normalized = equivalent.lower().strip().replace('-', ' ').replace('_', ' ')
+                    equivalent_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', equivalent_normalized).strip()
+                    
+                    # Check if equivalent matches job skill (exact match preferred)
+                    if equivalent_normalized == job_skill_normalized:
+                        return True
+                    # Also check if equivalent is contained in job skill or vice versa
+                    if len(equivalent_normalized) > 2 and len(job_skill_normalized) > 2:
+                        if equivalent_normalized in job_skill_normalized or job_skill_normalized in equivalent_normalized:
+                            return True
+                    
+        # No match found
         return False
+    
+    def _check_equivalency_match(self, job_skill: str, candidate_skills: set) -> bool:
+        """
+        Check if a job skill matches any candidate skill via equivalency mappings.
+        This checks both directions: job skill -> equivalent -> candidate skill AND candidate skill -> equivalent -> job skill.
+        
+        Args:
+            job_skill: Job skill to match
+            candidate_skills: Set of candidate skill names
+            
+        Returns:
+            True if match found via equivalency, False otherwise
+        """
+        if not job_skill or not job_skill.strip():
+            return False
+        
+        # Normalize job skill
+        normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
+        job_skill_normalized = normalized_result.lower() if normalized_result else job_skill.lower().strip()
+        job_skill_normalized = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+        job_skill_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_normalized).strip()
+        
+        # Check if job skill has equivalents defined
+        if job_skill_normalized in self.skill_equivalencies:
+            equivalents = self.skill_equivalencies[job_skill_normalized]
+            # Check if any candidate skill matches any equivalent
+            for candidate_skill in candidate_skills:
+                candidate_normalized = self._get_normalized_skill(candidate_skill)
+                if not candidate_normalized:
+                    candidate_normalized = candidate_skill.lower().strip()
+                candidate_normalized = candidate_normalized.replace('-', ' ').replace('_', ' ')
+                candidate_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_normalized).strip()
+                
+                # Check if candidate skill matches any equivalent
+                for equivalent in equivalents:
+                    equiv_normalized = equivalent.lower().strip().replace('-', ' ').replace('_', ' ')
+                    equiv_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', equiv_normalized).strip()
+                    
+                    if equiv_normalized == candidate_normalized:
+                        return True
+                    # Also check substring match for variations
+                    if equiv_normalized in candidate_normalized or candidate_normalized in equiv_normalized:
+                        return True
+        
+        # Check reverse direction: if any candidate skill has equivalents, check if job skill matches any equivalent
+        for candidate_skill in candidate_skills:
+            candidate_normalized = self._get_normalized_skill(candidate_skill)
+            if not candidate_normalized:
+                candidate_normalized = candidate_skill.lower().strip()
+            candidate_normalized = candidate_normalized.replace('-', ' ').replace('_', ' ')
+            candidate_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_normalized).strip()
+            
+            if candidate_normalized in self.skill_equivalencies:
+                equivalents = self.skill_equivalencies[candidate_normalized]
+                # Check if job skill matches any equivalent
+                for equivalent in equivalents:
+                    equiv_normalized = equivalent.lower().strip().replace('-', ' ').replace('_', ' ')
+                    equiv_normalized = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', equiv_normalized).strip()
+                    
+                    if equiv_normalized == job_skill_normalized:
+                        return True
+                    # Also check substring match for variations
+                    if equiv_normalized in job_skill_normalized or job_skill_normalized in equiv_normalized:
+                        return True
+        
+        return False
+    
+    def _find_exact_candidate_skill(self, job_skill: str, candidate_skills: set) -> str:
+        """
+        Find the exact candidate skill that matches a job skill.
+        Returns the candidate skill name if found, empty string otherwise.
+        
+        Args:
+            job_skill: Job skill to match
+            candidate_skills: Set of candidate skill names
+            
+        Returns:
+            Candidate skill name if exact match found, empty string otherwise
+        """
+        if not job_skill or not job_skill.strip():
+            return ""
+        
+        # Normalize job skill
+        job_skill_normalized = self._get_normalized_skill(job_skill)
+        if not job_skill_normalized:
+            job_skill_normalized = job_skill.lower().strip()
+        
+        job_skill_clean = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+        job_skill_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_clean).strip()
+        job_skill_lower = job_skill.lower().strip()
+        
+        # Check each candidate skill for exact match
+        for candidate_skill in candidate_skills:
+            candidate_normalized = self._get_normalized_skill(candidate_skill)
+            if not candidate_normalized:
+                candidate_normalized = candidate_skill.lower().strip()
+            
+            candidate_clean = candidate_normalized.replace('-', ' ').replace('_', ' ')
+            candidate_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_clean).strip()
+            candidate_lower = candidate_skill.lower().strip()
+            
+            # Exact match (case-insensitive, normalized)
+            if job_skill_clean == candidate_clean:
+                return candidate_skill
+            
+            # Also check if original names match (case-insensitive)
+            if job_skill_lower == candidate_lower:
+                return candidate_skill
+            
+            # Check if one is a substring of the other (e.g., "MS Access" vs "Microsoft MS Access")
+            if job_skill_lower in candidate_lower or candidate_lower in job_skill_lower:
+                # But only if they're very similar (to avoid false positives)
+                job_words = set(job_skill_lower.split())
+                candidate_words = set(candidate_lower.split())
+                if job_words == candidate_words or (len(job_words) > 0 and job_words.issubset(candidate_words)) or (len(candidate_words) > 0 and candidate_words.issubset(job_words)):
+                    return candidate_skill
+        
+        return ""
     
     def _is_partial_match(self, skill: str, job_desc: str) -> bool:
         """Check for partial matches using fuzzy logic with word boundaries"""
@@ -1713,22 +2036,117 @@ Please focus your analysis on the areas above and provide detailed insights on:
         return False
     
     def _find_matched_job_skill(self, candidate_skill: str, candidate_skill_normalized: str, job_skills: list) -> str:
-        """Find which job skill matches a candidate skill"""
-        # SIMPLIFIED: Only exact matches to avoid false positives
-        # e.g., "power-bi" should NOT match "business intelligence"
+        """Find which job skill matches a candidate skill (checks equivalencies too)"""
+        # Normalize candidate skill for comparison
+        candidate_normalized_clean = candidate_skill_normalized.replace('-', ' ').replace('_', ' ')
+        candidate_normalized_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_normalized_clean).strip()
+        
+        # First pass: Check exact matches
         for job_skill in job_skills:
             # Use advanced SkillNormalizer
             normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
-            job_skill_normalized = normalized_result.lower() if normalized_result else ""
+            job_skill_normalized = normalized_result.lower() if normalized_result else job_skill.lower()
+            job_skill_normalized_clean = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+            job_skill_normalized_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_normalized_clean).strip()
             
-            # Only exact matches - no substring matching
-            if candidate_skill_normalized == job_skill_normalized:
+            # Exact match (case-insensitive, normalized)
+            if candidate_normalized_clean == job_skill_normalized_clean:
                 return job_skill
         
-        # SIMPLIFIED: No fuzzy/word overlap matching - only exact matches
-        # This prevents false positives like "power-bi" matching "business intelligence" 
-        # because they share the word "bi"
+        # Second pass: Check equivalencies
+        # Combine hardcoded and loaded equivalencies
+        skill_equivalences = {
+            'aws lake formation': ['aws', 'lake formation', 'data lake', 'data warehousing'],
+            'amazon kinesis': ['aws', 'kinesis', 'streaming', 'data streaming'],
+            'insights': ['insight', 'analytics', 'data insights', 'business insights'],
+        }
+        for key, values in self.skill_equivalencies.items():
+            key_normalized = key.lower().strip()
+            values_normalized = [v.lower().strip() for v in values]
+            if key_normalized not in skill_equivalences:
+                skill_equivalences[key_normalized] = values_normalized
+        
+        # Check if candidate skill or its equivalents match any job skill
+        for job_skill in job_skills:
+            normalized_result = self.skill_normalizer.normalize(job_skill, fuzzy=True)
+            job_skill_normalized = normalized_result.lower() if normalized_result else job_skill.lower()
+            job_skill_normalized_clean = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+            job_skill_normalized_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_normalized_clean).strip()
+            
+            # Check if candidate skill has equivalents that match job skill
+            if candidate_normalized_clean in skill_equivalences:
+                for equivalent in skill_equivalences[candidate_normalized_clean]:
+                    equiv_clean = equivalent.replace('-', ' ').replace('_', ' ')
+                    equiv_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', equiv_clean).strip()
+                    if equiv_clean == job_skill_normalized_clean:
+                        return job_skill
+            
+            # Check if job skill has equivalents that match candidate skill
+            if job_skill_normalized_clean in skill_equivalences:
+                for equivalent in skill_equivalences[job_skill_normalized_clean]:
+                    equiv_clean = equivalent.replace('-', ' ').replace('_', ' ')
+                    equiv_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', equiv_clean).strip()
+                    if equiv_clean == candidate_normalized_clean:
+                        return job_skill
+        
         return ""
+    
+    def _find_exact_candidate_skill(self, job_skill: str, candidate_skills: set) -> Optional[str]:
+        """Find the candidate skill that exactly matches a job skill (case-insensitive, normalized)"""
+        job_skill_normalized = self._get_normalized_skill(job_skill)
+        if not job_skill_normalized:
+            return None
+        
+        job_skill_normalized_clean = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+        job_skill_normalized_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_skill_normalized_clean).strip()
+        
+        for candidate_skill in candidate_skills:
+            candidate_normalized = self._get_normalized_skill(candidate_skill)
+            if not candidate_normalized:
+                continue
+            candidate_normalized_clean = candidate_normalized.replace('-', ' ').replace('_', ' ')
+            candidate_normalized_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', candidate_normalized_clean).strip()
+            
+            if candidate_normalized_clean == job_skill_normalized_clean:
+                return candidate_skill
+        
+        return None
+    
+    def _add_match_if_not_duplicate(self, job_skill: str, candidate_skill: str, matches: dict):
+        """Add a match to exact_matches or partial_matches if not already present"""
+        # Check if already in exact_matches
+        if any(m.get('job_skill', '').lower() == job_skill.lower() for m in matches['exact_matches']):
+            return
+        # Check if already in partial_matches
+        if any(m.get('job_skill', '').lower() == job_skill.lower() for m in matches['partial_matches']):
+            return
+        
+        # Determine if it's an exact match (normalized forms are identical)
+        job_skill_normalized = self._get_normalized_skill(job_skill)
+        candidate_skill_normalized = self._get_normalized_skill(candidate_skill)
+        
+        if job_skill_normalized and candidate_skill_normalized:
+            job_clean = job_skill_normalized.replace('-', ' ').replace('_', ' ')
+            job_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', job_clean).strip()
+            cand_clean = candidate_skill_normalized.replace('-', ' ').replace('_', ' ')
+            cand_clean = re.sub(r'\s+(skills?|experience|expertise|knowledge|proficiency)$', '', cand_clean).strip()
+            
+            if job_clean == cand_clean:
+                # Exact match
+                matches['exact_matches'].append({
+                    'skill': candidate_skill,
+                    'job_skill': job_skill,
+                    'category': self.candidate_skills.get(candidate_skill, {}).get('category', 'Unknown'),
+                    'source': self.candidate_skills.get(candidate_skill, {}).get('source', 'Unknown')
+                })
+            else:
+                # Partial match
+                matches['partial_matches'].append({
+                    'skill': candidate_skill,
+                    'job_skill': job_skill,
+                    'category': self.candidate_skills.get(candidate_skill, {}).get('category', 'Unknown'),
+                    'source': self.candidate_skills.get(candidate_skill, {}).get('source', 'Unknown')
+                })
 
 if __name__ == "__main__":
     matcher = PreliminaryMatcher()

@@ -1,0 +1,1346 @@
+# Skill Equivalency Mappings
+# Maps canonical skills to their equivalent terms/variations that should be considered matches
+# Last Updated: 2025-01-08
+# Version: 1.0
+
+# Data Engineering equivalencies
+equivalencies:
+  "Data Engineering":
+    - "ETL"
+    - "ELT"
+    - "Data Pipelines"
+    - "Data Pipeline"
+    - "Data Warehousing"
+    - "Data Processing"
+    - "Pipelines"
+    - "ETL/ELT"
+    - "Data Pipeline Engineering"
+    - "Data Engineering Pipelines"
+  
+  "ETL":
+    - "Data Engineering"
+    - "ELT"
+    - "Data Pipelines"
+    - "Data Pipeline"
+    - "Data Processing"
+    - "Extract Transform Load"
+    - "ETL/ELT"
+  
+  "Data Pipelines":
+    - "Data Engineering"
+    - "ETL"
+    - "ELT"
+    - "Data Pipeline"
+    - "Pipelines"
+    - "Data Processing"
+  
+  "Data Warehousing":
+    - "Data Engineering"
+    - "Data Warehouse"
+    - "Data Lake"
+    - "ETL"
+    - "Data Pipelines"
+  
+  # Portfolio Management equivalencies
+  "Portfolio Management":
+    - "Asset Management"
+    - "Investment Management"
+    - "Portfolio Monitoring"
+    - "Asset Portfolio"
+    - "Investment Portfolio"
+  
+  "Asset Management":
+    - "Portfolio Management"
+    - "Investment Management"
+    - "Asset Portfolio"
+  
+  "Investment Management":
+    - "Portfolio Management"
+    - "Asset Management"
+    - "Investment Portfolio"
+  
+  # Risk Management equivalencies
+  "Risk Assessment":
+    - "Risk Management"
+    - "Risk Analysis"
+    - "Risk Mitigation"
+    - "Risk Evaluation"
+  
+  "Risk Management":
+    - "Risk Assessment"
+    - "Risk Analysis"
+    - "Risk Mitigation"
+    - "Risk Evaluation"
+  
+  "Risk Analysis":
+    - "Risk Assessment"
+    - "Risk Management"
+    - "Risk Mitigation"
+  
+  # Financial Modeling equivalencies
+  "Cash Flow Modeling":
+    - "Financial Modeling"
+    - "Financial Analysis"
+    - "Cash Flow Analysis"
+    - "Modeling"
+    - "Financial Models"
+  
+  "Financial Modeling":
+    - "Cash Flow Modeling"
+    - "Financial Analysis"
+    - "Financial Models"
+    - "Modeling"
+  
+  "Financial Analysis":
+    - "Cash Flow Modeling"
+    - "Financial Modeling"
+    - "Financial Models"
+    - "Financial Analytics"
+  
+  # Structured Finance equivalencies
+  "Asset-Backed Securities":
+    - "ABS"
+    - "Structured Finance"
+    - "Securitization"
+    - "Asset Backed Securities"
+  
+  "Mortgage-Backed Securities":
+    - "MBS"
+    - "Structured Finance"
+    - "Securitization"
+    - "Residential Mortgages"
+    - "Mortgage Securities"
+  
+  "Structured Finance":
+    - "Asset-Backed Securities"
+    - "ABS"
+    - "Mortgage-Backed Securities"
+    - "MBS"
+    - "Securitization"
+  
+  # Credit Analysis equivalencies
+  "Credit Research":
+    - "Credit Analysis"
+    - "Credit Risk"
+    - "Credit Evaluation"
+    - "Credit Assessment"
+  
+  "Credit Analysis":
+    - "Credit Research"
+    - "Credit Risk"
+    - "Credit Evaluation"
+    - "Credit Assessment"
+  
+  # Scenario Analysis equivalencies
+  "Scenario Analysis":
+    - "Sensitivity Analysis"
+    - "Stress Testing"
+    - "What-If Analysis"
+    - "Scenario Planning"
+  
+  "Sensitivity Analysis":
+    - "Scenario Analysis"
+    - "Stress Testing"
+    - "What-If Analysis"
+    - "Sensitivity Testing"
+  
+  # Regulatory equivalencies
+  "Regulatory Regime":
+    - "Regulatory Compliance"
+    - "Regulatory Requirements"
+    - "Compliance"
+    - "Regulatory Framework"
+  
+  "Regulatory Compliance":
+    - "Regulatory Regime"
+    - "Regulatory Requirements"
+    - "Compliance"
+    - "Regulatory Framework"
+  
+  "Regulatory Requirements":
+    - "Regulatory Compliance"
+    - "Regulatory Regime"
+    - "Compliance"
+    - "Regulatory Framework"
+  
+  # Capital Management equivalencies
+  "Capital Efficiency":
+    - "Capital Management"
+    - "Capital Allocation"
+    - "Capital Optimization"
+    - "Financial Management"
+  
+  "Capital Management":
+    - "Capital Efficiency"
+    - "Capital Allocation"
+    - "Capital Optimization"
+    - "Financial Management"
+  
+  # Data Platform equivalencies
+  "Data Platform":
+    - "Data Infrastructure"
+    - "Analytics Platform"
+    - "Data Platform Engineering"
+    - "Platform Engineering"
+  
+  "Data Infrastructure":
+    - "Data Platform"
+    - "Analytics Platform"
+    - "Infrastructure"
+    - "Platform Engineering"
+  
+  # Product Management equivalencies
+  "Product Leadership":
+    - "Product Management"
+    - "Product Strategy"
+    - "Product Development"
+    - "Product Roadmap"
+  
+  "Product Management":
+    - "Product Leadership"
+    - "Product Strategy"
+    - "Product Development"
+    - "Product Roadmap"
+  
+  "Product Strategy":
+    - "Product Management"
+    - "Product Leadership"
+    - "Strategy"
+    - "Business Strategy"
+  
+  # Leadership equivalencies
+  "Team Leadership":
+    - "Leadership"
+    - "Team Management"
+    - "People Management"
+    - "Management"
+  
+  "Leadership":
+    - "Team Leadership"
+    - "Team Management"
+    - "People Management"
+    - "Management"
+  
+  # Analytics equivalencies
+  "Data Analytics":
+    - "Analytics"
+    - "Business Analytics"
+    - "Product Analytics"
+    - "Data Insights"
+  
+  "Analytics":
+    - "Data Analytics"
+    - "Business Analytics"
+    - "Product Analytics"
+    - "Data Insights"
+  
+  "Data Insights":
+    - "Analytics"
+    - "Data Analytics"
+    - "Business Intelligence"
+    - "Insights"
+  
+  "Business Intelligence":
+    - "BI"
+    - "Data Analytics"
+    - "Analytics"
+    - "Reporting"
+    - "Dashboards"
+  
+  # Cloud equivalencies
+  "Cloud Platforms":
+    - "AWS"
+    - "Azure"
+    - "GCP"
+    - "Cloud"
+    - "Cloud Computing"
+  
+  "AWS":
+    - "Amazon Web Services"
+    - "Amazon Cloud"
+    - "Cloud Platforms"
+    - "Cloud"
+    - "AWS Services"
+    - "Amazon AWS"
+  
+  "Amazon Web Services":
+    - "AWS"
+    - "Amazon Cloud"
+    - "Cloud Platforms"
+    - "Cloud"
+    - "AWS Services"
+    - "Amazon AWS"
+  
+  "Amazon Cloud":
+    - "AWS"
+    - "Amazon Web Services"
+    - "Cloud Platforms"
+    - "Cloud"
+    - "AWS Services"
+  
+  "AWS Services":
+    - "AWS"
+    - "Amazon Web Services"
+    - "Amazon Cloud"
+    - "Cloud Platforms"
+    - "Cloud"
+  
+  # AWS EC2 equivalencies
+  "AWS EC2":
+    - "EC2"
+    - "Amazon EC2"
+    - "Elastic Compute Cloud"
+    - "AWS"
+    - "Amazon Web Services"
+    - "Cloud Computing"
+    - "Infrastructure"
+  
+  "EC2":
+    - "AWS EC2"
+    - "Amazon EC2"
+    - "Elastic Compute Cloud"
+    - "AWS"
+    - "Amazon Web Services"
+  
+  "Amazon EC2":
+    - "AWS EC2"
+    - "EC2"
+    - "Elastic Compute Cloud"
+    - "AWS"
+  
+  # AWS S3 equivalencies
+  "S3":
+    - "AWS S3"
+    - "Amazon S3"
+    - "Simple Storage Service"
+    - "Amazon Simple Storage Service"
+    - "AWS"
+    - "Cloud Storage"
+    - "Object Storage"
+  
+  "AWS S3":
+    - "S3"
+    - "Amazon S3"
+    - "Simple Storage Service"
+    - "Amazon Simple Storage Service"
+    - "AWS"
+    - "Cloud Storage"
+  
+  "Amazon S3":
+    - "S3"
+    - "AWS S3"
+    - "Simple Storage Service"
+    - "Amazon Simple Storage Service"
+    - "AWS"
+  
+  "Simple Storage Service":
+    - "S3"
+    - "AWS S3"
+    - "Amazon S3"
+    - "Amazon Simple Storage Service"
+    - "Cloud Storage"
+  
+  # AWS Redshift equivalencies
+  "Redshift":
+    - "AWS Redshift"
+    - "Amazon Redshift"
+    - "Data Warehousing"
+    - "Cloud Data Warehouse"
+    - "Data Warehouse"
+    - "AWS"
+    - "Analytics Platform"
+  
+  "AWS Redshift":
+    - "Redshift"
+    - "Amazon Redshift"
+    - "Data Warehousing"
+    - "Cloud Data Warehouse"
+    - "Data Warehouse"
+    - "AWS"
+    - "Analytics Platform"
+  
+  "Amazon Redshift":
+    - "Redshift"
+    - "AWS Redshift"
+    - "Data Warehousing"
+    - "Cloud Data Warehouse"
+    - "AWS"
+  
+  # AWS DynamoDB equivalencies
+  "DynamoDB":
+    - "AWS DynamoDB"
+    - "Amazon DynamoDB"
+    - "Dynamo DB"
+    - "NoSQL Database"
+    - "NoSQL"
+    - "Database"
+    - "AWS"
+    - "Cloud Database"
+  
+  "AWS DynamoDB":
+    - "DynamoDB"
+    - "Amazon DynamoDB"
+    - "Dynamo DB"
+    - "NoSQL Database"
+    - "AWS"
+  
+  "Amazon DynamoDB":
+    - "DynamoDB"
+    - "AWS DynamoDB"
+    - "Dynamo DB"
+    - "AWS"
+  
+  # AWS Aurora equivalencies
+  "Aurora":
+    - "AWS Aurora"
+    - "Amazon Aurora"
+    - "Aurora Database"
+    - "Relational Database"
+    - "RDS Aurora"
+    - "AWS RDS"
+    - "Database"
+    - "AWS"
+    - "Cloud Database"
+  
+  "AWS Aurora":
+    - "Aurora"
+    - "Amazon Aurora"
+    - "Aurora Database"
+    - "RDS Aurora"
+    - "AWS RDS"
+    - "AWS"
+  
+  "Amazon Aurora":
+    - "Aurora"
+    - "AWS Aurora"
+    - "Aurora Database"
+    - "AWS"
+  
+  # AWS Lake Formation equivalencies
+  "AWS Lake Formation":
+    - "Lake Formation"
+    - "Amazon Lake Formation"
+    - "Data Lake"
+    - "Data Lake Formation"
+    - "AWS"
+    - "Data Warehousing"
+    - "Data Lake Management"
+  
+  "Lake Formation":
+    - "AWS Lake Formation"
+    - "Amazon Lake Formation"
+    - "Data Lake"
+    - "Data Lake Formation"
+    - "AWS"
+    - "Data Warehousing"
+  
+  "Amazon Lake Formation":
+    - "AWS Lake Formation"
+    - "Lake Formation"
+    - "Data Lake"
+    - "AWS"
+  
+  "Data Lake Formation":
+    - "AWS Lake Formation"
+    - "Lake Formation"
+    - "Data Lake"
+    - "AWS"
+    - "Data Warehousing"
+  
+  # Amazon Kinesis equivalencies
+  "Amazon Kinesis":
+    - "Kinesis"
+    - "AWS Kinesis"
+    - "Amazon Kinesis Data Streams"
+    - "Kinesis Data Streams"
+    - "Data Streaming"
+    - "Streaming"
+    - "Real-time Data"
+    - "AWS"
+    - "Data Pipelines"
+  
+  "Kinesis":
+    - "Amazon Kinesis"
+    - "AWS Kinesis"
+    - "Kinesis Data Streams"
+    - "Data Streaming"
+    - "Streaming"
+    - "AWS"
+  
+  "AWS Kinesis":
+    - "Amazon Kinesis"
+    - "Kinesis"
+    - "Kinesis Data Streams"
+    - "Data Streaming"
+    - "AWS"
+  
+  # Amazon Q equivalencies
+  "Amazon Q":
+    - "AWS Q"
+    - "Amazon Q AI"
+    - "AWS Q AI"
+    - "AI"
+    - "Artificial Intelligence"
+    - "Machine Learning"
+    - "ML"
+    - "AWS"
+    - "Generative AI"
+  
+  "AWS Q":
+    - "Amazon Q"
+    - "Amazon Q AI"
+    - "AWS Q AI"
+    - "AI"
+    - "AWS"
+  
+  "Azure":
+    - "Microsoft Azure"
+    - "Cloud Platforms"
+    - "Cloud"
+  
+  "GCP":
+    - "Google Cloud Platform"
+    - "Google Cloud"
+    - "Cloud Platforms"
+    - "Cloud"
+  
+  # Communication equivalencies
+  "Communication Skills":
+    - "Communication"
+    - "Written Communication"
+    - "Verbal Communication"
+    - "Presentation Skills"
+    - "Excellent Communication"
+    - "Strong Communication"
+  
+  "Communication":
+    - "Communication Skills"
+    - "Written Communication"
+    - "Verbal Communication"
+    - "Presentation Skills"
+  
+  # Stakeholder Management equivalencies
+  "Stakeholder Engagement":
+    - "Stakeholder Management"
+    - "Stakeholder Communication"
+    - "Relationship Management"
+    - "Stakeholder Relations"
+  
+  "Stakeholder Management":
+    - "Stakeholder Engagement"
+    - "Stakeholder Communication"
+    - "Relationship Management"
+  
+  # Strategic equivalencies
+  "Strategic Planning":
+    - "Strategy"
+    - "Strategic"
+    - "Business Strategy"
+    - "Data Strategy"
+    - "Product Strategy"
+    - "Planning"
+  
+  "Strategy":
+    - "Strategic Planning"
+    - "Strategic"
+    - "Business Strategy"
+    - "Data Strategy"
+    - "Product Strategy"
+  
+  "Business Strategy":
+    - "Strategy"
+    - "Strategic Planning"
+    - "Strategic"
+    - "Product Strategy"
+  
+  "Data Strategy":
+    - "Strategy"
+    - "Strategic Planning"
+    - "Strategic"
+    - "Business Strategy"
+  
+  # Data Analytics equivalencies
+  "Data Analytics":
+    - "Analytics"
+    - "Business Analytics"
+    - "Product Analytics"
+    - "Data Insights"
+  
+  "Analytics":
+    - "Data Analytics"
+    - "Business Analytics"
+    - "Product Analytics"
+    - "Data Insights"
+  
+  # Product Vision equivalencies
+  "Product Vision":
+    - "Product Strategy"
+    - "Product Management"
+    - "Vision"
+    - "Strategic Vision"
+  
+  # Data Manipulation equivalencies
+  "Data Manipulation":
+    - "Data Processing"
+    - "Data Engineering"
+    - "ETL"
+    - "Data Transformation"
+  
+  # Data Infrastructure equivalencies
+  "Data Infrastructure":
+    - "Data Platform"
+    - "Infrastructure"
+    - "Platform Engineering"
+    - "Data Engineering"
+  
+  # Data Platform equivalencies (already exists but adding to make sure)
+  "Data Platform":
+    - "Data Infrastructure"
+    - "Analytics Platform"
+    - "Platform Engineering"
+    - "Infrastructure"
+  
+  # Data Science equivalencies
+  "Data Science":
+    - "Machine Learning"
+    - "ML"
+    - "Data Analytics"
+    - "Analytics"
+    - "Statistical Analysis"
+  
+  # Mentoring equivalencies
+  "Mentoring":
+    - "Mentorship"
+    - "Leadership"
+    - "Team Leadership"
+    - "Coaching"
+  
+  "Mentoring and Inspiring Teams":
+    - "Mentoring"
+    - "Mentorship"
+    - "Leadership"
+    - "Team Leadership"
+    - "Coaching"
+    - "Inspiring Teams"
+  
+  # Data Ingestion equivalencies
+  "Data Ingestion":
+    - "Data Ingestion & Processing"
+    - "Data Pipelines"
+    - "Data Pipeline"
+    - "Data Engineering"
+    - "ETL"
+    - "ELT"
+    - "Data Processing"
+    - "Ingestion"
+    - "Data Collection"
+  
+  # Data Management equivalencies
+  "Data Management":
+    - "Data Governance"
+    - "Data Quality"
+    - "Data Stewardship"
+    - "Data Warehousing"
+    - "Data Operations"
+    - "Data Administration"
+    - "Master Data Management"
+    - "MDM"
+  
+  "Data Governance":
+    - "Data Management"
+    - "Data Quality"
+    - "Data Stewardship"
+    - "Data Standards"
+    - "Data Policies"
+  
+  "Data Quality":
+    - "Data Management"
+    - "Data Governance"
+    - "Data Stewardship"
+    - "Data Validation"
+    - "Data Cleansing"
+  
+  # Data Transformation equivalencies
+  "Data Transformation":
+    - "ETL"
+    - "ELT"
+    - "Data Engineering"
+    - "Data Pipelines"
+    - "Data Pipeline"
+    - "Data Processing"
+    - "Data Manipulation"
+    - "Transformation"
+  
+  # Data Standards equivalencies
+  "Data Standards":
+    - "Data Governance"
+    - "Data Management"
+    - "Data Quality"
+    - "Standards"
+    - "Data Policies"
+    - "Data Best Practices"
+  
+  # Data Visualization equivalencies
+  "Data Visualization":
+    - "Visualization"
+    - "Visualizations"
+    - "Reporting"
+    - "Dashboards"
+    - "Dashboard"
+    - "Charts"
+    - "Graphs"
+    - "BI Tools"
+    - "Business Intelligence"
+    - "Analytics Reporting"
+    - "BI Reporting"
+    - "Reporting Tools"
+  
+  "Visualization":
+    - "Data Visualization"
+    - "Visualizations"
+    - "Reporting"
+    - "Dashboards"
+    - "Charts"
+    - "Graphs"
+    - "BI Tools"
+  
+  # Dashboards equivalencies
+  "Dashboards":
+    - "Dashboard"
+    - "Data Visualization"
+    - "Visualization"
+    - "Reporting"
+    - "Analytics Dashboards"
+    - "BI Dashboards"
+    - "Business Intelligence Dashboards"
+    - "Executive Dashboards"
+    - "Performance Dashboards"
+    - "Operational Dashboards"
+  
+  "Dashboard":
+    - "Dashboards"
+    - "Data Visualization"
+    - "Visualization"
+    - "Reporting"
+    - "Analytics Dashboards"
+    - "BI Dashboards"
+  
+  # Reporting equivalencies
+  "Reporting":
+    - "Data Visualization"
+    - "Dashboards"
+    - "Dashboard"
+    - "BI Reporting"
+    - "Business Intelligence Reporting"
+    - "Analytics Reporting"
+    - "Reporting Tools"
+    - "Business Reporting"
+    - "Executive Reporting"
+  
+  "BI Reporting":
+    - "Reporting"
+    - "Business Intelligence Reporting"
+    - "Analytics Reporting"
+    - "Dashboards"
+    - "Data Visualization"
+  
+  # Scorecards equivalencies
+  "Scorecards":
+    - "Scorecard"
+    - "Score Cards"
+    - "Score Card"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Metrics"
+    - "Performance Metrics"
+    - "Dashboards"
+    - "Performance Dashboards"
+    - "Executive Scorecards"
+  
+  "Scorecard":
+    - "Scorecards"
+    - "Score Cards"
+    - "Score Card"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Metrics"
+    - "Performance Metrics"
+  
+  "Score Cards":
+    - "Scorecards"
+    - "Scorecard"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Metrics"
+    - "Performance Metrics"
+    - "Dashboards"
+  
+  # KPIs equivalencies
+  "KPIs":
+    - "Key Performance Indicators"
+    - "KPI"
+    - "Metrics"
+    - "Performance Metrics"
+    - "Scorecards"
+    - "Scorecard"
+    - "Score Cards"
+    - "Key Metrics"
+    - "Business Metrics"
+    - "Success Metrics"
+    - "Dashboards"
+    - "Performance Dashboards"
+  
+  "Key Performance Indicators":
+    - "KPIs"
+    - "KPI"
+    - "Metrics"
+    - "Performance Metrics"
+    - "Scorecards"
+    - "Key Metrics"
+    - "Business Metrics"
+  
+  "KPI":
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Metrics"
+    - "Performance Metrics"
+  
+  # Metrics equivalencies
+  "Metrics":
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Performance Metrics"
+    - "Key Metrics"
+    - "Business Metrics"
+    - "Success Metrics"
+    - "Scorecards"
+    - "Scorecard"
+  
+  "Performance Metrics":
+    - "Metrics"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Key Metrics"
+    - "Business Metrics"
+    - "Scorecards"
+  
+  "Key Metrics":
+    - "Metrics"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Performance Metrics"
+    - "Business Metrics"
+  
+  "Business Metrics":
+    - "Metrics"
+    - "Key Metrics"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Business KPIs"
+  
+  # OKRs equivalencies
+  "OKRs":
+    - "Objectives and Key Results"
+    - "Objectives & Key Results"
+    - "OKR"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Key Results"
+    - "KRRs"
+    - "Objectives"
+    - "Goals"
+    - "Goal Setting"
+    - "Metrics"
+    - "Performance Metrics"
+  
+  "Objectives and Key Results":
+    - "OKRs"
+    - "OKR"
+    - "Objectives & Key Results"
+    - "Key Results"
+    - "Objectives"
+    - "KPIs"
+  
+  "Objectives & Key Results":
+    - "OKRs"
+    - "OKR"
+    - "Objectives and Key Results"
+    - "Key Results"
+    - "Objectives"
+  
+  "OKR":
+    - "OKRs"
+    - "Objectives and Key Results"
+    - "Objectives & Key Results"
+    - "Key Results"
+  
+  # Key Results equivalencies
+  "Key Results":
+    - "KRRs"
+    - "KRR"
+    - "OKRs"
+    - "Objectives and Key Results"
+    - "Objectives & Key Results"
+    - "KPIs"
+    - "Key Performance Indicators"
+    - "Metrics"
+    - "Success Metrics"
+  
+  # KRRs equivalencies
+  "KRRs":
+    - "Key Results"
+    - "KRR"
+    - "OKRs"
+    - "Objectives and Key Results"
+    - "Key Result Reporting"
+    - "KPIs"
+    - "Metrics"
+  
+  "KRR":
+    - "KRRs"
+    - "Key Results"
+    - "OKRs"
+    - "Objectives and Key Results"
+  
+  # Objectives equivalencies
+  "Objectives":
+    - "OKRs"
+    - "Objectives and Key Results"
+    - "Goals"
+    - "Goal Setting"
+    - "Strategic Objectives"
+    - "Business Objectives"
+  
+  # Goals equivalencies
+  "Goals":
+    - "Objectives"
+    - "OKRs"
+    - "Objectives and Key Results"
+    - "Goal Setting"
+    - "Strategic Goals"
+    - "Business Goals"
+  
+  "Goal Setting":
+    - "Goals"
+    - "Objectives"
+    - "OKRs"
+    - "Objectives and Key Results"
+    - "Strategic Planning"
+  
+  # Analytics Reporting equivalencies
+  "Analytics Reporting":
+    - "Reporting"
+    - "BI Reporting"
+    - "Business Intelligence Reporting"
+    - "Data Visualization"
+    - "Dashboards"
+    - "Analytics Dashboards"
+    - "Business Reporting"
+  
+  "Business Intelligence Reporting":
+    - "BI Reporting"
+    - "Reporting"
+    - "Analytics Reporting"
+    - "Data Visualization"
+    - "Dashboards"
+    - "Business Intelligence"
+  
+  # dbt equivalencies
+  "dbt":
+    - "Data Build Tool"
+    - "Data Builder Tool"
+    - "DBT"
+    - "dbt Core"
+    - "dbt Cloud"
+    - "Data Transformation"
+    - "ETL"
+    - "Data Modeling"
+    - "Analytics Engineering"
+  
+  "Data Build Tool":
+    - "dbt"
+    - "DBT"
+    - "Data Builder Tool"
+    - "Data Transformation"
+    - "ETL"
+    - "Analytics Engineering"
+  
+  "Data Builder Tool":
+    - "dbt"
+    - "DBT"
+    - "Data Build Tool"
+    - "Data Transformation"
+    - "ETL"
+  
+  "DBT":
+    - "dbt"
+    - "Data Build Tool"
+    - "Data Builder Tool"
+    - "Data Transformation"
+    - "ETL"
+  
+  # Compliance equivalencies
+  "Compliance":
+    - "Regulatory Compliance"
+    - "Regulatory Requirements"
+    - "Regulations"
+    - "Regulatory"
+    - "Regulatory Framework"
+    - "Compliance Management"
+    - "Risk Compliance"
+  
+  "Regulatory Compliance":
+    - "Compliance"
+    - "Regulatory Requirements"
+    - "Regulations"
+    - "Regulatory"
+    - "Regulatory Framework"
+  
+  "Regulations":
+    - "Regulatory"
+    - "Regulatory Compliance"
+    - "Regulatory Requirements"
+    - "Compliance"
+    - "Regulatory Framework"
+  
+  "Regulatory":
+    - "Regulations"
+    - "Regulatory Compliance"
+    - "Regulatory Requirements"
+    - "Compliance"
+    - "Regulatory Framework"
+  
+  "Regulatory Requirements":
+    - "Regulatory Compliance"
+    - "Regulations"
+    - "Regulatory"
+    - "Compliance"
+    - "Regulatory Framework"
+  
+  "Regulatory Framework":
+    - "Regulatory Compliance"
+    - "Regulations"
+    - "Regulatory"
+    - "Compliance"
+    - "Regulatory Requirements"
+  
+  # OFAC equivalencies
+  "OFAC":
+    - "Office of Foreign Assets Control"
+    - "OFAC Compliance"
+    - "Sanctions Compliance"
+    - "Sanctions"
+    - "Compliance"
+    - "Regulatory Compliance"
+  
+  "Office of Foreign Assets Control":
+    - "OFAC"
+    - "OFAC Compliance"
+    - "Sanctions Compliance"
+    - "Sanctions"
+  
+  "OFAC Compliance":
+    - "OFAC"
+    - "Office of Foreign Assets Control"
+    - "Sanctions Compliance"
+    - "Compliance"
+  
+  # AML equivalencies
+  "AML":
+    - "Anti-Money Laundering"
+    - "Anti Money Laundering"
+    - "AML Compliance"
+    - "Money Laundering Compliance"
+    - "Compliance"
+    - "Regulatory Compliance"
+    - "Financial Crime"
+  
+  "Anti-Money Laundering":
+    - "AML"
+    - "Anti Money Laundering"
+    - "AML Compliance"
+    - "Money Laundering Compliance"
+    - "Compliance"
+  
+  "Anti Money Laundering":
+    - "AML"
+    - "Anti-Money Laundering"
+    - "AML Compliance"
+    - "Compliance"
+  
+  "AML Compliance":
+    - "AML"
+    - "Anti-Money Laundering"
+    - "Anti Money Laundering"
+    - "Compliance"
+  
+  "Money Laundering Compliance":
+    - "AML"
+    - "Anti-Money Laundering"
+    - "AML Compliance"
+    - "Compliance"
+  
+  # Basel equivalencies
+  "Basel":
+    - "Basel Accords"
+    - "Basel I"
+    - "Basel II"
+    - "Basel III"
+    - "Basel IV"
+    - "Basel Framework"
+    - "Basel Regulations"
+    - "Regulatory Compliance"
+    - "Banking Regulations"
+    - "Financial Regulations"
+  
+  "Basel Accords":
+    - "Basel"
+    - "Basel Framework"
+    - "Basel Regulations"
+    - "Banking Regulations"
+  
+  "Basel Framework":
+    - "Basel"
+    - "Basel Accords"
+    - "Basel Regulations"
+    - "Regulatory Compliance"
+  
+  "Basel Regulations":
+    - "Basel"
+    - "Basel Accords"
+    - "Basel Framework"
+    - "Regulatory Compliance"
+  
+  # Third Party Sources equivalencies
+  "Third Party Sources":
+    - "Third-Party Sources"
+    - "Third Party Data"
+    - "Third-Party Data"
+    - "External Data Sources"
+    - "External Sources"
+    - "Data Sources"
+    - "Third Party Integrations"
+  
+  "Third-Party Sources":
+    - "Third Party Sources"
+    - "Third Party Data"
+    - "Third-Party Data"
+    - "External Data Sources"
+    - "External Sources"
+  
+  "Third Party Data":
+    - "Third Party Sources"
+    - "Third-Party Sources"
+    - "Third-Party Data"
+    - "External Data Sources"
+    - "Data Sources"
+  
+  "Third-Party Data":
+    - "Third Party Sources"
+    - "Third-Party Sources"
+    - "Third Party Data"
+    - "External Data Sources"
+  
+  "External Data Sources":
+    - "Third Party Sources"
+    - "Third-Party Sources"
+    - "Third Party Data"
+    - "Third-Party Data"
+    - "External Sources"
+    - "Data Sources"
+  
+  # Salesforce equivalencies
+  "Salesforce":
+    - "SalesForce"
+    - "SFDC"
+    - "Salesforce CRM"
+    - "CRM"
+    - "Customer Relationship Management"
+    - "Sales Cloud"
+    - "Service Cloud"
+  
+  "SalesForce":
+    - "Salesforce"
+    - "SFDC"
+    - "Salesforce CRM"
+    - "CRM"
+  
+  "SFDC":
+    - "Salesforce"
+    - "SalesForce"
+    - "Salesforce CRM"
+  
+  "Salesforce CRM":
+    - "Salesforce"
+    - "SalesForce"
+    - "SFDC"
+    - "CRM"
+    - "Customer Relationship Management"
+  
+  # Segment equivalencies
+  "Segment":
+    - "Segment.io"
+    - "Customer Data Platform"
+    - "CDP"
+    - "Data Collection"
+    - "Event Tracking"
+    - "Customer Analytics"
+    - "Data Integration"
+  
+  "Segment.io":
+    - "Segment"
+    - "Customer Data Platform"
+    - "CDP"
+  
+  # Pendo equivalencies
+  "Pendo":
+    - "Pendo.io"
+    - "Product Analytics"
+    - "User Analytics"
+    - "Product Intelligence"
+    - "User Insights"
+    - "Product Insights"
+    - "Analytics"
+  
+  "Pendo.io":
+    - "Pendo"
+    - "Product Analytics"
+    - "User Analytics"
+  
+  # Tatari equivalencies
+  "Tatari":
+    - "Tatari TV"
+    - "TV Analytics"
+    - "Media Analytics"
+    - "Advertising Analytics"
+    - "TV Attribution"
+    - "Media Attribution"
+    - "Analytics"
+  
+  "Tatari TV":
+    - "Tatari"
+    - "TV Analytics"
+    - "Media Analytics"
+  
+  # Braze equivalencies
+  "Braze":
+    - "Braze Customer Engagement"
+    - "Customer Engagement Platform"
+    - "Marketing Automation"
+    - "Customer Messaging"
+    - "Push Notifications"
+    - "Email Marketing"
+    - "Marketing Technology"
+  
+  "Braze Customer Engagement":
+    - "Braze"
+    - "Customer Engagement Platform"
+    - "Marketing Automation"
+  
+  # Quicken equivalencies
+  "Quicken":
+    - "Quicken Software"
+    - "Personal Finance"
+    - "Financial Software"
+    - "Accounting Software"
+    - "Financial Management"
+    - "Budgeting"
+  
+  "Quicken Software":
+    - "Quicken"
+    - "Personal Finance"
+    - "Financial Software"
+  
+  # ERP equivalencies
+  "ERPs":
+    - "ERP"
+    - "Enterprise Resource Planning"
+    - "ERP Systems"
+    - "ERP Software"
+    - "Enterprise Systems"
+    - "Business Systems"
+  
+  "ERP":
+    - "ERPs"
+    - "Enterprise Resource Planning"
+    - "ERP Systems"
+    - "ERP Software"
+    - "Enterprise Systems"
+  
+  "Enterprise Resource Planning":
+    - "ERP"
+    - "ERPs"
+    - "ERP Systems"
+    - "Enterprise Systems"
+  
+  "ERP Systems":
+    - "ERP"
+    - "ERPs"
+    - "Enterprise Resource Planning"
+    - "Enterprise Systems"
+  
+  # NetSuite equivalencies
+  "NetSuite":
+    - "Oracle NetSuite"
+    - "NetSuite ERP"
+    - "ERP"
+    - "ERPs"
+    - "Enterprise Resource Planning"
+    - "Cloud ERP"
+    - "Business Management Software"
+  
+  "Oracle NetSuite":
+    - "NetSuite"
+    - "NetSuite ERP"
+    - "ERP"
+  
+  "NetSuite ERP":
+    - "NetSuite"
+    - "Oracle NetSuite"
+    - "ERP"
+    - "Cloud ERP"
+  
+  # Zapier equivalencies
+  "Zapier":
+    - "Zapier Automation"
+    - "Workflow Automation"
+    - "Integration Platform"
+    - "API Integration"
+    - "Automation"
+    - "Data Integration"
+    - "Workflow Integration"
+  
+  "Zapier Automation":
+    - "Zapier"
+    - "Workflow Automation"
+    - "Integration Platform"
+    - "Automation"
+  
+  # SAP equivalencies
+  "SAP":
+    - "SAP ERP"
+    - "SAP Systems"
+    - "SAP Software"
+    - "ERP"
+    - "ERPs"
+    - "Enterprise Resource Planning"
+    - "Enterprise Systems"
+    - "Business Systems"
+  
+  "SAP ERP":
+    - "SAP"
+    - "SAP Systems"
+    - "ERP"
+    - "Enterprise Resource Planning"
+  
+  "SAP Systems":
+    - "SAP"
+    - "SAP ERP"
+    - "SAP Software"
+    - "ERP"
+  
+  "SAP Software":
+    - "SAP"
+    - "SAP ERP"
+    - "SAP Systems"
+    - "ERP"

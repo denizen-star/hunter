@@ -29,22 +29,47 @@ CRITICAL: Before listing any skill as "Missing", carefully examine the resume fo
 - Educational background that supports the skill
 - EQUIVALENT or RELATED skills that demonstrate the same capabilities
 
-IMPORTANT: Be GENEROUS in recognizing skills. For overqualified candidates, look for:
-- "AWS Lake Formation" is covered by general AWS experience
-- "Amazon Kinesis" is covered by AWS streaming/data experience
-- "Budget Management" is covered by leadership, management, or financial experience
-- "Financial Management" is covered by budget, management, or leadership experience
-- "Product Strategy" is covered by strategy, planning, or product experience
-- "Data Engineering" is covered by data warehousing, ETL, or data processing experience
+IMPORTANT: Be GENEROUS in recognizing equivalent and related skills. Look for these equivalencies:
 
-For example:
-- "Leadership" is demonstrated by managing teams, directing projects, or having leadership titles
-- "Product Management" is demonstrated by product manager roles, roadmaps, feature specifications, etc.
-- "Data Strategy" is demonstrated by strategic planning, roadmaps, data initiatives, etc.
-- "Business Intelligence" is demonstrated by experience with BI tools, analytics, reporting, dashboards
-- "Data Engineering" is demonstrated by ETL processes, data pipelines, data warehousing, etc.
+**Data Engineering Equivalencies:**
+- "Data Engineering" is covered by: ETL, ELT, Data Pipelines, Data Warehousing, Data Processing, Pipelines
+- "ETL" or "ELT" is covered by: Data Engineering, Data Pipelines, Data Processing, Data Warehousing
+- "Data Pipelines" is covered by: Data Engineering, ETL, ELT, Pipelines, Data Processing
+
+**Portfolio & Asset Management Equivalencies:**
+- "Portfolio Management" is covered by: Asset Management, Investment Management, Portfolio Monitoring
+- "Asset Management" is covered by: Portfolio Management, Investment Management
+- "Investment Management" is covered by: Portfolio Management, Asset Management
+
+**Risk Management Equivalencies:**
+- "Risk Assessment" is covered by: Risk Management, Risk Analysis, Risk Mitigation, Risk Evaluation
+- "Risk Management" is covered by: Risk Assessment, Risk Analysis, Risk Mitigation
+- "Risk Analysis" is covered by: Risk Assessment, Risk Management, Risk Mitigation
+
+**Financial Modeling Equivalencies:**
+- "Cash Flow Modeling" is covered by: Financial Modeling, Financial Analysis, Cash Flow Analysis, Modeling
+- "Financial Modeling" is covered by: Cash Flow Modeling, Financial Analysis, Financial Models, Modeling
+- "Financial Analysis" is covered by: Cash Flow Modeling, Financial Modeling, Financial Models, Financial Analytics
+
+**Structured Finance Equivalencies:**
+- "Asset-Backed Securities" or "ABS" is covered by: Structured Finance, Securitization
+- "Mortgage-Backed Securities" or "MBS" is covered by: Structured Finance, Securitization, Residential Mortgages
+- "Structured Finance" is covered by: Asset-Backed Securities, ABS, Mortgage-Backed Securities, MBS, Securitization
+
+**Other Important Equivalencies:**
+- "AWS Lake Formation" is covered by general AWS experience or data warehousing
+- "Amazon Kinesis" is covered by AWS streaming/data experience or data pipelines
+- "Budget Management" is covered by leadership, management, or financial experience
+- "Financial Management" is covered by budget management, management, or leadership experience
+- "Product Strategy" is covered by strategy, planning, product management, or business strategy
+- "Data Strategy" is covered by strategy, strategic planning, business strategy, or product strategy
 - "Cloud Platforms" is demonstrated by AWS, Azure, GCP experience or cloud-related projects
 - "AWS Services" (specific) are demonstrated by general AWS experience or cloud platform experience
+- "Communication Skills" is covered by: Communication, Written Communication, Verbal Communication, Presentation Skills
+- "Stakeholder Management" is covered by: Stakeholder Engagement, Relationship Management, Stakeholder Communication
+- "Leadership" is demonstrated by managing teams, directing projects, or having leadership titles
+- "Product Management" is demonstrated by product manager roles, roadmaps, feature specifications, etc.
+- "Business Intelligence" is demonstrated by experience with BI tools, analytics, reporting, dashboards
 
 Please provide a detailed analysis in the following format:
 
@@ -409,6 +434,37 @@ Hi Person,
 Each message should be direct, specific about actual business achievements, and use the exact character counts specified. CRITICAL: Message 1 MUST NOT exceed 280 characters. Messages 2 and 3 MUST NOT exceed 500 characters each - prioritize brevity over detail. Message 3 should be particularly attention-grabbing while remaining professional. Avoid technical jargon - use business language throughout. Naturally weave in relevant research details where they enhance the message without making it feel forced."""
 
 
+JOB_SKILL_EXTRACTION_PROMPT = """Extract ONLY skills, tools, technologies, and requirements that are explicitly mentioned in the job description below.
+
+CRITICAL RULES:
+1. Extract ONLY what is actually mentioned in the job description - do NOT add skills that are not present
+2. Do NOT include meta-text like "here is the extracted list of skills:" or any explanations
+3. Extract skills mentioned in: responsibilities, qualifications, requirements, and job descriptions
+4. Return ONLY skill names, one per line, with no numbering, bullets, or prefixes
+
+Extract:
+- Technical skills (e.g., Python, SQL, AWS, Data Engineering)
+- Tools and technologies (e.g., Tableau, Snowflake, Excel)
+- Soft skills (e.g., Leadership, Communication, Problem-solving)
+- Domain expertise (e.g., Product Vision, Business Insights)
+- Capabilities mentioned (e.g., "translate complex data", "engage stakeholders")
+- Experience requirements (e.g., "10+ years", "Data Engineering roles")
+
+JOB DESCRIPTION:
+{job_description}
+
+Return format (ONLY skill names, one per line):
+Python
+SQL
+Data Engineering
+Leadership
+Product Vision
+Business Insights
+Excellent Communication Skills
+Stakeholder Engagement
+"""
+
+
 def get_prompt(prompt_name: str, **kwargs) -> str:
     """Get a formatted prompt by name"""
     prompts = {
@@ -418,7 +474,8 @@ def get_prompt(prompt_name: str, **kwargs) -> str:
         'summary_generation': SUMMARY_GENERATION_PROMPT,
         'job_description_extraction': JOB_DESCRIPTION_EXTRACTION_PROMPT,
         'hiring_manager_intro': HIRING_MANAGER_INTRO_PROMPT,
-        'recruiter_intro': RECRUITER_INTRO_PROMPT
+        'recruiter_intro': RECRUITER_INTRO_PROMPT,
+        'job_skill_extraction': JOB_SKILL_EXTRACTION_PROMPT
     }
     
     if prompt_name not in prompts:
