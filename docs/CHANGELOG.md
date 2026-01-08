@@ -1,5 +1,37 @@
 # Changelog
 
+## Version 12.0.0 - January 8, 2026
+
+### 🔍 Unified Search & List View (MAJOR RELEASE)
+
+**Feature:** Comprehensive search functionality for applications and contacts
+- **Unified Search Page**: New dedicated Search page accessible from main navigation
+- **Combined List View**: View all applications and contacts in a single, searchable list
+- **Smart Sorting**: Applications first (by company, then newest to oldest), then Contacts (by company, then newest to oldest)
+- **Comprehensive Coverage**: Includes active applications, rejected applications, and archived applications
+- **Real-time Search**: Instant filtering by company name, person name, job title, or status
+- **Visual Distinction**: Type badges (APP/CONTACT) for quick identification
+- **Full-width Hero**: Hero header matches other dashboards with Search icon
+- **Responsive Design**: Clean table layout with hover effects and clickable rows
+
+**API Enhancements:**
+- **New Endpoint**: `GET /api/applications-and-contacts` - Returns combined list of all applications and contacts
+- **Enhanced Sorting**: Intelligent sorting by company name and last updated date
+- **Archived Support**: Includes applications from archived directory
+- **Rejected Support**: Includes rejected applications in search results
+
+**Files Changed:**
+- `app/web.py` - New `/search` route and `/api/applications-and-contacts` endpoint
+- `app/templates/web/search.html` - New search page template
+- `static/js/shared-menu.js` - Added Search menu item with icon
+- `app/services/dashboard_generator.py` - Removed list view from dashboard (moved to dedicated page)
+
+**Impact:** Users can now quickly search and filter all their job applications and networking contacts from a single, unified interface with powerful sorting and filtering capabilities.
+
+**Note:** For detailed release notes, see [RELEASE_NOTES_v12.0.0.md](RELEASE_NOTES_v12.0.0.md)
+
+---
+
 ## Version 11.0.0 - December 19, 2025
 
 ### 🎨 Visual Enrichment & Icon System (MAJOR RELEASE)

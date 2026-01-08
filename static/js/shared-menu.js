@@ -16,6 +16,7 @@
         { href: '/dashboard', label: 'App Dash', icon: 'AppDash.jpg' },
         { href: '/networking', label: 'Network Dash', icon: 'NetworkDash.jpg' },
         { href: '/progress', label: 'Progress Dash', icon: 'ProgressDash.png' },
+        { href: '/search', label: 'Search', icon: 'search11.png' },
         { href: '/reports', label: 'Reports', icon: 'Reports.png' },
         { href: '/analytics', label: 'Analytics', icon: 'Analytics.png' },
         { href: '/daily-activities', label: 'Daily Activities', icon: 'DailyActivities.jpg' }

@@ -171,6 +171,48 @@ Get a list of all job applications.
 }
 ```
 
+#### Get Applications and Contacts (Unified Search)
+```
+GET /api/applications-and-contacts
+```
+
+Get a combined list of all applications and contacts for unified search. Includes active applications, rejected applications, archived applications, and all networking contacts. Results are sorted with applications first (by company name, then newest to oldest), followed by contacts (by company name, then newest to oldest).
+
+**Response:**
+```json
+{
+  "success": true,
+  "items": [
+    {
+      "type": "application",
+      "id": "20250108120000-Company-JobTitle",
+      "name": "Company - Job Title",
+      "company": "Company",
+      "match_score": 85.5,
+      "status": "applied",
+      "last_updated": "2026-01-08T12:00:00",
+      "detail_url": "/applications/Company-JobTitle/summary.html"
+    },
+    {
+      "type": "contact",
+      "id": "20250108120000-Person-Company",
+      "name": "Person Name - Company",
+      "company": "Company",
+      "match_score": 90.0,
+      "status": "In Conversation",
+      "last_updated": "2026-01-08T10:00:00",
+      "detail_url": "/networking/Person-Company/summary.html"
+    }
+  ],
+  "count": 2
+}
+```
+
+**Sorting Logic:**
+- Applications appear first, then contacts
+- Within each type, items are sorted by company name (alphabetically, case-insensitive)
+- Within each company, items are sorted by last updated date (newest to oldest)
+
 #### Get Application Details
 ```
 GET /api/applications/<application_id>

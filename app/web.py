@@ -5,6 +5,7 @@ Flask application providing REST API and web interface
 """
 import os
 import uuid
+from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
@@ -294,6 +295,11 @@ def networking_dashboard():
     """Networking contacts dashboard"""
     return render_template('networking_dashboard.html')
 
+@app.route('/search')
+def search_page():
+    """Search page for applications and contacts"""
+    return render_template('search.html')
+
 
 @app.route('/api/dashboard-stats', methods=['GET'])
 def dashboard_stats():
@@ -385,6 +391,136 @@ def get_all_applications():
         } for app in applications])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/applications-and-contacts', methods=['GET'])
+def get_applications_and_contacts():
+    """Get combined list of applications and contacts for list view (includes rejected and archived applications)"""
+    try:
+        # Get all applications (including rejected ones for search)
+        applications = job_processor.list_all_applications()
+        
+        # Get archived applications
+        archived_applications = job_processor.list_archived_applications()
+        
+        # Combine applications, avoiding duplicates by ID
+        application_ids = {app.id for app in applications}
+        all_applications = applications + [app for app in archived_applications if app.id not in application_ids]
+        
+        # Get all contacts
+        contacts = networking_processor.list_all_contacts()
+        
+        # Combine into unified list
+        combined = []
+        
+        # Add applications (including archived and rejected)
+        for app in all_applications:
+            # Determine the URL to the details page
+            if app.summary_path and app.folder_path:
+                folder_name = app.folder_path.name
+                summary_filename = app.summary_path.name
+                detail_url = f"/applications/{folder_name}/{summary_filename}"
+            elif app.folder_path:
+                # Fallback: use folder name if no summary
+                detail_url = f"/applications/{app.folder_path.name}/"
+            else:
+                detail_url = f"/applications/{app.id}"
+            
+            combined.append({
+                'type': 'application',
+                'id': app.id,
+                'name': f"{app.company} - {app.job_title}",
+                'company': app.company,
+                'match_score': app.match_score,
+                'status': app.status,
+                'last_updated': app.status_updated_at if app.status_updated_at else app.created_at,
+                'detail_url': detail_url
+            })
+        
+        # Add contacts
+        for contact in contacts:
+            # Determine the URL to the details page
+            if contact.summary_path and contact.folder_path:
+                folder_name = contact.folder_path.name
+                summary_filename = contact.summary_path.name
+                detail_url = f"/networking/{folder_name}/{summary_filename}"
+            elif contact.folder_path:
+                # Fallback: use folder name if no summary
+                detail_url = f"/networking/{contact.folder_path.name}/"
+            else:
+                detail_url = f"/networking/{contact.id}"
+            
+            combined.append({
+                'type': 'contact',
+                'id': contact.id,
+                'name': f"{contact.person_name} - {contact.company_name}",
+                'company': contact.company_name,
+                'match_score': contact.match_score,
+                'status': contact.status,
+                'last_updated': contact.status_updated_at if contact.status_updated_at else contact.created_at,
+                'detail_url': detail_url
+            })
+        
+        # Helper function to get timestamp for sorting
+        def get_timestamp(item):
+            """Get timestamp from last_updated for sorting"""
+            last_updated = item['last_updated']
+            if isinstance(last_updated, datetime):
+                # Handle timezone-aware and timezone-naive datetimes
+                if last_updated.tzinfo is None:
+                    # Naive datetime - assume UTC
+                    from datetime import timezone
+                    last_updated = last_updated.replace(tzinfo=timezone.utc)
+                return last_updated.timestamp()
+            elif isinstance(last_updated, str):
+                try:
+                    dt = datetime.fromisoformat(last_updated)
+                    if dt.tzinfo is None:
+                        from datetime import timezone
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    return dt.timestamp()
+                except (ValueError, AttributeError):
+                    return 0
+            else:
+                return 0
+        
+        # Sort: Applications first (by company name, then last updated), then Contacts (by company name, then last updated)
+        # Separate applications and contacts
+        applications_list = [item for item in combined if item['type'] == 'application']
+        contacts_list = [item for item in combined if item['type'] == 'contact']
+        
+        # Sort applications: by company name, then by last updated (newest to oldest)
+        def sort_key_app(item):
+            company = item['company'].lower()
+            timestamp = get_timestamp(item)
+            return (company, -timestamp)  # Negative timestamp for descending (newest first)
+        
+        applications_list.sort(key=sort_key_app)
+        
+        # Sort contacts: by company name, then by last updated (newest to oldest)
+        def sort_key_contact(item):
+            company = item['company'].lower()
+            timestamp = get_timestamp(item)
+            return (company, -timestamp)  # Negative timestamp for descending (newest first)
+        
+        contacts_list.sort(key=sort_key_contact)
+        
+        # Combine: applications first, then contacts
+        combined = applications_list + contacts_list
+        
+        # Convert datetime objects to ISO format for JSON serialization
+        for item in combined:
+            if isinstance(item['last_updated'], datetime):
+                item['last_updated'] = item['last_updated'].isoformat()
+        
+        return jsonify({
+            'success': True,
+            'items': combined,
+            'count': len(combined)
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/check-ollama', methods=['GET'])
 def check_ollama():
