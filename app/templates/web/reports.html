@@ -1373,29 +1373,54 @@
                 window.statusChangesChart.destroy();
             }
             
-            // Format labels to title case and make them shorter
-            const labelMapping = {
-                'applied': 'Applied',
-                'pending': 'Pending',
-                'rejected': 'Rejected',
-                'contacted someone': 'Contacted',
-                'contacted hiring manager': 'Company Response',
-                'company response': 'Company Response',
-                'scheduled interview': 'Scheduled Interview',
-                'interviewed': 'Interview Notes',
-                'interview notes': 'Interview Notes',
-                'interview - follow up': 'Interview Follow Up',
-                'offered': 'Offered',
-                'accepted': 'Accepted',
-                'withdrawn': 'Withdrawn'
+            // Format transition labels (e.g., "pending → applied")
+            // Transition keys are now in format "from_status → to_status"
+            const formatTransitionLabel = (transitionKey) => {
+                // Split by arrow to get from and to statuses
+                const parts = transitionKey.split('→').map(s => s.trim());
+                if (parts.length === 2) {
+                    const fromStatus = formatStatusLabel(parts[0]);
+                    const toStatus = formatStatusLabel(parts[1]);
+                    return `${fromStatus} → ${toStatus}`;
+                }
+                // Fallback for unexpected format
+                return transitionKey;
             };
             
-            const labels = Object.keys(data).map(key => labelMapping[key] || key.charAt(0).toUpperCase() + key.slice(1));
-            const values = Object.values(data);
-            // Use status or category colors matching App Dash
-            const colors = Object.keys(data).map(key => getColor(key));
+            // Format individual status labels to title case
+            const formatStatusLabel = (status) => {
+                const statusLower = status.toLowerCase();
+                const labelMapping = {
+                    'applied': 'Applied',
+                    'pending': 'Pending',
+                    'rejected': 'Rejected',
+                    'unknown': 'Unknown',
+                    'contacted someone': 'Contacted',
+                    'contacted hiring manager': 'Company Response',
+                    'company response': 'Company Response',
+                    'scheduled interview': 'Scheduled Interview',
+                    'interviewed': 'Interview Notes',
+                    'interview notes': 'Interview Notes',
+                    'interview - follow up': 'Interview Follow Up',
+                    'interview follow up': 'Interview Follow Up',
+                    'offered': 'Offered',
+                    'accepted': 'Accepted',
+                    'withdrawn': 'Withdrawn'
+                };
+                return labelMapping[statusLower] || (status.charAt(0).toUpperCase() + status.slice(1));
+            };
             
-            console.log('Status Changes Chart Data:', { labels, values, data });
+            const labels = Object.keys(data).map(key => formatTransitionLabel(key));
+            const values = Object.values(data);
+            // Use color based on the "to" status (destination) for the transition
+            const colors = Object.keys(data).map(key => {
+                // Extract "to" status from transition key
+                const parts = key.split('→');
+                const toStatus = parts.length === 2 ? parts[1].trim() : key;
+                return getColor(toStatus);
+            });
+            
+            console.log('Status Changes Chart Data (Transitions):', { labels, values, data });
             
             // Plugin to draw mid-gray background
             const backgroundPlugin = {
@@ -1411,12 +1436,13 @@
             };
             
             try {
+                // Use horizontal bar chart for better readability with longer transition labels
                 window.statusChangesChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Status Changes',
+                            label: 'Status Transitions',
                             data: values,
                             backgroundColor: colors,
                             borderColor: colors,
@@ -1425,6 +1451,7 @@
                     },
                     plugins: [backgroundPlugin],
                     options: {
+                        indexAxis: 'y', // Horizontal bar chart
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
@@ -1435,23 +1462,39 @@
                                 titleColor: '#FDFBD4',
                                 bodyColor: '#FDFBD4',
                                 borderColor: '#FDFBD4',
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)'
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                callbacks: {
+                                    title: function(context) {
+                                        return 'Status Transition';
+                                    },
+                                    label: function(context) {
+                                        return `${context.label}: ${context.parsed.x} change${context.parsed.x !== 1 ? 's' : ''}`;
+                                    }
+                                }
                             }
                         },
                         scales: {
                             x: {
-                                ticks: {
-                                    color: '#FDFBD4'
-                                },
-                                grid: {
-                                    color: 'rgba(253, 251, 212, 0.2)'
-                                }
-                            },
-                            y: {
                                 beginAtZero: true,
                                 ticks: {
                                     stepSize: 1,
                                     color: '#FDFBD4'
+                                },
+                                grid: {
+                                    color: 'rgba(253, 251, 212, 0.2)'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Number of Changes',
+                                    color: '#FDFBD4'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#FDFBD4',
+                                    font: {
+                                        size: 11 // Slightly smaller font for transition labels
+                                    }
                                 },
                                 grid: {
                                     color: 'rgba(253, 251, 212, 0.2)'
@@ -1460,7 +1503,7 @@
                         }
                     }
                 });
-                console.log('Status Changes Chart created successfully');
+                console.log('Status Changes Chart (with transitions) created successfully');
                 // Hide text fallback immediately when chart works
                 document.getElementById('statusChangesData').style.display = 'none';
             } catch (error) {

@@ -88,6 +88,32 @@ def normalize_status_label(status: str) -> str:
     return STATUS_NORMALIZATION_MAP.get(normalized, normalized)
 
 
+def _extract_status_from_name_status(status: str) -> str:
+    """Extract status from name-status format (e.g., 'Name-Status' -> 'Status').
+    
+    This handles statuses that may contain person names or other prefixes
+    separated by dashes. Returns the normalized status portion.
+    """
+    if not status:
+        return status
+    
+    parts = status.replace('---', '-').replace('--', '-').split('-')
+    status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
+                      'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
+    
+    # If status has multiple parts and contains status keywords, normalize it
+    if len(parts) > 1:
+        for part in reversed(parts):
+            part_lower = part.lower()
+            if any(keyword in part_lower for keyword in status_keywords):
+                return part.replace('-', ' ').strip()
+        else:
+            # If no keyword found in any part, use last part
+            return parts[-1].replace('-', ' ').strip()
+    
+    return status
+
+
 def is_networking_status(status: str) -> bool:
     """Check if a status is a networking-related status (vs job application status)"""
     if not status:
@@ -2069,7 +2095,7 @@ def get_reports_data():
         # Process activities for reports
         from collections import defaultdict
         applications_by_status = {}
-        status_changes_by_status = {}
+        status_changes_by_status = {}  # Now tracks transitions: "from_status → to_status"
         daily_counts = defaultdict(lambda: defaultdict(int))
         status_changes_count = 0
         
@@ -2086,21 +2112,12 @@ def get_reports_data():
             
             if activity_type in ['job_application_created', 'networking_contact_created']:
                 status = activity.get('status', '')
+                is_networking_activity = activity_type == 'networking_contact_created'
+                
                 if status:
-                    # Normalize statuses that might contain person names
-                    parts = status.replace('---', '-').replace('--', '-').split('-')
-                    status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
-                                      'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
-                    if len(parts) > 1:
-                        for part in reversed(parts):
-                            part_lower = part.lower()
-                            if any(keyword in part_lower for keyword in status_keywords):
-                                status = part.replace('-', ' ').strip()
-                                break
-                        else:
-                            status = parts[-1].replace('-', ' ').strip()
-                    
-                    normalized_status = normalize_status_label(status)
+                    # Extract status from name-status format using helper function
+                    status_extracted = _extract_status_from_name_status(status)
+                    normalized_status = normalize_status_label(status_extracted)
                     
                     # Group networking statuses for charts if in networking view
                     # Check both activity type AND if status looks like networking
@@ -2124,57 +2141,62 @@ def get_reports_data():
                             temp_id = f"{company}-{position}-{activity_date}"
                             if temp_id not in app_final_status:
                                 app_final_status[temp_id] = display_status
-                
-                # Count daily (apply same normalization and grouping)
-                date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
-                original_status = activity.get('status', '')
-                parts = original_status.replace('---', '-').replace('--', '-').split('-')
-                if len(parts) > 1:
-                    for part in reversed(parts):
-                        part_lower = part.lower()
-                        if any(keyword in part_lower for keyword in status_keywords):
-                            status = part.replace('-', ' ').strip()
-                            break
-                    else:
-                        status = parts[-1].replace('-', ' ').strip()
-                else:
-                    status = original_status
-                normalized_status = normalize_status_label(status)
-                
-                # Group networking statuses for charts if in networking view
-                # Check both activity type AND if status looks like networking
-                if is_networking_view and (is_networking_activity or is_networking_status(normalized_status)):
-                    category = categorize_networking_status(normalized_status)
-                    display_status = category if category != normalized_status else normalized_status
-                else:
-                    display_status = normalized_status
-                
-                daily_counts[date_obj][display_status] += 1
+                    
+                    # Count daily (apply same normalization and grouping)
+                    date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
+                    daily_counts[date_obj][display_status] += 1
             
             elif activity_type in ['job_application_status_changed', 'networking_status_changed']:
-                new_status = activity.get('new_status', '')
+                old_status_raw = activity.get('old_status', '')
+                new_status_raw = activity.get('new_status', '')
                 is_networking_activity = activity_type == 'networking_status_changed'
                 
-                if new_status:
-                    # Normalize ALL statuses that contain person names (not just networking)
-                    # Pattern: "Name-Status" or "Name---Status" -> "Status"
-                    # Check if status looks like it contains a person name (has dashes and status keywords)
-                    parts = new_status.replace('---', '-').replace('--', '-').split('-')
-                    status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
-                                      'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
+                if new_status_raw:
+                    # Extract status from name-status format for both old and new statuses
+                    old_status_extracted = _extract_status_from_name_status(old_status_raw) if old_status_raw else ''
+                    new_status_extracted = _extract_status_from_name_status(new_status_raw)
                     
-                    # If status has multiple parts and contains status keywords, normalize it
-                    if len(parts) > 1:
-                        for part in reversed(parts):
-                            part_lower = part.lower()
-                            if any(keyword in part_lower for keyword in status_keywords):
-                                new_status = part.replace('-', ' ').strip()
-                                break
-                        else:
-                            # If no keyword found in any part, use last part
-                            new_status = parts[-1].replace('-', ' ').strip()
+                    # Normalize both statuses
+                    old_status_normalized = normalize_status_label(old_status_extracted) if old_status_extracted else 'unknown'
+                    new_status_normalized = normalize_status_label(new_status_extracted)
                     
-                    normalized_status = normalize_status_label(new_status)
+                    # Group networking statuses for charts if in networking view
+                    # Check both activity type AND if status looks like networking
+                    if is_networking_view and (is_networking_activity or is_networking_status(new_status_normalized)):
+                        old_category = categorize_networking_status(old_status_normalized) if old_status_normalized != 'unknown' else 'unknown'
+                        new_category = categorize_networking_status(new_status_normalized)
+                        old_display_status = old_category if old_category != old_status_normalized else old_status_normalized
+                        new_display_status = new_category if new_category != new_status_normalized else new_status_normalized
+                    else:
+                        old_display_status = old_status_normalized
+                        new_display_status = new_status_normalized
+                    
+                    # Create transition key: "from_status → to_status"
+                    transition_key = f"{old_display_status} → {new_display_status}"
+                    
+                    # Track final status (status changes override initial status for the period)
+                    app_id = activity.get('application_id') or activity.get('contact_id', '')
+                    if app_id:
+                        app_final_status[app_id] = new_display_status
+                    else:
+                        # No app_id, track it with a temporary ID based on company/position (fallback)
+                        company = activity.get('company') or activity.get('company_name', '')
+                        position = activity.get('job_title', '')
+                        if company and position:
+                            temp_id = f"{company}-{position}-{activity_date}"
+                            app_final_status[temp_id] = new_display_status
+                    
+                    # Track transitions instead of just destination status
+                    status_changes_by_status[transition_key] = status_changes_by_status.get(transition_key, 0) + 1
+                    status_changes_count += 1
+                
+                # Count daily (apply same normalization and grouping)
+                # For daily counts, we track the new status (destination) to show daily activity
+                date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
+                new_status_raw = activity.get('new_status', '')
+                if new_status_raw:
+                    new_status_extracted = _extract_status_from_name_status(new_status_raw)
+                    normalized_status = normalize_status_label(new_status_extracted)
                     
                     # Group networking statuses for charts if in networking view
                     # Check both activity type AND if status looks like networking
@@ -2184,49 +2206,7 @@ def get_reports_data():
                     else:
                         display_status = normalized_status
                     
-                    # Track final status (status changes override initial status for the period)
-                    app_id = activity.get('application_id') or activity.get('contact_id', '')
-                    if app_id:
-                        app_final_status[app_id] = display_status
-                    else:
-                        # No app_id, track it with a temporary ID based on company/position (fallback)
-                        company = activity.get('company') or activity.get('company_name', '')
-                        position = activity.get('job_title', '')
-                        if company and position:
-                            temp_id = f"{company}-{position}-{activity_date}"
-                            app_final_status[temp_id] = display_status
-                    
-                    status_changes_by_status[display_status] = status_changes_by_status.get(display_status, 0) + 1
-                    status_changes_count += 1
-                
-                # Count daily (apply same normalization and grouping)
-                date_obj = datetime.strptime(activity_date, '%Y-%m-%d').date()
-                # Re-normalize for daily counts (same logic as above)
-                original_status = activity.get('new_status', '')
-                parts = original_status.replace('---', '-').replace('--', '-').split('-')
-                status_keywords = ['contacted', 'sent', 'research', 'conversation', 'pending', 
-                                  'inactive', 'dormant', 'ready', 'new', 'connection', 'archive', 'cold', 'to', 'action']
-                if len(parts) > 1:
-                    for part in reversed(parts):
-                        part_lower = part.lower()
-                        if any(keyword in part_lower for keyword in status_keywords):
-                            new_status = part.replace('-', ' ').strip()
-                            break
-                    else:
-                        new_status = parts[-1].replace('-', ' ').strip()
-                else:
-                    new_status = original_status
-                normalized_status = normalize_status_label(new_status)
-                
-                # Group networking statuses for charts if in networking view
-                # Check both activity type AND if status looks like networking
-                if is_networking_view and (is_networking_activity or is_networking_status(normalized_status)):
-                    category = categorize_networking_status(normalized_status)
-                    display_status = category if category != normalized_status else normalized_status
-                else:
-                    display_status = normalized_status
-                
-                daily_counts[date_obj][display_status] += 1
+                    daily_counts[date_obj][display_status] += 1
         
         # Rebuild applications_by_status from final statuses (more accurate than incremental counting)
         applications_by_status = {}
@@ -2422,10 +2402,12 @@ def get_reports_data():
         active_applications = total_count - rejected_count
         
         # Calculate total contact count from status_changes_by_status (matches the chart)
+        # Note: status_changes_by_status now contains transitions like "old → new"
         total_contact_count = 0
-        for status_key, count in status_changes_by_status.items():
-            status_lower = status_key.lower()
-            if 'contacted' in status_lower or 'company response' in status_lower:
+        for transition_key, count in status_changes_by_status.items():
+            transition_lower = transition_key.lower()
+            # Check if transition involves contacted or company response statuses
+            if '→ contacted' in transition_lower or 'contacted →' in transition_lower or 'company response' in transition_lower:
                 total_contact_count += count
         
         # Calculate total actions (applications/contacts created + status changes) for the period
