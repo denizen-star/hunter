@@ -342,6 +342,22 @@
             text-align: center;
             color: #ef4444;
         }
+        
+        .hero-header-action-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+        
+        .hero-header-action-link:hover {
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue-hover);
+        }
     </style>
 </head>
 <body>
@@ -357,6 +373,10 @@
                         <p class="hero-header-subtitle">Search and filter all your job applications and networking contacts in one place</p>
                     </div>
                 </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="/new-application" class="hero-header-action-link">New Application</a>
+                <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
             </div>
         </div>
         

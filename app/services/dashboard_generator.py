@@ -191,7 +191,7 @@ class DashboardGenerator:
             header_title = f"Job Application Dashboard - {total}"
             header_subtitle = "Overview of your job search pipeline"
             nav_link_html = ""
-            new_app_link = '<a href="/new-application" class="hero-header-action-link">New Application</a>'
+            new_app_link = '<a href="/new-application" class="hero-header-action-link">New Application</a><a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>'
         
         html = f"""<!DOCTYPE html>
 <html lang="en">

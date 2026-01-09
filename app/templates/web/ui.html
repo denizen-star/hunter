@@ -129,6 +129,10 @@
             z-index: 100;
             width: 100%;
             box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
         }
         
         .hero-header-top {
@@ -136,6 +140,23 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 8px;
+            flex: 1;
+        }
+        
+        .hero-header-action-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+        
+        .hero-header-action-link:hover {
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue-hover);
         }
         
         .back-link {
@@ -672,6 +693,10 @@
                 Back to Dashboard
             </a>
             <h1>New Application</h1>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="/new-application" class="hero-header-action-link">New Application</a>
+            <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
         </div>
     </div>
     

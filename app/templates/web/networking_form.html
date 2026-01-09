@@ -32,6 +32,14 @@
         
         .header {
             margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .header-content {
+            flex: 1;
         }
         
         .header h1 {
@@ -45,6 +53,22 @@
             font-size: 15px;
             color: #6b7280;
             margin: 0;
+        }
+        
+        .hero-header-action-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: #3b82f6;
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+        
+        .hero-header-action-link:hover {
+            background-color: #eff6ff;
+            color: #2563eb;
         }
         
         .form-card {
@@ -382,8 +406,14 @@
     <!-- Main Content -->
     <div class="container">
         <div class="header">
-            <h1>New Networking Contact</h1>
-            <p>Add a professional contact to your networking pipeline</p>
+            <div class="header-content">
+                <h1>New Networking Contact</h1>
+                <p>Add a professional contact to your networking pipeline</p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="/new-application" class="hero-header-action-link">New Application</a>
+                <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
+            </div>
         </div>
         
         <div class="form-card">
