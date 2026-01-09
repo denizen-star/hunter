@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - Applications & Contacts - Hunter</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Menu -->
+    <script src="/static/js/shared-menu.js"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --border-primary: #e5e7eb;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-blue-light: #eff6ff;
+            --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-secondary);
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+        }
+        
+        .main-wrapper {
+            margin-left: 0;
+        }
+        
+        .container {
+            width: calc(100vw - 180px);
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        
+        /* Hero Header */
+        .hero-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+            margin-left: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .hero-header-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            flex: 1;
+        }
+        
+        .hero-header-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .hero-header-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .hero-header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .hero-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            text-align: left;
+        }
+        
+        .hero-header-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .page-header {
+            margin-bottom: var(--space-xl);
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .search-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: var(--font-family);
+            transition: all 0.2s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-light);
+        }
+        
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+        }
+        
+        .results-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .list-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+        }
+        
+        .list-header {
+            padding: 12px 16px;
+            background: var(--bg-active);
+            border-bottom: 1px solid var(--border-primary);
+            display: grid;
+            grid-template-columns: 60px 2fr 1fr 1.5fr 1.5fr;
+            gap: 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .list-header-item {
+            text-align: left;
+        }
+        
+        .list-header-item.center {
+            text-align: center;
+        }
+        
+        .list-items {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .list-item {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-primary);
+            display: grid;
+            grid-template-columns: 60px 2fr 1fr 1.5fr 1.5fr;
+            gap: 16px;
+            align-items: center;
+            transition: background 0.2s;
+            cursor: default;
+        }
+        
+        .list-item:hover {
+            background: var(--bg-hover);
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .type-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+        }
+        
+        .item-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: normal;
+            font-size: 15px;
+            transition: text-decoration 0.2s;
+        }
+        
+        .item-link:hover {
+            text-decoration: underline;
+        }
+        
+        .disabled-link {
+            color: #9ca3af;
+            cursor: not-allowed;
+            text-decoration: none;
+            pointer-events: none;
+            font-weight: normal;
+            font-size: 15px;
+        }
+        
+        .item-match-score {
+            text-align: center;
+            color: var(--text-primary);
+            font-weight: normal;
+            font-size: 15px;
+        }
+        
+        .item-status {
+            color: var(--text-primary);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        /* Application Status Colors (matching App Dash) */
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-applied { background: #dbeafe; color: #1e40af; }
+        .status-contacted-someone { background: #f3f4f6; color: #6b7280; }
+        .status-contacted-hiring-manager { background: #fee2e2; color: #991b1b; }
+        .status-company-response { background: #eff6ff; color: #1e40af; }
+        .status-scheduled-interview { background: #fef3c7; color: #92400e; }
+        .status-interviewed { background: #d1fae5; color: #065f46; }
+        .status-interview-notes { background: #d1fae5; color: #065f46; }
+        .status-interview-follow-up { background: #fce7f3; color: #9f1239; }
+        .status-interview-followup { background: #fce7f3; color: #9f1239; }
+        .status-offered { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-accepted { background: #d1fae5; color: #065f46; }
+        
+        /* Contact Status Colors (matching networking workflow) */
+        .status-found-contact { background: #dbeafe; color: #1e40af; }
+        .status-to-research { background: #dbeafe; color: #1e40af; }
+        .status-sent-linkedin-connection { background: #fef3c7; color: #92400e; }
+        .status-ready-to-connect { background: #fef3c7; color: #92400e; }
+        .status-sent-email { background: #eff6ff; color: #1e40af; }
+        .status-pending-reply { background: #eff6ff; color: #1e40af; }
+        .status-connection-accepted { background: #d1fae5; color: #065f46; }
+        .status-connected-initial { background: #d1fae5; color: #065f46; }
+        .status-in-conversation { background: #d1fae5; color: #065f46; }
+        .status-meeting-scheduled { background: #fef3c7; color: #92400e; }
+        .status-meeting-complete { background: #d1fae5; color: #065f46; }
+        .status-strong-connection { background: #d1fae5; color: #065f46; }
+        .status-referral-partner { background: #d1fae5; color: #065f46; }
+        .status-cold-inactive { background: #f3f4f6; color: #6b7280; }
+        .status-dormant { background: #f3f4f6; color: #6b7280; }
+        .status-inactive-dormant { background: #f3f4f6; color: #6b7280; }
+        
+        /* Default status (fallback) */
+        .status-default { background: #f3f4f6; color: #6b7280; }
+        
+        .item-updated {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .loading-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .error-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #ef4444;
+        }
+        
+        .hero-header-action-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+        
+        .hero-header-action-link:hover {
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue-hover);
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Hero Header -->
+        <div class="hero-header">
+            <div class="hero-header-top">
+                <div class="hero-header-content-wrapper">
+                    <img src="/static/images/icons/search11.png" alt="" class="hero-header-icon">
+                    <div class="hero-header-text">
+                        <h1>Search</h1>
+                        <p class="hero-header-subtitle">Search and filter all your job applications and networking contacts in one place</p>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <a href="/new-application" class="hero-header-action-link">New Application</a>
+                <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="search-container">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    class="search-input" 
+                    placeholder="Search by company, name, job title, or status..."
+                    autocomplete="off"
+                />
+            </div>
+            <div class="results-info" id="results-info">
+                Loading...
+            </div>
+        </div>
+        
+        <div class="list-container">
+            <div class="list-header">
+                <div class="list-header-item center"></div>
+                <div class="list-header-item">Name</div>
+                <div class="list-header-item center">Match Score</div>
+                <div class="list-header-item">Status</div>
+                <div class="list-header-item">Last Updated</div>
+            </div>
+            <div class="list-items" id="list-items">
+                <div class="loading-state">Loading applications and contacts...</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: var(--space-xl);">
+            <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-md);">
+                Rejected Apps & Dormant/Inactive Contacts
+            </h3>
+            <div class="list-container">
+                <div class="list-header">
+                    <div class="list-header-item center"></div>
+                    <div class="list-header-item">Name</div>
+                    <div class="list-header-item center">Match Score</div>
+                    <div class="list-header-item">Status</div>
+                    <div class="list-header-item">Last Updated</div>
+                </div>
+                <div class="list-items" id="inactive-list-items">
+                    <div class="loading-state">Loading inactive items...</div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <script>
+        // Embedded data from Flask API - replaced by generator script
+        const allItems = {{EMBEDDED_DATA}};
+        
+        // Load applications and contacts from embedded data
+        function loadData() {
+            try {
+                // Split items into active and inactive
+                const activeItems = [];
+                const inactiveItems = [];
+                
+                allItems.forEach(item => {
+                    const statusLower = (item.status || '').toLowerCase().trim();
+                    
+                    // Check if item is inactive
+                    const isRejectedApp = item.type === 'application' && statusLower === 'rejected';
+                    const isDormantContact = item.type === 'contact' && (
+                        statusLower === 'dormant' || 
+                        statusLower === 'inactive-dormant' || 
+                        statusLower === 'inactive/dormant' ||
+                        statusLower.includes('dormant')
+                    );
+                    const isColdInactiveContact = item.type === 'contact' && (
+                        statusLower === 'cold-inactive' || 
+                        statusLower === 'cold/inactive' || 
+                        statusLower === 'cold' ||
+                        (statusLower.includes('cold') && statusLower.includes('inactive'))
+                    );
+                    
+                    if (isRejectedApp || isDormantContact || isColdInactiveContact) {
+                        inactiveItems.push(item);
+                    } else {
+                        activeItems.push(item);
+                    }
+                });
+                
+                renderList(activeItems, 'list-items');
+                renderList(inactiveItems, 'inactive-list-items');
+                updateResultsInfo(activeItems.length, inactiveItems.length);
+            } catch (error) {
+                console.error('Error loading applications and contacts:', error);
+                showError('Error loading data. Please refresh the page.');
+            }
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            }) + ' ' + date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        
+        function formatMatchScore(score) {
+            if (score === null || score === undefined) return 'N/A';
+            return score.toFixed(0) + '%';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getStatusClass(status, type) {
+            if (!status) return 'status-default';
+            
+            // Normalize status string
+            const normalized = status.toLowerCase()
+                .replace(/&/g, 'and')
+                .replace(/\//g, '-')
+                .replace(/\(/g, '')
+                .replace(/\)/g, '')
+                .replace(/'/g, '')
+                .replace(/\./g, '')
+                .replace(/,/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            
+            // Check if status class exists
+            const statusClass = `status-${normalized}`;
+            
+            // Return the class (CSS will handle if it doesn't exist, fallback to default)
+            return statusClass;
+        }
+        
+        function renderList(items, containerId = 'list-items') {
+            const container = document.getElementById(containerId);
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state">No items found</div>';
+                return;
+            }
+            
+            container.innerHTML = items.map(item => {
+                const typeIconClass = item.type === 'application' ? 'app' : 'contact';
+                const name = escapeHtml(item.name);
+                const status = escapeHtml(item.status);
+                const statusClass = getStatusClass(item.status, item.type);
+                const matchScore = formatMatchScore(item.match_score);
+                const lastUpdated = formatDate(item.last_updated);
+                
+                // Briefcase emoji for applications, handshake emoji for contacts
+                const iconEmoji = item.type === 'application' ? '💼' : '🤝';
+                
+                // Disabled link - non-functional, just for display
+                return `
+                    <div class="list-item">
+                        <div class="type-icon ${typeIconClass}">
+                            ${iconEmoji}
+                        </div>
+                        <div class="item-name">
+                            <span class="disabled-link" title="Detail pages not available in static version">${name}</span>
+                        </div>
+                        <div class="item-match-score">${matchScore}</div>
+                        <div class="item-status">
+                            <span class="status-badge ${statusClass}">${status}</span>
+                        </div>
+                        <div class="item-updated">${lastUpdated}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateResultsInfo(activeCount, inactiveCount = 0) {
+            const info = document.getElementById('results-info');
+            const totalCount = activeCount + inactiveCount;
+            if (totalCount === 0) {
+                info.textContent = 'No results found';
+            } else if (totalCount === 1) {
+                info.textContent = '1 result found';
+            } else {
+                info.textContent = `${totalCount} results found (${activeCount} active${inactiveCount > 0 ? `, ${inactiveCount} inactive` : ''})`;
+            }
+        }
+        
+        function filterList() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allItems.filter(item => {
+                const searchable = (item.name + ' ' + item.company + ' ' + item.status).toLowerCase();
+                return searchable.includes(searchTerm);
+            });
+            
+            // Split filtered items into active and inactive
+            const activeFiltered = [];
+            const inactiveFiltered = [];
+            
+            filtered.forEach(item => {
+                const statusLower = (item.status || '').toLowerCase().trim();
+                
+                const isRejectedApp = item.type === 'application' && statusLower === 'rejected';
+                const isDormantContact = item.type === 'contact' && (
+                    statusLower === 'dormant' || 
+                    statusLower === 'inactive-dormant' || 
+                    statusLower === 'inactive/dormant' ||
+                    statusLower.includes('dormant')
+                );
+                const isColdInactiveContact = item.type === 'contact' && (
+                    statusLower === 'cold-inactive' || 
+                    statusLower === 'cold/inactive' || 
+                    statusLower === 'cold' ||
+                    (statusLower.includes('cold') && statusLower.includes('inactive'))
+                );
+                
+                if (isRejectedApp || isDormantContact || isColdInactiveContact) {
+                    inactiveFiltered.push(item);
+                } else {
+                    activeFiltered.push(item);
+                }
+            });
+            
+            renderList(activeFiltered, 'list-items');
+            renderList(inactiveFiltered, 'inactive-list-items');
+            updateResultsInfo(activeFiltered.length, inactiveFiltered.length);
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('list-items');
+            container.innerHTML = `<div class="error-state">${message}</div>`;
+        }
+        
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', filterList);
+        
+        // Load data on page load (from embedded data)
+        loadData();
+    </script>
+</body>
+</html>
