@@ -59,6 +59,10 @@
         if (path.startsWith('/networking/')) {
             return '/networking';
         }
+        // Handle search page (with or without .html extension)
+        if (path === '/search.html' || path === '/search') {
+            return '/search';
+        }
 
         return path;
     }
@@ -80,9 +84,21 @@
             const onclickAttr = item.onclick ? ` onclick="${item.onclick}"` : '';
             const iconHTML = item.icon ? `<img src="/static/images/icons/${item.icon}" alt="" class="nav-icon">` : '';
             
+            // For demo pages, use .html extension if current page has .html extension
+            let href = item.href;
+            if (window.location.pathname.endsWith('.html') && !href.endsWith('.html') && href !== '#') {
+                // Check if this is a demo page (in hunterapp_demo directory)
+                if (window.location.pathname.includes('hunterapp_demo') || 
+                    window.location.pathname.startsWith('/search.html') ||
+                    window.location.pathname.startsWith('/dashboard.html') ||
+                    window.location.pathname.startsWith('/networking.html')) {
+                    href = href + '.html';
+                }
+            }
+            
             menuHTML += `
                 <li>
-                    <a href="${item.href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
+                    <a href="${href}" class="nav-link ${activeClass}"${onclickAttr}>${iconHTML}${item.label}</a>
                 </li>
             `;
         });

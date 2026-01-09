@@ -15,6 +15,7 @@
     const mainItems = [
         { href: '/dashboard.html', label: 'App Dash', icon: 'AppDash.jpg' },
         { href: '/networking.html', label: 'Network Dash', icon: 'NetworkDash.jpg' },
+        { href: '/search.html', label: 'Search', icon: 'search11.png' },
         { href: '/reports.html', label: 'Reports', icon: 'Reports.png' },
         { href: '/analytics.html', label: 'Analytics', icon: 'Analytics.png' },
         { href: '/daily-activities.html', label: 'Daily Activities', icon: 'DailyActivities.jpg' }
@@ -61,6 +62,10 @@
         // Handle root path and index.html (both redirect to dashboard)
         if (path === '/' || path === '/index.html' || path === '/dashboard.html') {
             return '/dashboard.html';
+        }
+        // Handle search page
+        if (path === '/search.html' || path === '/search') {
+            return '/search.html';
         }
 
         return path;
