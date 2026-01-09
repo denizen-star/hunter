@@ -1,13 +1,18 @@
 # Daily Digest Configuration
 
 # Email settings (optional)
+# Zoho Mail Setup: https://www.zoho.com/mail/help/zoho-smtp.html
+# For personal accounts: smtp.zoho.com
+# For organization accounts: smtppro.zoho.com
+# Port 587 (TLS) recommended, or 465 (SSL)
+# If 2FA enabled, generate app-specific password in Settings > Account Security
 email:
-  enabled: false  # Set to true to enable email delivery
-  smtp_server: smtp.gmail.com
-  smtp_port: 587
-  sender_email: ""  # Your email address
-  sender_password: ""  # Your email password or app-specific password
-  recipient_email: ""  # Where to send the digest
+  enabled: true  # Set to true to enable email delivery
+  smtp_server: smtp.zohocloud.ca #smtp.zoho.com  # Use smtppro.zoho.com for organization accounts
+  smtp_port: 465  # Use 587 for TLS (recommended) or 465 for SSL
+  sender_email: "kerv@kervinapps.com"  # Your Zoho Mail address (e.g., your-email@zoho.com)
+  sender_password: "1XCt30Ruzgpx"  # App-specific password if 2FA enabled, or regular password
+  recipient_email: "leacock.kervin@gmail.com"  # Where to send the digest
   subject: "Daily Job Hunt Digest"
 
 # Output options

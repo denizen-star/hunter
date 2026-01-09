@@ -20,6 +20,9 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 - **[USER_GUIDE.md](USER_GUIDE.md)** - Complete guide to using Job Hunter
 - **[USER_GUIDE_ENHANCED_MATCHING.md](USER_GUIDE_ENHANCED_MATCHING.md)** - Guide for the enhanced matching system
 - **[CUSTOM_RESUME_GUIDE.md](CUSTOM_RESUME_GUIDE.md)** - How to manage and customize your resume
+- **[DAILY_DIGEST_SETUP.md](DAILY_DIGEST_SETUP.md)** - Set up automated daily digest emails/reports
+- **[DAILY_DIGEST_QUICK_REFERENCE.md](DAILY_DIGEST_QUICK_REFERENCE.md)** - Quick reference for daily digest
+- **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** - Email configuration for digest delivery
 
 ### 🔧 **Technical Documentation**
 - **[TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md)** - Complete technical specification and architecture
@@ -71,6 +74,7 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 - ✅ **AI-Powered Matching**: Local AI (Ollama) analyzes job descriptions and resumes
 - ✅ **Automated Documents**: Generates cover letters, tailored resumes, and analyses
 - ✅ **Application Tracking**: Dashboard with status management and notes
+- ✅ **Daily Digest**: Automated daily summaries with status changes, activities, and analytics (MD/PDF/Email)
 - ✅ **Privacy-First**: 100% local processing, no cloud services
 - ✅ **Modern Interface**: Clean web UI with tabbed dashboard
 
@@ -91,6 +95,7 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 This documentation is actively maintained and updated with each release. The current version reflects **Job Hunter v11.0.0** with comprehensive visual enhancements, icon system, and improved user experience.
 
 ### **Recent Updates**
+- ✅ Daily Digest System: Automated daily summaries with status tracking and email delivery (v12.1.0)
 - ✅ Comprehensive icon system and visual enhancements (v11.0.0)
 - ✅ Enhanced dashboard with tabs and sorting (v2.0.0)
 - ✅ Two-phase matching system (v1.5.0)

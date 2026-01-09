@@ -51,6 +51,7 @@ data/output/*.html
 
 # Cache and temporary files
 data/output/*.json
+data/output/digests/*.md
 data/backups/
 data/applications_archived/
 data/templates/*.html

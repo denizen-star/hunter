@@ -29,6 +29,14 @@ company_counts:
       badge_id: qualified_lead
       badge_name: Qualified Lead
       badge_points: 15
+  amtrust financial services, inc.:
+    contact_ids:
+    - 20260109135309-Briana Liebhardt-AmTrust Financial Services, Inc.
+    count: 1
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
   andersen labs:
     contact_ids:
     - 20251212172012-Darwin Robinson-Andersen Labs
@@ -220,6 +228,11 @@ company_counts:
       badge_id: qualified_lead
       badge_name: Qualified Lead
       badge_points: 15
+  intellativ:
+    contact_ids:
+    - 20260109132439-Balaram Tripathy-Intellativ
+    count: 1
+    latest_badge: null
   invesco ltd:
     contact_ids:
     - 20251212120845-Test Eisenberg-Invesco Ltd
@@ -475,4 +488,4 @@ company_counts:
       badge_id: deep_diver
       badge_name: Deep Diver
       badge_points: 10
-last_updated: '2026-01-09T12:13:42.904264-05:00'
+last_updated: '2026-01-09T16:55:27.093584-05:00'

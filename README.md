@@ -16,6 +16,7 @@ An intelligent job application management system that uses local AI (Ollama) to 
 - **AI-Powered Matching**: Local AI analyzes job descriptions and resumes for match scoring
 - **Automated Documents**: Generates cover letters, tailored resumes, and detailed analyses
 - **Application Tracking**: Comprehensive dashboard with status management, notes, and progress tracking
+- **Daily Digest**: Automated daily summaries with status changes, activities, and analytics (MD/PDF/Email)
 - **Unified Search**: Search and filter all applications and contacts from a single interface (v12.0.0)
 - **Networking Contacts**: Track professional networking contacts with AI-generated research and messages
 - **Privacy-First**: 100% local processing, no cloud services required
@@ -60,9 +61,11 @@ For complete documentation, installation guides, troubleshooting, and API refere
 
 - **App Dash**: Job applications dashboard with status cards and filtering
 - **Network Dash**: Networking contacts dashboard for relationship management
+- **Daily Activities**: Track all activities with status changes and timeline
 - **Search**: Unified search across all applications and contacts (v12.0.0)
 - **Reports**: Analytics and reporting on your job search activity
 - **Analytics**: Detailed insights and metrics
+- **Daily Digest**: Automated daily summaries (configure in `config/digest_config.yaml`)
 
 ---
 

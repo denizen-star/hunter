@@ -178,6 +178,9 @@ No activities recorded today.
             print(f"⚠️ Warning: Could not load reports data: {e}")
             reports_data = {'applications_by_status': {}}
         
+        # Get status changes for today (from/to analysis)
+        status_changes_today = self._get_status_changes_for_date(date)
+        
         # Prepare template context with safe defaults
         pipeline_data = app_analytics.get('interview_conversion', {})
         context = {
@@ -187,6 +190,7 @@ No activities recorded today.
             'new_applications_count': new_applications_count,
             'status_changes_count': status_changes_count,
             'networking_contacts_count': networking_contacts_count,
+            'status_changes': status_changes_today,
             'metrics': {
                 'total_applications': analytics.get('total_applications', 0),
                 'response_rate': app_analytics.get('response_rate', 0.0),
@@ -263,8 +267,15 @@ No activities recorded today.
                 msg.attach(part)
             
             # Send email
-            server = smtplib.SMTP(email_config['smtp_server'], email_config['smtp_port'])
-            server.starttls()
+            smtp_port = email_config.get('smtp_port', 587)
+            
+            # Use SSL for port 465, TLS for port 587
+            if smtp_port == 465:
+                server = smtplib.SMTP_SSL(email_config['smtp_server'], smtp_port)
+            else:
+                server = smtplib.SMTP(email_config['smtp_server'], smtp_port)
+                server.starttls()
+            
             server.login(email_config['sender_email'], email_config['sender_password'])
             server.send_message(msg)
             server.quit()
@@ -275,6 +286,66 @@ No activities recorded today.
         except Exception as e:
             print(f"❌ Error sending email: {e}")
             return False
+    
+    def _get_status_changes_for_date(self, date: datetime) -> Dict:
+        """Get status changes for a specific date with from/to analysis"""
+        start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = date.replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        try:
+            activities = self.activity_log_service.get_activities(
+                start_date=start_date,
+                end_date=end_date
+            )
+            
+            # Filter only status change activities
+            status_changes = [
+                a for a in activities 
+                if a.get('type') in ['job_application_status_changed', 'networking_status_changed']
+            ]
+            
+            # Count by from/to status
+            from_to_counts = {}
+            to_counts = {}
+            from_counts = {}
+            
+            for change in status_changes:
+                old_status = change.get('old_status', 'Unknown')
+                new_status = change.get('new_status', 'Unknown')
+                
+                # Normalize networking statuses
+                if change.get('type') == 'networking_status_changed':
+                    new_status = self.activity_log_service._normalize_networking_status(new_status)
+                    old_status = self.activity_log_service._normalize_networking_status(old_status)
+                
+                # Create from/to key
+                from_to_key = f"{old_status} → {new_status}"
+                from_to_counts[from_to_key] = from_to_counts.get(from_to_key, 0) + 1
+                
+                # Count by "to" status
+                to_counts[new_status] = to_counts.get(new_status, 0) + 1
+                
+                # Count by "from" status
+                from_counts[old_status] = from_counts.get(old_status, 0) + 1
+            
+            # Sort by count (descending)
+            from_to_sorted = sorted(
+                from_to_counts.items(), 
+                key=lambda x: x[1], 
+                reverse=True
+            )
+            
+            return {
+                'total_changes': len(status_changes),
+                'from_to_changes': dict(from_to_sorted[:10])  # Top 10 transitions
+            }
+            
+        except Exception as e:
+            print(f"⚠️ Warning: Could not analyze status changes: {e}")
+            return {
+                'total_changes': 0,
+                'from_to_changes': {}
+            }
     
     def _markdown_to_html(self, markdown_text: str) -> str:
         """Simple markdown to HTML conversion"""
