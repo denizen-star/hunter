@@ -15,7 +15,6 @@
     const mainItems = [
         { href: '/dashboard.html', label: 'App Dash', icon: 'AppDash.jpg' },
         { href: '/networking.html', label: 'Network Dash', icon: 'NetworkDash.jpg' },
-        { href: '/progress.html', label: 'Progress Dash', icon: 'ProgressDash.png' },
         { href: '/reports.html', label: 'Reports', icon: 'Reports.png' },
         { href: '/analytics.html', label: 'Analytics', icon: 'Analytics.png' },
         { href: '/daily-activities.html', label: 'Daily Activities', icon: 'DailyActivities.jpg' }

@@ -11,12 +11,11 @@ All pages in the Hunter application now have a **standardized sidebar menu** wit
 3. **Networking** - `/networking` _(NEW)_
 4. **New Contact** - `/new-networking-contact` _(NEW)_
 5. **Templates** - `/templates`
-6. **Progress** - `/progress`
-7. **Reports** - `/reports`
-8. **Analytics** - `/analytics`
-9. **Daily Activities** - `/daily-activities`
-10. **Check AI Status** - JavaScript function
-11. **Manage Resume** - `/new-application?resume=true`
+6. **Reports** - `/reports`
+7. **Analytics** - `/analytics`
+8. **Daily Activities** - `/daily-activities`
+9. **Check AI Status** - JavaScript function
+10. **Manage Resume** - `/new-application?resume=true`
 
 ## Files Updated
 
@@ -48,7 +47,6 @@ All pages in the Hunter application now have a **standardized sidebar menu** wit
         <li><a href="/networking" class="nav-link">Networking</a></li>
         <li><a href="/new-networking-contact" class="nav-link">New Contact</a></li>
         <li><a href="/templates" class="nav-link">Templates</a></li>
-        <li><a href="/progress" class="nav-link">Progress</a></li>
         <li><a href="/reports" class="nav-link">Reports</a></li>
         <li><a href="/analytics" class="nav-link">Analytics</a></li>
         <li><a href="/daily-activities" class="nav-link">Daily Activities</a></li>

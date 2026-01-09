@@ -50,9 +50,64 @@ company_counts:
       badge_id: qualified_lead
       badge_name: Qualified Lead
       badge_points: 15
+  bankrate:
+    contact_ids:
+    - 20260105172432-Amanda Crowley-Bankrate
+    count: 1
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
+  bankunited:
+    contact_ids:
+    - 20260106182522-Valerie Bonventre Calvo-BankUnited
+    count: 1
+    latest_badge: null
+  beyond finance:
+    contact_ids:
+    - 20260106112459-Joy Sharp-Beyond Finance
+    - 20260106112157-Aikeshia Earl-Beyond Finance
+    - 20260106112025-Brian Pintinics-Beyond Finance
+    - 20260106111739-Benjamin Fierke-Beyond Finance
+    - 20260106110918-Anthony Zipparro-Beyond Finance
+    - 20260106105609-Kalebh Martin-Beyond Finance
+    count: 6
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  blount fine foods:
+    contact_ids:
+    - 20260107114328-TJ Polak-Blount Fine Foods
+    count: 1
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
+  bny:
+    contact_ids:
+    - 20260108180429-Venkat Kambhampati-BNY
+    count: 1
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
   broadridge:
     contact_ids:
     - 20251214212715-Delia Șipoș-Broadridge
+    count: 1
+    latest_badge: null
+  brown & brown:
+    contact_ids:
+    - 20260108115720-Shania Dunn-Brown & Brown
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
+  byline bank:
+    contact_ids:
+    - 20260107120857-Cory Herring-Byline Bank
     count: 1
     latest_badge: null
   centene corporation:
@@ -82,6 +137,14 @@ company_counts:
       badge_id: profile_magnet
       badge_name: Profile Magnet
       badge_points: 3
+  create value:
+    contact_ids:
+    - 20260107113944-Patricia Duran Scheer-Create Value
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   current:
     contact_ids:
     - 20251215135753-Ian Sautner-Current
@@ -107,6 +170,11 @@ company_counts:
     - 20260102142054-Martin Eriksson-Ericsson
     count: 1
     latest_badge: null
+  evolus:
+    contact_ids:
+    - 20260107121418-Paulo Barriga-Evolus
+    count: 1
+    latest_badge: null
   flex:
     contact_ids:
     - 20260105141911-Craig Tullin-Flex
@@ -115,6 +183,15 @@ company_counts:
       badge_id: profile_magnet
       badge_name: Profile Magnet
       badge_points: 3
+  forward financing:
+    contact_ids:
+    - 20260105171135-Madeline Osterink-Forward Financing
+    - 20260105170346-Jeanne Wilkinson-Forward Financing
+    count: 2
+    latest_badge:
+      badge_id: deep_diver
+      badge_name: Deep Diver
+      badge_points: 10
   gemini:
     contact_ids:
     - 20251229120217-Makendra Jeanty-Gemini
@@ -128,9 +205,9 @@ company_counts:
     - 20251212164609-Keri Byrd-Global Holdings
     count: 1
     latest_badge:
-      badge_id: profile_magnet
-      badge_name: Profile Magnet
-      badge_points: 3
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   greystar:
     contact_ids:
     - 20251218162924-Alison Donnelly-Greystar
@@ -156,14 +233,22 @@ company_counts:
       badge_id: conversation_starter
       badge_name: Conversation Starter
       badge_points: 20
-  jpmorganchase:
+  jazwares, llc:
     contact_ids:
-    - 20251215100515-Matthew Fuss-JPMorganChase
+    - 20260107112826-Jay Dotson-Jazwares, LLC
     count: 1
     latest_badge:
       badge_id: qualified_lead
       badge_name: Qualified Lead
       badge_points: 15
+  jpmorganchase:
+    contact_ids:
+    - 20251215100515-Matthew Fuss-JPMorganChase
+    count: 1
+    latest_badge:
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
   justanswer:
     contact_ids:
     - 20251212172843-Jason Ballengee-JustAnswer
@@ -200,9 +285,9 @@ company_counts:
     - 20260105133437-Ruslan Z-LPL Financial
     count: 2
     latest_badge:
-      badge_id: deep_diver
-      badge_name: Deep Diver
-      badge_points: 10
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   mayo clinic:
     contact_ids:
     - 20260102143211-Phil Fiero-Mayo Clinic
@@ -227,11 +312,28 @@ company_counts:
       badge_id: rapport_builder
       badge_name: Rapport Builder
       badge_points: 50
+  metropolis technologies:
+    contact_ids:
+    - 20260107134300-Chris Hawk-Metropolis Technologies
+    count: 1
+    latest_badge:
+      badge_id: qualified_lead
+      badge_name: Qualified Lead
+      badge_points: 15
   mutual of omaha:
     contact_ids:
     - 20260102151248-Lorenzo Ball Jr-Mutual of Omaha
     count: 1
     latest_badge: null
+  nbcuniversal:
+    contact_ids:
+    - 20260107132059-Lacey Shaughnessy-NBCUniversal
+    - 20260107125257-Paul Roushey-NBCUniversal
+    count: 2
+    latest_badge:
+      badge_id: conversation_starter
+      badge_name: Conversation Starter
+      badge_points: 20
   new york life insurance company:
     contact_ids:
     - 20260102135200-Dmitry Goodman-New York Life Insurance Company
@@ -250,9 +352,9 @@ company_counts:
     - 20251217163608-Agness Daszykowski-Paramount
     count: 1
     latest_badge:
-      badge_id: conversation_starter
-      badge_name: Conversation Starter
-      badge_points: 20
+      badge_id: profile_magnet
+      badge_name: Profile Magnet
+      badge_points: 3
   picnichealth:
     contact_ids:
     - 20251217150014-Jeanne Sanchez-PicnicHealth
@@ -287,12 +389,13 @@ company_counts:
       badge_points: 15
   simpro software:
     contact_ids:
+    - 20260106151334-Louisa Smythe-Simpro Software
     - 20260105124322-Liam Stott-Simpro Software
-    count: 1
+    count: 2
     latest_badge:
-      badge_id: qualified_lead
-      badge_name: Qualified Lead
-      badge_points: 15
+      badge_id: super_connector
+      badge_name: Super Connector
+      badge_points: 100
   spot & tango:
     contact_ids:
     - 20251229121823-Morgan Keiper-Spot & Tango
@@ -372,4 +475,4 @@ company_counts:
       badge_id: deep_diver
       badge_name: Deep Diver
       badge_points: 10
-last_updated: '2026-01-05T15:57:27.033565-05:00'
+last_updated: '2026-01-09T12:13:42.904264-05:00'

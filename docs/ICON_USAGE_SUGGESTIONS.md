@@ -7,7 +7,7 @@ This document provides suggestions for where and how to use the app icons throug
 All icons are located in `/static/images/icons/`:
 - `AppDash.jpg` - Application Dashboard
 - `NetworkDash.jpg` - Networking Dashboard
-- `ProgressDash.png` - Progress Dashboard
+- `ProgressDash.png` - Progress Dashboard (deprecated - feature removed)
 - `Reports.png` - Reports
 - `Analytics.png` - Analytics
 - `DailyActivities.jpg` - Daily Activities
@@ -110,7 +110,7 @@ Use icons to enhance status visualizations:
 
 ```html
 <div class="status-badge">
-    <img src="/static/images/icons/ProgressDash.png" alt="" style="width: 16px; height: 16px;">
+    <img src="/static/images/icons/AppDash.jpg" alt="" style="width: 16px; height: 16px;">
     <span>In Progress</span>
 </div>
 ```

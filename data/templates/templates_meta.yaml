@@ -17,12 +17,6 @@ templates:
   delivery_method: Other
   id: '20251101103514'
   title: LinkedIn Link
-- content_file: 20251106103725.html
-  created_at: '2025-11-06T10:37:25.819863-05:00'
-  created_at_display: Nov 06, 2025 10:37 AM EST
-  delivery_method: LinkedIn Connection
-  id: '20251106103725'
-  title: Competitors short
 - content_file: 20251106122508.html
   created_at: '2025-11-06T12:25:08.482916-05:00'
   created_at_display: Nov 06, 2025 12:25 PM EST
@@ -109,3 +103,24 @@ templates:
   delivery_method: LinkedIn Message
   id: '20260102154902'
   title: Follow up Leader LinkedIn Acceptance
+- category: All
+  content_file: 20260106110350.html
+  created_at: '2026-01-06T11:03:50.119359-05:00'
+  created_at_display: Jan 06, 2026 11:03 AM EST
+  delivery_method: LinkedIn Connection
+  id: '20260106110350'
+  title: Competitor W/Match (268 Char)
+- category: All
+  content_file: 20260106110718.html
+  created_at: '2026-01-06T11:07:18.119280-05:00'
+  created_at_display: Jan 06, 2026 11:07 AM EST
+  delivery_method: LinkedIn Connection
+  id: '20260106110718'
+  title: Competitor Short (267 Char)
+- category: Networking
+  content_file: 20260108110836.html
+  created_at: '2026-01-08T11:08:36.836603-05:00'
+  created_at_display: Jan 08, 2026 11:08 AM EST
+  delivery_method: LinkedIn Connection
+  id: '20260108110836'
+  title: Post Interview Connection

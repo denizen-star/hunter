@@ -18,7 +18,6 @@ An intelligent job application management system that uses local AI (Ollama) to 
 - **Application Tracking**: Comprehensive dashboard with status management, notes, and progress tracking
 - **Unified Search**: Search and filter all applications and contacts from a single interface (v12.0.0)
 - **Networking Contacts**: Track professional networking contacts with AI-generated research and messages
-- **Progress Dashboard**: Visual overview of your entire job search pipeline
 - **Privacy-First**: 100% local processing, no cloud services required
 - **Modern Interface**: Clean web UI with icon-driven navigation and responsive design
 
@@ -61,7 +60,6 @@ For complete documentation, installation guides, troubleshooting, and API refere
 
 - **App Dash**: Job applications dashboard with status cards and filtering
 - **Network Dash**: Networking contacts dashboard for relationship management
-- **Progress Dash**: Combined view of applications and contacts with activity tracking
 - **Search**: Unified search across all applications and contacts (v12.0.0)
 - **Reports**: Analytics and reporting on your job search activity
 - **Analytics**: Detailed insights and metrics

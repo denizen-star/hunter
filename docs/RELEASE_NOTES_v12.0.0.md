@@ -14,7 +14,7 @@ Version 12.0.0 introduces a powerful new **Unified Search** feature that allows 
 
 A new dedicated Search page provides a centralized location to search and filter all applications and contacts:
 
-- **Accessible from Main Menu**: New "Search" menu item located after "Progress Dash"
+- **Accessible from Main Menu**: New "Search" menu item in main navigation
 - **Hero Header**: Matches the design language of other dashboards with Search icon
 - **Full-width Layout**: Hero header extends full width, touching the left sidebar
 - **Clean Interface**: Modern, table-based layout with clear visual hierarchy
@@ -108,7 +108,7 @@ Renders the unified search page template.
 ### Menu Integration
 
 - Added "Search" menu item to `static/js/shared-menu.js`
-- Positioned after "Progress Dash" in main navigation
+- Positioned in main navigation menu
 - Uses `search11.png` icon
 
 ## 📁 Files Changed
@@ -129,7 +129,7 @@ Renders the unified search page template.
 ## 🎨 UI/UX Improvements
 
 ### Hero Header
-- Matches Progress Dash design language
+- Matches other dashboard design language
 - Full-width layout touching left sidebar
 - Sticky positioning for easy access
 - Search icon (80px × 80px)

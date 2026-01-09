@@ -802,12 +802,6 @@ NOTE: This is a simple contact. For full AI analysis, match scoring, and additio
             position: relative;
             display: inline-block;
             width: auto;
-            min-width: 200px;
-        }}
-        
-        /* Message Templates dropdown specific width */
-        #statusUpdateForm .dropdown-minimal:has(select#messageTemplate) .custom-dropdown,
-        #statusUpdateForm label[for="messageTemplate"] + .dropdown-minimal .custom-dropdown {{
             min-width: 400px;
         }}
         
@@ -2877,12 +2871,6 @@ Check for mutual connections on LinkedIn that could provide warm introductions.
             position: relative;
             display: inline-block;
             width: auto;
-            min-width: 200px;
-        }}
-        
-        /* Message Templates dropdown specific width */
-        #statusUpdateForm .dropdown-minimal:has(select#messageTemplate) .custom-dropdown,
-        #statusUpdateForm label[for="messageTemplate"] + .dropdown-minimal .custom-dropdown {{
             min-width: 400px;
         }}
         
