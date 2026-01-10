@@ -180,11 +180,6 @@
             box-shadow: 0 0 0 3px var(--accent-blue-light);
         }
         
-        .search-icon {
-            width: 20px;
-            height: 20px;
-            color: var(--text-secondary);
-        }
         
         .results-info {
             font-size: 14px;
@@ -238,17 +233,19 @@
         
         .list-item {
             padding: 14px 16px;
-            border-bottom: 1px solid var(--border-primary);
+            border-bottom: 1px solid #4B5563; /* Darker border for dark background */
             display: grid;
             grid-template-columns: 60px 2fr 1fr 1.5fr 1.5fr;
             gap: 16px;
             align-items: center;
             transition: background 0.2s;
             cursor: default;
+            background-color: #374151; /* Dark gray background */
+            color: #ffffff; /* White text for contrast */
         }
         
         .list-item:hover {
-            background: var(--bg-hover);
+            background: #4B5563; /* Slightly lighter dark gray on hover */
         }
         
         .list-item:last-child {
@@ -284,7 +281,7 @@
         }
         
         .disabled-link {
-            color: #9ca3af;
+            color: #d1d5db; /* Lighter gray for better contrast on dark background */
             cursor: not-allowed;
             text-decoration: none;
             pointer-events: none;
@@ -399,12 +396,14 @@
                 flex-direction: column !important;
                 grid-template-columns: none !important;
                 padding: 12px;
-                border-bottom: 1px solid var(--border-primary);
+                border-bottom: 1px solid #4B5563; /* Darker border for dark background */
                 cursor: default;
                 gap: 0 !important;
                 width: 100%;
                 max-width: 100%;
                 box-sizing: border-box;
+                background-color: #374151; /* Ensure dark background on mobile */
+                color: #ffffff; /* White text for contrast */
             }
             
             /* Mobile: First row - Icon and Name side by side (already wrapped together) */
@@ -422,7 +421,7 @@
                 align-items: center;
                 width: 100%;
                 padding: 8px 0;
-                border-top: 1px solid var(--border-primary);
+                border-top: 1px solid #4B5563; /* Darker border for dark background */
                 margin-top: 8px;
             }
             
@@ -626,8 +625,17 @@
         .status-default { background: #f3f4f6; color: #6b7280; }
         
         .item-updated {
-            color: var(--text-secondary);
+            color: #d1d5db; /* Light gray for better contrast on dark background */
             font-size: 13px;
+        }
+        
+        /* Ensure all text elements within list items have proper contrast */
+        .list-item .item-match-score {
+            color: #ffffff; /* White text for contrast on dark background */
+        }
+        
+        .list-item .item-name {
+            color: #ffffff; /* White text for contrast on dark background */
         }
         
         .empty-state {
@@ -684,9 +692,6 @@
         <div class="container">
             <div class="search-container">
             <div class="search-input-wrapper">
-                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
                 <input 
                     type="text" 
                     id="search-input" 
