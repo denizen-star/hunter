@@ -11,9 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Shared Menu -->
-    <script src="/static/js/shared-menu.js"></script>
-    
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -58,7 +55,9 @@
         }
         
         .container {
-            width: calc(100vw - 180px);
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 24px;
             box-sizing: border-box;
         }
@@ -273,6 +272,218 @@
             font-size: 15px;
         }
         
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .hero-header {
+                padding: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .hero-header-content-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                width: 100%;
+            }
+            
+            .hero-header-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .hero-header h1 {
+                font-size: 20px;
+            }
+            
+            .hero-header-subtitle {
+                font-size: 13px;
+            }
+            
+            .hero-header > div:last-child {
+                width: 100%;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .hero-header-action-link {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            
+            .search-container {
+                padding: var(--space-md);
+                margin-bottom: var(--space-md);
+            }
+            
+            .search-input-wrapper {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+            
+            .search-input {
+                width: 100%;
+                padding: 10px 12px;
+            }
+            
+            .list-header {
+                display: none; /* Hide header on mobile */
+            }
+            
+            .list-items {
+                max-height: none;
+            }
+            
+            .list-item {
+                display: flex !important;
+                flex-direction: column !important;
+                grid-template-columns: none !important;
+                padding: 12px;
+                border-bottom: 1px solid var(--border-primary);
+                cursor: default;
+                gap: 0 !important;
+            }
+            
+            /* Mobile: First row - Icon and Name side by side (already wrapped together) */
+            .list-item > div:nth-child(1) {
+                display: flex !important;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 12px;
+                width: 100%;
+            }
+            
+            /* Match Score row */
+            .list-item > div:nth-child(2) {
+                display: flex !important;
+                align-items: center;
+                width: 100%;
+                padding: 8px 0;
+                border-top: 1px solid var(--border-primary);
+                margin-top: 8px;
+            }
+            
+            /* Status row */
+            .list-item > div:nth-child(3) {
+                display: flex !important;
+                align-items: center;
+                width: 100%;
+                padding: 8px 0;
+            }
+            
+            /* Updated row */
+            .list-item > div:nth-child(4) {
+                display: flex !important;
+                align-items: center;
+                width: 100%;
+                padding: 8px 0;
+            }
+            
+            .type-icon {
+                flex-shrink: 0;
+            }
+            
+            .item-name {
+                flex: 1;
+                font-weight: 600;
+                font-size: 15px;
+            }
+            
+            /* Match Score label */
+            .item-match-score {
+                font-size: 13px;
+            }
+            
+            .item-match-score::before {
+                content: "Match Score: ";
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-right: 8px;
+            }
+            
+            /* Status label */
+            .item-status {
+                font-size: 13px;
+            }
+            
+            .item-status::before {
+                content: "Status: ";
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-right: 8px;
+            }
+            
+            /* Updated label */
+            .item-updated {
+                font-size: 13px;
+            }
+            
+            .item-updated::before {
+                content: "Updated: ";
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-right: 8px;
+            }
+            
+            .status-badge {
+                display: inline-block;
+            }
+            
+            .results-info {
+                font-size: 13px;
+                margin-bottom: var(--space-sm);
+            }
+            
+            .inactive-section {
+                margin-top: var(--space-lg) !important;
+            }
+            
+            .inactive-section h3 {
+                font-size: 14px !important;
+                margin-bottom: var(--space-sm) !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+            
+            .hero-header {
+                padding: 8px;
+            }
+            
+            .hero-header h1 {
+                font-size: 18px;
+            }
+            
+            .hero-header-icon {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .search-container {
+                padding: var(--space-sm);
+            }
+            
+            .list-item {
+                padding: 10px;
+            }
+            
+            .hero-header-action-link {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+        }
+        
         .item-match-score {
             text-align: center;
             color: var(--text-primary);
@@ -421,7 +632,7 @@
             </div>
         </div>
         
-        <div style="margin-top: var(--space-xl);">
+        <div class="inactive-section" style="margin-top: var(--space-xl);">
             <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-md);">
                 Rejected Apps & Dormant/Inactive Contacts
             </h3>
@@ -5312,13 +5523,16 @@
                 const iconEmoji = item.type === 'application' ? '💼' : '🤝';
                 
                 // Disabled link - non-functional, just for display
+                // Structure: First div contains icon + name together for mobile layout
                 return `
                     <div class="list-item">
-                        <div class="type-icon ${typeIconClass}">
-                            ${iconEmoji}
-                        </div>
-                        <div class="item-name">
-                            <span class="disabled-link" title="Detail pages not available in static version">${name}</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="type-icon ${typeIconClass}">
+                                ${iconEmoji}
+                            </div>
+                            <div class="item-name">
+                                <span class="disabled-link" title="Detail pages not available in static version">${name}</span>
+                            </div>
                         </div>
                         <div class="item-match-score">${matchScore}</div>
                         <div class="item-status">
