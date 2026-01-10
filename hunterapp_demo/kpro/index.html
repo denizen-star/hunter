@@ -70,6 +70,7 @@
             margin: 0 auto;
             padding: 24px;
             box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
         
         /* Hero Header */
@@ -192,6 +193,7 @@
             border-radius: var(--radius-md);
             border: 1px solid var(--border-primary);
             overflow: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
@@ -222,12 +224,16 @@
         .list-items {
             max-height: 70vh;
             overflow-y: auto;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             width: 100%;
+            max-width: 100%;
             box-sizing: border-box;
         }
         
         .inactive-list-items {
             width: 100%;
+            max-width: 100%;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             box-sizing: border-box;
         }
         
@@ -254,6 +260,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            min-width: 0; /* Allow flex item to shrink */
+            overflow: hidden; /* Prevent overflow */
+        }
+        
+        .item-name .disabled-link {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
         }
         
         /* Dark gray background for icon + name section only */
@@ -261,13 +276,25 @@
             background-color: #374151 !important; /* Dark gray background */
             padding: 8px 12px !important;
             border-radius: 6px;
-            margin: -8px 0 -8px -16px !important;
+            margin: -8px -16px 0 -16px !important; /* Extend to list-item padding edge */
             padding-left: 12px !important;
             padding-right: 12px !important;
-            width: auto !important;
             display: flex !important;
             align-items: center !important;
             gap: 10px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            min-width: 0 !important; /* Allow flex item to shrink */
+            max-width: none !important; /* Allow natural width with margins */
+        }
+        
+        /* Ensure list items don't overflow */
+        .list-item {
+            overflow: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         /* Ensure icon and name text are white on dark background */
@@ -427,17 +454,26 @@
             }
             
             /* Mobile: First row - Icon and Name side by side with dark gray background */
+            .list-item {
+                overflow: hidden !important;
+                max-width: 100% !important;
+            }
+            
             .list-item > div:first-child {
                 display: flex !important;
                 align-items: center;
                 gap: 10px;
-                margin-bottom: 12px;
+                margin-bottom: 12px !important;
                 width: calc(100% + 24px) !important;
+                max-width: calc(100% + 24px) !important;
                 background-color: #374151 !important; /* Dark gray background */
                 padding: 8px 12px !important;
                 border-radius: 6px;
                 margin-left: -12px !important;
                 margin-right: -12px !important;
+                margin-top: -8px !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
             }
             
             /* Ensure white text on mobile too */
