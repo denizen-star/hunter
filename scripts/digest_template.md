@@ -1,18 +1,27 @@
 # Hunter Daily - {{ date }}
 
-## Status Changes Summary
 {%- if status_changes and status_changes.total_changes > 0 %}
-### Overview
-- **Total Status Changes Today**: {{ status_changes.total_changes }}
-
-### Status Transitions (From → To)
+- **Total Status Changes**: {{ status_changes.total_changes }}
+{%- if daily_activities %}
+- **Total Activities**: {{ daily_activities|length }}
+- **New Applications**: {{ new_applications_count }}
+- **Status Changes**: {{ status_changes_count }}
+- **Networking Contacts**: {{ networking_contacts_count }}
+{%- endif %}
+<div class="status-list-container">
 {%- if status_changes.from_to_changes %}
 {%- for transition, count in status_changes.from_to_changes.items() %}
-- {{ transition }}: {{ count }}
+<div class="status-item" data-transition="{{ transition }}">
+  <div class="status-marker"></div>
+  <div class="status-content">{{ transition }}: {{ count }}</div>
+</div>
 {%- endfor %}
 {%- else %}
-No status transitions today.
+<div class="status-item">
+  <div class="status-content">No status transitions today.</div>
+</div>
 {%- endif %}
+</div>
 
 ---
 {%- else %}
@@ -22,52 +31,52 @@ No status changes today.
 {%- endif %}
 ## Today's Activities
 {%- if daily_activities %}
-### Summary
-- **Total Activities**: {{ daily_activities|length }}
-- **New Applications**: {{ new_applications_count }}
-- **Status Changes**: {{ status_changes_count }}
-- **Networking Contacts**: {{ networking_contacts_count }}
-
-### Activity Details
+<div class="status-list-container">
 {%- for activity in daily_activities %}
-{{ loop.index }}. **{{ activity.timestamp }}** - {{ activity.company }} - {{ activity.position }}
-   {{ loop.index }}.1. {{ activity.activity }}
-   {{ loop.index }}.2. Status: {{ activity.status }}
+<div class="status-item" data-status="{{ activity.status|lower|replace(' ', '-')|replace('/', '-') }}">
+  <div class="status-marker"></div>
+  <div class="status-content">
+    <span class="timeline-time">{{ activity.timestamp }}</span> - 
+    <span class="timeline-company">{{ activity.company }}</span> - 
+    <span class="timeline-position">{{ activity.position }}</span> - 
+    <span class="timeline-status">{{ activity.status_display }}</span>
+  </div>
+</div>
 {%- endfor %}
+</div>
 {%- else %}
 No activities recorded today.
 {%- endif %}
 
 ---
+## Reports Snapshot - Last 30 Days
+<div class="status-list-container">
+{%- if status_distribution %}
+{%- for status, count in status_distribution.items() %}
+<div class="status-item" data-status="{{ status|lower|replace(' ', '-')|replace('/', '-') }}" data-status-raw="{{ status }}">
+  <div class="status-marker"></div>
+  <div class="status-content"><strong>{{ status }}</strong>: {{ count }}</div>
+</div>
+{%- endfor %}
+{%- else %}
+<div class="status-item">
+  <div class="status-content">No status data available.</div>
+</div>
+{%- endif %}
+</div>
 
-## Key Metrics (Last 30 Days)
+### Key Metrics
 ### Application Analytics
 - **Total Applications**: {{ metrics.total_applications }}
 - **Response Rate**: {{ "%.1f"|format(metrics.response_rate) }}%
 - **Interview Conversion Rate**: {{ "%.1f"|format(metrics.interview_rate) }}%
 
-### Pipeline Status
 - **Applied**: {{ pipeline.applied }}
 - **Responded**: {{ pipeline.responded }} ({{ "%.1f"|format(pipeline.response_rate) }}%)
 - **Phone Screens**: {{ pipeline.phone_screen }} ({{ "%.1f"|format(pipeline.phone_screen_rate) }}%)
 - **Interviews**: {{ pipeline.interview }} ({{ "%.1f"|format(pipeline.interview_rate) }}%)
 - **Offers**: {{ pipeline.offer }} ({{ "%.1f"|format(pipeline.offer_rate) }}%)
-
 ---
-
-## Reports Snapshot
-### Status Distribution
-{%- if status_distribution %}
-{%- for status, count in status_distribution.items() %}
-- **{{ status }}**: {{ count }}
-{%- endfor %}
-{%- else %}
-No status data available.
-{%- endif %}
-
----
-
-## Best Performing Days
 {%- if best_days %}
 {%- for day, stats in best_days.items() %}
 - **{{ day }}**: {{ stats.total_applications }} applications, {{ "%.1f"|format(stats.response_rate) }}% response rate
@@ -75,9 +84,7 @@ No status data available.
 {%- else %}
 No day performance data available.
 {%- endif %}
-
 ---
-
 {%- if skills_analysis is defined %}
 ## Skills Analysis
 ### Most Requested Skills (Top 10)

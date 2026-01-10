@@ -3049,14 +3049,14 @@ def generate_digest():
         # Initialize generator
         generator = DailyDigestGenerator()
         
-        # Generate digest for today
-        digest_path = generator.generate_digest()
+        # Generate digest for today (no date parameter means today)
+        digest_content, digest_path = generator.generate_digest()
         
         # Try to send email if configured
         email_sent = False
         email_message = ""
         try:
-            email_sent = generator.send_email(digest_path)
+            email_sent = generator.send_email(digest_content)
             if email_sent:
                 email_message = "Digest generated and emailed successfully."
             else:

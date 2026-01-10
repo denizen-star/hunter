@@ -7,7 +7,7 @@ Can be run via cron or manually.
 import sys
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -123,7 +123,7 @@ No activities recorded today.
 *Generated on {{ generated_at }}*
 """
     
-    def generate_digest(self, date: Optional[datetime] = None) -> Path:
+    def generate_digest(self, date: Optional[datetime] = None) -> Tuple[str, Path]:
         """Generate digest for specified date (defaults to today)"""
         if date is None:
             date = datetime.now(timezone(timedelta(hours=-5)))  # EST
@@ -223,26 +223,25 @@ No activities recorded today.
         # Render template
         digest_content = self.template.render(**context)
         
-        # Save to file
+        # Return content and path (but don't save yet)
         filename = f"{date_str}-digest.md"
         output_path = self.output_dir / filename
-        write_text_file(digest_content, output_path)
         
-        print(f"✅ Digest generated: {output_path}")
-        
-        return output_path
+        return digest_content, output_path
     
-    def send_email(self, digest_path: Path) -> bool:
-        """Send digest via email"""
+    def send_email(self, digest_content: str, digest_path: Optional[Path] = None) -> bool:
+        """Send digest via email
+        
+        Args:
+            digest_content: The markdown content of the digest
+            digest_path: Optional path to digest file (used for attachment if email fails)
+        """
         email_config = self.config.get('email', {})
         
         if not email_config.get('enabled', False):
             return False
         
         try:
-            # Read digest content
-            digest_content = read_text_file(digest_path)
-            
             # Convert markdown to HTML (simple conversion)
             html_content = self._markdown_to_html(digest_content)
             
@@ -255,16 +254,17 @@ No activities recorded today.
             # Add HTML body
             msg.attach(MIMEText(html_content, 'html'))
             
-            # Attach markdown file
-            with open(digest_path, 'rb') as f:
-                part = MIMEBase('application', 'octet-stream')
-                part.set_payload(f.read())
-                encoders.encode_base64(part)
-                part.add_header(
-                    'Content-Disposition',
-                    f'attachment; filename= {digest_path.name}'
-                )
-                msg.attach(part)
+            # Attach markdown file if path is provided
+            if digest_path and digest_path.exists():
+                with open(digest_path, 'rb') as f:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(f.read())
+                    encoders.encode_base64(part)
+                    part.add_header(
+                        'Content-Disposition',
+                        f'attachment; filename= {digest_path.name}'
+                    )
+                    msg.attach(part)
             
             # Send email
             smtp_port = email_config.get('smtp_port', 587)
@@ -286,6 +286,114 @@ No activities recorded today.
         except Exception as e:
             print(f"❌ Error sending email: {e}")
             return False
+    
+    def _get_status_colors(self, status: str) -> tuple:
+        """Get background and text colors for a status from STATUS_COLORS.md
+        
+        Handles both normalized formats (with hyphens) and original formats (with spaces).
+        """
+        if not status:
+            return ('#f3f4f6', '#6b7280')  # Default gray
+        
+        # Normalize status: replace hyphens with spaces and convert to lowercase
+        status_normalized = status.lower().strip().replace('-', ' ').replace('_', ' ')
+        
+        # Application status colors
+        app_colors = {
+            'pending': ('#fef3c7', '#92400e'),
+            'applied': ('#dbeafe', '#1e40af'),
+            'contacted someone': ('#f3f4f6', '#6b7280'),
+            'contacted hiring manager': ('#fee2e2', '#991b1b'),
+            'company response': ('#eff6ff', '#1e40af'),
+            'scheduled interview': ('#fef3c7', '#92400e'),
+            'interviewed': ('#d1fae5', '#065f46'),
+            'interview notes': ('#d1fae5', '#065f46'),
+            'interview follow up': ('#fce7f3', '#9f1239'),
+            'offered': ('#d1fae5', '#065f46'),
+            'rejected': ('#fee2e2', '#991b1b'),
+            'accepted': ('#d1fae5', '#065f46'),
+        }
+        
+        # Networking status colors
+        networking_colors = {
+            'found contact': ('#dbeafe', '#1e40af'),
+            'to research': ('#dbeafe', '#1e40af'),
+            'sent linkedin connection': ('#fef3c7', '#92400e'),
+            'ready to connect': ('#fef3c7', '#92400e'),
+            'sent email': ('#eff6ff', '#1e40af'),
+            'pending reply': ('#eff6ff', '#1e40af'),
+            'connection accepted': ('#d1fae5', '#065f46'),
+            'connected initial': ('#d1fae5', '#065f46'),  # Handles "connected - initial" and "connected-initial"
+            'in conversation': ('#d1fae5', '#065f46'),
+            'meeting scheduled': ('#fef3c7', '#92400e'),
+            'meeting complete': ('#d1fae5', '#065f46'),
+            'strong connection': ('#d1fae5', '#065f46'),
+            'referral partner': ('#d1fae5', '#065f46'),
+            'cold inactive': ('#f3f4f6', '#6b7280'),  # Handles "cold/inactive" and "cold-inactive"
+            'dormant': ('#f3f4f6', '#6b7280'),
+            'inactive dormant': ('#f3f4f6', '#6b7280'),  # Handles "inactive/dormant"
+        }
+        
+        # Check exact match first (normalized)
+        all_colors = {**app_colors, **networking_colors}
+        if status_normalized in all_colors:
+            return all_colors[status_normalized]
+        
+        # Try partial matches (case-insensitive, normalized)
+        for key, colors in all_colors.items():
+            # Normalize key for comparison
+            key_normalized = key.replace('-', ' ').replace('_', ' ')
+            if key_normalized in status_normalized or status_normalized in key_normalized:
+                return colors
+        
+        # Default gray for unmapped statuses
+        return ('#f3f4f6', '#6b7280')
+    
+    def _get_status_type(self, status: str) -> str:
+        """Determine if a status is for an application or contact.
+        
+        Returns 'app' for application statuses, 'contact' for contact statuses.
+        """
+        if not status:
+            return 'app'  # Default to app
+        
+        # Normalize status: replace hyphens with spaces and convert to lowercase
+        status_normalized = status.lower().strip().replace('-', ' ').replace('_', ' ')
+        
+        # Application statuses
+        app_statuses = [
+            'pending', 'applied', 'contacted someone', 'contacted hiring manager',
+            'company response', 'scheduled interview', 'interviewed', 'interview notes',
+            'interview follow up', 'offered', 'rejected', 'accepted'
+        ]
+        
+        # Contact/Networking statuses
+        contact_statuses = [
+            'found contact', 'to research', 'sent linkedin connection', 'ready to connect',
+            'sent email', 'pending reply', 'connection accepted', 'connected initial',
+            'in conversation', 'meeting scheduled', 'meeting complete', 'strong connection',
+            'referral partner', 'cold inactive', 'dormant', 'inactive dormant'
+        ]
+        
+        # Check exact match first (normalized)
+        if status_normalized in [s.replace('-', ' ').replace('_', ' ') for s in app_statuses]:
+            return 'app'
+        if status_normalized in [s.replace('-', ' ').replace('_', ' ') for s in contact_statuses]:
+            return 'contact'
+        
+        # Try partial matches
+        for app_status in app_statuses:
+            app_status_normalized = app_status.replace('-', ' ').replace('_', ' ')
+            if app_status_normalized in status_normalized or status_normalized in app_status_normalized:
+                return 'app'
+        
+        for contact_status in contact_statuses:
+            contact_status_normalized = contact_status.replace('-', ' ').replace('_', ' ')
+            if contact_status_normalized in status_normalized or status_normalized in contact_status_normalized:
+                return 'contact'
+        
+        # Default to app if unsure
+        return 'app'
     
     def _get_status_changes_for_date(self, date: datetime) -> Dict:
         """Get status changes for a specific date with from/to analysis"""
@@ -328,16 +436,27 @@ No activities recorded today.
                 # Count by "from" status
                 from_counts[old_status] = from_counts.get(old_status, 0) + 1
             
-            # Sort by count (descending)
+            # Sort by "to" status (alphabetically), then by count (descending) for same "to" status
+            def sort_key(item):
+                transition = item[0]  # e.g., "pending → applied"
+                count = item[1]
+                # Extract "to" status (part after "→")
+                if '→' in transition:
+                    to_status = transition.split('→')[1].strip()
+                elif '->' in transition:
+                    to_status = transition.split('->')[1].strip()
+                else:
+                    to_status = transition
+                return (to_status.lower(), -count)  # Sort by "to" status, then by count descending
+            
             from_to_sorted = sorted(
                 from_to_counts.items(), 
-                key=lambda x: x[1], 
-                reverse=True
+                key=sort_key
             )
             
             return {
                 'total_changes': len(status_changes),
-                'from_to_changes': dict(from_to_sorted[:10])  # Top 10 transitions
+                'from_to_changes': dict(from_to_sorted)  # All transitions sorted by "to" status
             }
             
         except Exception as e:
@@ -348,10 +467,85 @@ No activities recorded today.
             }
     
     def _markdown_to_html(self, markdown_text: str) -> str:
-        """Simple markdown to HTML conversion"""
+        """Simple markdown to HTML conversion with timeline support"""
         import re
         
         html = markdown_text
+        
+        # Process status-list-container (no vertical line, bullet-style markers)
+        # Pattern matches status items with data-status or data-transition, optionally with data-status-raw
+        status_item_pattern = r'<div class="status-item"([^>]*)>\s*<div class="status-marker"></div>\s*<div class="status-content">((?:.|\n)*?)</div>\s*</div>'
+        
+        def replace_status_item(match):
+            # Extract attributes from the div tag
+            attrs_str = match.group(1)
+            content_text = match.group(2).strip()
+            
+            # Extract data-status, data-transition, and data-status-raw from attributes
+            status_from_attr = None
+            status_raw = None
+            is_transition = False
+            
+            # Look for data-status
+            status_match = re.search(r'data-status="([^"]*)"', attrs_str)
+            if status_match:
+                status_from_attr = status_match.group(1)
+            
+            # Look for data-transition
+            transition_match = re.search(r'data-transition="([^"]*)"', attrs_str)
+            if transition_match:
+                status_from_attr = transition_match.group(1)
+                is_transition = True
+            
+            # Look for data-status-raw
+            raw_match = re.search(r'data-status-raw="([^"]*)"', attrs_str)
+            if raw_match:
+                status_raw = raw_match.group(1)
+            
+            # If it's a transition (contains "→"), extract the "to" status for coloring
+            status_for_color = status_from_attr
+            if status_from_attr and ('→' in status_from_attr or '->' in status_from_attr):
+                if '→' in status_from_attr:
+                    parts = status_from_attr.split('→')
+                else:
+                    parts = status_from_attr.split('->')
+                if len(parts) > 1:
+                    status_for_color = parts[-1].strip()  # Get the "to" status
+            
+            bg_color, text_color = self._get_status_colors(status_for_color)
+            
+            # Determine status type and add icon (only for Status Distribution, not transitions)
+            icon = ''
+            if status_raw and not is_transition:  # Only add icon if we have raw status and it's not a transition
+                status_type = self._get_status_type(status_raw)
+                if status_type == 'app':
+                    icon = '💼 '
+                elif status_type == 'contact':
+                    icon = '🤝 '
+            
+            # No bullet marker - just the colored content with icon
+            return f'<div class="status-item" style="position: relative; margin-bottom: 6px; padding-left: 0px; margin-left: 0px;">' + \
+                   f'<div class="status-content" style="background-color: {bg_color}; color: {text_color}; padding: 6px 10px; border-radius: 6px; margin-left: 0px; font-size: 14px; line-height: 1.5; display: inline-block;">{icon}{content_text}</div>' + \
+                   '</div>'
+        
+        # Process status items without data-status (no styling)
+        status_item_no_status_pattern = r'<div class="status-item"[^>]*>\s*<div class="status-content">((?:.|\n)*?)</div>\s*</div>'
+        def replace_status_item_no_status(match):
+            content_text = match.group(1).strip()
+            return f'<div class="status-item" style="margin-bottom: 6px; padding-left: 0px;">' + \
+                   f'<div class="status-content" style="padding: 6px 10px; font-size: 14px; line-height: 1.5; display: inline-block;">{content_text}</div>' + \
+                   '</div>'
+        
+        html = re.sub(status_item_pattern, replace_status_item, html, flags=re.DOTALL)
+        html = re.sub(status_item_no_status_pattern, replace_status_item_no_status, html, flags=re.DOTALL)
+        
+        # Process status-list-container (simple container, no vertical line)
+        # For status transitions, remove padding-left to eliminate indentation
+        html = re.sub(
+            r'<div class="status-list-container">',
+            '<div class="status-list-container" style="margin: 15px 0; padding-left: 0; margin-left: 0;">',
+            html
+        )
         
         # Headers (process in reverse order to avoid conflicts)
         html = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
@@ -367,6 +561,11 @@ No activities recorded today.
         result_lines = []
         
         for line in lines:
+            # Skip already processed HTML (timeline, status items)
+            if 'timeline' in line.lower() or 'status-item' in line.lower() or 'status-list-container' in line.lower():
+                result_lines.append(line)
+                continue
+            
             if line.strip().startswith('- '):
                 if not in_list:
                     result_lines.append('<ul>')
@@ -378,10 +577,12 @@ No activities recorded today.
                 if in_list:
                     result_lines.append('</ul>')
                     in_list = False
-                if line.strip():
+                if line.strip() and not line.strip().startswith('<'):
                     result_lines.append(f'<p>{line}</p>')
-                else:
+                elif not line.strip() and not line.strip().startswith('<'):
                     result_lines.append('<br>')
+                else:
+                    result_lines.append(line)
         
         if in_list:
             result_lines.append('</ul>')
@@ -396,16 +597,24 @@ No activities recorded today.
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: 0 auto; }}
-        h1 {{ color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }}
-        h2 {{ color: #555; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }}
-        h3 {{ color: #777; margin-top: 20px; }}
+        h1 {{ color: #333; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 14pt; }}
+        h2 {{ color: #555; margin-top: 5px; border-bottom: 1px solid #ddd; padding-bottom: 5px; font-size: 12pt; }}
+        h3 {{ color: #777; margin-top: 5px; font-size: 12pt; }}
         ul {{ margin: 10px 0; padding-left: 25px; }}
-        li {{ margin: 5px 0; }}
-        p {{ margin: 10px 0; }}
-        hr {{ margin: 20px 0; border: none; border-top: 1px solid #ddd; }}
+        li {{ margin: 5px 0; font-size: 10pt; }}
+        p {{ margin: 10px 0; font-size: 10pt; }}
+        hr {{ margin: 5px 0; border: none; border-top: 1px solid #ddd; }}
         strong {{ color: #333; }}
+        .timeline-container {{ position: relative; padding-left: 0; margin: 15px 0; }}
+        .status-list-container {{ margin: 15px 0; padding-left: 0; margin-left: 0; }}
+        .status-item {{ position: relative; margin-bottom: 6px; padding-left: 0px; margin-left: 0px; }}
+        .status-marker {{ display: none; width: 0; height: 0; padding: 0; margin: 0; }}
+        .status-content {{ padding: 6px 10px; border-radius: 6px; margin-left: 0px; font-size: 14px; line-height: 1.5; display: inline-block; }}
+        .timeline-time {{ font-weight: 600; }}
+        .timeline-company {{ font-weight: 600; }}
     </style>
 </head>
 <body>
@@ -455,12 +664,20 @@ def main():
     config_path = Path(args.config) if args.config else None
     generator = DailyDigestGenerator(config_path)
     
-    # Generate digest
-    digest_path = generator.generate_digest(date)
+    # Generate digest content (don't save yet)
+    digest_content, digest_path = generator.generate_digest(date)
     
     # Send email if configured and not disabled
+    email_sent = False
     if not args.no_email:
-        generator.send_email(digest_path)
+        email_sent = generator.send_email(digest_content)
+    
+    # Only save .md file if email failed to send (or email is disabled)
+    if not email_sent:
+        write_text_file(digest_content, digest_path)
+        print(f"✅ Digest saved to file: {digest_path}")
+    else:
+        print(f"✅ Email sent successfully - digest file not saved")
     
     return 0
 

@@ -203,12 +203,30 @@ class ActivityLogService:
             
             # Format for frontend
             activity_dt = datetime.fromisoformat(activity['timestamp'])
+            old_status = activity.get('old_status', '')
+            new_status = activity.get('new_status') or activity.get('status', '')
+            
+            # Normalize networking statuses if needed
+            if activity.get('type', '').startswith('networking'):
+                if old_status:
+                    old_status = self._normalize_networking_status(old_status)
+                if new_status:
+                    new_status = self._normalize_networking_status(new_status)
+            
+            # Format status display: "old_status → new_status" or just "new_status"
+            if old_status and new_status and old_status != new_status:
+                status_display = f"{old_status} → {new_status}"
+            else:
+                status_display = new_status
+            
             formatted_activity = {
                 'company': activity.get('company') or activity.get('company_name', ''),
                 'position': activity.get('job_title', ''),
                 'timestamp': activity_dt.strftime('%I:%M %p EST'),
                 'activity': self._format_activity_description(activity),
-                'status': activity.get('new_status') or activity.get('status', ''),
+                'status': new_status,  # Keep original status for filtering/coloring
+                'status_display': status_display,  # Formatted display string
+                'old_status': old_status,  # Store old_status separately
                 'application_id': activity.get('application_id') or activity.get('contact_id', ''),
                 'type': 'job' if 'application' in activity.get('type', '') else 'networking',
                 '_sort_key': activity_dt  # Store datetime for sorting

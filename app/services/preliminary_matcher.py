@@ -38,9 +38,15 @@ class PreliminaryMatcher:
             skills_data = yaml.safe_load(f)
             self.candidate_skills = skills_data.get('skills', {})
         
-        # Load job skills from markdown
-        job_skills_content = read_text_file(self.job_skills_path)
-        self.job_skills = self._parse_job_skills_markdown(job_skills_content)
+        # Load job skills from markdown (optional file)
+        if self.job_skills_path.exists():
+            job_skills_content = read_text_file(self.job_skills_path)
+            self.job_skills = self._parse_job_skills_markdown(job_skills_content)
+        else:
+            # If file doesn't exist, use empty dict (job skills are optional)
+            print(f"⚠️ Warning: Job skills file not found: {self.job_skills_path}")
+            print(f"   Continuing without job skills database. The file is optional.")
+            self.job_skills = {}
     
     def _build_normalization_cache(self):
         """Initialize empty cache - normalize lazily as needed"""
