@@ -5,16 +5,13 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 ## 🗂️ Documentation Structure
 
 ### 💻 **Windows Users** 
-- **[WINDOWS_RESOURCES_INDEX.md](WINDOWS_RESOURCES_INDEX.md)** - Complete guide to all Windows documentation
+- **[WINDOWS_GUIDE.md](WINDOWS_GUIDE.md)** - Complete Windows guide (installation, usage, troubleshooting, checklist)
 
 ### 📖 **Getting Started**
 - **[README.md](README.md)** - Main project overview and quick start guide
 - **[WHAT_IS_HUNTER.md](WHAT_IS_HUNTER.md)** - Friendly explanation of what Hunter does and why it's useful
 - **[QUICKSTART.md](QUICKSTART.md)** - Get up and running in 5 minutes
-- **[INSTALLATION.md](INSTALLATION.md)** - Detailed installation instructions
-- **[INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)** - Windows-specific installation guide
-- **[WINDOWS_QUICK_REFERENCE.md](WINDOWS_QUICK_REFERENCE.md)** - Quick reference card for Windows users
-- **[WINDOWS_INSTALLATION_CHECKLIST.md](WINDOWS_INSTALLATION_CHECKLIST.md)** - Printable installation checklist
+- **[INSTALLATION.md](INSTALLATION.md)** - Detailed installation instructions (macOS/Linux)
 
 ### 👤 **User Guides**
 - **[USER_GUIDE.md](USER_GUIDE.md)** - Complete guide to using Job Hunter
@@ -26,18 +23,21 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 - **[PRD_PUSH_GUIDE.md](PRD_PUSH_GUIDE.md)** - Guide for deploying static search pages to production
 
 ### 🔧 **Technical Documentation**
-- **[TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md)** - Complete technical specification and architecture
 - **[TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md)** - API reference and technical details
 - **[API_REFERENCE.md](API_REFERENCE.md)** - Complete REST API documentation
+- **[MASTER_AGENT_REFERENCE.md](MASTER_AGENT_REFERENCE.md)** - Comprehensive operational manual for developers/AI agents
 - **[APPLICATION_PROCESSING_PIPELINE.md](APPLICATION_PROCESSING_PIPELINE.md)** - Complete 10-step processing pipeline with timing and descriptions
 - **[ENHANCED_MATCHING_SYSTEM.md](ENHANCED_MATCHING_SYSTEM.md)** - Two-phase matching system documentation
 - **[FEATURE_EXTRACTION.md](FEATURE_EXTRACTION.md)** - Feature extraction and matching capabilities
+- **[MATCHING_INVARIANTS.md](MATCHING_INVARIANTS.md)** - Critical matching system rules that must never break
+- **[SKILL_MATCHING_PROCESS.md](SKILL_MATCHING_PROCESS.md)** - Technical details of skill matching process
 
 ### 🐛 **Support & Troubleshooting**
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
-- **[WINDOWS_TROUBLESHOOTING_FLOWCHART.md](WINDOWS_TROUBLESHOOTING_FLOWCHART.md)** - Windows troubleshooting decision tree
+- **[WINDOWS_GUIDE.md](WINDOWS_GUIDE.md)** - Complete Windows guide including troubleshooting
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-- **[RELEASE_NOTES_v11.0.0.md](RELEASE_NOTES_v11.0.0.md)** - Latest release notes
+- **[RELEASE_NOTES_v11.0.0.md](RELEASE_NOTES_v11.0.0.md)** - Release notes for v11.0.0
+- **[RELEASE_NOTES_v12.0.0.md](RELEASE_NOTES_v12.0.0.md)** - Release notes for v12.0.0
 
 ### 🤝 **Development**
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
@@ -53,16 +53,16 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 3. Use **[USER_GUIDE.md](USER_GUIDE.md)** for detailed usage instructions
 
 ### **For Installation Issues** 🔧
-1. **Windows Users**: Follow **[INSTALLATION_WINDOWS.md](INSTALLATION_WINDOWS.md)** for step-by-step Windows setup
+1. **Windows Users**: Follow **[WINDOWS_GUIDE.md](WINDOWS_GUIDE.md)** for complete Windows installation, usage, and troubleshooting
 2. Check **[INSTALLATION.md](INSTALLATION.md)** for detailed setup (macOS/Linux)
 3. Review **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** for common problems
-4. Use **[WINDOWS_QUICK_REFERENCE.md](WINDOWS_QUICK_REFERENCE.md)** for daily commands (Windows)
-5. Ensure Ollama is properly installed and running
+4. Ensure Ollama is properly installed and running
 
 ### **For Developers** 👨‍💻
-1. Read **[TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md)** for architecture
-2. Use **[API_REFERENCE.md](API_REFERENCE.md)** for integration
-3. Check **[CONTRIBUTING.md](CONTRIBUTING.md)** for contribution guidelines
+1. Read **[MASTER_AGENT_REFERENCE.md](MASTER_AGENT_REFERENCE.md)** for comprehensive system architecture and operations
+2. Use **[TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md)** for technical details
+3. Use **[API_REFERENCE.md](API_REFERENCE.md)** for integration
+4. Check **[CONTRIBUTING.md](CONTRIBUTING.md)** for contribution guidelines
 
 ### **For Advanced Users** 🚀
 1. Explore **[ENHANCED_MATCHING_SYSTEM.md](ENHANCED_MATCHING_SYSTEM.md)** for matching details
@@ -110,7 +110,7 @@ If you need assistance:
 1. **Check the troubleshooting guide** - Most issues are covered in [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 2. **Review the changelog** - See [CHANGELOG.md](CHANGELOG.md) for recent fixes
 3. **Check system requirements** - Ensure Ollama is running and you have sufficient RAM
-4. **Review the technical specification** - [TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md) has detailed setup information
+4. **Review technical documentation** - [TECHNICAL_REFERENCE.md](TECHNICAL_REFERENCE.md) and [MASTER_AGENT_REFERENCE.md](MASTER_AGENT_REFERENCE.md) have detailed setup information
 
 ## 📄 **License**
 
