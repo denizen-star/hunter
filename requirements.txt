@@ -1,6 +1,7 @@
 # Core dependencies
 ollama>=0.1.0              # Primary - Local LLM client
 requests>=2.31.0           # For HTTP requests
+urllib3<2.0.0,>=1.26.0     # Pin to v1.x for LibreSSL compatibility on macOS
 python-dotenv>=1.0.0       # Environment configuration
 python-dateutil>=2.8.0     # Datetime utilities
 pytz>=2024.1               # Timezone support
