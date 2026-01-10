@@ -60,3 +60,6 @@ migration_report_*.json
 
 # Logs
 *.log
+
+# Local configuration files
+config/digest_config.yaml
