@@ -70,6 +70,7 @@
             margin: 0 auto;
             padding: 24px;
             box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
         
         /* Hero Header */
@@ -180,11 +181,6 @@
             box-shadow: 0 0 0 3px var(--accent-blue-light);
         }
         
-        .search-icon {
-            width: 20px;
-            height: 20px;
-            color: var(--text-secondary);
-        }
         
         .results-info {
             font-size: 14px;
@@ -197,6 +193,7 @@
             border-radius: var(--radius-md);
             border: 1px solid var(--border-primary);
             overflow: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
@@ -227,12 +224,16 @@
         .list-items {
             max-height: 70vh;
             overflow-y: auto;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             width: 100%;
+            max-width: 100%;
             box-sizing: border-box;
         }
         
         .inactive-list-items {
             width: 100%;
+            max-width: 100%;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
             box-sizing: border-box;
         }
         
@@ -259,6 +260,51 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            min-width: 0; /* Allow flex item to shrink */
+            overflow: hidden; /* Prevent overflow */
+        }
+        
+        .item-name .disabled-link {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        
+        /* Dark gray background for icon + name section only */
+        .list-item > div:first-child {
+            background-color: #374151 !important; /* Dark gray background */
+            padding: 8px 12px !important;
+            border-radius: 6px;
+            margin: -8px -16px 0 -16px !important; /* Extend to list-item padding edge */
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            min-width: 0 !important; /* Allow flex item to shrink */
+            max-width: none !important; /* Allow natural width with margins */
+        }
+        
+        /* Ensure list items don't overflow */
+        .list-item {
+            overflow: hidden;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Ensure icon and name text are white on dark background */
+        .list-item > div:first-child .type-icon {
+            color: #ffffff !important; /* White emoji/text for contrast */
+        }
+        
+        .list-item > div:first-child .item-name,
+        .list-item > div:first-child .item-name .disabled-link {
+            color: #ffffff !important; /* White text for contrast on dark background */
         }
         
         .type-icon {
@@ -407,13 +453,34 @@
                 box-sizing: border-box;
             }
             
-            /* Mobile: First row - Icon and Name side by side (already wrapped together) */
-            .list-item > div:nth-child(1) {
+            /* Mobile: First row - Icon and Name side by side with dark gray background */
+            .list-item {
+                overflow: hidden !important;
+                max-width: 100% !important;
+            }
+            
+            .list-item > div:first-child {
                 display: flex !important;
                 align-items: center;
                 gap: 10px;
-                margin-bottom: 12px;
-                width: 100%;
+                margin-bottom: 12px !important;
+                width: calc(100% + 24px) !important;
+                max-width: calc(100% + 24px) !important;
+                background-color: #374151 !important; /* Dark gray background */
+                padding: 8px 12px !important;
+                border-radius: 6px;
+                margin-left: -12px !important;
+                margin-right: -12px !important;
+                margin-top: -8px !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+            }
+            
+            /* Ensure white text on mobile too */
+            .list-item > div:first-child .type-icon,
+            .list-item > div:first-child .item-name,
+            .list-item > div:first-child .disabled-link {
+                color: #ffffff !important;
             }
             
             /* Match Score row */
@@ -684,9 +751,6 @@
         <div class="container">
             <div class="search-container">
             <div class="search-input-wrapper">
-                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
                 <input 
                     type="text" 
                     id="search-input" 
