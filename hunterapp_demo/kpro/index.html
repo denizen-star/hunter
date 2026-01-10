@@ -42,16 +42,26 @@
             box-sizing: border-box;
         }
         
+        html {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
         body {
             font-family: var(--font-family);
             background: var(--bg-secondary);
             margin: 0;
             padding: 0;
+            width: 100%;
+            overflow-x: hidden;
             color: var(--text-primary);
         }
         
         .main-wrapper {
             margin-left: 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         
         .container {
@@ -187,6 +197,9 @@
             border-radius: var(--radius-md);
             border: 1px solid var(--border-primary);
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .list-header {
@@ -214,6 +227,13 @@
         .list-items {
             max-height: 70vh;
             overflow-y: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .inactive-list-items {
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .list-item {
@@ -274,9 +294,23 @@
         
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
+            html, body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .main-wrapper {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
             .container {
                 width: 100%;
+                max-width: 100%;
                 padding: 12px;
+                margin: 0;
             }
             
             .hero-header {
@@ -284,6 +318,8 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
+                width: 100%;
+                max-width: 100%;
             }
             
             .hero-header-content-wrapper {
@@ -322,16 +358,23 @@
             .search-container {
                 padding: var(--space-md);
                 margin-bottom: var(--space-md);
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .search-input-wrapper {
                 flex-direction: column;
                 gap: var(--space-sm);
+                width: 100%;
+                max-width: 100%;
             }
             
             .search-input {
                 width: 100%;
+                max-width: 100%;
                 padding: 10px 12px;
+                box-sizing: border-box;
             }
             
             .list-header {
@@ -340,6 +383,15 @@
             
             .list-items {
                 max-height: none;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .inactive-list-items {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .list-item {
@@ -350,6 +402,9 @@
                 border-bottom: 1px solid var(--border-primary);
                 cursor: default;
                 gap: 0 !important;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             /* Mobile: First row - Icon and Name side by side (already wrapped together) */
@@ -440,25 +495,55 @@
             .results-info {
                 font-size: 13px;
                 margin-bottom: var(--space-sm);
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .list-container {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .inactive-section {
                 margin-top: var(--space-lg) !important;
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .inactive-section h3 {
                 font-size: 14px !important;
                 margin-bottom: var(--space-sm) !important;
+                width: 100%;
+                box-sizing: border-box;
             }
         }
         
         @media (max-width: 480px) {
+            html, body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            .main-wrapper {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
             .container {
+                width: 100%;
+                max-width: 100%;
                 padding: 8px;
+                margin: 0;
             }
             
             .hero-header {
                 padding: 8px;
+                width: 100%;
+                max-width: 100%;
             }
             
             .hero-header h1 {
@@ -593,10 +678,6 @@
                         <p class="hero-header-subtitle">Search and filter all your job applications and networking contacts in one place</p>
                     </div>
                 </div>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <a href="/new-application" class="hero-header-action-link">New Application</a>
-                <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
             </div>
         </div>
         
