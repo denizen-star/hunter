@@ -60,6 +60,3 @@ migration_report_*.json
 
 # Logs
 *.log
-
-# Static search output (generated files)
-static_search/

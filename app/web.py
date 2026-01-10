@@ -10,6 +10,9 @@ from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from app.services.resume_manager import ResumeManager
 from app.services.job_processor import JobProcessor
@@ -23,7 +26,7 @@ from app.services.networking_document_generator import NetworkingDocumentGenerat
 from app.services.activity_log_service import ActivityLogService
 from app.services.contact_count_cache import ContactCountCache
 from app.utils.datetime_utils import format_for_display
-from app.utils.file_utils import get_project_root, get_data_path
+from app.utils.file_utils import get_project_root, get_data_path, load_yaml
 from app.utils.cache_utils import is_cache_stale, get_cached_json, save_cached_json
 from app.utils.input_sanitizer import sanitize_text, sanitize_email, sanitize_phone
 
@@ -325,6 +328,390 @@ def networking_dashboard():
 def search_page():
     """Search page for applications and contacts"""
     return render_template('search.html')
+
+
+def send_prd_push_notification(success: bool, message: str, git_pushed: bool = False, git_committed: bool = False, git_error: str = None):
+    """Send email notification for Prd Push using the same config as daily digest"""
+    try:
+        # Load email configuration from digest_config.yaml (same as daily digest)
+        config_path = get_project_root() / 'config' / 'digest_config.yaml'
+        if not config_path.exists():
+            return False
+        
+        config = load_yaml(config_path)
+        email_config = config.get('email', {})
+        
+        if not email_config.get('enabled', False):
+            return False
+        
+        # Build email content
+        subject = "Prd Push - Static Search Page Generation"
+        
+        if success:
+            if git_pushed:
+                status_emoji = "✅"
+                status_text = "SUCCESSFUL"
+                body_text = f"""
+Static search page generated successfully!
+
+{status_emoji} Committed and pushed to GitHub
+{status_emoji} Netlify will auto-deploy shortly
+
+The page will be available at:
+https://hunter.kervinapps.com/kpro
+
+Details:
+{message}
+"""
+            elif git_committed:
+                status_emoji = "⚠️"
+                status_text = "PARTIAL SUCCESS"
+                body_text = f"""
+Static search page generated successfully.
+
+{status_emoji} Committed to git (push failed)
+
+You may need to push manually:
+git push origin main
+
+Git error: {git_error or 'Unknown error'}
+
+Details:
+{message}
+"""
+            elif git_error and ('already up to date' in git_error.lower() or 'no changes detected' in git_error.lower()):
+                status_emoji = "✅"
+                status_text = "UP TO DATE"
+                body_text = f"""
+Static search page generated successfully.
+
+{status_emoji} File generated and copied
+{status_emoji} File is already up to date in git
+{status_emoji} Page should be live at: https://hunter.kervinapps.com/kpro
+
+Details:
+{message}
+"""
+            else:
+                status_emoji = "⚠️"
+                status_text = "GENERATED (GIT FAILED)"
+                body_text = f"""
+Static search page generated successfully.
+
+{status_emoji} File copied to hunterapp_demo/kpro/index.html
+
+Git operations failed. You may need to commit and push manually:
+git add hunterapp_demo/kpro/index.html
+git commit -m "Update kpro"
+git push origin main
+
+Git error: {git_error or 'Unknown error'}
+
+Details:
+{message}
+"""
+        else:
+            status_emoji = "❌"
+            status_text = "FAILED"
+            body_text = f"""
+Static search page generation failed.
+
+{status_emoji} Error: {message}
+
+Please check the server logs for more details.
+"""
+        
+        # Add HTML body with basic formatting
+        html_content = f"""
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .status {{ font-size: 18px; font-weight: bold; margin: 20px 0; }}
+                .details {{ background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+                .url {{ color: #0066cc; text-decoration: none; }}
+                pre {{ background-color: #f9f9f9; padding: 10px; border-left: 3px solid #ccc; overflow-x: auto; white-space: pre-wrap; }}
+            </style>
+        </head>
+        <body>
+            <h2>{subject}</h2>
+            <div class="status">{status_emoji} Status: {status_text}</div>
+            <div class="details">
+                <pre>{body_text}</pre>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Create multipart message with both HTML and plain text
+        msg = MIMEMultipart('alternative')
+        msg['From'] = email_config['sender_email']
+        msg['To'] = email_config['recipient_email']
+        msg['Subject'] = f"{subject} - {status_text}"
+        
+        # Add plain text version
+        part1 = MIMEText(body_text, 'plain')
+        # Add HTML version
+        part2 = MIMEText(html_content, 'html')
+        
+        msg.attach(part1)
+        msg.attach(part2)
+        
+        # Send email
+        smtp_port = email_config.get('smtp_port', 587)
+        
+        # Use SSL for port 465, TLS for port 587
+        if smtp_port == 465:
+            server = smtplib.SMTP_SSL(email_config['smtp_server'], smtp_port)
+        else:
+            server = smtplib.SMTP(email_config['smtp_server'], smtp_port)
+            server.starttls()
+        
+        server.login(email_config['sender_email'], email_config['sender_password'])
+        server.send_message(msg)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Error sending Prd Push notification email: {e}")
+        return False
+
+
+@app.route('/api/static-search/generate', methods=['POST'])
+def generate_static_search():
+    """Generate static search page (kpro.html) with real data"""
+    try:
+        import subprocess
+        import sys
+        from pathlib import Path
+        
+        # Get the script path
+        script_path = get_project_root() / 'scripts' / 'generate_static_search.py'
+        
+        if not script_path.exists():
+            return jsonify({
+                'success': False,
+                'error': 'Generator script not found'
+            }), 404
+        
+        # Run the generator script
+        result = subprocess.run(
+            [sys.executable, str(script_path), 'kpro.html'],
+            capture_output=True,
+            text=True,
+            cwd=str(get_project_root()),
+            timeout=60
+        )
+        
+        if result.returncode == 0:
+            output_path = get_project_root() / 'static_search' / 'kpro.html'
+            
+            # Copy to deployment directory for Netlify
+            deploy_dir = get_project_root() / 'hunterapp_demo'
+            deploy_path = None
+            kpro_index_path = None
+            git_commit_success = False
+            git_push_success = False
+            git_error_msg = None
+            
+            if output_path.exists() and deploy_dir.exists():
+                import shutil
+                from pathlib import Path
+                
+                # Create kpro directory and copy as index.html for /kpro URL access
+                kpro_dir = deploy_dir / 'kpro'
+                kpro_dir.mkdir(exist_ok=True)
+                kpro_index_path = kpro_dir / 'index.html'
+                shutil.copy2(output_path, kpro_index_path)
+                
+                deploy_path = kpro_index_path
+                
+                # Commit and push to GitHub for Netlify deployment
+                try:
+                    # Check if file is tracked and has changes
+                    rel_path = 'hunterapp_demo/kpro/index.html'
+                    
+                    # First check if file has changes
+                    status_result = subprocess.run(
+                        ['git', 'status', '--porcelain', rel_path],
+                        cwd=str(get_project_root()),
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                    
+                    # Stage the file
+                    stage_result = subprocess.run(
+                        ['git', 'add', rel_path],
+                        cwd=str(get_project_root()),
+                        capture_output=True,
+                        text=True,
+                        timeout=10
+                    )
+                    
+                    if stage_result.returncode == 0:
+                        # Check again if file is now staged
+                        staged_status = subprocess.run(
+                            ['git', 'status', '--porcelain', rel_path],
+                            cwd=str(get_project_root()),
+                            capture_output=True,
+                            text=True,
+                            timeout=10
+                        )
+                        
+                        # If file is staged (status starts with 'A' or 'M'), commit it
+                        if staged_status.returncode == 0 and staged_status.stdout.strip() and (staged_status.stdout.strip().startswith('A') or staged_status.stdout.strip().startswith('M')):
+                            # Commit the file
+                            commit_result = subprocess.run(
+                                ['git', 'commit', '-m', 'Update kpro search page with latest data'],
+                                cwd=str(get_project_root()),
+                                capture_output=True,
+                                text=True,
+                                timeout=10
+                            )
+                            
+                            if commit_result.returncode == 0:
+                                git_commit_success = True
+                                
+                                # Push to origin main
+                                push_result = subprocess.run(
+                                    ['git', 'push', 'origin', 'main'],
+                                    cwd=str(get_project_root()),
+                                    capture_output=True,
+                                    text=True,
+                                    timeout=30
+                                )
+                                
+                                if push_result.returncode == 0:
+                                    git_push_success = True
+                                else:
+                                    git_error_msg = push_result.stderr or push_result.stdout or 'Push failed'
+                            else:
+                                git_error_msg = commit_result.stderr or commit_result.stdout or 'Commit failed'
+                                # If commit failed, unstage the file
+                                subprocess.run(['git', 'reset', 'HEAD', rel_path], cwd=str(get_project_root()), capture_output=True, timeout=5)
+                        else:
+                            # No changes to commit (file is already up to date)
+                            git_error_msg = "No changes detected - file is already up to date with latest data"
+                            # Unstage if it was staged
+                            subprocess.run(['git', 'reset', 'HEAD', rel_path], cwd=str(get_project_root()), capture_output=True, timeout=5)
+                    else:
+                        git_error_msg = stage_result.stderr or stage_result.stdout or 'Git add failed'
+                except subprocess.TimeoutExpired:
+                    git_error_msg = "Git operation timed out"
+                except Exception as e:
+                    git_error_msg = str(e)
+            
+            # Configure git to ignore changes to source file
+            try:
+                subprocess.run(
+                    ['git', 'update-index', '--skip-worktree', 'static_search/kpro.html'],
+                    cwd=str(get_project_root()),
+                    capture_output=True,
+                    timeout=10
+                )
+            except Exception:
+                pass  # Git command is optional
+            
+            # Build success message
+            if git_push_success:
+                message = 'Static search page generated, copied to deployment directory, and pushed to GitHub! Netlify will auto-deploy shortly.'
+            elif git_commit_success:
+                message = 'Static search page generated and committed. Push to GitHub failed - you may need to push manually.'
+                if git_error_msg:
+                    message += f'\nGit error: {git_error_msg[:200]}'
+            elif git_error_msg and 'already up to date' in git_error_msg.lower():
+                message = 'Static search page generated and copied. File is already up to date in git - no changes to commit. Page should be live at hunter.kervinapps.com/kpro'
+            elif deploy_path:
+                message = 'Static search page generated and copied to deployment directory. Git commit/push failed - you may need to commit and push manually.'
+                if git_error_msg:
+                    message += f'\nGit error: {git_error_msg[:200]}'
+            else:
+                message = 'Static search page generated successfully. Deployment directory not found - check hunterapp_demo exists.'
+            
+            # Send email notification using same config as daily digest
+            email_sent = False
+            try:
+                email_sent = send_prd_push_notification(
+                    success=True,
+                    message=message,
+                    git_pushed=git_push_success,
+                    git_committed=git_commit_success,
+                    git_error=git_error_msg
+                )
+            except Exception as e:
+                print(f"Error sending Prd Push notification email: {e}")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Static search page generated successfully. Email notification sent.' if email_sent else 'Static search page generated successfully.',
+                'email_sent': email_sent,
+                'output_path': str(output_path),
+                'deploy_path': str(deploy_path) if deploy_path else None,
+                'kpro_path': str(kpro_index_path) if kpro_index_path else None,
+                'git_committed': git_commit_success,
+                'git_pushed': git_push_success,
+                'git_error': git_error_msg if git_error_msg else None
+            })
+        else:
+            error_message = result.stderr or 'Generation failed'
+            
+            # Send email notification for failure
+            email_sent = False
+            try:
+                email_sent = send_prd_push_notification(
+                    success=False,
+                    message=error_message,
+                    git_error=result.stdout or 'No additional output'
+                )
+            except Exception as e:
+                print(f"Error sending Prd Push failure notification email: {e}")
+            
+            return jsonify({
+                'success': False,
+                'error': error_message,
+                'email_sent': email_sent,
+                'output': result.stdout
+            }), 500
+            
+    except subprocess.TimeoutExpired:
+        error_message = 'Generation timed out after 60 seconds'
+        
+        # Send email notification for timeout
+        email_sent = False
+        try:
+            email_sent = send_prd_push_notification(
+                success=False,
+                message=error_message
+            )
+        except Exception as email_err:
+            print(f"Error sending Prd Push timeout notification email: {email_err}")
+        
+        return jsonify({
+            'success': False,
+            'error': error_message,
+            'email_sent': email_sent
+        }), 500
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        error_message = str(e)
+        
+        # Send email notification for exception
+        email_sent = False
+        try:
+            email_sent = send_prd_push_notification(
+                success=False,
+                message=error_message
+            )
+        except Exception as email_err:
+            print(f"Error sending Prd Push exception notification email: {email_err}")
+        
+        return jsonify({
+            'success': False,
+            'error': error_message,
+            'email_sent': email_sent
+        }), 500
 
 
 @app.route('/api/dashboard-stats', methods=['GET'])

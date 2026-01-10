@@ -5,9 +5,12 @@ This script fetches data from the Flask app API and generates a static HTML file
 that can be deployed to Netlify at hunter.kervinapps.com/search
 
 Usage:
-    python3 scripts/generate_static_search.py
+    python3 scripts/generate_static_search.py [filename]
     OR
-    ./scripts/generate_static_search.py
+    ./scripts/generate_static_search.py [filename]
+    
+    Default filename: search.html
+    Example: python3 scripts/generate_static_search.py kpro.html
 
 Requirements:
     - Flask app must be running on http://localhost:51003
@@ -82,6 +85,11 @@ def generate_static_html(items, template):
 
 def main():
     """Main function to generate static search page"""
+    import sys
+    
+    # Allow custom filename via command line argument
+    output_filename = sys.argv[1] if len(sys.argv) > 1 else 'search.html'
+    
     print("=" * 60)
     print("Static Search Page Generator")
     print("=" * 60)
@@ -108,7 +116,7 @@ def main():
     output_dir.mkdir(exist_ok=True)
     
     # Write output file
-    output_path = output_dir / 'search.html'
+    output_path = output_dir / output_filename
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html)
     
@@ -122,7 +130,7 @@ def main():
     print()
     print("Next steps:")
     print(f"1. Review the generated file: {output_path}")
-    print("2. Deploy static_search/search.html to Netlify at hunter.kervinapps.com/search")
+    print(f"2. Deploy to Netlify at hunter.kervinapps.com/{output_filename.replace('.html', '')}")
     print("=" * 60)
 
 

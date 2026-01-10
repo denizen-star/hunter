@@ -358,6 +358,35 @@
             background-color: var(--accent-blue-light);
             color: var(--accent-blue-hover);
         }
+        
+        .prd-push-button {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-family);
+        }
+        
+        .prd-push-button:hover {
+            background: var(--accent-blue-hover);
+        }
+        
+        .prd-push-button:active {
+            transform: translateY(1px);
+        }
+        
+        .prd-push-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -375,6 +404,12 @@
                 </div>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="prd-push-button" id="prd-push-btn" onclick="prdPush()" title="Generate and push static search page to production">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    Prd Push
+                </button>
                 <a href="/new-application" class="hero-header-action-link">New Application</a>
                 <a href="/new-networking-contact" class="hero-header-action-link">New Contact</a>
             </div>
@@ -633,6 +668,94 @@
         
         // Load data on page load
         loadData();
+        
+        // Prd Push function - generate and push static search page
+        async function prdPush() {
+            const btn = document.getElementById('prd-push-btn');
+            const originalText = btn.innerHTML;
+            
+            // Disable button and show loading state
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Generating...
+            `;
+            
+            try {
+                const response = await fetch('/api/static-search/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    btn.innerHTML = `
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Generated!
+                    `;
+                    btn.style.background = '#10b981';
+                    
+                    // Simple success message - details are sent via email
+                    console.log('Prd Push successful:', data.message);
+                    if (data.email_sent) {
+                        console.log('Email notification sent');
+                    }
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    btn.innerHTML = `
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Failed
+                    `;
+                    btn.style.background = '#ef4444';
+                    
+                    // Log error - details are sent via email
+                    console.error('Prd Push failed:', data.error || 'Unknown error');
+                    if (data.email_sent) {
+                        console.log('Failure email notification sent');
+                    }
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Error generating static search page:', error);
+                btn.innerHTML = `
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="stroke-width: 2;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Error
+                `;
+                btn.style.background = '#ef4444';
+                
+                console.error('Prd Push error:', error.message);
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
     </script>
 </body>
 </html>
