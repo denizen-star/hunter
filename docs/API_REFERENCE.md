@@ -345,6 +345,101 @@ View the generated HTML dashboard (opens in browser).
 
 ---
 
+### Static Search / PRD Push
+
+#### Generate Static Search Page
+```
+POST /api/static-search/generate
+```
+
+Generate a static HTML search page containing all applications and networking contacts, then deploy it to production.
+
+**What This Endpoint Does:**
+1. Fetches all applications and contacts from the API
+2. Generates static HTML file with embedded JSON data
+3. Copies file to `hunterapp_demo/kpro/index.html`
+4. Commits and pushes to GitHub (if git is configured)
+5. Sends email notification (if email is configured)
+
+**Response (Success):**
+```json
+{
+  "success": true,
+  "message": "Static search page generated successfully. Email notification sent.",
+  "email_sent": true,
+  "output_path": "/path/to/static_search/kpro.html",
+  "deploy_path": "/path/to/hunterapp_demo/kpro/index.html",
+  "kpro_path": "/path/to/hunterapp_demo/kpro/index.html",
+  "git_committed": true,
+  "git_pushed": true,
+  "git_error": null
+}
+```
+
+**Response (Partial Success - Git Push Failed):**
+```json
+{
+  "success": true,
+  "message": "Static search page generated and committed. Push to GitHub failed - you may need to push manually.",
+  "email_sent": true,
+  "output_path": "/path/to/static_search/kpro.html",
+  "deploy_path": "/path/to/hunterapp_demo/kpro/index.html",
+  "kpro_path": "/path/to/hunterapp_demo/kpro/index.html",
+  "git_committed": true,
+  "git_pushed": false,
+  "git_error": "Git push failed: authentication required"
+}
+```
+
+**Response (Failure):**
+```json
+{
+  "success": false,
+  "error": "Generation script not found",
+  "email_sent": false,
+  "output": ""
+}
+```
+
+**Prerequisites:**
+- Flask app must be running on `http://localhost:51003`
+- Generator script must exist at `scripts/generate_static_search.py`
+- Git repository must be initialized (for automatic deployment)
+- Email configuration optional (see **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)**)
+
+**Timeout:** 60 seconds maximum
+
+**Email Notifications:**
+- If email is configured in `config/digest_config.yaml`, notifications are sent for:
+  - Successful generation and deployment
+  - Partial success (generated but push failed)
+  - Already up to date (no changes detected)
+  - Generation failures
+- See **[PRD_PUSH_GUIDE.md](PRD_PUSH_GUIDE.md)** for detailed setup instructions
+
+**Example cURL:**
+```bash
+curl -X POST http://localhost:51003/api/static-search/generate
+```
+
+**Example JavaScript:**
+```javascript
+const response = await fetch('http://localhost:51003/api/static-search/generate', {
+  method: 'POST'
+});
+
+const data = await response.json();
+if (data.success) {
+  console.log(`Generated: ${data.output_path}`);
+  console.log(`Deployed: ${data.deploy_path}`);
+  if (data.git_pushed) {
+    console.log('Successfully pushed to GitHub!');
+  }
+}
+```
+
+---
+
 ### File Serving
 
 #### Serve Application Files
@@ -451,6 +546,9 @@ curl -X PUT http://localhost:51003/api/applications/<APP_ID>/status \
 
 # List applications
 curl http://localhost:51003/api/applications
+
+# Generate static search page (PRD Push)
+curl -X POST http://localhost:51003/api/static-search/generate
 ```
 
 ### JavaScript (fetch)
@@ -496,5 +594,9 @@ API version is not included in URL paths. Breaking changes will be announced in 
 
 ---
 
-**Need Help?** See [Troubleshooting Guide](TROUBLESHOOTING.md) or [User Guide](USER_GUIDE.md)
+**Need Help?** 
+- [Troubleshooting Guide](TROUBLESHOOTING.md)
+- [User Guide](USER_GUIDE.md)
+- [PRD Push Guide](PRD_PUSH_GUIDE.md)
+- [Email Setup Guide](EMAIL_SETUP_GUIDE.md)
 

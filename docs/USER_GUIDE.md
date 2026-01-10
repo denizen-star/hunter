@@ -10,7 +10,9 @@ Complete guide to using Job Hunter for managing your job applications.
 4. [Understanding the Results](#understanding-the-results)
 5. [Managing Applications](#managing-applications)
 6. [Dashboard Overview](#dashboard-overview)
-7. [Best Practices](#best-practices)
+7. [Daily Digest](#daily-digest)
+8. [PRD Push - Static Search Page Deployment](#prd-push---static-search-page-deployment)
+9. [Best Practices](#best-practices)
 
 ## Getting Started
 
@@ -278,6 +280,133 @@ data/applications/<Company>-<JobTitle>/
 
 ### Creating New Application from Dashboard
 Click "+ New Application" to return to main form
+
+## Daily Digest
+
+Job Hunter can automatically generate daily digest reports that summarize your job hunting activity, including status changes, new applications, and analytics.
+
+### Generating a Daily Digest
+
+The daily digest can be generated manually or automated:
+
+```bash
+# Generate daily digest manually
+python3 scripts/generate_daily_digest.py
+```
+
+This creates a markdown file in `data/output/digests/` with today's date, containing:
+- Summary of activity since last digest
+- Status changes (new applications, status updates)
+- Analytics and metrics
+- List of all current applications
+- Networking contacts updates (if applicable)
+
+### Email Configuration
+
+To receive daily digests via email, you need to configure email settings. See the **[Email Setup Guide](EMAIL_SETUP_GUIDE.md)** for detailed instructions on setting up:
+
+- Zoho Mail (recommended)
+- Gmail
+- Outlook/Hotmail
+- Yahoo Mail
+- Custom SMTP servers
+
+**Quick Setup Steps:**
+
+1. Copy the sample configuration file:
+   ```bash
+   cp config/digest_config.yaml.example config/digest_config.yaml
+   ```
+
+2. Edit `config/digest_config.yaml` with your email settings
+
+3. Follow the detailed instructions in **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** to:
+   - Enable IMAP access in your email provider
+   - Generate app-specific passwords (if 2FA enabled)
+   - Configure SMTP server settings
+   - Test email delivery
+
+4. Generate and test:
+   ```bash
+   python3 scripts/generate_daily_digest.py
+   ```
+
+### Digest Contents
+
+The daily digest includes:
+- **Activity Summary**: New applications created, status updates, notes added
+- **Status Changes**: All applications that changed status since last digest
+- **Analytics**: Match score distribution, application counts by status
+- **Application List**: Quick reference of all active applications
+- **Networking Updates**: New contacts added, research completed (if applicable)
+
+### Automating Daily Digest
+
+You can set up a cron job (macOS/Linux) or Task Scheduler (Windows) to automatically generate and email the digest daily. See **[DAILY_DIGEST_SETUP.md](DAILY_DIGEST_SETUP.md)** for automation instructions.
+
+## PRD Push - Static Search Page Deployment
+
+PRD Push ("Production Push") allows you to generate a static HTML search page containing all your applications and networking contacts, then automatically deploy it to production via GitHub and Netlify.
+
+### What is PRD Push?
+
+PRD Push generates a fully static HTML page with embedded data that can be deployed without a backend server. This is useful for:
+- Creating a public searchable view of your applications and contacts
+- Sharing your job search progress
+- Deploying to static hosting services like Netlify
+
+### How to Use PRD Push
+
+**Via Web Interface:**
+1. Navigate to the search page: `http://localhost:51003/search`
+2. Click the "Prd Push" button
+3. Wait 30-60 seconds for processing
+4. Check email for deployment status (if email is configured)
+
+**Via API:**
+```bash
+curl -X POST http://localhost:51003/api/static-search/generate
+```
+
+### Configuration Requirements
+
+PRD Push uses the **same email configuration** as the daily digest:
+
+1. **Configure Email** (optional but recommended for notifications):
+   - Follow the **[Email Setup Guide](EMAIL_SETUP_GUIDE.md)** to configure email
+   - PRD Push will send status notifications using the same email settings
+
+2. **Git Setup** (required for automatic deployment):
+   - Ensure your repository is a git repository
+   - Configure remote: `git remote add origin https://github.com/your-username/hunter.git`
+   - Ensure you have push access to the `main` branch
+
+3. **Netlify Setup** (optional, for public deployment):
+   - Connect your GitHub repository to Netlify
+   - Configure build directory as `hunterapp_demo`
+   - Page will be available at: `https://your-domain.com/kpro`
+
+### What Gets Generated
+
+The PRD Push process:
+1. Fetches all applications and networking contacts from the API
+2. Generates static HTML file with embedded JSON data
+3. Copies to `hunterapp_demo/kpro/index.html`
+4. Commits and pushes to GitHub automatically
+5. Triggers Netlify auto-deployment (if configured)
+6. Sends email notification with status
+
+### Email Notifications
+
+You'll receive email notifications about:
+- **Success**: Page generated, committed, and pushed successfully
+- **Partial Success**: Generated and committed, but push failed (manual push needed)
+- **Up to Date**: No changes detected, page already current
+- **Failure**: Generation or deployment failed with error details
+
+### Detailed Documentation
+
+For complete setup instructions, troubleshooting, and advanced usage, see the **[PRD Push Guide](PRD_PUSH_GUIDE.md)**.
 
 ## Best Practices
 

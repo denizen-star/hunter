@@ -1,0 +1,67 @@
+# Daily Digest and PRD Push Email Configuration
+# Copy this file to digest_config.yaml and fill in your actual values
+#
+# This configuration is used for:
+# - Daily Digest email delivery
+# - PRD Push (static search page deployment) email notifications
+#
+# Email settings (optional but recommended)
+# Zoho Mail Setup: https://www.zoho.com/mail/help/zoho-smtp.html
+# For detailed setup instructions, see: docs/EMAIL_SETUP_GUIDE.md
+# 
+# For personal accounts: smtp.zoho.com
+# For organization accounts: smtppro.zoho.com
+# Port 587 (TLS) recommended, or 465 (SSL)
+# If 2FA enabled, generate app-specific password in Settings > Account Security
+email:
+  enabled: false  # Set to true to enable email delivery for daily digest and PRD Push notifications
+  smtp_server: smtp.zoho.com  # Use smtppro.zoho.com for organization accounts, or smtp.zohocloud.ca for Canadian data center
+  smtp_port: 587  # Use 587 for TLS (recommended) or 465 for SSL
+  sender_email: "your-email@zoho.com"  # Your Zoho Mail address (e.g., your-email@zoho.com or your-email@yourdomain.com)
+  sender_password: "your-app-specific-password"  # App-specific password if 2FA enabled, or regular password if 2FA is not enabled
+  recipient_email: "your-email@zoho.com"  # Where to send the digest (can be same as sender or different)
+  subject: "Daily Job Hunt Digest"
+
+# Output options
+output:
+  include_skills_analysis: false  # Set to true to include skills gap analysis (slower)
+  include_full_analytics: true  # Include full analytics metrics
+
+# Email Configuration Examples:
+#
+# For Personal Zoho Mail (e.g., username@zoho.com or username@zoho.ca):
+#   smtp_server: smtp.zoho.com
+#   smtp_port: 587
+#   sender_email: "your-email@zoho.com"
+#
+# For Organization/Enterprise Zoho Mail (e.g., you@yourdomain.com):
+#   smtp_server: smtppro.zoho.com
+#   smtp_port: 587
+#   sender_email: "your-email@yourdomain.com"
+#
+# For Canadian Data Center (mail.zohocloud.ca):
+#   smtp_server: smtp.zoho.com  # Standard Zoho SMTP works for all regions
+#   smtp_port: 587
+#   sender_email: "your-email@yourdomain.ca"
+#
+# For Gmail:
+#   smtp_server: smtp.gmail.com
+#   smtp_port: 587
+#   sender_email: "your-email@gmail.com"
+#   sender_password: "your-app-specific-password"  # REQUIRED: Must use app password, not regular password
+#
+# For Outlook/Hotmail:
+#   smtp_server: smtp-mail.outlook.com
+#   smtp_port: 587
+#   sender_email: "your-email@outlook.com"
+#
+# For Yahoo Mail:
+#   smtp_server: smtp.mail.yahoo.com
+#   smtp_port: 587
+#   sender_email: "your-email@yahoo.com"
+#   sender_password: "your-app-specific-password"  # REQUIRED: Must use app password
+#
+# Related Documentation:
+# - docs/EMAIL_SETUP_GUIDE.md - Complete email setup instructions and troubleshooting
+# - docs/PRD_PUSH_GUIDE.md - Guide for PRD Push functionality and deployment
+# - docs/DAILY_DIGEST_SETUP.md - Guide for daily digest automation

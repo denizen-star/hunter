@@ -22,7 +22,8 @@ Welcome to the comprehensive documentation for Job Hunter - an AI-powered job ap
 - **[CUSTOM_RESUME_GUIDE.md](CUSTOM_RESUME_GUIDE.md)** - How to manage and customize your resume
 - **[DAILY_DIGEST_SETUP.md](DAILY_DIGEST_SETUP.md)** - Set up automated daily digest emails/reports
 - **[DAILY_DIGEST_QUICK_REFERENCE.md](DAILY_DIGEST_QUICK_REFERENCE.md)** - Quick reference for daily digest
-- **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** - Email configuration for digest delivery
+- **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** - Email configuration for digest delivery and PRD Push notifications
+- **[PRD_PUSH_GUIDE.md](PRD_PUSH_GUIDE.md)** - Guide for deploying static search pages to production
 
 ### 🔧 **Technical Documentation**
 - **[TECHNICAL_SPECIFICATION.md](TECHNICAL_SPECIFICATION.md)** - Complete technical specification and architecture

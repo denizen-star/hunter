@@ -354,6 +354,160 @@ export LC_ALL=en_US.UTF-8
 
 ---
 
+### 11. PRD Push / Static Search Page Generation Fails
+
+**Symptoms:**
+- "Prd Push" button doesn't work
+- Error: "Generation script not found"
+- Error: "Could not connect to Flask app"
+- Git push fails
+- Email notifications not sending
+
+**Solutions:**
+
+**Check Flask App is Running:**
+```bash
+# Verify Flask app is running
+curl http://localhost:51003/api/check-ollama
+
+# If not running, start it:
+python -m app.web
+```
+
+**Verify Generator Script Exists:**
+```bash
+ls -la scripts/generate_static_search.py
+# Should exist and be executable
+```
+
+**Check API Endpoint:**
+```bash
+# Test the endpoint directly
+curl -X POST http://localhost:51003/api/static-search/generate
+```
+
+**Git Push Issues:**
+
+If git push fails, verify:
+```bash
+# Check git remote is configured
+git remote -v
+
+# Check branch name
+git branch
+
+# Verify authentication (for HTTPS)
+git push origin main --dry-run
+
+# Manual push if automatic fails:
+cd hunterapp_demo/kpro
+git add index.html
+git commit -m "Update kpro search page with latest data"
+git push origin main
+```
+
+**Email Notifications Not Sending:**
+
+1. Verify email is enabled in `config/digest_config.yaml`:
+   ```yaml
+   email:
+     enabled: true
+   ```
+
+2. Follow **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** to configure email properly
+
+3. Test email configuration with daily digest:
+   ```bash
+   python3 scripts/generate_daily_digest.py
+   ```
+
+4. Check server logs for email errors in terminal
+
+**"No changes detected" Message:**
+
+This is normal! The generated file is identical to the version already in git. The page is already up to date. This is not an error.
+
+**Generation Timeout:**
+
+If process takes longer than 60 seconds:
+```bash
+# Check Flask app is responsive
+curl http://localhost:51003/api/applications-and-contacts
+
+# Check system resources (RAM, CPU)
+# Large datasets may take longer to process
+```
+
+For detailed PRD Push troubleshooting, see **[PRD_PUSH_GUIDE.md](PRD_PUSH_GUIDE.md)**.
+
+---
+
+### 12. Email Notifications Not Working (Daily Digest / PRD Push)
+
+**Symptoms:**
+- Daily digest emails not sending
+- PRD Push email notifications not received
+- "Authentication failed" errors
+- "Connection refused" errors
+
+**Solutions:**
+
+**Verify Email Configuration:**
+```bash
+# Check config file exists and is properly formatted
+cat config/digest_config.yaml
+
+# Should have:
+# email:
+#   enabled: true
+#   smtp_server: smtp.zoho.com  # or your provider
+#   smtp_port: 587
+#   sender_email: "your-email@example.com"
+#   sender_password: "your-password"
+#   recipient_email: "your-email@example.com"
+```
+
+**For Zoho Mail:**
+- Ensure IMAP Access is enabled in Zoho Mail settings
+- If 2FA is enabled, use app-specific password (not regular password)
+- Verify SMTP server: `smtp.zoho.com` (personal) or `smtppro.zoho.com` (organization)
+
+**For Gmail:**
+- Must use app-specific password (not regular password)
+- Generate app password at: https://myaccount.google.com/apppasswords
+
+**Test Email Configuration:**
+```bash
+# Test with daily digest
+python3 scripts/generate_daily_digest.py
+
+# Check server logs for errors
+# Look for "Error sending email" messages
+```
+
+**Common Errors:**
+
+**"Authentication failed":**
+- Check username/password are correct
+- For Zoho/Gmail with 2FA: Use app-specific password
+- Verify email address is correct (case-sensitive for some providers)
+
+**"Connection refused":**
+- Check internet connection
+- Verify SMTP server and port are correct
+- Some networks block SMTP ports (try different network)
+- Check firewall settings
+
+**Email enabled but not sending:**
+- Verify `enabled: true` in config
+- Check spam/junk folder
+- Verify all email fields are filled in
+- Check server logs for detailed error messages
+
+For detailed email setup, see **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)**.
+
+---
+
 ## Platform-Specific Issues
 
 ### macOS
@@ -480,5 +634,6 @@ Create an issue on GitHub with:
 **Related Documentation:**
 - [Installation Guide](INSTALLATION.md)
 - [User Guide](USER_GUIDE.md)
-- [FAQ](FAQ.md)
+- [Email Setup Guide](EMAIL_SETUP_GUIDE.md)
+- [PRD Push Guide](PRD_PUSH_GUIDE.md)
 

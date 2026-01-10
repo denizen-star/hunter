@@ -154,11 +154,38 @@ Open your browser and go to:
 - **Main UI**: http://localhost:51003
 - **Dashboard**: http://localhost:51003/dashboard
 
+## Step 7: Configure Email (Optional)
+
+Email configuration is used for both **Daily Digest** reports and **PRD Push** notifications. To enable email notifications:
+
+1. **Copy the sample configuration file**:
+   ```bash
+   cp config/digest_config.yaml.example config/digest_config.yaml
+   ```
+
+2. **Edit the configuration**:
+   ```bash
+   # Edit with your preferred text editor
+   nano config/digest_config.yaml
+   # or
+   code config/digest_config.yaml
+   ```
+
+3. **Follow the Email Setup Guide**:
+   - See **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** for detailed instructions
+   - Configure your email provider (Zoho Mail, Gmail, Outlook, etc.)
+   - Set up app-specific passwords if 2FA is enabled
+   - Test email delivery
+
+**Note**: Email configuration is optional. The daily digest can still be generated and saved locally without email delivery. PRD Push will work without email, but you won't receive deployment status notifications.
+
 ## Next Steps
 
 1. **Set up your resume**: Click "📄 Manage Resume" and add your information
 2. **Create your first application**: Click "+ New Application"
 3. **Explore the dashboard**: See all your applications at http://localhost:51003/dashboard
+4. **(Optional) Configure email**: Set up email for daily digest and PRD Push notifications as described above
+5. **(Optional) Set up PRD Push**: Configure git and Netlify for static search page deployment (see **[PRD_PUSH_GUIDE.md](PRD_PUSH_GUIDE.md)**)
 
 ## Troubleshooting Installation
 
